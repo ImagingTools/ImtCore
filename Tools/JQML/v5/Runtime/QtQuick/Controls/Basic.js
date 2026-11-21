@@ -1382,7 +1382,244 @@ class ComboBox extends T.ComboBox {
 }
 defineType(ComboBox, {})
 
+// ---- ToolTip, DialogButtonBox, Dialog, Menu, MenuItem, Drawer ----
+class ToolTip extends T.ToolTip {
+    constructor(parent = null){
+        super(parent)
+        let c = this
+        this.$bind(T.Popup.X, () => (c.parent && c.parent.$isItem ? (c.parent.width - c.implicitWidth) / 2 : 0), null, this)
+        this.$bind(T.Popup.Y, () => -c.implicitHeight - 3, null, this)
+        this.margins = 6
+        this.padding = 6
+        this.closePolicy = 16 | 2 | 8
+    }
+    $makeStyle(){
+        let c = this
+        popupStyle(this, () => make(Rectangle, null, { 'border.color': () => c.palette.dark, color: () => c.palette.toolTipBase }))
+        if(!this.$item.$v[T.Control.CONTENTITEM] || this.$item.$v[T.Control.CONTENTITEM] === this.$item.$ownContent){
+            let text = make(Text, null, { text: () => c.text, wrapMode: Text.Wrap, color: () => c.palette.toolTipText })
+            c.font.$follow(text)
+            this.contentItem = text
+        }
+    }
+}
+defineType(ToolTip, {})
+T.ToolTipAttached.$make = (parent) => new ToolTip(parent)
+
+class DialogButtonBox extends T.DialogButtonBox {
+    constructor(parent = null){
+        super(parent)
+        let c = this
+        this.$bind(Item.IMPLICITWIDTH, () => Math.max(c.implicitBackgroundWidth + c.leftInset + c.rightInset,
+            (c.count === 1 ? c.implicitContentWidth * 2 : c.implicitContentWidth) + c.leftPadding + c.rightPadding), null, this)
+        this.$bind(Item.IMPLICITHEIGHT, () => Math.max(c.implicitBackgroundHeight + c.topInset + c.bottomInset, c.implicitContentHeight + c.topPadding + c.bottomPadding), null, this)
+        this.spacing = 1
+        this.padding = 12
+        this.$bind(T.DialogButtonBox.ALIGNMENT, () => (c.count === 1 ? 2 : 0), null, this)
+    }
+    $makeButton(){ return super.$makeButton() }
+    // delegate: Button { width: control.count === 1 ? control.availableWidth / 2 : undefined }: one button is half wide
+    $updateLayout(){
+        super.$updateLayout()
+        let items = this.$v[T.Container.CONTENTMODEL].$items
+        if(items.length === 1){
+            items[0].$boxWidth = true
+            items[0].$explicit |= 1
+            items[0].$write(Item.WIDTH, this.availableWidth / 2)
+        }
+    }
+    $makeStyle(){
+        let c = this
+        // delegate: Button { } (the standard buttons are made by $makeButton, as this delegate would)
+        if(!this.$v[T.DialogButtonBox.DELEGATE]) this.$plain(T.DialogButtonBox.DELEGATE, new (require('../../QtQml/Component').Component)(null, (parent) => new Button(parent)))
+        this.$styleDelegate(T.Control.CONTENTITEM, () => {
+            let view = make(ListView, null, {
+                model: () => c.contentModel,
+                spacing: () => c.spacing,
+                orientation: ListView.Horizontal,
+                boundsBehavior: 0,
+                snapMode: ListView.SnapToItem,
+            })
+            view.$bind(Item.IMPLICITWIDTH, () => view.contentWidth, null, view)
+            return view
+        })
+        let background = this.$styleDelegate(T.Control.BACKGROUND, () => make(Rectangle, null, { implicitHeight: 40, x: 1, y: 1, color: () => c.palette.window }), -1)
+        if(background){
+            background.$ownSize = 3
+            background.$bind(Item.WIDTH, () => c.width - 2, null, background)
+            background.$bind(Item.HEIGHT, () => c.height - 2, null, background)
+        }
+        // contentWidth: (contentItem as ListView)?.contentWidth
+        this.$bind(T.Container.CONTENTWIDTH, () => (c.contentItem && c.contentItem.contentWidth !== undefined ? c.contentItem.contentWidth : 0), null, this)
+        // the delegate buttons are laid out by a ListView of the content model: the box keeps them sorted when made
+        if(this.$pendingButtons){
+            this.$pendingButtons = false
+            this.$madeOnce = true
+            this.$makeStandardButtons()
+        }
+    }
+}
+defineType(DialogButtonBox, {})
+
+class Dialog extends T.Dialog {
+    constructor(parent = null){
+        super(parent)
+        let c = this, item = this.$item
+        item.$bind(Item.IMPLICITWIDTH, () => Math.max(item.implicitBackgroundWidth + item.leftInset + item.rightInset, item.implicitContentWidth + item.leftPadding + item.rightPadding,
+            item.implicitHeaderWidth, item.implicitFooterWidth), null, item)
+        item.$bind(Item.IMPLICITHEIGHT, () => Math.max(item.implicitBackgroundHeight + item.topInset + item.bottomInset, item.implicitContentHeight + item.topPadding + item.bottomPadding
+            + (item.implicitHeaderHeight > 0 ? item.implicitHeaderHeight + item.spacing : 0) + (item.implicitFooterHeight > 0 ? item.implicitFooterHeight + item.spacing : 0)), null, item)
+        this.padding = 12
+    }
+    $makeStyle(){
+        let c = this, item = this.$item
+        c.$styleDimmer = (modal) => dimmer(c, modal)
+        item.$styleDelegate(T.Control.BACKGROUND, () => make(Rectangle, null, { color: () => c.palette.window, 'border.color': () => c.palette.dark }), -1)
+        if(!item.header){
+            let header = new Label(null)
+            apply(header, {
+                text: () => c.title,
+                visible: () => !!(header.parent && header.parent.parent && header.parent.parent instanceof T.Overlay && c.title),
+                elide: Text.ElideRight,
+                'font.bold': true,
+                padding: 12,
+            })
+            let bg = make(Rectangle, null, { x: 1, y: 1, color: () => c.palette.window })
+            bg.$bind(Item.WIDTH, () => header.width - 2, null, bg)
+            bg.$bind(Item.HEIGHT, () => header.height - 1, null, bg)
+            bg.$ownSize = 3
+            header.background = bg
+            this.header = header
+        }
+        if(!item.footer){
+            let footer = new DialogButtonBox(null)
+            footer.$bind(Item.VISIBLE, () => footer.count > 0, null, footer)
+            this.footer = footer
+        }
+    }
+}
+defineType(Dialog, {})
+
+class MenuItem extends T.MenuItem {
+    constructor(parent = null){
+        super(parent)
+        implicitSize(this, true)
+        this.padding = 6
+        this.spacing = 6
+        this.icon.width = 24
+        this.icon.height = 24
+    }
+    $makeStyle(){
+        let c = this
+        let indicator = this.$styleDelegate(T.AbstractButton.INDICATOR, () => styleImage('check', null, () => c.palette.windowText, { visible: () => c.checked }))
+        if(indicator){
+            indicator.$bind(Item.X, () => (c.mirrored ? c.width - indicator.width - c.rightPadding : c.leftPadding), null, indicator)
+            indicator.$bind(Item.Y, () => c.topPadding + (c.availableHeight - indicator.height) / 2, null, indicator)
+            indicator.$write(Item.IMPLICITWIDTH, 28)
+            indicator.$write(Item.IMPLICITHEIGHT, 28)
+            // source: control.checkable ? check.png : ""
+            indicator.$bind(Image.SOURCE, () => (c.checkable ? IMAGES.check(indicator.color) : ''), null, indicator)
+        }
+        // arrow: ColorImage { visible: control.subMenu; source: arrow-indicator.png when a sub menu }
+        let arrow = this.$styleDelegate(T.MenuItem.ARROW, () => {
+            let image = make(ColorImage, null, { width: 11, height: 18, defaultColor: '#353637', color: () => c.palette.windowText, visible: () => !!c.subMenu })
+            image.$bind(Image.SOURCE, () => (c.subMenu ? svg(11, 18, '<path d="M1 1.2H3L10 9L3 16.8H1V15.3L6.6 9L1 2.7Z" fill="' + image.color + '"/>') : ''), null, image)
+            image.$bind(Item.X, () => (c.mirrored ? c.leftPadding : c.width - image.width - c.rightPadding), null, image)
+            image.$bind(Item.Y, () => c.topPadding + (c.availableHeight - image.height) / 2, null, image)
+            return image
+        })
+        this.$styleDelegate(T.Control.CONTENTITEM, () => iconLabel(c, {
+            leftPadding: () => (!c.mirrored ? (c.checkable && c.indicator ? c.indicator.width + c.spacing : 0) : (c.subMenu && c.arrow ? c.arrow.width + c.spacing : 0)),
+            rightPadding: () => (c.mirrored ? (c.checkable && c.indicator ? c.indicator.width + c.spacing : 0) : (c.subMenu && c.arrow ? c.arrow.width + c.spacing : 0)),
+            alignment: 1,
+            defaultIconColor: () => c.palette.windowText,
+            color: () => c.palette.windowText,
+        }))
+        let background = this.$styleDelegate(T.Control.BACKGROUND, () => make(Rectangle, null, {
+            implicitWidth: 200,
+            implicitHeight: 40,
+            x: 1,
+            y: 1,
+            color: () => (c.down ? c.palette.midlight : c.highlighted ? c.palette.light : 'transparent'),
+            'border.color': () => c.palette.dark,
+            'border.width': 0,
+        }), -1)
+        if(background){
+            background.$ownSize = 3
+            background.$bind(Item.WIDTH, () => c.width - 2, null, background)
+            background.$bind(Item.HEIGHT, () => c.height - 2, null, background)
+        }
+    }
+}
+defineType(MenuItem, {})
+
+class Menu extends T.Menu {
+    constructor(parent = null){
+        super(parent)
+        this.margins = 0
+        this.overlap = 1
+    }
+    $makeStyle(){
+        let c = this
+        // delegate: MenuItem { }
+        if(!this.$v[T.Menu.DELEGATE]) this.$plain(T.Menu.DELEGATE, new (require('../../QtQml/Component').Component)(null, (parent) => new MenuItem(parent)))
+        popupStyle(this, () => make(Rectangle, null, { implicitWidth: 200, implicitHeight: 40, color: () => c.palette.window, 'border.color': () => c.palette.dark }))
+        let view = make(ListView, null, {
+            model: () => c.contentModel,
+            clip: true,
+            currentIndex: () => c.currentIndex,
+        })
+        view.$bind(Item.IMPLICITHEIGHT, () => view.contentHeight, null, view)
+        view.$bind(ListView.INTERACTIVE, () => view.contentHeight + c.topPadding + c.bottomPadding > c.height, null, view)
+        view.ScrollIndicator.vertical = new ScrollIndicator(null)
+        this.contentItem = view
+        // the items take the width of the menu (QQuickMenuPrivate::resizeItems)
+        let resize = () => { for(let item of c.$items()) if(!(item.$explicit & 1)) item.$write(Item.WIDTH, view.width) }
+        engine.connect(view, Item.SIGNAL_widthChanged, resize, null, engine.PRIORITY_NORMAL, this)
+        engine.connect(this.$v[T.Menu.CONTENTMODEL], this.$v[T.Menu.CONTENTMODEL].constructor.SIGNAL_countChanged, resize, null, engine.PRIORITY_NORMAL, this)
+        // the content size is the widest item (QQuickMenu: contentWidth of the ListView of items)
+        view.$bind(Item.IMPLICITWIDTH, () => Math.max(0, ...c.$items().map(i => i.implicitWidth)), null, view)
+    }
+}
+defineType(Menu, {})
+
+class Drawer extends T.Drawer {
+    constructor(parent = null){
+        super(parent)
+        let c = this
+        implicitSize(this.$item)
+        this.$bind(T.Popup.TOPPADDING, () => (c.edge === 8 ? 1 : 0), null, this)
+        this.$bind(T.Popup.LEFTPADDING, () => (c.edge === 4 ? 1 : 0), null, this)
+        this.$bind(T.Popup.RIGHTPADDING, () => (c.edge === 2 ? 1 : 0), null, this)
+        this.$bind(T.Popup.BOTTOMPADDING, () => (c.edge === 1 ? 1 : 0), null, this)
+    }
+    $makeStyle(){
+        let c = this
+        // parent: T.Overlay.overlay
+        let overlay = this.$overlay()
+        if(overlay && this.$parent !== overlay) this.$setParent(overlay)
+        // enter / exit: Transition { SmoothedAnimation { velocity: 5 } }
+        let { Transition } = require('../Transition')
+        if(!this.enter) this.$plain(T.Popup.ENTER, new Transition(this))
+        if(!this.exit) this.$plain(T.Popup.EXIT, new Transition(this))
+        c.$styleDimmer = (modal) => dimmer(c, modal)
+        this.$item.$styleDelegate(T.Control.BACKGROUND, () => {
+            let bg = make(Rectangle, null, { color: () => c.palette.window })
+            let line = make(Rectangle, bg, { color: () => c.palette.dark })
+            let horizontal = () => c.edge === 2 || c.edge === 4
+            line.$bind(Item.WIDTH, () => (horizontal() ? 1 : bg.width), null, line)
+            line.$bind(Item.HEIGHT, () => (horizontal() ? bg.height : 1), null, line)
+            line.$bind(Item.X, () => (c.edge === 2 ? bg.width - 1 : 0), null, line)
+            line.$bind(Item.Y, () => (c.edge === 1 ? bg.height - 1 : 0), null, line)
+            return bg
+        }, -1)
+    }
+}
+defineType(Drawer, {})
+
 module.exports = {
+    Action: T.Action, ActionGroup: T.ActionGroup, ButtonGroup: T.ButtonGroup,
+    ToolTip, DialogButtonBox, Dialog, Menu, MenuItem, Drawer,
     ComboBox,
     Popup, Overlay: T.Overlay,
     TextField, TextArea,

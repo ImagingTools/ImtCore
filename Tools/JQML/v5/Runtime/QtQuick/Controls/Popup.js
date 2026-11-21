@@ -64,6 +64,18 @@ class Overlay extends Item {
         }
     }
     $mouseMove(){}
+    // Escape: the topmost open popup that closes on it (QQuickPopupPrivate::handleEscape)
+    $escape(){
+        for(let popup of this.$stacked().reverse()){
+            if(popup.$v[Popup.CLOSEPOLICY] & CloseOnEscape){
+                if(popup.$closeByEscape) popup.$closeByEscape()
+                else popup.close()
+                return true
+            }
+            if(popup.$v[Popup.MODAL]) return false
+        }
+        return false
+    }
     // a modal popup blocks the hover of the items below it
     $acceptsHover(){ return this.$popups.some(p => p.$v[Popup.MODAL]) }
     $hoverEnter(){}
@@ -95,8 +107,10 @@ class PopupItem extends Page {
     // the font and the palette of the popup pass from the item it is in (QQuickPopupItemPrivate::resolveFont)
     $paletteParent(){ return this.$popup ? this.$popup.$parentItem() : null }
     $keyEvent(event, kind){
-        if(event.key === QtEnums.Key_Escape && kind === 'pressed' && (this.$popup.$v[Popup.CLOSEPOLICY] & CloseOnEscape)){
-            this.$popup.close()
+        let popup = this.$popup
+        if(event.key === QtEnums.Key_Escape && kind === 'pressed' && (popup.$v[Popup.CLOSEPOLICY] & CloseOnEscape)){
+            if(popup.$closeByEscape) popup.$closeByEscape()
+            else popup.close()
             return 1
         }
         return 0
@@ -146,14 +160,15 @@ class Popup extends QtObject {
         if(parent) this.$setParent(parent)
         engine.scheduleComponentComplete(this)
     }
+    // the value of the item: kept, then its notification (bindings it runs write the popup as any write does)
     $pull(id, value){
-        this.$syncing = true
-        try {
-            QtObject.prototype.$write.call(this, id, value)
-        } finally {
-            this.$syncing = false
-        }
+        let old = this.$v[id]
+        if(old === value || (old !== old && value !== value)) return
+        this.$v[id] = value
+        engine.emit(this, this.constructor.$type.props[id].signal, old, value)
     }
+    // a write that keeps the value only (as a control's $plain)
+    $plain(id, value){ this.$pull(id, value) }
     // a write to a forwarded property: the item's (its setter: padding, background...)
     $push(id, value){
         let name = this.constructor.$type.props[id].name
@@ -360,8 +375,13 @@ class Popup extends QtObject {
         if(m.top >= 0 && y < m.top) y = m.top
         item.$write(Item.X, x)
         item.$write(Item.Y, y)
-        this.$pull(Popup.X, x - origin.x)
-        this.$pull(Popup.Y, y - origin.y)
+        this.$setEffective(x - origin.x, y - origin.y)
+    }
+    // effectiveX / effectiveY: what x and y read, with their notifications
+    $setEffective(x, y){
+        let e = this.$effective || (this.$effective = { x: 0, y: 0 })
+        if(e.x !== x){ e.x = x; engine.emit(this, Popup.SIGNAL_xChanged) }
+        if(e.y !== y){ e.y = y; engine.emit(this, Popup.SIGNAL_yChanged) }
     }
     $margins(){
         let v = this.$v, set = this.$marginsSet
@@ -385,8 +405,8 @@ class Popup extends QtObject {
         if(FORWARDED.includes(name)) return this.$push(id, value)
         if(id === Popup.VISIBLE) return this.$setVisible(value)
         if(id === Popup.X || id === Popup.Y){
+            // QQuickPopup::setX: the position asked for; x reads where the popup is (effectiveX, 0 before it is shown)
             this.$requested[id === Popup.X ? 'x' : 'y'] = Number(value) || 0
-            QtObject.prototype.$write.call(this, id, Number(value) || 0)
             return this.$reposition()
         }
         if(id === Popup.FOCUS){
@@ -484,6 +504,19 @@ for(let name of ['Overlay', 'anchors']){
 }
 Object.assign(Popup, { NoAutoClose, CloseOnPressOutside, CloseOnPressOutsideParent, CloseOnReleaseOutside, CloseOnReleaseOutsideParent,
     CloseOnEscape, Item: 0, Window: 1, Native: 2 })
+// x and y read where the popup is (QQuickPopup::x: effectiveX)
+for(let name of ['x', 'y']){
+    let signal = Popup['SIGNAL_' + name + 'Changed']
+    let set = Object.getOwnPropertyDescriptor(Popup.prototype, name).set
+    Object.defineProperty(Popup.prototype, name, {
+        get(){
+            engine.track(this, signal)
+            return this.$effective ? this.$effective[name] : 0
+        },
+        set,
+        configurable: true,
+    })
+}
 // read-only for QML, written by the popup (the item's values)
 for(let name of ['availableWidth', 'availableHeight', 'implicitContentWidth', 'implicitContentHeight', 'implicitBackgroundWidth', 'implicitBackgroundHeight', 'mirrored']){
     let id = Popup[name.toUpperCase()]

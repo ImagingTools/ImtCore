@@ -15,8 +15,8 @@ const SKIP_TYPES = new Set(['Overlay', 'HorizontalHeaderView', 'VerticalHeaderVi
 const SKIP_PROPS = new Set(['locale', 'font', 'palette'])
 // the sizes of a text (an empty one too) depend on the font of the platform: printed on a line of their own (text:), which
 // a v5 build on another platform may print otherwise
-const TEXT_METRICS = new Set(['baselineOffset', 'implicitContentWidth', 'implicitContentHeight', 'implicitLabelHeight', 'implicitLabelWidth', 'implicitWidth', 'implicitHeight'])
-const TEXT_TYPES = new Set(['Label', 'CheckBox', 'RadioButton', 'Switch', 'DelayButton', 'SpinBox', 'GroupBox', 'TextField', 'TextArea', 'ComboBox'])
+const TEXT_METRICS = new Set(['baselineOffset', 'implicitContentWidth', 'implicitContentHeight', 'implicitLabelHeight', 'implicitLabelWidth', 'implicitWidth', 'implicitHeight', 'height', 'contentHeight', 'availableHeight'])
+const TEXT_TYPES = new Set(['Label', 'CheckBox', 'RadioButton', 'Switch', 'DelayButton', 'SpinBox', 'GroupBox', 'TextField', 'TextArea', 'ComboBox', 'ToolTip'])
 // properties that hold an object: printed as null or object
 const isObject = (p) => p.pointer || p.list || /^Q(Font|Locale|QuickIcon|Color|JSValue|Variant|Object)$|^QQuick|Component|QRectF|QPointF|QSizeF/.test(p.type) && p.type !== 'QColor'
 
@@ -61,7 +61,7 @@ ${types.map((name, i) => `    ${name} { id: c${i} }`).join('\n')}
             console.log(t.name, "objects:", t.objects.map(n => n + "=" + (c[n] === null || c[n] === undefined ? show(c[n]) : "object")).join(" "))
             console.log(t.name, "signals:", t.signals.filter(n => typeof c[n] !== "function").join(" ") || "all")
             console.log(t.name, "methods:", t.methods.filter(n => typeof c[n] !== "function").join(" ") || "all")
-            console.log(t.name, "size:", ${'"'}${'"'} + (${JSON.stringify([...TEXT_TYPES])}.indexOf(t.name) >= 0 ? "(text)" : c.implicitWidth + " " + c.implicitHeight), "font:", c.font.pixelSize, c.font.bold, c.font.weight,
+            console.log(t.name, "size:", ${'"'}${'"'} + (${JSON.stringify([...TEXT_TYPES])}.indexOf(t.name) >= 0 ? "(text)" : c.implicitWidth + " " + c.implicitHeight), "font:", c.font ? [c.font.pixelSize, c.font.bold, c.font.weight].join(" ") : "-",
                         "icon:", c.icon ? [c.icon.name, c.icon.source, c.icon.width, c.icon.height, c.icon.color, c.icon.cache].join(",") : "-")
         }
         Qt.quit()

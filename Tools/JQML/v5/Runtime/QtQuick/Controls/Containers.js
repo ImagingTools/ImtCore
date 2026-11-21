@@ -61,9 +61,18 @@ class Pane extends Control {
     }
     // QQuickPanePrivate::updateContentWidth / Height: a single item's implicit size, unless the size is set
     $updateContentSize(){
-        let children = this.$contentChildren()
-        let single = children.length === 1 ? children[0] : null
-        let w = single ? single.$v[Item.IMPLICITWIDTH] : 0, h = single ? single.$v[Item.IMPLICITHEIGHT] : 0
+        let content = this.$v[Control.CONTENTITEM]
+        let w = 0, h = 0
+        if(content && content !== this.$ownContent){
+            // a content item of its own: its implicit size (QQuickPanePrivate::getContentWidth)
+            w = content.$v[Item.IMPLICITWIDTH]
+            h = content.$v[Item.IMPLICITHEIGHT]
+        } else {
+            let children = this.$contentChildren()
+            let single = children.length === 1 ? children[0] : null
+            w = single ? single.$v[Item.IMPLICITWIDTH] : 0
+            h = single ? single.$v[Item.IMPLICITHEIGHT] : 0
+        }
         if(!this.$contentSizeSet.w) this.$plain(Pane.CONTENTWIDTH, w)
         if(!this.$contentSizeSet.h) this.$plain(Pane.CONTENTHEIGHT, h)
         this.$plain(Control.IMPLICITCONTENTWIDTH, w)
@@ -146,17 +155,19 @@ class Page extends Pane {
             this.$watchImplicit(item, id)
             let layout = () => this.$relayout()
             engine.connect(item, Item.SIGNAL_heightChanged, layout, null, engine.PRIORITY_NORMAL, this)
-            engine.connect(item, Item.SIGNAL_visibleChanged, layout, null, engine.PRIORITY_NORMAL, this)
+            engine.connect(item, Item.SIGNAL_visibleChanged, () => this.$delegateImplicitChanged(id), null, engine.PRIORITY_NORMAL, this)
         }
         this.$delegateImplicitChanged(id)
         this.$relayout()
     }
     $delegateImplicitChanged(id){
         if(id === Page.HEADER || id === Page.FOOTER){
+            // a hidden header or footer has no implicit size (QQuickPagePrivate::getImplicitHeaderHeight)
             let item = this.$v[id]
+            let shown = item && item.$v[Item.VISIBLE]
             let header = id === Page.HEADER
-            this.$plain(header ? Page.IMPLICITHEADERWIDTH : Page.IMPLICITFOOTERWIDTH, item ? item.$v[Item.IMPLICITWIDTH] : 0)
-            this.$plain(header ? Page.IMPLICITHEADERHEIGHT : Page.IMPLICITFOOTERHEIGHT, item ? item.$v[Item.IMPLICITHEIGHT] : 0)
+            this.$plain(header ? Page.IMPLICITHEADERWIDTH : Page.IMPLICITFOOTERWIDTH, shown ? item.$v[Item.IMPLICITWIDTH] : 0)
+            this.$plain(header ? Page.IMPLICITHEADERHEIGHT : Page.IMPLICITFOOTERHEIGHT, shown ? item.$v[Item.IMPLICITHEIGHT] : 0)
             this.$relayout()
             return
         }

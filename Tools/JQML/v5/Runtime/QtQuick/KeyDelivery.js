@@ -346,6 +346,12 @@ function deliverKey(e, kind){
             }
         }
         for(let it = item; it instanceof Item && !result; it = it.$parent) result = deliverTo(it, event, kind)
+        // an Escape nothing took: the topmost popup of the window that closes on it (the Overlay)
+        if(!result && kind === 'pressed' && event.key === QtEnums.Key_Escape){
+            let top = item
+            while(top.$parent instanceof Item) top = top.$parent
+            if(top.$overlay && top.$overlay.$escape && top.$overlay.$escape()) result = ACCEPTED
+        }
     })
     if(result === ACCEPTED) e.preventDefault()
 }

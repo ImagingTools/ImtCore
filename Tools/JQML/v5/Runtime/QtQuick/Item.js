@@ -310,6 +310,10 @@ defineType(Item, {
         ScrollBar: { group: null },         // set by Controls/ScrollBar.js
         ScrollIndicator: { group: null },   // set by Controls/ScrollBar.js
         Overlay: { group: null },           // set by Controls/Popup.js
+        ToolTip: { group: null },           // set by Controls/Popups.js
+        DialogButtonBox: { group: null },   // set by Controls/Popups.js
+        ButtonGroup: { group: null },       // set by Controls/Actions.js
+        ActionGroup: { group: null },       // set by Controls/Actions.js
         // QQuickItem::palette (Qt 6): made when it is read or set (Palette.js)
         palette: { group: require('./Palette').Palette },
     },

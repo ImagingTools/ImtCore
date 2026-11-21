@@ -101,9 +101,10 @@ class AbstractButton extends Control {
     }
     // QQuickAbstractButtonPrivate::trigger: the action, else clicked
     $trigger(){
+        // the action is triggered, then clicked (QQuickAbstractButtonPrivate::trigger, actionTriggered)
         let action = this.$v[AbstractButton.ACTION]
         if(action && action.enabled !== false && action.$trigger) action.$trigger(this)
-        else if(this.$v[Item.ENABLED]) engine.emit(this, AbstractButton.SIGNAL_clicked)
+        if(this.$v[Item.ENABLED]) engine.emit(this, AbstractButton.SIGNAL_clicked)
     }
 
     // ---- press, move, release (QQuickAbstractButtonPrivate::handlePress / handleMove / handleRelease) ----
