@@ -935,7 +935,8 @@ class ListView extends Item {
         this.$updateHeaderFooter()
         this.$placeHeaderFooter()
         this.$updateViewport()
-        this.$setPosition(-this.$headerSize())
+        // QQuickItemViewPrivate::contentStartOffset: before the header and the margin at the start of the flow
+        this.$setPosition(-this.$headerSize() - this.$startMargin())
         this.$fill(false)
         // QQuickItemView::componentComplete: refill(), then updateCurrent(0) unless the index was cleared;
         // QQuickItemView::setModel: setCurrentIndex(count > 0 ? 0 : -1) (a model without a delegate has no rows);
@@ -1283,11 +1284,18 @@ class ListView extends Item {
         this.$updateOrigin()
     }
 
-    // QQuickItemView::originX / originY, atXBeginning ... (QQuickFlickable::updateBeginningEnd)
+    // the margin where the flow starts: topMargin, bottomMargin of a flow from the bottom; leftMargin, rightMargin of
+    // a flow from the right
+    $startMargin(){
+        let m = require('./Flickable').margins(this, this.$vertical() ? 'y' : 'x')
+        return this.$reversed() ? m.end : m.start
+    }
+
+    // QQuickItemView::originX / originY (of the content, not the margins), atXBeginning ... (QQuickFlickable::updateBeginningEnd)
     $updateOrigin(){
         let vertical = this.$vertical()
         let axis = vertical ? 'y' : 'x'
-        let b = this.$flickBounds(axis)
+        let b = this.$contentBounds(axis)
         let origin = b.min
         if(this.$reversed() && this.$contentSize() < this.$viewSize()) origin = -this.$lastPosition() - this.$footerSize()
         this.$write(vertical ? ListView.ORIGINY : ListView.ORIGINX, origin)

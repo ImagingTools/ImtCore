@@ -377,6 +377,38 @@ class Control extends Item {
 const padding = () => 'real'
 const inset = () => 'real'
 
+// QQuickControlPrivate::propagateLocale: the items below an object whose locale changes, down to those with their own,
+// emit localeChanged (their inherited locale changed)
+function propagateLocale(owner){
+    let visit = (item) => {
+        for(let child of item.$children || []){
+            let id = child.constructor.LOCALE
+            if(id !== undefined){
+                if(child.$v[id]) continue
+                engine.emit(child, child.constructor.$type.props[id].signal)
+            }
+            visit(child)
+        }
+    }
+    // a popup is no item: its popup item and what is in it
+    if(owner.$isItem) visit(owner)
+    else if(owner.$item){
+        let id = owner.$item.constructor.LOCALE
+        if(id !== undefined && !owner.$item.$v[id]) engine.emit(owner.$item, owner.$item.constructor.$type.props[id].signal)
+        visit(owner.$item)
+    }
+}
+
+function inheritedLocale(control){
+    for(let it = control; it; it = it.$parent){
+        let id = it.constructor.LOCALE
+        if(id !== undefined && it.$v[id]) return it.$v[id]
+        // the window of a popup's item: the popup, then what it is in
+        if(it.$popup && it.$popup.$v[it.$popup.constructor.LOCALE]) return it.$popup.$v[it.$popup.constructor.LOCALE]
+    }
+    return require('../../Qt/Locale').locale()
+}
+
 defineType(Control, {
     props: {
         font: { group: ControlFont },
@@ -394,7 +426,15 @@ defineType(Control, {
         rightInset: inset('rightInset'),
         bottomInset: inset('bottomInset'),
         spacing: 'real',
-        locale: 'var',
+        // QQuickControlPrivate::calcLocale: its own, else the one of the control or window above, else the default
+        locale: {
+            kind: 'var',
+            effect: (control) => propagateLocale(control),
+            get(){
+                engine.track(this, Control.SIGNAL_localeChanged)
+                return inheritedLocale(this)
+            },
+        },
         focusPolicy: {
             kind: 'int',
             effect(control, value){ control.$write(Item.ACTIVEFOCUSONTAB, (value & TabFocus) === TabFocus) },
@@ -459,5 +499,5 @@ Object.assign(Control, { NoFocus, TabFocus, ClickFocus, StrongFocus, WheelFocus 
 // the palette of a control defaults to the theme's (QQuickTheme::palette): the Basic one
 Control.prototype.$theme = 'basic'
 
-module.exports = { Control, ControlFont, withSetters, installFont, resolveFont, propagateFont, FONT_FIELDS, THEME_FONT,
+module.exports = { propagateLocale, inheritedLocale, Control, ControlFont, withSetters, installFont, resolveFont, propagateFont, FONT_FIELDS, THEME_FONT,
     NoFocus, TabFocus, ClickFocus, StrongFocus, WheelFocus, MouseFocusReason, TabFocusReason, BacktabFocusReason, OtherFocusReason }

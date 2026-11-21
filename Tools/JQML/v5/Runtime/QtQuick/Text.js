@@ -351,6 +351,10 @@ class Text extends Item {
                 if(layout.rich){
                     inner.style.whiteSpace = v[Text.WRAPMODE] !== NOWRAP && (this.$explicit & 1) ? 'normal' : 'nowrap'
                     inner.replaceChildren(sanitize(layout.text))
+                    // a link is drawn in linkColor, unless its HTML gives it a color (QQuickTextDocumentWithImageResources)
+                    for(let link of inner.querySelectorAll('a[href]')){
+                        if(!link.style.color) link.style.color = toCss(v[Text.LINKCOLOR])
+                    }
                 } else {
                     inner.style.whiteSpace = 'pre'
                     inner.textContent = layout.lines.join('\n')
@@ -397,7 +401,7 @@ defineType(Text, {
         paintedHeight: { kind: 'real', readonly: true },
         truncated: { kind: 'bool', readonly: true },
         hoveredLink: { kind: 'string', readonly: true },
-        linkColor: { kind: 'color', initial: '#0000ff' },
+        linkColor: { kind: 'color', initial: '#0000ff', effect: (t) => engine.markDirty(t, TEXT) },
         style: 'int',
         styleColor: 'color',
         baseUrl: 'string',

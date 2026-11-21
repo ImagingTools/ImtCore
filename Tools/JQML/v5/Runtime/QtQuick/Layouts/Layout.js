@@ -87,6 +87,9 @@ function hints(item, horizontal, parentLayout){
     let fill = fillExplicit ? !!v[horizontal ? P.FILLWIDTH : P.FILLHEIGHT] : (item instanceof Layout || (parentLayout instanceof require('./StackLayout').StackLayout))
     let stretch = v ? v[horizontal ? P.HORIZONTALSTRETCHFACTOR : P.VERTICALSTRETCHFACTOR] : -1
     preferred = Math.max(min, Math.min(max, preferred))
+    // snapped to the pixel grid: the sizes of an item are whole pixels, up (QQuickLayout, QGridLayoutItem::box)
+    preferred = Math.ceil(preferred - 1e-9)
+    min = Math.ceil(min - 1e-9)
     return { preferred: preferred + before + after, min: min + before + after, max: max + before + after, fill, stretch, before, after }
 }
 
@@ -190,6 +193,10 @@ class Layout extends Item {
         this.$invalidate()
     }
 
+    $childImplicitChanged(){
+        this.$invalidate()
+    }
+
     $items(){
         let result = []
         for(let child of this.$children || []){
@@ -244,8 +251,13 @@ function align(start, cell, size, flags, horizontal){
 for(let Class of [Layout]){
     let base = Class.prototype.$write
     Class.prototype.$write = function(id, value){
+        let old = id === Item.WIDTH || id === Item.HEIGHT ? this.$v[id] : undefined
         base.call(this, id, value)
-        if((id === Item.WIDTH || id === Item.HEIGHT) && this.$f & engine.COMPLETED && !this.$arranging) engine.queuePolish(this)
+        if(id !== Item.WIDTH && id !== Item.HEIGHT) return
+        // a size that follows the implicit one changes while the layout arranges: it arranges again in the new size
+        if(this.$arranging){
+            if(this.$v[id] !== old) this.$again = true
+        } else if(this.$f & engine.COMPLETED) engine.queuePolish(this)
     }
 }
 

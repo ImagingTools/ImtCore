@@ -12,13 +12,13 @@ const QUICK = [
     'State', 'PropertyChanges', 'StateChangeScript', 'Transition', 'StateGroup',
     'PauseAnimation', 'PropertyAnimation', 'NumberAnimation', 'ColorAnimation', 'RotationAnimation', 'SmoothedAnimation',
     'XAnimator', 'YAnimator', 'ScaleAnimator', 'RotationAnimator', 'OpacityAnimator', 'PropertyAction', 'ScriptAction',
-    'SequentialAnimation', 'ParallelAnimation', 'Behavior', 'Window', 'Translate', 'Scale', 'Rotation', 'Matrix4x4', 'Accessible', 'ShaderEffectSource', 'Screen', 'HoverHandler', 'DragHandler', 'PointerDevice', 'PointerHandler',
+    'SequentialAnimation', 'ParallelAnimation', 'Behavior', 'Window', 'Translate', 'Scale', 'Rotation', 'Matrix4x4', 'Accessible', 'ShaderEffectSource', 'Screen', 'EnterKey', 'HoverHandler', 'DragHandler', 'PointerDevice', 'PointerHandler',
     'Path', 'PathLine', 'PathMove', 'PathQuad', 'PathCubic', 'PathArc', 'PathAngleArc', 'PathRectangle', 'PathSvg', 'PathPolyline',
     'PathMultiline', 'PathAttribute', 'PathPercent', 'PathElement',
 ]
 const SHAPES = ['Shape', 'ShapePath', 'ShapeGradient', 'LinearGradient', 'RadialGradient', 'ConicalGradient']
-const IMPL = ['PlaceholderText', 'ColorImage', 'IconImage', 'IconLabel', 'PaddedRectangle']
-const QUICK_UNCREATABLE = ['Keys', 'KeyNavigation', 'Animation', 'Easing', 'StandardKey', 'Accessible', 'Screen', 'PointerDevice', 'PointerHandler', 'PathElement']
+const IMPL = ['PlaceholderText', 'ColorImage', 'IconImage', 'IconLabel', 'PaddedRectangle', 'Color']
+const QUICK_UNCREATABLE = ['Keys', 'KeyNavigation', 'Animation', 'Easing', 'StandardKey', 'Accessible', 'Screen', 'EnterKey', 'PointerDevice', 'PointerHandler', 'PathElement']
 // QtQuick.Controls.Basic (the style QtQuick.Controls imports) and QtQuick.Templates (the controls without a style): the
 // types the runtime has, the names of the Qt 6.12 qmldir / plugins.qmltypes. A Templates class is JQ.types['T.<Name>']
 const TABLE_CONTROLS = ['HorizontalHeaderView', 'VerticalHeaderView', 'TableViewDelegate', 'TreeViewDelegate', 'SelectionRectangle']
@@ -52,7 +52,7 @@ const MODULES = {
     'QtQuick.Effects': { types: ['MultiEffect'], uncreatable: [] },
     'QtQuick.Shapes': { types: SHAPES, uncreatable: ['ShapeGradient'] },
     // the items the styles are made of (Controls/impl.js)
-    'QtQuick.Controls.impl': { types: IMPL, uncreatable: [] },
+    'QtQuick.Controls.impl': { types: IMPL, uncreatable: ['Color'] },
     'QtQuick.Dialogs': { types: ['FileDialog', 'FolderDialog'], uncreatable: [] },
     'QtWebSockets': { types: ['WebSocket'], uncreatable: [] },
     'Qt5Compat.GraphicalEffects': { types: ['DropShadow'], uncreatable: [] },

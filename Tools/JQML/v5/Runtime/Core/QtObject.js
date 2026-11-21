@@ -62,6 +62,18 @@ class QtObject {
             return
         }
         let prop = this.constructor.$type.props[id]
+        // the group of another object (font: control.font): shown by this one, which is told of its changes (a group
+        // keeps its $users: Font.js lays them out again) and follows it now
+        if(prop.group && value instanceof prop.group && value.$owner !== this){
+            let old = this.$v[id]
+            if(old === value) return
+            if(old && old.$users && old.$owner !== this) old.$users.delete(this)
+            ;(value.$users || (value.$users = new Set())).add(this)
+            this.$v[id] = value
+            if(this.$updateImplicitSize) this.$updateImplicitSize()
+            engine.emit(this, prop.signal, old, value)
+            return
+        }
         // a value of a grouped value type (sourceSize: Qt.size(48, 48)) is a write of each of its fields
         if(prop.group && value && typeof value === 'object' && !(value instanceof prop.group)){
             this[prop.name].$writeValue(value)

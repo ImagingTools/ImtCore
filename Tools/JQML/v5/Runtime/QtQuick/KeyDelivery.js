@@ -136,7 +136,10 @@ function setFocusInScope(scope, item, options = 0){
             }
         }
     }
-    if(oldActive !== agent.activeFocusItem) syncDomFocus()
+    if(oldActive !== agent.activeFocusItem){
+        syncDomFocus()
+        activeFocusItemChanged()
+    }
     notify(changed)
 }
 
@@ -161,8 +164,20 @@ function clearFocusInScope(scope, item, options = 0){
         changed.push(item)
     }
     if(newActive) agent.activeFocusItem = newActive
-    if(oldActive !== agent.activeFocusItem) syncDomFocus()
+    if(oldActive !== agent.activeFocusItem){
+        syncDomFocus()
+        activeFocusItemChanged()
+    }
     notify(changed)
+}
+
+// QQuickWindow::activeFocusItemChanged, before the items are told (QQuickDeliveryAgentPrivate::setFocusInScope)
+function activeFocusItemChanged(){
+    let Window = require('./Window/Window').Window
+    for(let window of Array.from(Window.$all || [])){
+        if(window.$f & engine.DESTROYED) Window.$all.delete(window)
+        else engine.emit(window, Window.SIGNAL_activeFocusItemChanged)
+    }
 }
 
 // The DOM follows the active focus: a text field's input is focused, any other item blurs the input that has it

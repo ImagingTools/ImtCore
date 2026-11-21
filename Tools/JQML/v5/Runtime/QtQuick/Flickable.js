@@ -543,7 +543,34 @@ function updateVisibleArea(view){
     if(view.$scrollBars) view.$scrollBars.$visibleAreaChanged(values)
 }
 
+// the margins of a view along an axis: { start, end } (topMargin / bottomMargin, leftMargin / rightMargin)
+function margins(view, axis){
+    let C = view.constructor, v = view.$v
+    if(C.TOPMARGIN === undefined) return { start: 0, end: 0 }
+    return axis === 'y' ? { start: v[C.TOPMARGIN], end: v[C.BOTTOMMARGIN] } : { start: v[C.LEFTMARGIN], end: v[C.RIGHTMARGIN] }
+}
+
+// QQuickFlickable::setTopMargin ...: the range changes; a view that does not move is put back in it at once
+function marginChanged(view, axis){
+    if(view.$updateOrigin) view.$updateOrigin()
+    else if(view.$updateBounds) view.$updateBounds()
+    if(!(view.$f & engine.COMPLETED) || view.$v[view.constructor.MOVING]) return
+    fixup(view, axis, true)
+}
+
 function installFlick(Class){
+    // the range of the content of an item view, widened by its margins (QQuickItemViewPrivate::minExtentForAxis:
+    // + startMargin, maxExtentForAxis: - endMargin); the range of the content itself stays $contentBounds
+    if(Class.prototype.$flickBounds && !Class.prototype.$ownMargins){
+        let content = Class.prototype.$flickBounds
+        Class.prototype.$contentBounds = content
+        Class.prototype.$flickBounds = function(axis){
+            let b = content.call(this, axis)
+            let m = margins(this, axis)
+            if(!m.start && !m.end) return b
+            return { min: b.min - m.start, max: b.max + m.end }
+        }
+    }
     Object.defineProperty(Class.prototype, 'visibleArea', {
         get(){
             if(!this.$visibleArea){
@@ -588,13 +615,27 @@ function flickDirection(direction, contentSize, viewSize, axis){
 // "Items declared as children of a Flickable are automatically parented to the Flickable's contentItem."
 // contentWidth / contentHeight -1: the content item follows the Flickable's size
 class Flickable extends Item {
+    // its $flickBounds has the margins (installFlick)
+    get $ownMargins(){ return true }
+
     constructor(parent = null){
         super(parent)
         this.$content = new Item(this)
         this.$syncContentSize()
+        engine.scheduleComponentComplete(this)
     }
 
     get contentItem(){ return this.$content }
+
+    $assign(id, value){
+        if(id === Flickable.CONTENTX || id === Flickable.CONTENTY) (this.$explicitContentPos || (this.$explicitContentPos = {}))[id === Flickable.CONTENTX ? 'x' : 'y'] = true
+        super.$assign(id, value)
+    }
+
+    $bind(id, fn, scope, self){
+        if(id === Flickable.CONTENTX || id === Flickable.CONTENTY) (this.$explicitContentPos || (this.$explicitContentPos = {}))[id === Flickable.CONTENTX ? 'x' : 'y'] = true
+        return super.$bind(id, fn, scope, self)
+    }
 
     $syncContentSize(){
         if(!this.$content) return
@@ -604,11 +645,22 @@ class Flickable extends Item {
         this.$updateBounds()
     }
 
-    // QQuickFlickable::minXExtent = 0, maxXExtent = min(0, width - contentWidth)
+    // QQuickFlickable::minYExtent = topMargin, maxYExtent = min(minYExtent, height - contentHeight - bottomMargin):
+    // contentY from -topMargin to contentHeight + bottomMargin - height
     $flickBounds(axis){
         let content = this.$content ? this.$content.$v[axis === 'x' ? Item.WIDTH : Item.HEIGHT] : 0
         let size = this.$v[axis === 'x' ? Item.WIDTH : Item.HEIGHT]
-        return { min: 0, max: Math.max(0, content - size) }
+        let m = margins(this, axis)
+        return { min: -m.start, max: Math.max(-m.start, content + m.end - size) }
+    }
+
+    // QQuickFlickable::componentComplete: a content position not set goes to the start of a margin
+    $componentComplete(){
+        super.$componentComplete()
+        for(let axis of ['x', 'y']){
+            let m = margins(this, axis)
+            if(m.start && !this.$explicitContentPos?.[axis]) this.$setContentPos(axis, -m.start)
+        }
     }
 
     $flickAxis(axis){
@@ -733,6 +785,10 @@ const FLICK_PROPS = {
     dragging: { kind: 'bool', readonly: true },
     maximumFlickVelocity: { kind: 'real', initial: 2500 },
     flickDeceleration: { kind: 'real', initial: 1500 },
+    topMargin: { kind: 'real', effect: (view) => marginChanged(view, 'y') },
+    bottomMargin: { kind: 'real', effect: (view) => marginChanged(view, 'y') },
+    leftMargin: { kind: 'real', effect: (view) => marginChanged(view, 'x') },
+    rightMargin: { kind: 'real', effect: (view) => marginChanged(view, 'x') },
     pressDelay: 'int',
 }
 const FLICK_SIGNALS = ['movementStarted', 'movementEnded', 'flickStarted', 'flickEnded', 'dragStarted', 'dragEnded']
@@ -771,4 +827,4 @@ Object.assign(Flickable, FLICK_ENUMS)
     }
 }
 
-module.exports = { Flickable, VisibleArea, updateVisibleArea, wheelScroll, externalMove, installFlick, flickDirection, flickState, fixup, FLICK_PROPS, FLICK_SIGNALS, FLICK_ENUMS, clock, DRAG_THRESHOLD }
+module.exports = { margins, Flickable, VisibleArea, updateVisibleArea, wheelScroll, externalMove, installFlick, flickDirection, flickState, fixup, FLICK_PROPS, FLICK_SIGNALS, FLICK_ENUMS, clock, DRAG_THRESHOLD }

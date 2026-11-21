@@ -504,7 +504,7 @@ defineType(Popup, {
         contentWidth: 'real', contentHeight: 'real', availableWidth: { kind: 'real', readonly: true }, availableHeight: { kind: 'real', readonly: true },
         margins: real(-1), topMargin: real(-1), leftMargin: real(-1), rightMargin: real(-1), bottomMargin: real(-1),
         padding: 'real', topPadding: 'real', leftPadding: 'real', rightPadding: 'real', bottomPadding: 'real',
-        locale: 'var', font: { group: require('./Control').ControlFont },
+        locale: { kind: 'var', effect: (owner) => require('./Control').propagateLocale(owner) }, font: { group: require('./Control').ControlFont },
         background: { kind: 'var', initial: null }, contentItem: { kind: 'var', initial: null },
         clip: 'bool', focus: 'bool', activeFocus: { kind: 'bool', readonly: true }, modal: 'bool', dim: 'bool', visible: 'bool',
         opacity: real(1), scale: real(1), closePolicy: 'int', transformOrigin: { kind: 'int', initial: 4 },

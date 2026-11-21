@@ -46,4 +46,18 @@ Object.defineProperty(Item.prototype, 'Accessible', {
 // Accessible.announce(message, politeness) (Qt 6.8): nothing to say to without an accessibility tree
 Accessible.announce = function(){}
 
-module.exports = { Accessible, AccessibleAttached }
+// ---- EnterKey (QQuickEnterKeyAttached, Qt 6.4): the kind of the enter key an on-screen keyboard shows for an item ----
+class EnterKeyAttached extends GroupObject {}
+defineType(EnterKeyAttached, { props: { type: 'int' } })
+class EnterKey extends GroupObject {}
+defineType(EnterKey, {})
+{
+    const prop = Item.$type.propByName.get('EnterKey')
+    prop.group = EnterKeyAttached
+    Object.defineProperty(Item.prototype, 'EnterKey', {
+        get(){ return this.$v[prop.id] || (this.$v[prop.id] = new EnterKeyAttached(this)) },
+        configurable: true,
+    })
+}
+
+module.exports = { Accessible, AccessibleAttached, EnterKey, EnterKeyAttached }

@@ -104,7 +104,7 @@ defineType(ApplicationWindow, {
     props: {
         background: { kind: 'var', initial: null }, contentItem: { kind: 'var', readonly: true, initial: null },
         font: { group: require('./Control').ControlFont }, header: { kind: 'var', initial: null }, footer: { kind: 'var', initial: null },
-        menuBar: { kind: 'var', initial: null }, locale: 'var',
+        menuBar: { kind: 'var', initial: null }, locale: { kind: 'var', effect: (owner) => require('./Control').propagateLocale(owner) },
         // the safe area margins of the window (none on a page)
         topPadding: 'real', leftPadding: 'real', rightPadding: 'real', bottomPadding: 'real',
     },

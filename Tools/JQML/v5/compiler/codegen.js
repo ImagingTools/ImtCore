@@ -416,7 +416,7 @@ class Codegen {
             // inside a delegate an unknown name is a model role: `text: name`
             depth = 0
             for(let scope = el.scope; scope; scope = scope.parent, depth++){
-                if(scope.isDelegate) return 'JQ.mctx($s' + '.$p'.repeat(depth) + ').$role(' + JSON.stringify(name) + ')'
+                if(scope.isDelegate) return 'JQ.mrole($s,' + JSON.stringify(name) + ')'
             }
             if(name !== 'model' && name !== 'index' && name !== 'modelData' && name !== 'context' && !(file.nativeNames && file.nativeNames.has(name))) this.warn(file, el.line, name + ' is not found')
             return 'JQ.ctx($s,' + JSON.stringify(name) + ')'

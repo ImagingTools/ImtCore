@@ -236,6 +236,17 @@ function mctx(s){
     return null
 }
 
+// A name of a delegate the compiler did not find: a role of the model, else a name of the contexts above (an id of
+// the document the view is in: QQmlContextWrapper looks the role up in the delegate's context, then goes up)
+function mrole(s, name){
+    let c = mctx(s)
+    if(c && c.$row && typeof c.$row === 'object' && name in c.$row) return c.$role(name)
+    let found = lookup(s, name)
+    if(found !== MISSING) return found
+    if(c) return c.$role(name)
+    throw new ReferenceError(name + ' is not defined')
+}
+
 const modules = {}      // module -> type name -> class
 const scripts = {}      // url of a JavaScript resource -> its script (compiler/scripts.js)
 
@@ -382,7 +393,7 @@ function qsTrIn(context){
 }
 
 const JQ = {
-    qsTrIn, forward, bindAlias, handleGroup, callCreateQmlObject, files, scripts, script, si, sis, moduleScripts, make: engine.make, inContext: engine.inContext, callCreateComponent, sctx, sctxValue, sset, singleton, defineMethod, defaultParent, defaultAssign, aliasAssign, ctx, ctxValue, mctx, as, ns, qmlModule, subAssign, rootContext,
+    qsTrIn, forward, bindAlias, handleGroup, callCreateQmlObject, files, scripts, script, si, sis, moduleScripts, make: engine.make, inContext: engine.inContext, callCreateComponent, sctx, sctxValue, sset, singleton, defineMethod, defaultParent, defaultAssign, aliasAssign, ctx, ctxValue, mctx, mrole, as, ns, qmlModule, subAssign, rootContext,
     engine, defineType, create,
     batch: engine.batch,
     stats: engine.stats,
@@ -399,11 +410,12 @@ const JQ = {
         XAnimator, YAnimator, ScaleAnimator, RotationAnimator, OpacityAnimator, PropertyAction, ScriptAction,
         SequentialAnimation, ParallelAnimation, Behavior, Easing, EasingGroup,
         Accessible: require('./QtQuick/Accessible').Accessible,
+        EnterKey: require('./QtQuick/Accessible').EnterKey,
         Screen: require('./QtQuick/Screen').Screen,
         ...require('./QtQuick/Path'),
         ...(({ Shape, ShapePath, ShapeGradient, LinearGradient, RadialGradient, ConicalGradient }) => ({ Shape, ShapePath, ShapeGradient, LinearGradient, RadialGradient, ConicalGradient }))(require('./QtQuick/Shapes')),
         ...(({ PointerDevice, PointerHandler, HoverHandler, DragHandler }) => ({ PointerDevice, PointerHandler, HoverHandler, DragHandler }))(require('./QtQuick/PointerHandlers')),
-        ...(({ PlaceholderText, ColorImage, IconImage, IconLabel, PaddedRectangle }) => ({ PlaceholderText, ColorImage, IconImage, IconLabel, PaddedRectangle }))(require('./QtQuick/Controls/impl')),
+        ...(({ PlaceholderText, ColorImage, IconImage, IconLabel, PaddedRectangle, ColorType }) => ({ PlaceholderText, ColorImage, IconImage, IconLabel, PaddedRectangle, Color: ColorType }))(require('./QtQuick/Controls/impl')),
         MultiEffect: require('./QtQuick/Effects').MultiEffect, ShaderEffectSource: require('./QtQuick/Effects').ShaderEffectSource,
         ...(({ SortFilterProxyModel, ValueFilter, FunctionFilter, RoleSorter, StringSorter, FunctionSorter }) => ({ SortFilterProxyModel, ValueFilter, FunctionFilter, RoleSorter, StringSorter, FunctionSorter }))(require('./QtQml/Models/SortFilterProxyModel')),
         Translate: require('./QtQuick/Transform').Translate, Scale: require('./QtQuick/Transform').Scale, Rotation: require('./QtQuick/Transform').Rotation, Matrix4x4: require('./QtQuick/Transform').Matrix4x4,

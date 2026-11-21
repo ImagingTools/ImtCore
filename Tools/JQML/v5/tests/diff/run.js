@@ -85,6 +85,12 @@ async function v5Lines(file){
         top.width = root.width
         top.height = root.height
     })
+    // the qml tool shows the root in a window and activates it (a TestCase does it itself, as qmltestrunner)
+    if(!testCase && JQ.keys && !JQ.keys.agent.root){
+        JQ.keys.agent.root = top
+        top.$isFocusScope = true
+        JQ.batch(() => JQ.keys.activateWindow())
+    }
     if(testCase){
         JQ.mouse.scene.roots = [top]
         let visit = (obj) => {

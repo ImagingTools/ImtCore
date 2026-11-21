@@ -10,7 +10,7 @@ const { Text } = require('../Text')
 const { Rectangle, Border } = require('../Rectangle')
 const { Image } = require('../Image')
 const { Font } = require('../Font')
-const { GroupObject } = require('../../Core/QtObject')
+const { GroupObject, QtObject } = require('../../Core/QtObject')
 const QtEnums = require('../../Qt/enums')
 
 // ---- make: an item of Class with props; a function is a binding, 'group.name' a property of a group, 'onX' a handler ----
@@ -61,6 +61,10 @@ function transparent(color, opacity){
     return '#' + hex2(Math.round(Math.max(0, Math.min(1, opacity)) * 255)) + hex2(c[0]) + hex2(c[1]) + hex2(c[2])
 }
 const Color = { blend, transparent }
+// the Color singleton of QtQuick.Controls.impl (QQuickColor): Color.transparent(color, opacity), Color.blend(a, b, factor)
+class ColorType extends QtObject {}
+defineType(ColorType)
+Object.assign(ColorType, Color)
 
 // ---- the icon of a button (QQuickIcon): a value of name, source, width, height, color, cache ----
 class Icon extends GroupObject {}
@@ -445,5 +449,5 @@ class PlaceholderText extends Text {
 }
 defineType(PlaceholderText)
 
-module.exports = { PlaceholderText, make, apply, Color, blend, transparent, Icon, IconLabel, MnemonicLabel, CheckLabel, PaddedRectangle, ColorImage, IconImage,
+module.exports = { ColorType, PlaceholderText, make, apply, Color, blend, transparent, Icon, IconLabel, MnemonicLabel, CheckLabel, PaddedRectangle, ColorImage, IconImage,
     stripMnemonic, copyFont, IconOnly, TextOnly, TextBesideIcon, TextUnderIcon }

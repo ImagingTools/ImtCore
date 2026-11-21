@@ -55,6 +55,11 @@ function implicitWrite(item, id, value){
     try { item.$write(id, value) } finally { item.$implicitWrite = false }
 }
 
+// a layout follows the implicit size of its items, also of those it sized (QQuickLayout::itemImplicitWidthChanged)
+function implicitChanged(item){
+    if(item.$parent && item.$parent.$childImplicitChanged) item.$parent.$childImplicitChanged(item)
+}
+
 function sizeChanged(item){
     engine.markDirty(item, GEOMETRY)
     if(item.$parent && item.$parent.$childGeometryChanged) item.$parent.$childGeometryChanged(item)
@@ -127,6 +132,9 @@ class Item extends QtObject {
         }
         if(old && old.$childGeometryChanged) old.$childGeometryChanged(this)
         if(parent && parent.$childGeometryChanged) parent.$childGeometryChanged(this)
+        // QQuickContents::itemChildRemoved / itemChildAdded
+        if(old instanceof Item && old.$contents) old.$calcContents(null)
+        if(parent instanceof Item && parent.$contents) parent.$calcContents(this)
     }
 
     $assign(id, value){
@@ -182,6 +190,38 @@ class Item extends QtObject {
             value = this.$ownVisible && (!parent || !(parent instanceof Item) || parent.$v[Item.VISIBLE])
         }
         super.$write(id, value)
+        // QQuickContents::itemGeometryChanged: the childrenRect of the parent is computed again
+        if(id <= Item.HEIGHT && id >= Item.X && this.$parent && this.$parent.$contents) this.$parent.$calcContents(null)
+    }
+
+    // QQuickContents: the rect of the children (all of them, the hidden ones too). A change of a child computes it
+    // again; a child added only widens it (calcGeometry(item))
+    $calcContents(added){
+        let c = this.$contents
+        let old = [c.x, c.y, c.w, c.h]
+        if(added){
+            let x = added.$v[Item.X], y = added.$v[Item.Y]
+            let right = Math.max(c.x + c.w, x + added.$v[Item.WIDTH]), bottom = Math.max(c.y + c.h, y + added.$v[Item.HEIGHT])
+            c.x = Math.min(c.x, x)
+            c.y = Math.min(c.y, y)
+            c.w = right - c.x
+            c.h = bottom - c.y
+        } else {
+            let children = (this.$children || []).filter(child => child instanceof Item)
+            let left = Number.MAX_VALUE, right = -Number.MAX_VALUE, top = Number.MAX_VALUE, bottom = -Number.MAX_VALUE
+            for(let child of children){
+                let v = child.$v
+                left = Math.min(left, v[Item.X]); right = Math.max(right, v[Item.X] + v[Item.WIDTH])
+                top = Math.min(top, v[Item.Y]); bottom = Math.max(bottom, v[Item.Y] + v[Item.HEIGHT])
+            }
+            if(children.length){
+                c.x = left
+                c.y = top
+            }
+            c.w = Math.max(right - left, 0)
+            c.h = Math.max(bottom - top, 0)
+        }
+        if(old[0] !== c.x || old[1] !== c.y || old[2] !== c.w || old[3] !== c.h) engine.emit(this, Item.SIGNAL_childrenRectChanged)
     }
 
     $componentComplete(){
@@ -315,8 +355,22 @@ defineType(Item, {
         },
         width: { kind: 'real', effect: sizeChanged },
         height: { kind: 'real', effect: sizeChanged },
-        implicitWidth: { kind: 'real', effect(item, value){ if(!(item.$explicit & EXPLICIT_WIDTH)) implicitWrite(item, Item.WIDTH, value) } },
-        implicitHeight: { kind: 'real', effect(item, value){ if(!(item.$explicit & EXPLICIT_HEIGHT)) implicitWrite(item, Item.HEIGHT, value) } },
+        // QQuickItem::childrenRect: made on its first read, computed then
+        childrenRect: {
+            kind: 'var',
+            readonly: true,
+            get(){
+                engine.track(this, Item.SIGNAL_childrenRectChanged)
+                if(!this.$contents){
+                    this.$contents = { x: 0, y: 0, w: 0, h: 0 }
+                    this.$calcContents(null)
+                }
+                let c = this.$contents
+                return new (require('../Core/ValueTypes').QRectF)(c.x, c.y, c.w, c.h)
+            },
+        },
+        implicitWidth: { kind: 'real', effect(item, value){ if(!(item.$explicit & EXPLICIT_WIDTH)) implicitWrite(item, Item.WIDTH, value); implicitChanged(item) } },
+        implicitHeight: { kind: 'real', effect(item, value){ if(!(item.$explicit & EXPLICIT_HEIGHT)) implicitWrite(item, Item.HEIGHT, value); implicitChanged(item) } },
         opacity: { kind: 'real', initial: 1, effect: geometry(OPACITY) },
         scale: { kind: 'real', initial: 1, effect: geometry(GEOMETRY) },
         rotation: { kind: 'real', effect: geometry(GEOMETRY) },
@@ -376,6 +430,7 @@ defineType(Item, {
         SwipeDelegate: { group: null },     // set by Controls/SwipeDelegate.js
         ContextMenu: { group: null },       // set by Controls/ContextMenu.js
         Accessible: { group: null },        // set by Accessible.js
+        EnterKey: { group: null },          // set by Accessible.js
         Screen: { group: null },            // set by Screen.js
         layer: { group: null },             // set by Effects.js
         SwipeView: { group: null },         // set by Controls/Containers.js

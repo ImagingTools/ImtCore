@@ -9,6 +9,7 @@ class Window extends Item {
         super(parent)
         // the items of a Window belong to it from the start, also while it is being created
         require('../KeyDelivery').windowCreated()
+        ;(Window.$all || (Window.$all = new Set())).add(this)
         engine.scheduleComponentComplete(this)
     }
 
@@ -79,6 +80,15 @@ defineType(Window, {
         maximumHeight: { kind: 'real', initial: 16777215 },
         active: { kind: 'bool', initial: true, readonly: true },
         contentItem: { kind: 'var', readonly: true, get(){ return this } },
+        // the item with the active focus (the page is one window: the one of the page)
+        activeFocusItem: {
+            kind: 'var',
+            readonly: true,
+            get(){
+                engine.track(this, Window.SIGNAL_activeFocusItemChanged)
+                return require('../KeyDelivery').agent.activeFocusItem
+            },
+        },
     },
     signals: ['closing(close)'],
 })
