@@ -1764,7 +1764,76 @@ class MenuBar extends T.MenuBar {
 }
 defineType(MenuBar, {})
 
+// ---- MonthGrid, DayOfWeekRow, WeekNumberColumn (the Basic calendar) ----
+// delegate: Text { horizontalAlignment, verticalAlignment, text: <role>, font: control.font, color: control.palette.text }
+function calendarText(c, text, props = {}){
+    return new (require('../../QtQml/Component').Component)(null, (parent, ctx) => {
+        let role = (name) => (ctx && ctx.$role ? ctx.$role(name) : undefined)
+        let label = make(Text, parent, Object.assign({
+            horizontalAlignment: Text.AlignHCenter,
+            verticalAlignment: Text.AlignVCenter,
+            text: () => String(role(text)),
+            color: () => c.palette.text,
+        }, typeof props === 'function' ? props(role) : props))
+        c.font.$follow(label)
+        return label
+    })
+}
+// contentItem: <positioner> { spacing; Repeater { model: control.source; delegate: control.delegate } }
+function calendarContent(c, Positioner, props){
+    let box = make(Positioner, null, props)
+    make(require('../Repeater').Repeater, box, { model: () => c.source, delegate: () => c.delegate })
+    box.forceLayout()
+    return box
+}
+class MonthGrid extends T.AbstractMonthGrid {
+    constructor(parent = null){
+        super(parent)
+        implicitSize(this)
+        this.spacing = 6
+    }
+    $makeStyle(){
+        let c = this
+        if(!this.$v[T.AbstractMonthGrid.DELEGATE]) this.$plain(T.AbstractMonthGrid.DELEGATE, calendarText(this, 'day', (role) => ({ opacity: () => (role('month') === c.month ? 1 : 0) })))
+        this.$styleDelegate(T.Control.CONTENTITEM, () => calendarContent(c, require('../Grid').Grid, { rows: 6, columns: 7, rowSpacing: () => c.spacing, columnSpacing: () => c.spacing }))
+    }
+}
+defineType(MonthGrid, {})
+class DayOfWeekRow extends T.AbstractDayOfWeekRow {
+    constructor(parent = null){
+        super(parent)
+        implicitSize(this)
+        this.spacing = 6
+        this.topPadding = 6
+        this.bottomPadding = 6
+        this.font.bold = true
+    }
+    $makeStyle(){
+        let c = this
+        if(!this.$v[T.AbstractDayOfWeekRow.DELEGATE]) this.$plain(T.AbstractDayOfWeekRow.DELEGATE, calendarText(this, 'shortName'))
+        this.$styleDelegate(T.Control.CONTENTITEM, () => calendarContent(c, require('../Row').Row, { spacing: () => c.spacing }))
+    }
+}
+defineType(DayOfWeekRow, {})
+class WeekNumberColumn extends T.AbstractWeekNumberColumn {
+    constructor(parent = null){
+        super(parent)
+        implicitSize(this)
+        this.spacing = 6
+        this.leftPadding = 6
+        this.rightPadding = 6
+        this.font.bold = true
+    }
+    $makeStyle(){
+        let c = this
+        if(!this.$v[T.AbstractWeekNumberColumn.DELEGATE]) this.$plain(T.AbstractWeekNumberColumn.DELEGATE, calendarText(this, 'weekNumber'))
+        this.$styleDelegate(T.Control.CONTENTITEM, () => calendarContent(c, require('../Column').Column, { spacing: () => c.spacing }))
+    }
+}
+defineType(WeekNumberColumn, {})
+
 module.exports = {
+    MonthGrid, DayOfWeekRow, WeekNumberColumn, CalendarModel: T.CalendarModel, Calendar: T.Calendar,
     ApplicationWindow, MenuBar, MenuBarItem,
     SplitView,
     StackView,

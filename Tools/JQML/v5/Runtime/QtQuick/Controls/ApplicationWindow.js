@@ -228,7 +228,7 @@ class MenuBar extends Container {
         if(this.$openItem && this.$openItem !== item) this.$toggleMenu(item)
     }
 }
-defineType(MenuBar, { props: { delegate: { kind: 'var', initial: null } }, signals: ['menusChanged'] })
+defineType(MenuBar, { props: { delegate: { kind: 'component', initial: null } }, signals: ['menusChanged'] })
 
 for(let [name, Group] of [['ApplicationWindow', ApplicationWindowAttached]]){
     let prop = Item.$type.propByName.get(name)

@@ -24,7 +24,35 @@ class Locale {
     $name(date, options){
         return new Intl.DateTimeFormat(this.$tag, options).format(date)
     }
+
+    // QLocale::firstDayOfWeek: Qt.Monday 1 .. Qt.Sunday 7 (Intl.Locale weekInfo, else by the region)
+    get firstDayOfWeek(){
+        try {
+            let info = new Intl.Locale(this.$tag)
+            let week = info.getWeekInfo ? info.getWeekInfo() : info.weekInfo
+            if(week && week.firstDay) return week.firstDay
+        } catch(error) {}
+        let region = (this.$tag.split('-')[1] || '').toUpperCase()
+        return ['US', 'CA', 'JP', 'BR', 'IL', 'KR', 'MX', 'PH', 'TW', 'ZA', 'AU', ''].includes(region) && region !== 'AU' ? 7 : 1
+    }
+    // QLocale::dayName / standaloneDayName (day: Qt.Monday 1 .. Qt.Sunday 7) and monthName / standaloneMonthName (1 .. 12)
+    dayName(day, type = Locale.LongFormat){ return this.$day(day, type, false) }
+    standaloneDayName(day, type = Locale.LongFormat){ return this.$day(day, type, true) }
+    monthName(month, type = Locale.LongFormat){ return this.$month(month, type, false) }
+    standaloneMonthName(month, type = Locale.LongFormat){ return this.$month(month, type, true) }
+    $day(day, type, standalone){
+        // a Monday: 2024-01-01
+        let date = new Date(2024, 0, ((day - 1) % 7) + 1)
+        return this.$name(date, { weekday: WIDTHS[type] || 'long' })
+    }
+    $month(month, type, standalone){
+        let date = new Date(2024, month - 1, 15)
+        let options = { month: WIDTHS[type] || 'long' }
+        if(!standalone) return new Intl.DateTimeFormat(this.$tag, Object.assign({ day: 'numeric' }, options)).formatToParts(date).find(p => p.type === 'month').value
+        return this.$name(date, options)
+    }
 }
+const WIDTHS = ['long', 'short', 'narrow']
 Object.assign(Locale, { LongFormat: 0, ShortFormat: 1, NarrowFormat: 2 })
 
 function defaultName(){

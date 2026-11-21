@@ -7,7 +7,7 @@ const MODELS = ['ListModel', 'ListElement', 'Instantiator', 'ItemSelectionModel'
 const LABS_MODELS = ['TableModel', 'TableModelColumn', 'TreeModel', 'DelegateChooser', 'DelegateChoice']
 const QUICK = [
     'Item', 'FocusScope', 'Rectangle', 'Gradient', 'GradientStop', 'Text', 'TextInput', 'TextEdit', 'Image', 'Canvas',
-    'MouseArea', 'DropArea', 'Flickable', 'Column', 'Row', 'Flow', 'Repeater', 'Loader', 'ListView', 'GridView', 'TableView', 'TreeView', 'Shortcut',
+    'MouseArea', 'DropArea', 'Flickable', 'Column', 'Row', 'Flow', 'Grid', 'Repeater', 'Loader', 'ListView', 'GridView', 'TableView', 'TreeView', 'Shortcut',
     'IntValidator', 'DoubleValidator', 'RegularExpressionValidator', 'FontLoader',
     'State', 'PropertyChanges', 'StateChangeScript', 'Transition', 'StateGroup',
     'PauseAnimation', 'PropertyAnimation', 'NumberAnimation', 'ColorAnimation', 'RotationAnimation', 'SmoothedAnimation',
@@ -22,8 +22,11 @@ const TABLE_CONTROLS = ['HorizontalHeaderView', 'VerticalHeaderView', 'TableView
 // that the runtime has each of them
 const BASIC_CONTROLS = ['Control', 'Label', 'AbstractButton', 'Button', 'ToolButton', 'RoundButton', 'CheckBox', 'RadioButton', 'Switch',
     'DelayButton', 'TabButton', 'ItemDelegate', 'CheckDelegate', 'RadioDelegate', 'SwitchDelegate', 'ScrollBar', 'ScrollIndicator', 'Slider', 'RangeSlider', 'ProgressBar', 'BusyIndicator', 'Dial', 'PageIndicator', 'SpinBox', 'Pane', 'Frame', 'GroupBox', 'Page', 'ToolBar', 'ToolSeparator', 'MenuSeparator', 'Container', 'TabBar', 'SwipeView', 'TextField', 'TextArea', 'Popup', 'Overlay', 'ComboBox', 'ToolTip', 'DialogButtonBox', 'Dialog', 'Menu', 'MenuItem', 'Drawer', 'Action', 'ActionGroup', 'ButtonGroup', 'ScrollView', 'StackView', 'SplitView', 'ApplicationWindow', 'MenuBar', 'MenuBarItem']
-const CONTROLS = [...TABLE_CONTROLS, ...BASIC_CONTROLS]
-const TEMPLATES = ['HeaderViewDelegate', ...BASIC_CONTROLS]
+// the calendar: MonthGrid, DayOfWeekRow, WeekNumberColumn of QtQuick.Controls are AbstractMonthGrid... of QtQuick.Templates
+const CALENDAR = ['CalendarModel', 'Calendar']
+const CALENDAR_CONTROLS = ['MonthGrid', 'DayOfWeekRow', 'WeekNumberColumn']
+const CONTROLS = [...TABLE_CONTROLS, ...BASIC_CONTROLS, ...CALENDAR_CONTROLS, ...CALENDAR]
+const TEMPLATES = ['HeaderViewDelegate', ...BASIC_CONTROLS, 'AbstractMonthGrid', 'AbstractDayOfWeekRow', 'AbstractWeekNumberColumn', ...CALENDAR]
 const LAYOUTS = ['RowLayout', 'ColumnLayout', 'GridLayout', 'StackLayout', 'LayoutItemProxy']
 
 // transitive: the modules its qmldir imports (`import X auto`, `default import X auto`). QQmlImports looks up a name in
@@ -38,8 +41,8 @@ const MODULES = {
     'QtQuick.Layouts': { types: LAYOUTS, uncreatable: ['Layout'] },
     'Qt.labs.qmlmodels': { types: LABS_MODELS, uncreatable: [] },
     'QtQuick.Controls': { types: [], uncreatable: [], transitive: ['QtQuick.Controls.Basic'] },
-    'QtQuick.Controls.Basic': { types: CONTROLS, uncreatable: ['Overlay'] },
-    'QtQuick.Templates': { types: TEMPLATES, uncreatable: ['Overlay'], prefix: 'T.' },
+    'QtQuick.Controls.Basic': { types: CONTROLS, uncreatable: ['Overlay', 'Calendar'] },
+    'QtQuick.Templates': { types: TEMPLATES, uncreatable: ['Overlay', 'Calendar'], prefix: 'T.' },
     'QtQuick.Dialogs': { types: ['FileDialog', 'FolderDialog'], uncreatable: [] },
     'QtWebSockets': { types: ['WebSocket'], uncreatable: [] },
     'Qt5Compat.GraphicalEffects': { types: ['DropShadow'], uncreatable: [] },

@@ -276,7 +276,7 @@ defineType(ComboBox, {
         count: { kind: 'int', readonly: true }, model: 'var', delegateModel: { kind: 'var', readonly: true, initial: null },
         pressed: { kind: 'bool', readonly: true }, highlightedIndex: { kind: 'int', readonly: true }, currentIndex: 'int',
         currentText: { kind: 'string', readonly: true }, displayText: 'string', textRole: 'string', valueRole: 'string',
-        currentValue: { kind: 'var', readonly: true }, delegate: { kind: 'var', initial: null }, indicator: { kind: 'var', initial: null },
+        currentValue: { kind: 'var', readonly: true }, delegate: { kind: 'component', initial: null }, indicator: { kind: 'var', initial: null },
         popup: { kind: 'var', initial: null }, flat: 'bool', down: 'bool', editable: 'bool', editText: 'string',
         validator: { kind: 'var', initial: null }, inputMethodHints: 'int', inputMethodComposing: { kind: 'bool', readonly: true },
         acceptableInput: { kind: 'bool', readonly: true, initial: true },

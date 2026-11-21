@@ -363,7 +363,7 @@ const JQ = {
     types: {
         QtObject, Component, Timer, Connections, Binding, ListModel, Instantiator, ItemSelectionModel, TableModel, TableModelColumn, TreeModel,
         Item, Anchors, FocusScope, Keys, KeyNavigation, Rectangle, Border, Gradient, GradientStop, Text, Font, TextInput, TextEdit, Image, Canvas,
-        MouseArea, MouseDrag, DropArea, Drag, Flickable, Column, Row, Flow, Repeater, Loader, ListView, GridView, TableView, TreeView, HorizontalHeaderView, VerticalHeaderView, HeaderViewDelegate, TableViewDelegate, TreeViewDelegate, SelectionRectangle, DelegateModel, Shortcut, StandardKey,
+        MouseArea, MouseDrag, DropArea, Drag, Flickable, Column, Row, Flow, Grid: require('./QtQuick/Grid').Grid, Repeater, Loader, ListView, GridView, TableView, TreeView, HorizontalHeaderView, VerticalHeaderView, HeaderViewDelegate, TableViewDelegate, TreeViewDelegate, SelectionRectangle, DelegateModel, Shortcut, StandardKey,
         DelegateChooser, DelegateChoice, ObjectModel: require('./QtQml/Models/ObjectModel').ObjectModel,
         IntValidator, DoubleValidator, RegularExpressionValidator, RegExpValidator, FontLoader,
         State, PropertyChanges, StateChangeScript, Transition, StateGroup,

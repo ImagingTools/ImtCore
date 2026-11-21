@@ -264,7 +264,7 @@ class DialogButtonBox extends Container {
     }
 }
 defineType(DialogButtonBox, {
-    props: { position: { kind: 'int', initial: 1 }, alignment: 'int', standardButtons: 'int', delegate: { kind: 'var', initial: null }, buttonLayout: 'int',
+    props: { position: { kind: 'int', initial: 1 }, alignment: 'int', standardButtons: 'int', delegate: { kind: 'component', initial: null }, buttonLayout: 'int',
         defaultButton: { kind: 'var', initial: null }, defaultStandardButton: 'int' },
     signals: ['accepted', 'rejected', 'helpRequested', 'clicked(button)', 'applied', 'reset', 'discarded'],
 })
@@ -515,7 +515,7 @@ class Menu extends Popup {
 defineType(Menu, {
     props: {
         contentModel: { kind: 'var', readonly: true }, title: 'string', cascade: 'bool', overlap: 'real',
-        delegate: { kind: 'var', initial: null }, currentIndex: 'int', separatorsCollapsible: { kind: 'bool', initial: true },
+        delegate: { kind: 'component', initial: null }, currentIndex: 'int', separatorsCollapsible: { kind: 'bool', initial: true },
         icon: { group: require('./impl').Icon },
     },
     signals: ['countChanged'],

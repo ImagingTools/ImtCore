@@ -63,28 +63,34 @@ class Repeater extends Item {
         let item = rows.object ? rows.object(index) : delegate.createObject(this.$parent, null, ctx)
         if(item && rows.object && item.$parent !== this.$parent) item.$setParent(this.$parent)
         if(!item) return null
-        this.$placeAfter(item, index)
+        this.$placeAfter(item, index, this.$items[index])
         this.$items.splice(index, 0, item)
         this.$contexts.splice(index, 0, ctx)
         return item
     }
 
-    // Children order (and DOM order) of the parent: Repeater, delegate 0, delegate 1, ...
-    $placeAfter(item, index){
+    // Children order (and DOM order) of the parent: delegate 0, delegate 1, ..., Repeater (QQuickRepeater::initItem: an
+    // item is stacked after the one before it, else before the next one, else before the Repeater)
+    $placeAfter(item, index, next = this.$items[index + 1]){
         let siblings = this.$parent.$children
-        let anchor = index === 0 ? this : this.$items[index - 1]
-        // a delegate made at the end, right after the one before it: already in its place (children and DOM)
-        let last = siblings.length - 1
-        if(siblings[last] === item && siblings[last - 1] === anchor) return
-        let from = siblings.indexOf(item)
-        if(from >= 0) siblings.splice(from, 1)
-        let to = siblings.indexOf(anchor) + 1
-        siblings.splice(to, 0, item)
+        let prev = index > 0 ? this.$items[index - 1] : null
+        let last = siblings.length - 1, at
+        // a delegate made at the end, after the one before it: the Repeater goes after it (children and DOM)
+        if(siblings[last] === item && siblings[last - 1] === this && (!prev || siblings[last - 2] === prev) && !next){
+            siblings[last - 1] = item
+            siblings[last] = this
+            at = last - 1
+        } else {
+            let from = siblings.indexOf(item)
+            if(from >= 0) siblings.splice(from, 1)
+            let to = prev && siblings.includes(prev) ? siblings.indexOf(prev) + 1 : siblings.indexOf(next && siblings.includes(next) ? next : this)
+            siblings.splice(to, 0, item)
+            at = to
+        }
         if(item.$dom && this.$parent.$dom){
-            let next = siblings[to + 1]
             let nextDom = null
-            for(let i = to + 1; i < siblings.length && !nextDom; i++) nextDom = siblings[i].$dom || null
-            this.$parent.$dom.insertBefore(item.$dom, nextDom)
+            for(let i = at + 1; i < siblings.length && !nextDom; i++) nextDom = siblings[i].$dom || null
+            if(item.$dom.nextSibling !== nextDom || item.$dom.parentNode !== this.$parent.$dom) this.$parent.$dom.insertBefore(item.$dom, nextDom)
         }
     }
 

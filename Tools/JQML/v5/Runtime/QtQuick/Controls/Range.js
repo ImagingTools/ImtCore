@@ -573,7 +573,7 @@ class PageIndicator extends Control {
         })
     }
 }
-defineType(PageIndicator, { props: { count: 'int', currentIndex: 'int', interactive: 'bool', delegate: { kind: 'var', initial: null } } })
+defineType(PageIndicator, { props: { count: 'int', currentIndex: 'int', interactive: 'bool', delegate: { kind: 'component', initial: null } } })
 
 // ---- SpinBox (QQuickSpinBox) and its up / down buttons (QQuickIndicatorButton) ----
 class IndicatorButton extends GroupObject {}

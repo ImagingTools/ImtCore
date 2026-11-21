@@ -256,7 +256,7 @@ class SplitView extends Container {
         this.$layout()
     }
 }
-defineType(SplitView, { props: { orientation: 'int', resizing: { kind: 'bool', readonly: true }, handle: { kind: 'var', initial: null } } })
+defineType(SplitView, { props: { orientation: 'int', resizing: { kind: 'bool', readonly: true }, handle: { kind: 'component', initial: null } } })
 SplitView.$setters = withSetters(Container, [[SplitView.ORIENTATION, (s, v) => { s.$plain(SplitView.ORIENTATION, v); s.$requestLayout() }],
     [SplitView.HANDLE, (s, v) => { s.$plain(SplitView.HANDLE, v); for(let h of s.$handles.splice(0)) h.destroy(); s.$requestLayout() }]])
 SplitView.prototype.$controlName = 'SplitView'
