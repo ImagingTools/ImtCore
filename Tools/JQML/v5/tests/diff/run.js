@@ -51,6 +51,8 @@ async function v5Lines(file){
     let error = (...a) => {
         let fail = testCase && /^FAIL!  : (\w+)/.exec(text(a))
         lines.push(fail ? 'FAIL ' + fail[1] : 'ERROR ' + text(a))
+        // DIFF_VERBOSE=1: the message of a failure too
+        if(fail && process.env.DIFF_VERBOSE) lines.push('  ' + text(a))
     }
     let consoleOf = { log: (...a) => lines.push(text(a)), info(){}, debug(){}, warn(){}, error }
     let app = compileQml({ 'Main.qml': fs.readFileSync(file, 'utf8') }, { allowWarnings: true })

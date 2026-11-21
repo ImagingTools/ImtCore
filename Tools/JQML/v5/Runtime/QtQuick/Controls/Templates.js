@@ -16,4 +16,5 @@ const { SplitView } = require('./SplitView')
 const appWindow = require('./ApplicationWindow')
 
 const calendar = require('./Calendar')
-module.exports = Object.assign({ Control, Label, ScrollBar, ScrollIndicator, ComboBox, ScrollView, StackView, SplitView }, buttons, range, containers, texts, popups, morePopups, actions, appWindow, calendar)
+const tumbler = require('./Tumbler')
+module.exports = Object.assign({ Control, Label, ScrollBar, ScrollIndicator, ComboBox, ScrollView, StackView, SplitView }, buttons, range, containers, texts, popups, morePopups, actions, appWindow, calendar, tumbler)

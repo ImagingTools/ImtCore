@@ -1832,7 +1832,41 @@ class WeekNumberColumn extends T.AbstractWeekNumberColumn {
 }
 defineType(WeekNumberColumn, {})
 
+// ---- Tumbler ----
+// delegate: Text { text: modelData; color: visualFocus ? highlight : text; font: control.font;
+//   opacity: 1.0 - Math.abs(Tumbler.displacement) / (control.visibleItemCount / 2); centered }
+class Tumbler extends T.Tumbler {
+    constructor(parent = null){
+        super(parent)
+        implicitSize(this)
+    }
+    $makeStyle(){
+        let c = this
+        if(!this.$v[T.Tumbler.DELEGATE]) this.$plain(T.Tumbler.DELEGATE, new (require('../../QtQml/Component').Component)(null, (parent, ctx) => {
+            let label = make(Text, parent, {
+                text: () => String(ctx ? ctx.modelData : ''),
+                color: () => (c.visualFocus ? c.palette.highlight : c.palette.text),
+                horizontalAlignment: Text.AlignHCenter,
+                verticalAlignment: Text.AlignVCenter,
+            })
+            c.font.$follow(label)
+            label.$bind(Item.OPACITY, () => 1.0 - Math.abs(label.Tumbler.displacement) / (c.visibleItemCount / 2), null, label)
+            return label
+        }))
+        // contentItem: TumblerView { implicitWidth: 60; implicitHeight: 200; model; delegate; path }
+        this.$styleDelegate(T.Control.CONTENTITEM, () => make(T.TumblerView, null, { implicitWidth: 60, implicitHeight: 200 }))
+        // background: Rectangle { visible: high contrast; border by visualFocus }
+        this.$styleDelegate(T.Control.BACKGROUND, () => make(Rectangle, null, {
+            visible: false,
+            'border.color': () => (c.visualFocus ? c.palette.highlight : c.palette.windowText),
+            'border.width': () => (c.visualFocus ? 2 : 1),
+        }), -1)
+    }
+}
+defineType(Tumbler, {})
+
 module.exports = {
+    Tumbler,
     MonthGrid, DayOfWeekRow, WeekNumberColumn, CalendarModel: T.CalendarModel, Calendar: T.Calendar,
     ApplicationWindow, MenuBar, MenuBarItem,
     SplitView,

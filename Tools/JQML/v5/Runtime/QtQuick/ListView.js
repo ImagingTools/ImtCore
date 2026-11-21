@@ -571,7 +571,7 @@ class ListView extends Item {
 
     $componentComplete(){
         super.$componentComplete()
-        this.$sync()
+        this.$sync('complete')
     }
 
     // ---- header, footer, highlight (QQuickItemViewPrivate::createComponentItem: z 1, the highlight z 0) ----
@@ -811,6 +811,33 @@ class ListView extends Item {
         animation.restart()
     }
 
+    // QQuickListView::viewportMoved with StrictlyEnforceRange: unless the view moves for a new current index, the
+    // highlight stays in the highlight range of the view, and the item at the highlight (snapItemAt) becomes current
+    $strictViewportMoved(){
+        if(this.$inViewportMoved || this.$moveReason === MOVE_SET_INDEX || !(this.$f & engine.COMPLETED)) return
+        let highlight = this.$highlight, range = this.$highlightRange()
+        if(!range.strict || !highlight || !this.$v[ListView.COUNT] || this.$reversed()) return
+        this.$inViewportMoved = true
+        try {
+            let viewPos = this.$position()
+            let pos = this.$flowPosOf(highlight), size = this.$sizeOf(highlight)
+            if(pos > viewPos + range.end - size) pos = viewPos + range.end - size
+            if(pos < viewPos + range.start) pos = viewPos + range.start
+            if(pos !== this.$flowPosOf(highlight)){
+                this.$stopHighlightAnimations()
+                highlight.$write(this.$vertical() ? Item.Y : Item.X, pos)
+            }
+            let index = this.$snapIndexAt(pos)
+            if(index >= 0 && index !== this.$v[ListView.CURRENTINDEX] && this.$entries.get(index)){
+                // updateCurrent: not a SetIndex move
+                this.$viewMovedCurrent = true
+                try { this.$write(ListView.CURRENTINDEX, index) } finally { this.$viewMovedCurrent = false }
+            }
+        } finally {
+            this.$inViewportMoved = false
+        }
+    }
+
     $stopHighlightAnimations(){
         let animations = this.$highlightAnimations
         if(!animations) return
@@ -873,7 +900,8 @@ class ListView extends Item {
 
     // QQuickItemViewPrivate::regenerate: everything released, the viewport for no item, the view at the start, refill,
     // then the current item
-    $sync(){
+    // reason: 'complete' (QQuickItemView::componentComplete), 'model' (setModel), else a regeneration (a new delegate...)
+    $sync(reason){
         let model = this.$v[ListView.MODEL]
         if(model !== this.$model){
             if(this.$model && this.$model.$removeView) this.$model.$removeView(this)
@@ -894,15 +922,38 @@ class ListView extends Item {
         this.$updateViewport()
         this.$setPosition(-this.$headerSize())
         this.$fill(false)
-        // QQuickItemView::componentComplete: refill(), then updateCurrent(0) unless the index was cleared
-        if(count > 0 && this.$v[ListView.CURRENTINDEX] < 0) this.$write(ListView.CURRENTINDEX, 0)
-        if(this.$v[ListView.CURRENTINDEX] >= count) this.$write(ListView.CURRENTINDEX, count - 1)
-        // QQuickItemView::modelUpdated(reset) / componentComplete: SetIndex for the regeneration, the highlight put at
-        // the current item at once (resetHighlightPosition) and tracked
-        this.$moveReason = MOVE_SET_INDEX
-        this.$ensureCurrentItem()
-        this.$resetHighlightPosition()
-        this.$trackedPositionChanged()
+        // QQuickItemView::componentComplete: refill(), then updateCurrent(0) unless the index was cleared;
+        // QQuickItemView::setModel: setCurrentIndex(count > 0 ? 0 : -1) (a model without a delegate has no rows);
+        // QQuickItemViewPrivate::regenerate: updateCurrent(currentIndex)
+        let index = this.$v[ListView.CURRENTINDEX]
+        let defaultIndex = false
+        if(reason === 'model') index = count > 0 && this.$v[ListView.DELEGATE] ? 0 : -1
+        else if(reason === 'complete' && count > 0 && index < 0 && !this.$currentIndexCleared){
+            index = 0
+            defaultIndex = true
+        }
+        if(index >= count) index = count - 1
+        let range = this.$highlightRange()
+        let strictStart = defaultIndex && range.strict
+        this.$inSync = true
+        // (the first item of a strict view becomes current without a SetIndex move)
+        this.$viewMovedCurrent = strictStart
+        try { if(index !== this.$v[ListView.CURRENTINDEX]) this.$write(ListView.CURRENTINDEX, index) } finally { this.$inSync = false; this.$viewMovedCurrent = false }
+        if(strictStart && this.$visible.length){
+            // a view made with its component and the first item current: the delegates come after componentComplete
+            // (incubated), the view stays at its start and the item at the highlight range becomes current (checked)
+            this.$moveReason = MOVE_OTHER
+            this.$ensureCurrentItem()
+            this.$resetHighlightPosition()
+            this.$strictViewportMoved()
+        } else {
+            // QQuickItemView::modelUpdated(reset) / componentComplete: SetIndex for the regeneration, the highlight put
+            // at the current item at once (resetHighlightPosition) and tracked
+            this.$moveReason = MOVE_SET_INDEX
+            this.$ensureCurrentItem()
+            this.$resetHighlightPosition()
+            this.$trackedPositionChanged()
+        }
         this.$moveReason = MOVE_OTHER
         // QQuickItemView::setModel / componentComplete end with updateViewport, also when refill laid nothing out
         // (a view of no size): lastPosition estimates the rows with averageSize - the size of the current item when it
@@ -1312,10 +1363,12 @@ class ListView extends Item {
         let old = this.$v[id]
         if(id === ListView.FLICKABLEDIRECTION && !this.$settingDirection) this.$flickDirectionSet = true
         if(id === ListView.KEYNAVIGATIONENABLED) this.$keyNavigationSet = true
+        // QQuickItemView::setCurrentIndex: currentIndexCleared by -1
+        if(id === ListView.CURRENTINDEX && !this.$inSync && !this.$viewMovedCurrent) this.$currentIndexCleared = value === -1
         super.$write(id, value)
         // QQuickItemView::setCurrentIndex: moveReason SetIndex (not for a change of the model), updateCurrent
         if(id === ListView.CURRENTINDEX && this.$v[id] !== old){
-            if(!this.$modelUpdating && this.$f & engine.COMPLETED) this.$moveReason = MOVE_SET_INDEX
+            if(!this.$modelUpdating && !this.$viewMovedCurrent && this.$f & engine.COMPLETED) this.$moveReason = MOVE_SET_INDEX
             this.$ensureCurrentItem()
         }
         // QQuickListView::geometryChange drains the pool, setReuseItems(false) as well
@@ -1548,7 +1601,7 @@ class ListView extends Item {
 installFlick(ListView)
 
 const resync = (view) => { if(view.$f & engine.COMPLETED) view.$sync() }
-const modelSet = (view, value, old) => { if(!sameModel(value, old)) resync(view) }
+const modelSet = (view, value, old) => { if(!sameModel(value, old) && view.$f & engine.COMPLETED) view.$sync('model') }
 // QQuickItemViewPrivate::forceLayoutPolish (setSpacing, setCacheBuffer, setHighlightRangeMode ...)
 const refill = (view) => view.$forceLayoutPolish()
 const scrolled = (view) => {
@@ -1556,6 +1609,7 @@ const scrolled = (view) => {
     view.$content.$write(Item.Y, -view.$v[ListView.CONTENTY])
     view.$updateBeginningEnd()
     engine.queuePolish(view)
+    view.$strictViewportMoved()
 }
 // QQuickListView::setOrientation: the flick direction follows the orientation unless it was set
 const orientationChanged = (view) => {
