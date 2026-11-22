@@ -4,6 +4,7 @@
 
 // STL includes
 #include <atomic>
+#include <functional>
 #include <memory>
 
 // Qt includes
@@ -208,17 +209,21 @@ typedef icomp::TSimComponentWrap<imtrest::CTcpServerComp> TcpServer;
 */
 struct STeardownStep
 {
-	explicit STeardownStep(const char* text)
-		:text(text)
+	explicit STeardownStep(const char* text, const std::function<QByteArray()>& getDetails = {})
+		:text(text),
+		getDetails(getDetails)
 	{
 	}
 
 	~STeardownStep()
 	{
-		qInfo("Teardown: %s", text);
+		qInfo("Teardown: %s %s", text, getDetails ? getDetails().constData() : "");
 	}
 
 	const char* text;
+
+	// The state of the object before it is destroyed
+	std::function<QByteArray()> getDetails;
 };
 
 
@@ -315,7 +320,7 @@ struct SServer
 	Engine engine;
 	STeardownStep engineStep{"engine"};
 	Connection connection;
-	STeardownStep connectionStep{"connection interface"};
+	STeardownStep connectionStep{"connection interface", [this](){ return "(observers: " + QByteArray::number(connection->GetObserverCount()) + ")"; }};
 	TcpServer server;
 	STeardownStep serverStep{"server component"};
 };
@@ -505,6 +510,30 @@ QtMessageHandler CThreadWarningCatcher::s_previousHandler = nullptr;
 
 
 } // namespace
+
+
+void CTcpServerConnectionTest::ConnectionInterfaceIsDestroyedTest()
+{
+	STeardownStep finishedStep("finished");
+
+	Connection connection;
+	STeardownStep connectionStep("connection interface alone", [&connection](){ return "(observers: " + QByteArray::number(connection->GetObserverCount()) + ")"; });
+
+	const int port = FindFreePort();
+	connection->SetIntAttr("DefaultHttpPort", port);
+	connection->InitComponent();
+
+	QCOMPARE(connection->GetPort(imtcom::IServerConnectionInterface::PT_HTTP), port);
+}
+
+
+void CTcpServerConnectionTest::ServerWithoutConnectionsIsDestroyedTest()
+{
+	STeardownStep finishedStep("finished");
+
+	SServer server(5);
+	QVERIFY(server.IsListening());
+}
 
 
 // While the first request is handled, the client sends 32 MiB of the next one. Qt does not limit the read buffer by default,

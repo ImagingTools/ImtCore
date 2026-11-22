@@ -18,6 +18,10 @@ class CTcpServerConnectionTest: public QObject
 {
 	Q_OBJECT
 private slots:
+	// The components of the server are created and destroyed: the interface of the connection alone, then the server without connections
+	void ConnectionInterfaceIsDestroyedTest();
+	void ServerWithoutConnectionsIsDestroyedTest();
+
 	// The data of the next request must not pile up in the memory of the server while the current request is handled
 	void ReadBufferIsLimitedWhileRequestIsHandledTest();
 	void NextRequestIsReceivedAfterResponseTest();
