@@ -26,7 +26,9 @@ namespace imtfile
 	ifile::CAutoPersistenceComp, is refused; use CPrivateAutoPersistenceComp for the automatic persistence. The slave persistence writes
 	into a new file of the owner next to the file, the file is replaced by it as a whole only when the data are complete: a failed save
 	keeps the previous file. The new file is private by itself (Unix: mode 600; Windows: its own protected access list, nothing of the
-	folder is inherited) and is checked before the slave writes anything into it.
+	folder is inherited) and is checked before the slave writes anything into it. On Windows another program can keep the file open for
+	a moment and not allow to replace it (an antivirus checks a file that has just been written): the save tries again and waits for
+	it at most a second.
 
 	The private folder:
 	- belongs to the account of the process, nobody else can open it: on Unix its mode is 700, on Windows only this account, the system

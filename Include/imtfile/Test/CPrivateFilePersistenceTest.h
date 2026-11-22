@@ -21,6 +21,8 @@ private slots:
 	void initTestCase();
 	void SaveCreatesPrivateFolderAndFileTest();
 	void SaveReplacesSharedFileTest();
+	void SaveWaitsForBrieflyOpenFileTest();
+	void SaveFailsWhileFileIsKeptOpenTest();
 	void SaveKeepsFileOnFailureTest();
 	void OtherFolderIsRefusedTest();
 	void ReplaceableParentFolderIsRefusedTest();

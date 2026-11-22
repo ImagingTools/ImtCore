@@ -30,6 +30,7 @@
 #include <windows.h>
 #include <aclapi.h>
 #include <sddl.h>
+#include <thread>
 #include <vector>
 #else
 #include <fcntl.h>
@@ -692,6 +693,74 @@ void CPrivateFilePersistenceTest::SaveReplacesSharedFileTest()
 	CTextData loaded;
 	QCOMPARE(persistence.persistence.LoadFromFile(loaded), ifile::IFilePersistence::OS_OK);
 	QCOMPARE(loaded.text, QByteArray("new"));
+}
+
+
+// Another program keeps the file open for a moment and does not allow to delete it (as an antivirus checks a new file): the save
+// waits for it and replaces the file when it is closed
+void CPrivateFilePersistenceTest::SaveWaitsForBrieflyOpenFileTest()
+{
+#ifndef Q_OS_WIN
+	QSKIP("Unix replaces a file that other programs have open");
+#else
+	QTemporaryDir root(GetTestRootTemplate());
+	QVERIFY(root.isValid());
+	const QString filePath = root.filePath(QStringLiteral("Private/Secrets.xml"));
+
+	SPersistence persistence(filePath);
+	CTextData data;
+	data.text = "old";
+	QCOMPARE(persistence.persistence.SaveToFile(data), ifile::IFilePersistence::OS_OK);
+
+	const std::wstring nativePath = QDir::toNativeSeparators(filePath).toStdWString();
+	const HANDLE fileHandle = ::CreateFileW(nativePath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+	QVERIFY(fileHandle != INVALID_HANDLE_VALUE);
+
+	std::thread otherProgram([fileHandle](){
+		std::this_thread::sleep_for(std::chrono::milliseconds(300));
+
+		::CloseHandle(fileHandle);
+	});
+
+	data.text = "new";
+	const ifile::IFilePersistence::OperationState state = persistence.persistence.SaveToFile(data);
+	otherProgram.join();
+
+	QCOMPARE(state, ifile::IFilePersistence::OS_OK);
+	QCOMPARE(ReadFile(filePath), QByteArray("new"));
+#endif
+}
+
+
+// The file stays open by another program: the save fails after a while, the file keeps the data of the last save and the working
+// file is removed
+void CPrivateFilePersistenceTest::SaveFailsWhileFileIsKeptOpenTest()
+{
+#ifndef Q_OS_WIN
+	QSKIP("Unix replaces a file that other programs have open");
+#else
+	QTemporaryDir root(GetTestRootTemplate());
+	QVERIFY(root.isValid());
+	const QString folderPath = root.filePath(QStringLiteral("Private"));
+	const QString filePath = folderPath + QStringLiteral("/Secrets.xml");
+
+	SPersistence persistence(filePath);
+	CTextData data;
+	data.text = "old";
+	QCOMPARE(persistence.persistence.SaveToFile(data), ifile::IFilePersistence::OS_OK);
+
+	const std::wstring nativePath = QDir::toNativeSeparators(filePath).toStdWString();
+	const HANDLE fileHandle = ::CreateFileW(nativePath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+	QVERIFY(fileHandle != INVALID_HANDLE_VALUE);
+
+	data.text = "new";
+	const ifile::IFilePersistence::OperationState state = persistence.persistence.SaveToFile(data);
+	::CloseHandle(fileHandle);
+
+	QCOMPARE(state, ifile::IFilePersistence::OS_FAILED);
+	QCOMPARE(ReadFile(filePath), QByteArray("old"));
+	QCOMPARE(QDir(folderPath).entryList(QDir::Files | QDir::Hidden), QStringList{QStringLiteral("Secrets.xml")});
+#endif
 }
 
 

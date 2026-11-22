@@ -13,6 +13,8 @@
 #include <imtfile/CFileTools.h>
 
 #ifdef Q_OS_WIN
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QThread>
 #include <windows.h>
 #include <aclapi.h>
 #include <sddl.h>
@@ -21,6 +23,7 @@
 #include <cerrno>
 #include <climits>
 #include <cstdio>
+#include <cstring>
 #include <sys/stat.h>
 #include <unistd.h>
 #ifdef Q_OS_MACOS
@@ -353,12 +356,59 @@ bool CreatePrivateFile(const QString& filePath)
 }
 
 
-bool ReplaceFile(const QString& sourcePath, const QString& targetPath)
+/**
+	The text of an error of the system for the log.
+*/
+QString GetErrorText(DWORD errorCode)
 {
+	LPWSTR textPtr = nullptr;
+	const DWORD size = ::FormatMessageW(
+				FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+				nullptr,
+				errorCode,
+				0,
+				reinterpret_cast<LPWSTR>(&textPtr),
+				0,
+				nullptr);
+
+	QString retVal = (size > 0) ? QString::fromWCharArray(textPtr, int(size)).trimmed() : QString();
+
+	::LocalFree(textPtr);
+
+	return QStringLiteral("%1 (error %2)").arg(retVal).arg(errorCode);
+}
+
+
+/**
+	Replace the file by the new one. Another program can keep the file open for a moment and not allow to delete it, for example an
+	antivirus or the indexer checks a file that has just been written: then the replacement is tried again for a while. A save waits
+	for it at most \c maxWaitMs.
+*/
+bool ReplaceFile(const QString& sourcePath, const QString& targetPath, QString& errorMessage)
+{
+	const qint64 maxWaitMs = 1000;
+	const unsigned long retryDelayMs = 20;
+
 	const std::wstring nativeSourcePath = QDir::toNativeSeparators(sourcePath).toStdWString();
 	const std::wstring nativeTargetPath = QDir::toNativeSeparators(targetPath).toStdWString();
 
-	return ::MoveFileExW(nativeSourcePath.c_str(), nativeTargetPath.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH) != 0;
+	QElapsedTimer timer;
+	timer.start();
+	while (true){
+		if (::MoveFileExW(nativeSourcePath.c_str(), nativeTargetPath.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH) != 0){
+			return true;
+		}
+
+		const DWORD errorCode = ::GetLastError();
+		const bool isBusy = (errorCode == ERROR_ACCESS_DENIED) || (errorCode == ERROR_SHARING_VIOLATION) || (errorCode == ERROR_LOCK_VIOLATION);
+		if (!isBusy || (timer.elapsed() >= maxWaitMs)){
+			errorMessage = QStringLiteral("The file '%1' cannot be replaced: %2").arg(targetPath, GetErrorText(errorCode));
+
+			return false;
+		}
+
+		QThread::msleep(retryDelayMs);
+	}
 }
 
 
@@ -674,9 +724,20 @@ bool CreatePrivateFile(const QString& filePath)
 }
 
 
-bool ReplaceFile(const QString& sourcePath, const QString& targetPath)
+/**
+	Replace the file by the new one: the file that other programs have open is replaced as well.
+*/
+bool ReplaceFile(const QString& sourcePath, const QString& targetPath, QString& errorMessage)
 {
-	return ::rename(QFile::encodeName(sourcePath).constData(), QFile::encodeName(targetPath).constData()) == 0;
+	if (::rename(QFile::encodeName(sourcePath).constData(), QFile::encodeName(targetPath).constData()) != 0){
+		const int errorCode = errno;
+
+		errorMessage = QStringLiteral("The file '%1' cannot be replaced: %2 (error %3)").arg(targetPath, QString::fromLocal8Bit(std::strerror(errorCode))).arg(errorCode);
+
+		return false;
+	}
+
+	return true;
 }
 
 
@@ -871,9 +932,7 @@ ifile::IFilePersistence::OperationState CPrivateFilePersistenceComp::SaveToFile(
 
 			retVal = OS_FAILED;
 		}
-		else if (!ReplaceFile(workingPath, path)){
-			errorMessage = QStringLiteral("The file '%1' cannot be replaced").arg(path);
-
+		else if (!ReplaceFile(workingPath, path, errorMessage)){
 			retVal = OS_FAILED;
 		}
 		else{
