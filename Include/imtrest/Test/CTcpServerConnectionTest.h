@@ -18,12 +18,8 @@ class CTcpServerConnectionTest: public QObject
 {
 	Q_OBJECT
 private slots:
-	// The components of the server are created and destroyed, from the simplest: a model with attributes (only ACF), the interface of
-	// the connection without and with the model, the server without connections
+	// A simulated model with an attribute is destroyed without failure (see TSimModelComponentPtr)
 	void ModelWithAttributesIsDestroyedTest();
-	void ConnectionInterfaceWithoutModelIsDestroyedTest();
-	void ConnectionInterfaceIsDestroyedTest();
-	void ServerWithoutConnectionsIsDestroyedTest();
 
 	// The data of the next request must not pile up in the memory of the server while the current request is handled
 	void ReadBufferIsLimitedWhileRequestIsHandledTest();

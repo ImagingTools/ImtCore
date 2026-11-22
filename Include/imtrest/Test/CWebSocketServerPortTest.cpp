@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "CWebSocketServerPortTest.h"
+#include "TSimModelComponentPtr.h"
 
 
 // Qt includes
@@ -9,7 +10,6 @@
 #include <QtWebSockets/QWebSocket>
 
 // ACF includes
-#include <icomp/TModelCompWrap.h>
 #include <icomp/TSimComponentWrap.h>
 
 // ImtCore includes
@@ -25,7 +25,7 @@ namespace
 
 typedef icomp::TSimSharedComponentPtr<imtrest::CWebSocketProtocolEngineComp> Engine;
 // A model, as the package of the component makes it: the server follows the changes of its port
-typedef icomp::TSimSharedComponentPtr<icomp::TModelCompWrap<imtcom::CServerConnectionInterfaceParamComp>> Connection;
+typedef TSimModelComponentPtr<imtcom::CServerConnectionInterfaceParamComp> Connection;
 typedef icomp::TSimComponentWrap<imtrest::CWebSocketServerComp> WebSocketServer;
 
 

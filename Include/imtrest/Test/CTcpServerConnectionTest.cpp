@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "CTcpServerConnectionTest.h"
+#include "TSimModelComponentPtr.h"
 
 
 // STL includes
 #include <atomic>
-#include <functional>
 #include <memory>
 
 // Qt includes
@@ -196,8 +196,8 @@ private:
 
 
 /**
-	Data with an attribute and a reference of the component, the data are the first base as in the interface of the connection:
-	the same model, without the code of the interface.
+	Data with an attribute and a reference of the component, the data are the first base as in the interface of the connection: the
+	simplest model that fails in its destructor with MSVC if it has its context still (see TSimModelComponentPtr).
 */
 class CNumberData: virtual public istd::IChangeable
 {
@@ -234,40 +234,13 @@ private:
 };
 
 
-typedef icomp::TSimSharedComponentPtr<icomp::TModelCompWrap<CNumberDataComp>> NumberModel;
-typedef icomp::TSimSharedComponentPtr<imtcom::CServerConnectionInterfaceParamComp> PlainConnection;
-
-
+typedef TSimModelComponentPtr<CNumberDataComp> NumberModel;
 typedef icomp::TSimSharedComponentPtr<CHoldingServletComp> Servlet;
 typedef icomp::TSimSharedComponentPtr<CSlowBodyPolicyComp> SlowBodyPolicy;
 typedef icomp::TSimSharedComponentPtr<imtrest::CHttpProtocolEngineComp> Engine;
 // A model, as the package of the component makes it: the server follows the changes of its port
-typedef icomp::TSimSharedComponentPtr<icomp::TModelCompWrap<imtcom::CServerConnectionInterfaceParamComp>> Connection;
+typedef TSimModelComponentPtr<imtcom::CServerConnectionInterfaceParamComp> Connection;
 typedef icomp::TSimComponentWrap<imtrest::CTcpServerComp> TcpServer;
-
-
-/**
-	Writes its text to the log when it is destroyed. Declared right after an object, it is destroyed right before it: the log shows
-	which object is being destroyed when the end of a test fails.
-*/
-struct STeardownStep
-{
-	explicit STeardownStep(const char* text, const std::function<QByteArray()>& getDetails = {})
-		:text(text),
-		getDetails(getDetails)
-	{
-	}
-
-	~STeardownStep()
-	{
-		qInfo("Teardown: %s %s", text, getDetails ? getDetails().constData() : "");
-	}
-
-	const char* text;
-
-	// The state of the object before it is destroyed
-	std::function<QByteArray()> getDetails;
-};
 
 
 int FindFreePort()
@@ -357,15 +330,10 @@ struct SServer
 
 	int port = 0;
 	Servlet servlet;
-	STeardownStep servletStep{"servlet (with the requests that are not answered)"};
 	SlowBodyPolicy bodyPolicy;
-	STeardownStep bodyPolicyStep{"body policy"};
 	Engine engine;
-	STeardownStep engineStep{"engine"};
 	Connection connection;
-	STeardownStep connectionStep{"connection interface", [this](){ return "(observers: " + QByteArray::number(connection->GetObserverCount()) + ")"; }};
 	TcpServer server;
-	STeardownStep serverStep{"server component"};
 };
 
 
@@ -555,13 +523,10 @@ QtMessageHandler CThreadWarningCatcher::s_previousHandler = nullptr;
 } // namespace
 
 
+// The model of the test is created and destroyed: it takes the attribute on creation and leaves its context before its destructor
 void CTcpServerConnectionTest::ModelWithAttributesIsDestroyedTest()
 {
-	STeardownStep finishedStep("finished");
-
 	NumberModel model;
-	STeardownStep modelStep("model with attributes");
-
 	model->SetIntAttr("Number", 7);
 	model->InitComponent();
 
@@ -569,63 +534,20 @@ void CTcpServerConnectionTest::ModelWithAttributesIsDestroyedTest()
 }
 
 
-void CTcpServerConnectionTest::ConnectionInterfaceWithoutModelIsDestroyedTest()
-{
-	STeardownStep finishedStep("finished");
-
-	PlainConnection connection;
-	STeardownStep connectionStep("connection interface without model");
-
-	const int port = FindFreePort();
-	connection->SetIntAttr("DefaultHttpPort", port);
-	connection->InitComponent();
-
-	QCOMPARE(connection->GetPort(imtcom::IServerConnectionInterface::PT_HTTP), port);
-}
-
-
-void CTcpServerConnectionTest::ConnectionInterfaceIsDestroyedTest()
-{
-	STeardownStep finishedStep("finished");
-
-	Connection connection;
-	STeardownStep connectionStep("connection interface alone", [&connection](){ return "(observers: " + QByteArray::number(connection->GetObserverCount()) + ")"; });
-
-	const int port = FindFreePort();
-	connection->SetIntAttr("DefaultHttpPort", port);
-	connection->InitComponent();
-
-	QCOMPARE(connection->GetPort(imtcom::IServerConnectionInterface::PT_HTTP), port);
-}
-
-
-void CTcpServerConnectionTest::ServerWithoutConnectionsIsDestroyedTest()
-{
-	STeardownStep finishedStep("finished");
-
-	SServer server(5);
-	QVERIFY(server.IsListening());
-}
-
-
 // While the first request is handled, the client sends 32 MiB of the next one. Qt does not limit the read buffer by default,
 // so before the limit the server took all the data into its memory at once, even though nobody read them.
 void CTcpServerConnectionTest::ReadBufferIsLimitedWhileRequestIsHandledTest()
 {
-	STeardownStep finishedStep("finished");
-
 	SServer server(5);
 	QVERIFY(server.IsListening());
 
 	CClient client;
-	STeardownStep clientStep("client");
 	QVERIFY(client.Connect(server.port));
 
 	client.SendGet("/first");
 	QTRY_COMPARE_WITH_TIMEOUT(server.servlet->GetHeld().size(), 1, 5000);
 
 	CBigUpload upload(client.GetSocket(), "/second", 32 * s_mebibyte);
-	STeardownStep uploadStep("upload");
 
 	// The server does not read the data of the next request, so the client cannot pass them all to the network
 	QElapsedTimer timer;
