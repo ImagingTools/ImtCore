@@ -202,6 +202,26 @@ typedef icomp::TSimSharedComponentPtr<icomp::TModelCompWrap<imtcom::CServerConne
 typedef icomp::TSimComponentWrap<imtrest::CTcpServerComp> TcpServer;
 
 
+/**
+	Writes its text to the log when it is destroyed. Declared right after an object, it is destroyed right before it: the log shows
+	which object is being destroyed when the end of a test fails.
+*/
+struct STeardownStep
+{
+	explicit STeardownStep(const char* text)
+		:text(text)
+	{
+	}
+
+	~STeardownStep()
+	{
+		qInfo("Teardown: %s", text);
+	}
+
+	const char* text;
+};
+
+
 int FindFreePort()
 {
 	QTcpServer server;
@@ -289,10 +309,15 @@ struct SServer
 
 	int port = 0;
 	Servlet servlet;
+	STeardownStep servletStep{"servlet (with the requests that are not answered)"};
 	SlowBodyPolicy bodyPolicy;
+	STeardownStep bodyPolicyStep{"body policy"};
 	Engine engine;
+	STeardownStep engineStep{"engine"};
 	Connection connection;
+	STeardownStep connectionStep{"connection interface"};
 	TcpServer server;
+	STeardownStep serverStep{"server component"};
 };
 
 
@@ -486,16 +511,20 @@ QtMessageHandler CThreadWarningCatcher::s_previousHandler = nullptr;
 // so before the limit the server took all the data into its memory at once, even though nobody read them.
 void CTcpServerConnectionTest::ReadBufferIsLimitedWhileRequestIsHandledTest()
 {
+	STeardownStep finishedStep("finished");
+
 	SServer server(5);
 	QVERIFY(server.IsListening());
 
 	CClient client;
+	STeardownStep clientStep("client");
 	QVERIFY(client.Connect(server.port));
 
 	client.SendGet("/first");
 	QTRY_COMPARE_WITH_TIMEOUT(server.servlet->GetHeld().size(), 1, 5000);
 
 	CBigUpload upload(client.GetSocket(), "/second", 32 * s_mebibyte);
+	STeardownStep uploadStep("upload");
 
 	// The server does not read the data of the next request, so the client cannot pass them all to the network
 	QElapsedTimer timer;
