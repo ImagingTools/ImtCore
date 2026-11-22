@@ -18,7 +18,10 @@ class CTcpServerConnectionTest: public QObject
 {
 	Q_OBJECT
 private slots:
-	// The components of the server are created and destroyed: the interface of the connection alone, then the server without connections
+	// The components of the server are created and destroyed, from the simplest: a model with attributes (only ACF), the interface of
+	// the connection without and with the model, the server without connections
+	void ModelWithAttributesIsDestroyedTest();
+	void ConnectionInterfaceWithoutModelIsDestroyedTest();
 	void ConnectionInterfaceIsDestroyedTest();
 	void ServerWithoutConnectionsIsDestroyedTest();
 

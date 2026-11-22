@@ -195,6 +195,49 @@ private:
 };
 
 
+/**
+	Data with an attribute and a reference of the component, the data are the first base as in the interface of the connection:
+	the same model, without the code of the interface.
+*/
+class CNumberData: virtual public istd::IChangeable
+{
+public:
+	int number = 0;
+};
+
+
+class CNumberDataComp:
+			public CNumberData,
+			public icomp::CComponentBase
+{
+public:
+	typedef icomp::CComponentBase BaseClass;
+
+	I_BEGIN_COMPONENT(CNumberDataComp);
+		I_REGISTER_INTERFACE(istd::IChangeable);
+		I_ASSIGN(m_numberAttrPtr, "Number", "Initial number", false, 1);
+		I_ASSIGN(m_slaveCompPtr, "Slave", "Unused reference", false, "Slave");
+	I_END_COMPONENT;
+
+protected:
+	// reimplemented (icomp::CComponentBase)
+	void OnComponentCreated() override
+	{
+		BaseClass::OnComponentCreated();
+
+		number = *m_numberAttrPtr;
+	}
+
+private:
+	I_ATTR(int, m_numberAttrPtr);
+	I_REF(istd::IChangeable, m_slaveCompPtr);
+};
+
+
+typedef icomp::TSimSharedComponentPtr<icomp::TModelCompWrap<CNumberDataComp>> NumberModel;
+typedef icomp::TSimSharedComponentPtr<imtcom::CServerConnectionInterfaceParamComp> PlainConnection;
+
+
 typedef icomp::TSimSharedComponentPtr<CHoldingServletComp> Servlet;
 typedef icomp::TSimSharedComponentPtr<CSlowBodyPolicyComp> SlowBodyPolicy;
 typedef icomp::TSimSharedComponentPtr<imtrest::CHttpProtocolEngineComp> Engine;
@@ -510,6 +553,35 @@ QtMessageHandler CThreadWarningCatcher::s_previousHandler = nullptr;
 
 
 } // namespace
+
+
+void CTcpServerConnectionTest::ModelWithAttributesIsDestroyedTest()
+{
+	STeardownStep finishedStep("finished");
+
+	NumberModel model;
+	STeardownStep modelStep("model with attributes");
+
+	model->SetIntAttr("Number", 7);
+	model->InitComponent();
+
+	QCOMPARE(model->number, 7);
+}
+
+
+void CTcpServerConnectionTest::ConnectionInterfaceWithoutModelIsDestroyedTest()
+{
+	STeardownStep finishedStep("finished");
+
+	PlainConnection connection;
+	STeardownStep connectionStep("connection interface without model");
+
+	const int port = FindFreePort();
+	connection->SetIntAttr("DefaultHttpPort", port);
+	connection->InitComponent();
+
+	QCOMPARE(connection->GetPort(imtcom::IServerConnectionInterface::PT_HTTP), port);
+}
 
 
 void CTcpServerConnectionTest::ConnectionInterfaceIsDestroyedTest()
