@@ -127,8 +127,15 @@ class Codegen {
             for(let imp of file.imports){
                 let target = String(imp.path || '').replace(/^["']|["']$/g, '')
                 if(!target.endsWith('.js')) continue
-                let fileName = path.resolve(path.dirname(file.fileName), target)
-                let url = (file.url || '').slice(0, (file.url || '').lastIndexOf('/') + 1) + target
+                // qrc:/x.js: the file a .qrc declares at that resource path; its url is that path
+                let qrc = target.startsWith('qrc:')
+                let fileName = qrc ? (this.files.$qrcFile && this.files.$qrcFile(target, file.fileName)) : path.resolve(path.dirname(file.fileName), target)
+                if(!fileName || !fs.existsSync(fileName)){
+                    // Qt: the document is not loaded ("Script ... unavailable"); here the qualifier is an empty object
+                    this.warn(file, imp.line || 0, 'script ' + target + ' is not found')
+                    if(!fileName) fileName = path.resolve(path.dirname(file.fileName), target.replace(/^[a-z]+:\/*/i, ''))
+                }
+                let url = qrc ? target : (file.url || '').slice(0, (file.url || '').lastIndexOf('/') + 1) + target
                 if(!this.scriptUrls.has(path.normalize(fileName))) this.scriptUrls.set(path.normalize(fileName), normalizeUrl(url))
                 if(imp.as) file.scriptImports.set(imp.as, this.scriptRef(fileName))
             }

@@ -393,8 +393,25 @@ function qsTrIn(context){
     return fn
 }
 
+// c.a = v, item.color.r = v: a component of a color written (compiler/valueWrites.js). A color is a string that does
+// not change: the new color goes where the value came from (the variable, or the property of obj); another value gets
+// the member as JavaScript gives it
+function cset(value, name, v, assign){
+    let color = require('./Core/color').setComponent(value, name, v)
+    if(color === null) value[name] = v
+    else if(assign) assign(color)
+    return v
+}
+function csetm(obj, key, name, v){
+    let value = obj[key]
+    let color = require('./Core/color').setComponent(value, name, v)
+    if(color === null) value[name] = v
+    else obj[key] = color
+    return v
+}
+
 const JQ = {
-    qsTrIn, forward, bindAlias, handleGroup, callCreateQmlObject, files, scripts, script, si, sis, moduleScripts, make: engine.make, inContext: engine.inContext, callCreateComponent, sctx, sctxValue, sset, singleton, defineMethod, defaultParent, defaultAssign, aliasAssign, ctx, ctxValue, mctx, mrole, as, ns, qmlModule, subAssign, rootContext,
+    cset, csetm, qsTrIn, forward, bindAlias, handleGroup, callCreateQmlObject, files, scripts, script, si, sis, moduleScripts, make: engine.make, inContext: engine.inContext, callCreateComponent, sctx, sctxValue, sset, singleton, defineMethod, defaultParent, defaultAssign, aliasAssign, ctx, ctxValue, mctx, mrole, as, ns, qmlModule, subAssign, rootContext,
     engine, defineType, create,
     batch: engine.batch,
     stats: engine.stats,

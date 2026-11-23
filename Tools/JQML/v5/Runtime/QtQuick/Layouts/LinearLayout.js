@@ -13,6 +13,19 @@ class LinearLayout extends Layout {
         return main ? values.reduce((a, b) => a + b, 0) + this.$v[LinearLayout.SPACING] * (values.length - 1) : Math.max(...values)
     }
 
+    // QQuickLayout::sizeHint(Qt::MaximumSize): an item that does not fill is as large as it prefers; along the layout
+    // their sum with the spacing, across it the largest
+    $maximum(horizontal){
+        let items = this.$items()
+        let main = horizontal === this.$horizontal()
+        let values = items.map(item => {
+            let h = hints(item, horizontal, this)
+            return h.fill ? h.max : h.preferred
+        })
+        if(!values.length) return Infinity
+        return main ? values.reduce((a, b) => a + b, 0) + this.$v[LinearLayout.SPACING] * (values.length - 1) : Math.max(...values)
+    }
+
     $arrange(){
         let horizontal = this.$horizontal()
         let items = this.$items()

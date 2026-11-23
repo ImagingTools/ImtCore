@@ -87,6 +87,8 @@ function readQrcDir(dir){
     let dirKey = pathKey(dir)
     if(qrcDirs.has(dirKey)) return qrcDirs.get(dirKey)
     let urls = new Map()
+    // every resource the .qrc files of the dir declare: its path (without qrc:/) -> the file
+    urls.$resources = new Map()
     qrcDirs.set(dirKey, urls)
     let names = []
     try {
@@ -105,6 +107,7 @@ function readQrcDir(dir){
             let file = m[3].trim()
             let alias = (m[2].match(/\balias\s*=\s*"([^"]*)"/) || [])[1]
             let resource = normalizeResource((prefix ? prefix + '/' : '') + (alias || file))
+            if(!urls.$resources.has(resource)) urls.$resources.set(resource, path.resolve(dir, file))
             if(!resource.startsWith('qml/')) continue
             let fileKey = pathKey(path.resolve(dir, file))
             if(!urls.has(fileKey)) urls.set(fileKey, resource.slice(4))
@@ -120,6 +123,20 @@ function qrcUrl(fileName){
     while(true){
         let url = readQrcDir(dir).get(key)
         if(url) return url
+        let parent = path.dirname(dir)
+        if(parent === dir) return null
+        dir = parent
+    }
+}
+
+// The file of a resource url (qrc:/LayoutManager.js) as a .qrc of the dir of fileName, or of a dir above, declares it
+// (the resources of the application Qt serves at qrc:/), or null
+function qrcFile(url, fileName){
+    let resource = normalizeResource(String(url).replace(/^qrc:/, ''))
+    let dir = path.dirname(path.resolve(fileName))
+    while(true){
+        let file = readQrcDir(dir).$resources.get(resource)
+        if(file) return file
         let parent = path.dirname(dir)
         if(parent === dir) return null
         dir = parent
@@ -178,6 +195,7 @@ function collectFiles(entry, configPath){
     files.$modules = new Map()
     files.$paths = new Set()
     files.$qrcUrl = qrcUrl
+    files.$qrcFile = qrcFile
     let dirs = configPath && fs.existsSync(configPath) ? loadConfig(configPath).filter(dir => fs.existsSync(dir)) : []
     // a module may span several dirs with their own qmldir; urls are relative to the topmost one
     let modules = dirs.map(dir => ({ name: readQmldir(dir).module || path.basename(dir), root: path.resolve(dir) }))
@@ -213,8 +231,9 @@ function collectFiles(entry, configPath){
         // a script that calls Qt.createQmlObject resolves the types of its documents against its own directory
         for(let imp of file.imports){
             let target = String(imp.path || '').replace(/^["']|["']$/g, '')
-            if(!target.endsWith('.js') || /^[a-z]+:/i.test(target)) continue
-            let script = path.resolve(path.dirname(file.fileName), target)
+            if(!target.endsWith('.js') || (/^[a-z]+:/i.test(target) && !target.startsWith('qrc:'))) continue
+            let script = target.startsWith('qrc:') ? qrcFile(target, file.fileName) : path.resolve(path.dirname(file.fileName), target)
+            if(!script) continue
             if(!fs.existsSync(script)) continue
             let source = fs.readFileSync(script, 'utf8')
             if(!source.includes('createQmlObject')) continue

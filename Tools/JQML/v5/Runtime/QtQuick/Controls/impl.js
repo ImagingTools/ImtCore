@@ -279,7 +279,8 @@ class IconLabel extends Item {
             image.name = icon.$v[Icon.NAME] || ''
             image.sourceSize.width = icon.$v[Icon.WIDTH]
             image.sourceSize.height = icon.$v[Icon.HEIGHT]
-            image.defaultColor = this.$v[IconLabel.DEFAULTICONCOLOR]
+            // QQuickIconLabelPrivate::syncImage: the color of the icon, else the default one of the label; the
+            // defaultColor of the image is not set (transparent), so the picture is drawn in that color
             let color = icon.$v[Icon.COLOR]
             image.color = color && color !== '#00000000' ? color : this.$v[IconLabel.DEFAULTICONCOLOR]
             image.cache = icon.$v[Icon.CACHE]

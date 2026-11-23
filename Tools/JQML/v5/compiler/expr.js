@@ -1,6 +1,7 @@
 // Rewrites QML JavaScript: every free identifier goes through resolve(name),
 // which returns replacement JS source or null to keep the name (JS globals).
 const U = require('uglify-js')
+const { colorWrites } = require('./valueWrites')
 
 const replacementCache = new Map()
 
@@ -119,7 +120,7 @@ function transformFree(ast, resolve, free){
         }
         return undefined
     }
-    return ast.transform(new U.TreeTransformer(before, function(node){
+    return colorWrites(ast.transform(new U.TreeTransformer(before, function(node){
         // value instanceof __qmlas__(Type): JQ.as(value, Type) (rewriteAs)
         if(node instanceof U.AST_Binary && node.operator === 'instanceof' && node.right instanceof U.AST_Call
             && node.right.expression instanceof U.AST_SymbolRef && node.right.expression.name === '__qmlas__'){
@@ -157,7 +158,7 @@ function transformFree(ast, resolve, free){
             })
         }
         return undefined
-    }))
+    })))
 }
 
 const PRINT = { beautify: false, comments: false, ascii_only: false }

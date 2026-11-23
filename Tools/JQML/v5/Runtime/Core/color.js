@@ -285,8 +285,30 @@ function installComponents(){
     }
 }
 
+// a color with one component set, or null when text is not a color: QQuickColorValueType::setR (QColor::setRedF), ...,
+// setHsvHue (QColor::getHsvF, then setHsvF with the new hue), ...
+function setComponent(text, name, value){
+    if(typeof text !== 'string' || !COLOR_TEXT.test(text) || !COMPONENTS[name] || name === 'valid') return null
+    let c = parseColor(text)
+    let get = (n) => COMPONENTS[n](c)
+    let v = Number(value)
+    switch(name){
+        case 'r': return rgbaColor(v, get('g'), get('b'), get('a'))
+        case 'g': return rgbaColor(get('r'), v, get('b'), get('a'))
+        case 'b': return rgbaColor(get('r'), get('g'), v, get('a'))
+        case 'a': return rgbaColor(get('r'), get('g'), get('b'), v)
+        case 'hsvHue': return hsvaColor(v, get('hsvSaturation'), get('hsvValue'), get('a'))
+        case 'hsvSaturation': return hsvaColor(get('hsvHue'), v, get('hsvValue'), get('a'))
+        case 'hsvValue': return hsvaColor(get('hsvHue'), get('hsvSaturation'), v, get('a'))
+        case 'hslHue': return hslaColor(v, get('hslSaturation'), get('hslLightness'), get('a'))
+        case 'hslSaturation': return hslaColor(get('hslHue'), v, get('hslLightness'), get('a'))
+        case 'hslLightness': return hslaColor(get('hslHue'), get('hslSaturation'), v, get('a'))
+    }
+    return null
+}
+
 module.exports = {
-    installComponents, rgbToHsl,
+    installComponents, rgbToHsl, setComponent,
     coerceColor, toCss, rgba, NAMED, parseColor, colorName, rgbaColor, hslaColor, hsvaColor, lighterColor, darkerColor,
     alphaColor, tintColor,
 }

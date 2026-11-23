@@ -99,3 +99,37 @@ test('a module file the .qrc puts at the root of qml/ gets that url, as Qt serve
     assert.ok(code.includes('"Window.qml"'))
     assert.ok(!code.includes('"controls/Base/Window.qml"'))
 })
+
+// import "qrc:/x.js" as X: the script the .qrc of the project declares at that resource path (prefix "/" of a qml.qrc
+// next to main.qml, as Tesla-Dashboard-UI-3 has it); a script that is found nowhere is reported (Qt does not load the
+// document)
+function compiled(files, entry){
+    let root = fs.mkdtempSync(path.join(os.tmpdir(), 'jqml-qrc-'))
+    try {
+        write(root, files)
+        let output = path.join(root, 'out')
+        let result = compile({ mode: 'js', entry: path.join(root, entry), output, name: 'index' })
+        return { code: fs.readFileSync(path.join(output, 'index.js'), 'utf8'), warnings: result.warnings }
+    } finally {
+        fs.rmSync(root, { recursive: true, force: true })
+    }
+}
+
+test('a script imported by its qrc: url is the file the .qrc declares there', () => {
+    let { code, warnings } = compiled({
+        'app/main.qml': 'import QtQuick 2.15\nimport "qrc:/LayoutManager.js" as Responsive\nItem { property var m: new Responsive.Manager(2) }\n',
+        'app/LayoutManager.js': 'function Manager(n) { this.n = n }\n',
+        'app/qml.qrc': '<RCC><qresource prefix="/"><file>main.qml</file><file>LayoutManager.js</file></qresource></RCC>',
+    }, 'app/main.qml')
+    assert.deepEqual(warnings, [])
+    assert.match(code, /JQ\.script\("qrc:\/LayoutManager\.js",false,\(function\(Qt,\$c\)\{function Manager/)
+})
+
+test('a script that is not found is reported', () => {
+    let { warnings } = compiled({
+        'app/main.qml': 'import QtQuick 2.15\nimport "qrc:/Missing.js" as M\nimport "missing.js" as N\nItem {}\n',
+    }, 'app/main.qml')
+    assert.equal(warnings.length, 2)
+    assert.match(warnings[0], /main\.qml:2: warning: script qrc:\/Missing\.js is not found/)
+    assert.match(warnings[1], /main\.qml:3: warning: script missing\.js is not found/)
+})

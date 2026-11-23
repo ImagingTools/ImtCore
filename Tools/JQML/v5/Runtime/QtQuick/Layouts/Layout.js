@@ -83,6 +83,8 @@ function hints(item, horizontal, parentLayout){
     let min = v ? v[horizontal ? P.MINIMUMWIDTH : P.MINIMUMHEIGHT] : 0
     let max = v ? v[horizontal ? P.MAXIMUMWIDTH : P.MAXIMUMHEIGHT] : Infinity
     if(item instanceof Layout && !(v && v[horizontal ? P.MINIMUMWIDTH : P.MINIMUMHEIGHT])) min = item.$minimum(horizontal)
+    // a layout in a layout: no larger than its items let it be (QQuickLayout::sizeHint(Qt::MaximumSize))
+    if(item instanceof Layout && max === Infinity) max = item.$maximum(horizontal)
     let fillExplicit = attached && attached.$explicit & (horizontal ? 16 : 32)
     let fill = fillExplicit ? !!v[horizontal ? P.FILLWIDTH : P.FILLHEIGHT] : (item instanceof Layout || (parentLayout instanceof require('./StackLayout').StackLayout))
     let stretch = v ? v[horizontal ? P.HORIZONTALSTRETCHFACTOR : P.VERTICALSTRETCHFACTOR] : -1
@@ -122,6 +124,15 @@ function solve(cells, available){
                     continue
                 }
                 for(let i of growing) sizes[i] += totalWeight > 0 ? extra * weight(i) / totalWeight : extra / growing.length
+                extra = 0
+            }
+            // every fill cell at its maximum: the cells take the rest past it (QGridLayoutRowData::calculateGeometries,
+            // a target above the maximum), by stretch factor; their items keep their maximum, aligned in the cell
+            if(extra > 0.0001){
+                let fills = cells.map((cell, i) => i).filter(i => cells[i].fill)
+                let stretchOf = (i) => (cells[i].stretch > 0 ? cells[i].stretch : 1)
+                let totalStretch = fills.reduce((sum, i) => sum + stretchOf(i), 0)
+                for(let i of fills) sizes[i] += extra * stretchOf(i) / totalStretch
                 extra = 0
             }
         } else if(total > 0){
@@ -206,6 +217,7 @@ class Layout extends Item {
     }
 
     $minimum(horizontal){ return 0 }
+    $maximum(horizontal){ return Infinity }
 
     // position first, then size, like QQuickLayout::rearrange applying item geometry
     // (not $place: that is Item.$place(id, value), a layout in a layout is placed by it)
