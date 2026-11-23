@@ -225,8 +225,9 @@ FocusScope {
 		clip: true;
 		
 		activeFocusOnPress: !containerTextField.readOnly;
-		activeFocusOnTab: !containerTextField.readOnly;
-		
+		// Qt refuses to clear activeFocusOnTab on the focused item (a field turning read-only while edited): keep it until the focus leaves
+		activeFocusOnTab: !containerTextField.readOnly || textField.activeFocus;
+
 		onAccepted: {
 			containerTextField.accepted();
 		}
