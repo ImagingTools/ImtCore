@@ -338,7 +338,7 @@ class Text extends Item {
             let v = this.$v
             if(dirty & TEXT){
                 this.$styleFont(s, this.$font(), layout.lh)
-                let h = v[Text.HORIZONTALALIGNMENT]
+                let h = this.$effectiveHAlign()
                 s.textAlign = h & 2 ? 'right' : h & 4 ? 'center' : h & 8 ? 'justify' : 'left'
                 s.justifyContent = h & 2 ? 'flex-end' : h & 4 ? 'center' : 'flex-start'
                 let valign = v[Text.VERTICALALIGNMENT]
@@ -351,6 +351,10 @@ class Text extends Item {
                 if(layout.rich){
                     inner.style.whiteSpace = v[Text.WRAPMODE] !== NOWRAP && (this.$explicit & 1) ? 'normal' : 'nowrap'
                     inner.replaceChildren(sanitize(layout.text))
+                    // a link is drawn in linkColor, unless its HTML gives it a color (QQuickTextDocumentWithImageResources)
+                    for(let link of inner.querySelectorAll('a[href]')){
+                        if(!link.style.color) link.style.color = toCss(v[Text.LINKCOLOR])
+                    }
                 } else {
                     inner.style.whiteSpace = 'pre'
                     inner.textContent = layout.lines.join('\n')
@@ -377,7 +381,23 @@ defineType(Text, {
         text: { kind: 'string', effect: relayoutText },
         color: { kind: 'color', effect: style },
         font: { group: Font },
-        horizontalAlignment: { kind: 'int', initial: 1, effect: (t) => engine.markDirty(t, TEXT) },
+        horizontalAlignment: {
+            kind: 'int',
+            initial: 1,
+            effect: (t) => {
+                engine.markDirty(t, TEXT)
+                engine.emit(t, Text.SIGNAL_effectiveHorizontalAlignmentChanged)
+            },
+        },
+        // QQuickText::effectiveHAlign: an alignment set explicitly is to the other side in a mirrored item
+        effectiveHorizontalAlignment: {
+            kind: 'int',
+            readonly: true,
+            get(){
+                engine.track(this, Text.SIGNAL_effectiveHorizontalAlignmentChanged)
+                return this.$effectiveHAlign()
+            },
+        },
         verticalAlignment: { kind: 'int', initial: 32, effect: (t) => engine.markDirty(t, TEXT) },
         wrapMode: { kind: 'int', effect: relayoutText },
         elide: { kind: 'int', initial: ELIDE_NONE, effect: relayoutText },
@@ -397,7 +417,7 @@ defineType(Text, {
         paintedHeight: { kind: 'real', readonly: true },
         truncated: { kind: 'bool', readonly: true },
         hoveredLink: { kind: 'string', readonly: true },
-        linkColor: { kind: 'color', initial: '#0000ff' },
+        linkColor: { kind: 'color', initial: '#0000ff', effect: (t) => engine.markDirty(t, TEXT) },
         style: 'int',
         styleColor: 'color',
         baseUrl: 'string',
@@ -409,6 +429,28 @@ defineType(Text, {
     },
     signals: ['linkActivated(link)', 'linkHovered(link)', 'lineLaidOut(line)'],
 })
+Object.assign(Text.prototype, {
+    $effectiveHAlign(){
+        let h = this.$v[Text.HORIZONTALALIGNMENT]
+        if(!this.$hAlignExplicit || !require('./LayoutMirroring').mirrored(this)) return h
+        return h === 1 ? 2 : h === 2 ? 1 : h
+    },
+    $mirrorChanged(){
+        engine.markDirty(this, TEXT)
+        engine.emit(this, Text.SIGNAL_effectiveHorizontalAlignmentChanged)
+    },
+})
+// a written alignment is explicit (hAlignImplicit false); undefined resets it (resetHAlign)
+{
+    let base = Text.prototype.$write
+    Text.prototype.$write = function(id, value){
+        if(id === Text.HORIZONTALALIGNMENT){
+            this.$hAlignExplicit = value !== undefined
+            if(value === undefined) value = 1
+        }
+        base.call(this, id, value)
+    }
+}
 
 Object.assign(Text, { AlignLeft: 0x1, AlignRight: 0x2, AlignHCenter: 0x4, AlignJustify: 0x8, AlignTop: 0x20, AlignBottom: 0x40, AlignVCenter: 0x80 }, {
     NoWrap: 0, WordWrap: 1, WrapAnywhere: 3, Wrap: 4, WrapAtWordBoundaryOrAnywhere: 4,

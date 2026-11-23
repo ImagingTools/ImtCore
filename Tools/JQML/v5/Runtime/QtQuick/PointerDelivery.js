@@ -39,7 +39,9 @@ function paintOrder(item){
 
 // an item that takes mouse events: presses, hover or the wheel. $acceptsMouse: an item that takes the press without
 // handling it here (TextInput, TextEdit: setAcceptedMouseButtons(Qt::LeftButton), their native control does the rest)
-const handlesMouse = (item) => item.$mousePress !== undefined || item.$acceptsMouse !== undefined || item.$acceptsHover !== undefined || item.$wheel !== undefined
+const handlesMouseItself = (item) => item.$mousePress !== undefined || item.$acceptsMouse !== undefined || item.$acceptsHover !== undefined || item.$wheel !== undefined
+// or through its pointer handlers (PointerHandlers.js)
+const handlesMouse = (item) => handlesMouseItself(item) || (item.$handlers !== undefined && item.$handlers.length > 0)
 
 // Items under a scene point that take mouse events (all items with `all`), topmost first, each with the point in its
 // own coordinates. Invisible or disabled items hide their subtree; a clipping item hides children outside it.
@@ -99,6 +101,8 @@ const scene = {
     grabber: null,
     pressedButtons: NoButton,
     hovered: [],
+    hoverHandlers: new Set(),   // the hovered HoverHandlers
+    passive: [],                // the handlers with a passive grab of the press (DragHandler)
     x: -1,
     y: -1,
     modifiers: 0,
@@ -120,6 +124,35 @@ function local(item, x, y){
     return { x: x - pos.x, y: y - pos.y }
 }
 
+// the moves of a press go to the handlers with a passive grab; one that takes the grab (a DragHandler past its
+// threshold) cancels the item that had it, unless that item keeps it (MouseArea.preventStealing). True when a handler
+// has the grab: the items get no move
+function dragPassive(x, y, buttons, modifiers){
+    for(let handler of scene.passive.slice()){
+        if(handler.$f & engine.DESTROYED) continue
+        let grabber = scene.grabber
+        // QQuickPointerHandler::grabPoints: the item that keeps its grab (or another handler's grab) refuses it;
+        // the grabber is canceled before the handler becomes active
+        let grab = () => {
+            if(grabber === handler) return true
+            if(grabber && (grabber.$isHandler || grabber.$keepMouseGrab)) return false
+            transferGrab(handler)
+            return true
+        }
+        handler.$drag(x, y, buttons, modifiers, grab)
+    }
+    return !!(scene.grabber && scene.grabber.$isHandler)
+}
+
+// the press ends for the handlers that saw it
+function endPassive(canceled){
+    let handlers = scene.passive
+    scene.passive = []
+    for(let handler of handlers){
+        if(!(handler.$f & engine.DESTROYED)) handler.$end(canceled)
+    }
+}
+
 // native: the TextInput or TextEdit whose native control is under the point. True when the press reaches it before
 // an item above takes it (QQuickDeliveryAgent, topmost first): the native control handles the press then
 function press(x, y, button, buttons, modifiers, doubleClick, native = null){
@@ -130,6 +163,7 @@ function press(x, y, button, buttons, modifiers, doubleClick, native = null){
         scene.pressedButtons = buttons
         scene.modifiers = modifiers
         let grabber = scene.grabber
+        if(grabber && grabber.$isHandler) return
         if(grabber && !(grabber.$f & engine.DESTROYED)){
             // another button while grabbed goes to the grabber
             let p = local(grabber, x, y)
@@ -137,26 +171,41 @@ function press(x, y, button, buttons, modifiers, doubleClick, native = null){
             return
         }
         scene.grabber = null
+        endPassive(false)
         let filtered = new Set()
+        // once an item has the press, the items below it only give it to their handlers (handlersOnly of
+        // QQuickDeliveryAgentPrivate::deliverPressOrReleaseEvent)
+        let handlersOnly = false
         for(let target of targetsAt(x, y)){
             let item = target.item
+            // the handlers of the item see the press first; a passive grab does not stop it
+            if(item.$handlers){
+                for(let handler of item.$handlers){
+                    if(handler.$press && handler.$press(target.x, target.y, x, y, button, modifiers)) scene.passive.push(handler)
+                }
+            }
+            if(handlersOnly || !handlesMouseItself(item)) continue
             let filter = filterChildEvent('press', item, x, y, buttons, filtered)
             if(filter.filtered){
                 scene.grabber = filter.grabber
-                break
+                handlersOnly = true
+                continue
             }
             if(native && item === native){
                 reached = true
-                break
+                handlersOnly = true
+                continue
             }
             if(item.$mousePress){
                 if(item.$mousePress(target.x, target.y, button, buttons, modifiers)){
                     scene.grabber = item
-                    break
+                    handlersOnly = true
                 }
             } else if(item.$acceptsMouse){
                 scene.grabber = item
-                break
+                // QQuickTextInput::mousePressEvent: activeFocusOnPress gives the field the focus (Qt::MouseFocusReason)
+                if(item.$pressFocus && button === LeftButton) item.$pressFocus()
+                handlersOnly = true
             }
         }
         if(doubleClick && scene.grabber && scene.grabber.$mouseDoubleClick){
@@ -164,16 +213,23 @@ function press(x, y, button, buttons, modifiers, doubleClick, native = null){
             scene.grabber.$mouseDoubleClick(p.x, p.y, button, buttons, modifiers)
         }
         scene.contextMenuGrabbed = !!(scene.grabber && button === RightButton && scene.grabber.$mousePress)
+        // QWindowPrivate::maybeSynthesizeContextMenuEvent: a right press no item takes is a context menu event
+        // (QQuickDeliveryAgentPrivate::deliverContextMenuEvent: ContextMenu of QtQuick.Controls)
+        if(button === RightButton && !scene.grabber && !reached && contextMenuHandler) contextMenuHandler(x, y, targetsAt(x, y, true).map(t => t.item))
     })
     return reached
 }
+let contextMenuHandler = null
+function setContextMenuHandler(fn){ contextMenuHandler = fn }
 
 function move(x, y, buttons, modifiers){
     engine.batch(() => {
         scene.x = x
         scene.y = y
         scene.modifiers = modifiers
+        if(buttons && scene.passive.length && dragPassive(x, y, buttons, modifiers)) return
         let grabber = scene.grabber
+        if(grabber && grabber.$isHandler) return
         if(grabber && !(grabber.$f & engine.DESTROYED)){
             let filter = filterChildEvent('move', grabber, x, y, buttons, null)
             if(filter.grabber && filter.grabber !== grabber){
@@ -197,7 +253,10 @@ function release(x, y, button, buttons, modifiers){
         scene.pressedButtons = buttons
         scene.modifiers = modifiers
         let grabber = scene.grabber
-        if(grabber && !(grabber.$f & engine.DESTROYED)){
+        if(!buttons) endPassive(false)
+        if(grabber && grabber.$isHandler){
+            if(!buttons) scene.grabber = null
+        } else if(grabber && !(grabber.$f & engine.DESTROYED)){
             let filter = filterChildEvent('release', grabber, x, y, buttons, null)
             let p = local(grabber, x, y)
             if(!filter.filtered && grabber.$mouseRelease) grabber.$mouseRelease(p.x, p.y, button, buttons, modifiers)
@@ -225,6 +284,19 @@ function hoverItem(item, x, y, pass){
     } else if(index >= 0){
         scene.hovered.splice(index, 1)
         if(!(item.$f & engine.DESTROYED) && item.$hoverLeave) item.$hoverLeave()
+    }
+    // the HoverHandlers of the item, whether or not it takes hover events: a hovered one makes the item the leaf, a
+    // blocking one ends the pass (QQuickDeliveryAgentPrivate::deliverHoverEventToItem)
+    if(item.$handlers){
+        for(let handler of item.$handlers){
+            if(!handler.$hover) continue
+            if(!handler.$hover(x, y, scene.x, scene.y, pass.modifiers)) continue
+            pass.leafFound = true
+            pass.handlers.add(handler)
+            scene.hoverHandlers.add(handler)
+            if(pass.cursor === undefined && handler.$cursor() !== null) pass.cursor = handler.$cursor()
+            if(handler.blocking) return true
+        }
     }
     return false
 }
@@ -259,7 +331,7 @@ function hover(x, y, modifiers){
         let item = target.item
         if(cursor === null && item.$cursor) cursor = item.$cursor()
     }
-    let pass = hoverPass = { hovered: new Set(), leafFound: false, modifiers }
+    let pass = hoverPass = { hovered: new Set(), handlers: new Set(), leafFound: false, modifiers, cursor: undefined }
     try {
         for(let i = scene.roots.length - 1; i >= 0 && !pass.leafFound; i--){
             let root = scene.roots[i]
@@ -272,14 +344,25 @@ function hover(x, y, modifiers){
             scene.hovered.splice(scene.hovered.indexOf(item), 1)
             if(!(item.$f & engine.DESTROYED)) item.$hoverLeave()
         }
+        leaveHandlers(pass.handlers)
     } finally {
         hoverPass = null
     }
-    setCursor(cursor)
+    setCursor(pass.cursor !== undefined ? pass.cursor : cursor)
+}
+
+// the HoverHandlers hovered before and not in this pass are left
+function leaveHandlers(keep){
+    for(let handler of Array.from(scene.hoverHandlers)){
+        if(keep && keep.has(handler)) continue
+        scene.hoverHandlers.delete(handler)
+        if(!(handler.$f & engine.DESTROYED)) handler.$leave()
+    }
 }
 
 function leaveWindow(){
     engine.batch(() => {
+        leaveHandlers(null)
         for(let item of scene.hovered){
             if(!(item.$f & engine.DESTROYED)) item.$hoverLeave()
         }
@@ -343,8 +426,30 @@ engine.onSceneChanged(() => {
     if(!scene.grabber && scene.x >= 0 && scene.y >= 0 && scene.roots.length) engine.queueFrame(frameHover)
 })
 
+// Qt::CursorShape -> the CSS cursor that looks like it (QCursor shapes by number; BitmapCursor / CustomCursor have none)
+const CSS_CURSORS = ['default', 'default', 'crosshair', 'wait', 'text', 'ns-resize', 'ew-resize', 'nesw-resize', 'nwse-resize',
+    'move', 'none', 'row-resize', 'col-resize', 'pointer', 'not-allowed', 'help', 'progress', 'grab', 'grabbing', 'copy', 'move',
+    'alias']
+
+function cssCursor(shape){
+    if(typeof shape === 'number') return CSS_CURSORS[shape] || 'default'
+    return shape || ''
+}
+
+// QGuiApplication::setOverrideCursor / restoreOverrideCursor: a cursor over every item (TableView resizing a column);
+// the last one set wins, an owner takes its own off
+const overrides = []
+function setOverrideCursor(owner, shape){
+    let at = overrides.findIndex(o => o.owner === owner)
+    if(at >= 0) overrides.splice(at, 1)
+    if(shape !== null && shape !== undefined) overrides.push({ owner, shape })
+    setCursor(scene.lastCursor === undefined ? null : scene.lastCursor)
+}
+
 function setCursor(cursor){
-    if(scene.element) scene.element.style.cursor = cursor || ''
+    scene.lastCursor = cursor
+    if(overrides.length) cursor = overrides[overrides.length - 1].shape
+    if(scene.element) scene.element.style.cursor = cursor === null || cursor === undefined ? '' : cssCursor(cursor)
 }
 
 // ---- DOM ------------------------------------------------------------------------------------
@@ -468,33 +573,46 @@ function translated(p, dx, dy){
     return out
 }
 
-function windowOrigin(){
+// the screen point of the scene of an item: the position its window was given (a window of the page keeps x and y as
+// its place on the screen, Window.js), else where the page is
+function windowOrigin(item){
+    for(let it = item; it; it = it.$parent){
+        if(it.$screen) return { x: it.$screen[0], y: it.$screen[1] }
+    }
     if(!scene.element) return { x: 0, y: 0 }
     let rect = scene.element.getBoundingClientRect()
     return { x: rect.left + (window.screenX || 0), y: rect.top + (window.screenY || 0) }
 }
 
+// a point (or a rectangle: the bounds of its corners) from the coordinates of an item to those of another (null: the
+// scene), through the positions and the transforms of both (QQuickItem::mapToItem)
+function mapBetween(from, to, p){
+    const T = require('./Transform')
+    let a = from instanceof Item ? T.itemToScene(from, Item) : { x: 0, y: 0 }
+    let b = to instanceof Item ? T.itemToScene(to, Item) : { x: 0, y: 0 }
+    if(!Array.isArray(a) && !Array.isArray(b)) return translated(p, a.x - b.x, a.y - b.y)
+    let toM = (m) => (Array.isArray(m) ? m : [1, 0, 0, 1, m.x, m.y])
+    let back = T.invert(toM(b))
+    if(!back) return translated(p, 0, 0)
+    let m = T.mul(back, toM(a))
+    if(!('width' in p)) return T.apply(m, p.x, p.y)
+    let corners = [T.apply(m, p.x, p.y), T.apply(m, p.x + p.width, p.y), T.apply(m, p.x, p.y + p.height), T.apply(m, p.x + p.width, p.y + p.height)]
+    let xs = corners.map(c => c.x), ys = corners.map(c => c.y)
+    let x = Math.min(...xs), y = Math.min(...ys)
+    return { x, y, width: Math.max(...xs) - x, height: Math.max(...ys) - y }
+}
+
 Object.assign(Item.prototype, {
-    mapToItem(item, ...args){
-        let p = pointArgs(args)
-        let from = scenePos(this)
-        let to = item instanceof Item ? scenePos(item) : { x: 0, y: 0 }
-        return translated(p, from.x - to.x, from.y - to.y)
-    },
-    mapFromItem(item, ...args){
-        let p = pointArgs(args)
-        let from = item instanceof Item ? scenePos(item) : { x: 0, y: 0 }
-        let to = scenePos(this)
-        return translated(p, from.x - to.x, from.y - to.y)
-    },
+    mapToItem(item, ...args){ return mapBetween(this, item, pointArgs(args)) },
+    mapFromItem(item, ...args){ return mapBetween(item, this, pointArgs(args)) },
     mapToGlobal(...args){
         let p = pointArgs(args)
-        let from = scenePos(this), origin = windowOrigin()
+        let from = scenePos(this), origin = windowOrigin(this)
         return translated(p, from.x + origin.x, from.y + origin.y)
     },
     mapFromGlobal(...args){
         let p = pointArgs(args)
-        let to = scenePos(this), origin = windowOrigin()
+        let to = scenePos(this), origin = windowOrigin(this)
         return translated(p, -to.x - origin.x, -to.y - origin.y)
     },
     contains(point){
@@ -522,4 +640,4 @@ Object.assign(Item.prototype, {
     }
 }
 
-module.exports = { modifiersOf, NoButton, LeftButton, scenePos, contains, scene, targetsAt, press, move, release, leaveWindow, wheel, ungrab, pointerOver, deliverHover, isHovered }
+module.exports = { setContextMenuHandler, setOverrideCursor, modifiersOf, NoButton, LeftButton, scenePos, contains, scene, targetsAt, press, move, release, leaveWindow, wheel, ungrab, pointerOver, deliverHover, isHovered }

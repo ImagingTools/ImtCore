@@ -1,7 +1,7 @@
 const engine = require('../Core/engine')
 const { defineType, makeReadonly } = require('../Core/type')
 const { Item } = require('./Item')
-const { Positioner } = require('./Positioner')
+const { Positioner, relayout } = require('./Positioner')
 
 class Row extends Positioner {
     $polish(){
@@ -19,10 +19,17 @@ class Row extends Positioner {
         }
         this.$write(Item.IMPLICITWIDTH, x + this.$padding('rightPadding'))
         this.$write(Item.IMPLICITHEIGHT, height + top + this.$padding('bottomPadding'))
+        this.$mirror(this.$visibleChildren())
         engine.emitArgs(this, Positioner.SIGNAL_positioningComplete, [])
     }
 }
-defineType(Row)
+defineType(Row, {
+    props: {
+        layoutDirection: { kind: 'int', effect: (row) => { engine.emit(row, Row.SIGNAL_effectiveLayoutDirectionChanged); relayout(row) } },
+        effectiveLayoutDirection: { kind: 'int', readonly: true },
+    },
+})
+require('./Positioner').effectiveDirection(Row)
 
 // read-only in Qt, writable in the base class
 makeReadonly(Row, 'implicitWidth')

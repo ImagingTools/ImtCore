@@ -49,4 +49,13 @@ function loadConfig(configPath, env = process.env){
     return collect(read(configPath), path.dirname(path.resolve(configPath)))
 }
 
-module.exports = { loadConfig }
+// The icon theme of the application (QIcon::setThemeName of a main.cpp): { name, paths } from "iconTheme" and
+// "iconThemePaths" (the folders with <name>/index.theme, like QIcon::themeSearchPaths); null without one
+function loadIconTheme(configPath, env = process.env){
+    let config = JSON.parse(envFill(fs.readFileSync(configPath, 'utf8'), env))
+    if(!config.iconTheme) return null
+    let baseDir = path.dirname(path.resolve(configPath))
+    return { name: config.iconTheme, paths: (config.iconThemePaths || ['icons']).map(dir => resolveRef(baseDir, dir, env)) }
+}
+
+module.exports = { loadConfig, loadIconTheme }

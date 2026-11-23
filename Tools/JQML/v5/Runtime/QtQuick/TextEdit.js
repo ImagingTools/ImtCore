@@ -1,3 +1,4 @@
+const QtEnums = require('../Qt/enums')
 const { defineType, makeReadonly } = require('../Core/type')
 const { Item } = require('./Item')
 const { TextField, common, relayout } = require('./TextField')
@@ -20,7 +21,7 @@ class TextEdit extends TextField {
 
     // QQuickTextEditPrivate::updateMouseCursorShape (a TextInput sets no cursor)
     $cursor(){
-        return this.$v[TextEdit.READONLY] && !this.$v[TextEdit.SELECTBYMOUSE] ? 'default' : 'text'
+        return this.$v[TextEdit.READONLY] && !this.$v[TextEdit.SELECTBYMOUSE] ? QtEnums.ArrowCursor : QtEnums.IBeamCursor
     }
 
     // QQuickTextEdit::append: a new paragraph at the end (the text itself when empty); not undone by undo() of

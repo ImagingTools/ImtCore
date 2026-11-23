@@ -8,6 +8,7 @@ Item {
 	id: filterDelegate
 
 	width: switchControl.width
+	implicitWidth: switchControl.width
 	height: Style.controlHeightM
 	objectName: filterId
 
@@ -25,7 +26,24 @@ Item {
 	property string filterValue: ""
 	property bool allowEmptyFilterValue: false
 
+	// The same face to FilterPanelDecorator as FilterDelegateBase. Folded into
+	// the overflow menu, a switch is a checkable row that flips it.
+	readonly property bool toggleable: true
+	readonly property string valueText: ""
+	property Item popupAnchorItem: null
+
 	signal clearFilter(bool beQuiet)
+	signal openFilter()
+
+	function optionCount(){
+		return 0
+	}
+
+	onOpenFilter: {
+		if (!filterDelegate.readOnly){
+			switchControl.setChecked(!switchControl.checked)
+		}
+	}
 
 	Connections {
 		target: filterDelegate.filterMenu ? filterDelegate.filterMenu : null

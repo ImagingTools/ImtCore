@@ -755,7 +755,7 @@ let creating = null
 
 function beginCreate(){
     let previous = creating
-    creating = { bindings: [], componentComplete: [], completed: [], roots: [] }
+    creating = { bindings: [], componentComplete: [], finalizers: [], completed: [], roots: [] }
     inProgressCreations++
     beginUpdate()
     return previous
@@ -781,6 +781,8 @@ function endCreate(previous){
             let obj = current.componentComplete[i]
             if(!(obj.$f & DESTROYED)) obj.$componentComplete()
         }
+        // QQmlFinalizerHook::componentFinalized, in the order the objects were made, before Component.onCompleted
+        for(let obj of current.finalizers) if(!(obj.$f & DESTROYED)) obj.$componentFinalized()
         for(let obj of completionOrder(current)) obj.$complete()
     } finally {
         endUpdate()
@@ -854,6 +856,12 @@ function scheduleComponentComplete(obj){
     else obj.$componentComplete()
 }
 
+// an object with a QQmlFinalizerHook: componentFinalized() runs after every componentComplete of the creation
+function scheduleFinalize(obj){
+    if(creating) creating.finalizers.push(obj)
+    else obj.$componentFinalized()
+}
+
 function creatingRoot(obj){
     if(creating && obj) creating.roots.push(obj)
 }
@@ -900,7 +908,7 @@ module.exports = {
     emit, emitArgs, track, evaluate, runBinding, disposeBinding, isUpdating, flushPending,
     beginUpdate, endUpdate, batch, markDirty, onSceneChanged, queuePolish, queueCall, queueDelete, queueFrame, flushFrame, stop, isStopped,
     timerScheduled, timerDone,
-    beginCreate, endCreate, creatingRoot, scheduleComponentComplete, scheduleBinding, scheduleCompleted,
+    beginCreate, endCreate, creatingRoot, scheduleComponentComplete, scheduleFinalize, scheduleBinding, scheduleCompleted,
     reportError,
     writeError, bindingError
 }

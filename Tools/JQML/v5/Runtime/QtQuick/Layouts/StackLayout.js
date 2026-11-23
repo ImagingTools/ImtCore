@@ -36,7 +36,7 @@ class StackLayout extends Layout {
             let [item, hx, hy] = entry
             let w = hx.fill ? Math.min(W, hx.max) : hx.preferred
             let h = hy.fill ? Math.min(H, hy.max) : hy.preferred
-            this.$place(item, hx.before, hy.before, w - hx.before - hx.after, h - hy.before - hy.after)
+            this.$placeItem(item, hx.before, hy.before, w - hx.before - hx.after, h - hy.before - hy.after)
         }
     }
 

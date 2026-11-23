@@ -8,7 +8,7 @@ const assert = require('node:assert/strict')
 const { runtimes } = require('./runtimes')
 
 const INVALID = 0, INTERMEDIATE = 1, ACCEPTABLE = 2
-const Key_Return = 'Enter'  // QtEnums.Key_Return of the runtime
+const Key_Return = 0x01000004  // Qt::Key_Return
 
 function cases(name, runtime){
     const { engine, TextInput, types } = runtime

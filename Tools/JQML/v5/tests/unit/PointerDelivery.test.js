@@ -165,7 +165,7 @@ function cases(name, runtime){
 
     test(name + ': the cursor over a field covered by a MouseArea with a cursor shape is that of the MouseArea', () => {
         let { overlay } = scene()
-        mouseArea(overlay, (it) => { it.cursorShape = 'pointer' })
+        mouseArea(overlay, (it) => { it.cursorShape = 13 })
         assert.equal(cursorAt(50, 110), 'pointer')
     })
 
@@ -191,7 +191,7 @@ function cases(name, runtime){
         let { window, overlay } = scene()
         let edit
         engine.batch(() => { edit = geometry(new TextEdit(window), 10, 250, 200, 40) })
-        let below = mouseArea(overlay, (it) => { it.cursorShape = 'text' })
+        let below = mouseArea(overlay, (it) => { it.cursorShape = 4 })
         engine.batch(() => {
             overlay.height = 300
             overlay.z = 1

@@ -251,8 +251,11 @@ DocumentServiceBase {
 			}
 
 			if (result){
-				// Try save
-				let savedFunc = function(savedDocumentId){
+				// Try save. Both handlers disconnect each other, so both are declared before either is defined.
+				let savedFunc = null
+				let savedFailedFunc = null
+
+				savedFunc = function(savedDocumentId){
 					if (documentId === savedDocumentId){
 						documentSaved.disconnect(savedFunc)
 						saveDocumentFailed.disconnect(savedFailedFunc)
@@ -260,7 +263,7 @@ DocumentServiceBase {
 					}
 				}
 
-				let savedFailedFunc = function(savedDocumentId, message){
+				savedFailedFunc = function(savedDocumentId, message){
 					if (documentId === savedDocumentId){
 						documentSaved.disconnect(savedFunc)
 						saveDocumentFailed.disconnect(savedFailedFunc)

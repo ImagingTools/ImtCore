@@ -417,7 +417,7 @@ defineType(MouseArea, {
         preventStealing: 'bool',
         scrollGestureEnabled: { kind: 'bool', initial: true },
         pressAndHoldInterval: { kind: 'int', initial: PRESS_AND_HOLD_INTERVAL },
-        cursorShape: { kind: 'var', initial: 'default' },
+        cursorShape: { kind: 'var', initial: 0 },     // Qt.ArrowCursor
         drag: { group: MouseDrag },
     },
     signals: ['pressed(mouse)', 'released(mouse)', 'clicked(mouse)', 'doubleClicked(mouse)', 'pressAndHold(mouse)',
