@@ -11,11 +11,14 @@ const { Connections } = require('./QtQml/Connections')
 const { Binding } = require('./QtQml/Binding')
 const { ListModel } = require('./QtQml/Models/ListModel')
 const { Instantiator } = require('./QtQml/Models/Instantiator')
+const { ItemSelectionModel } = require('./QtQml/Models/ItemSelectionModel')
+const { TableModel, TableModelColumn } = require('./QtQml/Models/TableModel')
 const { Item, Anchors } = require('./QtQuick/Item')
 const { FocusScope } = require('./QtQuick/FocusScope')
 const { Keys } = require('./QtQuick/Keys')
 const { KeyNavigation } = require('./QtQuick/KeyNavigation')
 require('./QtQuick/KeyDelivery')
+require('./QtQuick/LayoutMirroring')
 const { Rectangle, Border } = require('./QtQuick/Rectangle')
 const { Gradient, GradientStop } = require('./QtQuick/Gradient')
 const { Text } = require('./QtQuick/Text')
@@ -35,6 +38,14 @@ const { Repeater } = require('./QtQuick/Repeater')
 const { Loader } = require('./QtQuick/Loader')
 const { ListView } = require('./QtQuick/ListView')
 const { GridView } = require('./QtQuick/GridView')
+const { TableView } = require('./QtQuick/TableView')
+const { TreeView } = require('./QtQuick/TreeView')
+const { HorizontalHeaderView, VerticalHeaderView, HeaderViewDelegate, HorizontalHeaderViewDelegate, VerticalHeaderViewDelegate } = require('./QtQuick/Controls/HeaderView')
+const { TableViewDelegate, TreeViewDelegate } = require('./QtQuick/Controls/ViewDelegates')
+const { SelectionRectangle } = require('./QtQuick/Controls/SelectionRectangle')
+const { DelegateModel } = require('./QtQml/Models/DelegateModel')
+const { TreeModel } = require('./QtQml/Models/TreeModel')
+const { DelegateChooser, DelegateChoice } = require('./QtQml/Models/DelegateChooser')
 const { Shortcut, StandardKey } = require('./QtQuick/Shortcut')
 const { IntValidator } = require('./QtQuick/IntValidator')
 const { DoubleValidator } = require('./QtQuick/DoubleValidator')
@@ -130,8 +141,12 @@ function bindAlias(owner, name, fn, scope){
 
 // QML methods are bound to their object, also when read as a value: obj.ping.connect(handler).
 // The bound function is made on first access and kept on the object.
-function defineMethod(Class, name, fn){
+function defineMethod(Class, name, fn, params){
     let key = '$m_' + name
+    if(params){
+        if(!Object.prototype.hasOwnProperty.call(Class, '$methodParams')) Class.$methodParams = Object.assign({}, Class.$methodParams)
+        Class.$methodParams[name] = params
+    }
     Object.defineProperty(Class.prototype, name, {
         get(){
             return Object.prototype.hasOwnProperty.call(this, key) ? this[key] : (this[key] = fn.bind(this))
@@ -146,6 +161,22 @@ function defineMethod(Class, name, fn){
 // Parent for the children of obj: the target of a default property alias of Class, or obj itself
 function defaultParent(Class, obj){
     return Class.$defaultParent ? Class.$defaultParent(obj) : obj
+}
+// a child of a type whose default property is an alias of an object property (pane.contentItem): assigned to it
+// an object declared in an alias (media: Item {}): appended to the list of an alias of data / children / resources
+// (QQmlObjectCreator appends to a list property), else the value of the alias
+function aliasAssign(obj, name, child){
+    let list = obj.constructor.$listAliases && obj.constructor.$listAliases[name]
+    if(!list){
+        obj[name] = child
+        return
+    }
+    let [owner, prop] = list(obj)
+    if(child && child.$setParent && (prop !== 'children' || child.$isItem)) child.$setParent(owner)
+}
+
+function defaultAssign(Class, obj, child){
+    Class.$defaultAssign(obj, child)
 }
 
 // Root context properties: "context" is CClientUserContextComp on the desktop, the web context in a browser
@@ -188,6 +219,13 @@ function lookup(s, name){
     return MISSING
 }
 
+// `value as Type` of QML (a type assertion, Qt 6): the value when it is an instance of the type, else null
+function as(value, Type){
+    if(value === null || value === undefined) return null
+    if(typeof Type !== 'function') return value
+    return value instanceof Type ? value : null
+}
+
 // The nearest model context up the context chain: a component declared in a delegate and created by a Loader
 // sees the delegate's model, index and roles
 function mctx(s){
@@ -197,6 +235,17 @@ function mctx(s){
         else scope = scope[0] && scope[0].$cctx || null
     }
     return null
+}
+
+// A name of a delegate the compiler did not find: a role of the model, else a name of the contexts above (an id of
+// the document the view is in: QQmlContextWrapper looks the role up in the delegate's context, then goes up)
+function mrole(s, name){
+    let c = mctx(s)
+    if(c && c.$row && typeof c.$row === 'object' && name in c.$row) return c.$role(name)
+    let found = lookup(s, name)
+    if(found !== MISSING) return found
+    if(c) return c.$role(name)
+    throw new ReferenceError(name + ' is not defined')
 }
 
 const modules = {}      // module -> type name -> class
@@ -322,9 +371,10 @@ function subAssign(owner, name, entries, scope){
     else owner[name] = build(owner, scope)
 }
 
-// pragma Singleton types: one instance, created on first use
+// pragma Singleton types: one instance, created on first use. It is the instance from its construction on: its own
+// bindings and Component.onCompleted, run before the creation ends, read the singleton through its name
 function singleton(Class){
-    if(!Object.prototype.hasOwnProperty.call(Class, '$instance')) Class.$instance = create(() => new Class(null))
+    if(!Object.prototype.hasOwnProperty.call(Class, '$instance')) create(() => Class.$instance = new Class(null))
     return Class.$instance
 }
 
@@ -343,27 +393,66 @@ function qsTrIn(context){
     return fn
 }
 
+// c.a = v, item.color.r = v: a component of a color written (compiler/valueWrites.js). A color is a string that does
+// not change: the new color goes where the value came from (the variable, or the property of obj); another value gets
+// the member as JavaScript gives it
+function cset(value, name, v, assign){
+    let color = require('./Core/color').setComponent(value, name, v)
+    if(color === null) value[name] = v
+    else if(assign) assign(color)
+    return v
+}
+function csetm(obj, key, name, v){
+    let value = obj[key]
+    let color = require('./Core/color').setComponent(value, name, v)
+    if(color === null) value[name] = v
+    else obj[key] = color
+    return v
+}
+
 const JQ = {
-    qsTrIn, forward, bindAlias, handleGroup, callCreateQmlObject, files, scripts, script, si, sis, moduleScripts, make: engine.make, inContext: engine.inContext, callCreateComponent, sctx, sctxValue, sset, singleton, defineMethod, defaultParent, ctx, ctxValue, mctx, ns, qmlModule, subAssign, rootContext,
+    cset, csetm, qsTrIn, forward, bindAlias, handleGroup, callCreateQmlObject, files, scripts, script, si, sis, moduleScripts, make: engine.make, inContext: engine.inContext, callCreateComponent, sctx, sctxValue, sset, singleton, defineMethod, defaultParent, defaultAssign, aliasAssign, ctx, ctxValue, mctx, mrole, as, ns, qmlModule, subAssign, rootContext,
     engine, defineType, create,
     batch: engine.batch,
     stats: engine.stats,
     Qt,
     // QML types by name
     types: {
-        QtObject, Component, Timer, Connections, Binding, ListModel, Instantiator,
+        QtObject, Component, Timer, Connections, Binding, ListModel, Instantiator, ItemSelectionModel, TableModel, TableModelColumn, TreeModel,
         Item, Anchors, FocusScope, Keys, KeyNavigation, Rectangle, Border, Gradient, GradientStop, Text, Font, TextInput, TextEdit, Image, Canvas,
-        MouseArea, MouseDrag, DropArea, Drag, Flickable, Column, Row, Flow, Repeater, Loader, ListView, GridView, Shortcut, StandardKey,
+        MouseArea, MouseDrag, DropArea, Drag, Flickable, Column, Row, Flow, Grid: require('./QtQuick/Grid').Grid, Repeater, Loader, ListView, GridView, TableView, TreeView, HorizontalHeaderView, VerticalHeaderView, HeaderViewDelegate, TableViewDelegate, TreeViewDelegate, SelectionRectangle, DelegateModel, Shortcut, StandardKey,
+        DelegateChooser, DelegateChoice, ObjectModel: require('./QtQml/Models/ObjectModel').ObjectModel,
         IntValidator, DoubleValidator, RegularExpressionValidator, RegExpValidator, FontLoader,
         State, PropertyChanges, StateChangeScript, Transition, StateGroup,
         Animation, PauseAnimation, PropertyAnimation, NumberAnimation, ColorAnimation, RotationAnimation, SmoothedAnimation,
         XAnimator, YAnimator, ScaleAnimator, RotationAnimator, OpacityAnimator, PropertyAction, ScriptAction,
         SequentialAnimation, ParallelAnimation, Behavior, Easing, EasingGroup,
+        Accessible: require('./QtQuick/Accessible').Accessible,
+        EnterKey: require('./QtQuick/Accessible').EnterKey,
+        Screen: require('./QtQuick/Screen').Screen,
+        PathView: require('./QtQuick/PathView').PathView,
+        ColorDialog: require('./QtQuick/Dialogs/ColorDialog').ColorDialog,
+        StandardPaths: require('./QtCore/StandardPaths').StandardPaths,
+        ...require('./QtQuick/Path'),
+        ...(({ Shape, ShapePath, ShapeGradient, LinearGradient, RadialGradient, ConicalGradient }) => ({ Shape, ShapePath, ShapeGradient, LinearGradient, RadialGradient, ConicalGradient }))(require('./QtQuick/Shapes')),
+        ...(({ PointerDevice, PointerHandler, HoverHandler, DragHandler }) => ({ PointerDevice, PointerHandler, HoverHandler, DragHandler }))(require('./QtQuick/PointerHandlers')),
+        ...(({ PlaceholderText, ColorImage, IconImage, IconLabel, PaddedRectangle, ColorType }) => ({ PlaceholderText, ColorImage, IconImage, IconLabel, PaddedRectangle, Color: ColorType }))(require('./QtQuick/Controls/impl')),
+        MultiEffect: require('./QtQuick/Effects').MultiEffect, ShaderEffectSource: require('./QtQuick/Effects').ShaderEffectSource,
+        ...(({ SortFilterProxyModel, ValueFilter, FunctionFilter, RoleSorter, StringSorter, FunctionSorter }) => ({ SortFilterProxyModel, ValueFilter, FunctionFilter, RoleSorter, StringSorter, FunctionSorter }))(require('./QtQml/Models/SortFilterProxyModel')),
+        Translate: require('./QtQuick/Transform').Translate, Scale: require('./QtQuick/Transform').Scale, Rotation: require('./QtQuick/Transform').Rotation, Matrix4x4: require('./QtQuick/Transform').Matrix4x4,
         LayoutAttached, RowLayout, ColumnLayout, GridLayout, StackLayout, LayoutItemProxy,
         Window, FileDialog, FolderDialog, Settings, WebSocket: QmlWebSocket, DropShadow, TestCase, SignalSpy,
         BaseClass, BaseModel, TreeItemModel, GqlModel, GqlRequest, FileIO, Process, RemoteFileController, NavigationHistory,
         // the Locale of QML: Locale.ShortFormat, the type of Qt.locale()
         Locale: require('./Qt/Locale').Locale,
+        // QtQuick.Controls (Basic) and QtQuick.Templates ('T.Button')
+        ...require('./QtQuick/Controls/index').types(),
+        'T.HeaderViewDelegate': HeaderViewDelegate,
+        // the table controls have no style of their own: the templates are the same types (QtQuick.Templates 6.12)
+        'T.HorizontalHeaderView': HorizontalHeaderView, 'T.VerticalHeaderView': VerticalHeaderView,
+        'T.TableViewDelegate': TableViewDelegate, 'T.TreeViewDelegate': TreeViewDelegate, 'T.SelectionRectangle': SelectionRectangle,
+        HorizontalHeaderViewDelegate, VerticalHeaderViewDelegate,
+        SplitHandle: require('./QtQuick/Controls/SplitView').SplitHandle, 'T.SplitHandle': require('./QtQuick/Controls/SplitView').SplitHandle,
     },
     mouse: require('./QtQuick/PointerDelivery'),
     keys: require('./QtQuick/KeyDelivery'),
@@ -386,6 +475,7 @@ if(typeof globalThis !== 'undefined'){
 }
 
 require('./Qt/Locale').install()
+require('./Core/color').installComponents()
 
 if(!String.prototype.arg){
     // QString::arg: replaces the lowest-numbered %N

@@ -1,7 +1,13 @@
 const { GroupObject } = require('../Core/QtObject')
 const { defineType } = require('../Core/type')
 
-const ownerText = (group) => group.$owner.$updateImplicitSize()
+// the text of the font is laid out again: its owner's, and of the texts that show it (`font: control.font` gives a Text the
+// font of the control itself)
+const ownerText = (group) => {
+    let owner = group.$owner
+    if(owner && owner.$updateImplicitSize) owner.$updateImplicitSize()
+    if(group.$users) for(let user of group.$users) if(user !== owner && user.$updateImplicitSize) user.$updateImplicitSize()
+}
 
 const POINTS_PER_PIXEL = 72 / 96
 
@@ -30,6 +36,13 @@ class Font extends GroupObject {
             if(id === Font.POINTSIZE) this.$v[Font.PIXELSIZE] = Math.round(value / POINTS_PER_PIXEL)
         }
         super.$write(id, value)
+        // QFont::setBold: the weight Bold or Normal; QFont::bold: a weight above Medium
+        if(id === Font.BOLD){
+            let weight = this.$v[Font.WEIGHT]
+            if(value ? weight <= 500 : weight > 500) this.$write(Font.WEIGHT, value ? 700 : 400)
+        } else if(id === Font.WEIGHT){
+            if(this.$v[Font.BOLD] !== value > 500) this.$write(Font.BOLD, value > 500)
+        }
     }
 }
 defineType(Font, {

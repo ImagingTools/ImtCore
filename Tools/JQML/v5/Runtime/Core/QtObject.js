@@ -62,6 +62,23 @@ class QtObject {
             return
         }
         let prop = this.constructor.$type.props[id]
+        // the group of another object (font: control.font): shown by this one, which is told of its changes (a group
+        // keeps its $users: Font.js lays them out again) and follows it now
+        if(prop.group && value instanceof prop.group && value.$owner !== this){
+            let old = this.$v[id]
+            if(old === value) return
+            if(old && old.$users && old.$owner !== this) old.$users.delete(this)
+            ;(value.$users || (value.$users = new Set())).add(this)
+            this.$v[id] = value
+            if(this.$updateImplicitSize) this.$updateImplicitSize()
+            engine.emit(this, prop.signal, old, value)
+            return
+        }
+        // a value of a grouped value type (sourceSize: Qt.size(48, 48)) is a write of each of its fields
+        if(prop.group && value && typeof value === 'object' && !(value instanceof prop.group)){
+            this[prop.name].$writeValue(value)
+            return
+        }
         if(prop.coerce){
             try {
                 value = prop.coerce(value)
@@ -77,7 +94,10 @@ class QtObject {
             if(old instanceof QtObject) unguard(old, this, id)
             if(value instanceof QtObject) guard(value, this, id)
         }
-        if(prop.effect) prop.effect(this, value, old)
+        if(prop.effect){
+            if(this.$effects) this.$effects.add(prop.effect)
+            else prop.effect(this, value, old)
+        }
         engine.emit(this, prop.signal, old, value)
     }
 
@@ -158,6 +178,8 @@ class QtObject {
             else children.push(this)
         }
         this.$parentChanged(old, parent)
+        // an object that is not an item (an Action in a Menu): a parent that takes such children
+        if(parent && !this.$isItem && parent.$childObjectAdded) parent.$childObjectAdded(this)
         engine.emit(this, QtObject.SIGNAL_parentChanged, old, parent)
     }
 
@@ -379,6 +401,18 @@ class GroupObject extends QtObject {
     constructor(owner){
         super(null)
         this.$owner = owner
+    }
+
+    // a whole value written to the group (sourceSize: Qt.size(48, 24)): each field, then the effect of the changed ones
+    // once, as one write of a value type property emits one change of it
+    $writeValue(value){
+        let effects = this.$effects = new Set()
+        try {
+            for(let key in value) this[key] = value[key]
+        } finally {
+            this.$effects = null
+        }
+        for(let effect of effects) effect(this)
     }
 }
 

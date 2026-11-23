@@ -67,10 +67,28 @@ function animating(s){
     return !!(s.x.animation || s.y.animation)
 }
 
-function movementEnding(view){
+// QQuickFlickable::movementEnding(hMovementEnding, vMovementEnding): both axes, or the one given
+function movementEnding(view, only = null){
     let s = flickState(view)
     let type = view.constructor
     let wasFlicking = s.x.flicking || s.y.flicking
+    if(only){
+        s[only].flicking = false
+        s[only].moved = false
+        s[only].fixingUp = false
+        s[only].smoothVelocity = 0
+        let other = s[only === 'x' ? 'y' : 'x']
+        if(wasFlicking && !other.flicking){
+            setFlag(view, type.FLICKING, false)
+            engine.emitArgs(view, type.SIGNAL_flickEnded, [])
+        }
+        if(s.moving && !s.pressed && !s.dragging && !other.flicking && !other.moved && !other.animation){
+            s.moving = false
+            setFlag(view, type.MOVING, false)
+            engine.emitArgs(view, type.SIGNAL_movementEnded, [])
+        }
+        return
+    }
     s.x.flicking = s.y.flicking = false
     if(wasFlicking){
         setFlag(view, type.FLICKING, false)
@@ -120,6 +138,24 @@ function draggingEnding(view){
     engine.emitArgs(view, view.constructor.SIGNAL_dragEnded, [])
 }
 
+// a move of the view itself (its timeline, a drag, a fixup): not a write of contentX / contentY from outside
+function setPos(view, axis, value){
+    let s = flickState(view)
+    let was = s.internalMove
+    s.internalMove = true
+    try { view.$setContentPos(axis, value) } finally { s.internalMove = was }
+}
+
+// QQuickFlickable::setContentX / setContentY from outside the view: the timeline of the axis stops, and a movement
+// or a flick ends on that axis (movementEnding(h, v))
+function externalMove(view, axis){
+    let s = view.$fs
+    if(!s || s.internalMove) return
+    resetTimeline(view, axis)
+    s[axis].fixingUp = false
+    if(s.moving || s[axis].flicking) movementEnding(view, axis)
+}
+
 // ---- the timeline: segments of an axis, one frame after the other ----
 
 function resetTimeline(view, axis){
@@ -141,7 +177,7 @@ function runTimeline(view, axis, segments, done){
                 let elapsed = time - animation.start
                 let value = segment.at(Math.min(elapsed, segment.duration))
                 s.smoothVelocity = segment.velocity ? segment.velocity(Math.min(elapsed, segment.duration)) : 0
-                view.$setContentPos(axis, value)
+                setPos(view, axis, value)
                 if(elapsed < segment.duration) return
                 animation.start += segment.duration
                 animation.index++
@@ -188,7 +224,7 @@ function fixup(view, axis, immediate = false){
     if(target === pos) return endIfIdle(view)
     resetTimeline(view, axis)
     if(immediate){
-        view.$setContentPos(axis, target)
+        setPos(view, axis, target)
         return endIfIdle(view)
     }
     s[axis].fixingUp = true
@@ -197,6 +233,16 @@ function fixup(view, axis, immediate = false){
         s[axis].fixingUp = false
         endIfIdle(view)
     })
+}
+
+// QQuickFlickable::geometryChange: "Make sure that we're entirely in view" - a new width or height puts the content
+// back within its bounds at once, unless it is pressed or moving
+function geometryFixup(view, axis){
+    let s = view.$fs
+    if(s && (s.pressed || s.moving)) return
+    let { min, max } = bounds(view, axis)
+    let pos = view.$contentPos(axis)
+    if(pos < min || pos > max) fixup(view, axis, true)
 }
 
 function endIfIdle(view){
@@ -289,7 +335,7 @@ function dragAxis(view, axis, delta, overThreshold, elapsedSincePress){
     else if(pos > max) pos = max + (pos - max) / 2
     if(!result.reject && s.stealMouse && delta !== a.previousDragDelta){
         resetTimeline(view, axis)
-        view.$setContentPos(axis, pos)
+        setPos(view, axis, pos)
         a.moved = true
     }
     if(!result.reject && overThreshold) result.steal = true
@@ -465,7 +511,77 @@ const flickMouse = {
     },
 }
 
+// ---- visibleArea (QQuickFlickableVisibleArea): the part of the content the view shows, as fractions ----
+const { GroupObject } = require('../Core/QtObject')
+class VisibleArea extends GroupObject {}
+defineType(VisibleArea, { props: { xPosition: { kind: 'real', readonly: true }, widthRatio: { kind: 'real', readonly: true },
+    yPosition: { kind: 'real', readonly: true }, heightRatio: { kind: 'real', readonly: true } } })
+
+// QQuickFlickableVisibleArea::updateVisible: pagePos = (-move + minExtent) / (maxExtent range + view size), pageSize =
+// view size / that; the attached scroll bars follow it
+function updateVisibleArea(view){
+    let area = view.$visibleArea
+    if(!area && !view.$scrollBars) return
+    let values = {}
+    for(let axis of AXES){
+        let b = bounds(view, axis)
+        let viewSize = view.$v[axis === 'x' ? Item.WIDTH : Item.HEIGHT]
+        let range = b.max - b.min + viewSize
+        let pos = 0, size = 0
+        if(range !== 0){
+            pos = (view.$contentPos(axis) - b.min) / range
+            size = viewSize / range
+        }
+        values[axis] = { pos, size }
+    }
+    if(area){
+        area.$write(VisibleArea.XPOSITION, values.x.pos)
+        area.$write(VisibleArea.WIDTHRATIO, values.x.size)
+        area.$write(VisibleArea.YPOSITION, values.y.pos)
+        area.$write(VisibleArea.HEIGHTRATIO, values.y.size)
+    }
+    if(view.$scrollBars) view.$scrollBars.$visibleAreaChanged(values)
+}
+
+// the margins of a view along an axis: { start, end } (topMargin / bottomMargin, leftMargin / rightMargin)
+function margins(view, axis){
+    let C = view.constructor, v = view.$v
+    if(C.TOPMARGIN === undefined) return { start: 0, end: 0 }
+    return axis === 'y' ? { start: v[C.TOPMARGIN], end: v[C.BOTTOMMARGIN] } : { start: v[C.LEFTMARGIN], end: v[C.RIGHTMARGIN] }
+}
+
+// QQuickFlickable::setTopMargin ...: the range changes; a view that does not move is put back in it at once
+function marginChanged(view, axis){
+    if(view.$updateOrigin) view.$updateOrigin()
+    else if(view.$updateBounds) view.$updateBounds()
+    if(!(view.$f & engine.COMPLETED) || view.$v[view.constructor.MOVING]) return
+    fixup(view, axis, true)
+}
+
 function installFlick(Class){
+    // the range of the content of an item view, widened by its margins (QQuickItemViewPrivate::minExtentForAxis:
+    // + startMargin, maxExtentForAxis: - endMargin); the range of the content itself stays $contentBounds
+    if(Class.prototype.$flickBounds && !Class.prototype.$ownMargins){
+        let content = Class.prototype.$flickBounds
+        Class.prototype.$contentBounds = content
+        Class.prototype.$flickBounds = function(axis){
+            let b = content.call(this, axis)
+            let m = margins(this, axis)
+            if(!m.start && !m.end) return b
+            return { min: b.min - m.start, max: b.max + m.end }
+        }
+    }
+    Object.defineProperty(Class.prototype, 'visibleArea', {
+        get(){
+            if(!this.$visibleArea){
+                this.$visibleArea = new VisibleArea(this)
+                updateVisibleArea(this)
+            }
+            return this.$visibleArea
+        },
+        configurable: true,
+    })
+    Class.prototype.$updateVisibleArea = function(){ updateVisibleArea(this) }
     for(let name of Object.getOwnPropertyNames(flickMouse)){
         Object.defineProperty(Class.prototype, name, Object.getOwnPropertyDescriptor(flickMouse, name))
     }
@@ -499,13 +615,27 @@ function flickDirection(direction, contentSize, viewSize, axis){
 // "Items declared as children of a Flickable are automatically parented to the Flickable's contentItem."
 // contentWidth / contentHeight -1: the content item follows the Flickable's size
 class Flickable extends Item {
+    // its $flickBounds has the margins (installFlick)
+    get $ownMargins(){ return true }
+
     constructor(parent = null){
         super(parent)
         this.$content = new Item(this)
         this.$syncContentSize()
+        engine.scheduleComponentComplete(this)
     }
 
     get contentItem(){ return this.$content }
+
+    $assign(id, value){
+        if(id === Flickable.CONTENTX || id === Flickable.CONTENTY) (this.$explicitContentPos || (this.$explicitContentPos = {}))[id === Flickable.CONTENTX ? 'x' : 'y'] = true
+        super.$assign(id, value)
+    }
+
+    $bind(id, fn, scope, self){
+        if(id === Flickable.CONTENTX || id === Flickable.CONTENTY) (this.$explicitContentPos || (this.$explicitContentPos = {}))[id === Flickable.CONTENTX ? 'x' : 'y'] = true
+        return super.$bind(id, fn, scope, self)
+    }
 
     $syncContentSize(){
         if(!this.$content) return
@@ -515,11 +645,22 @@ class Flickable extends Item {
         this.$updateBounds()
     }
 
-    // QQuickFlickable::minXExtent = 0, maxXExtent = min(0, width - contentWidth)
+    // QQuickFlickable::minYExtent = topMargin, maxYExtent = min(minYExtent, height - contentHeight - bottomMargin):
+    // contentY from -topMargin to contentHeight + bottomMargin - height
     $flickBounds(axis){
         let content = this.$content ? this.$content.$v[axis === 'x' ? Item.WIDTH : Item.HEIGHT] : 0
         let size = this.$v[axis === 'x' ? Item.WIDTH : Item.HEIGHT]
-        return { min: 0, max: Math.max(0, content - size) }
+        let m = margins(this, axis)
+        return { min: -m.start, max: Math.max(-m.start, content + m.end - size) }
+    }
+
+    // QQuickFlickable::componentComplete: a content position not set goes to the start of a margin
+    $componentComplete(){
+        super.$componentComplete()
+        for(let axis of ['x', 'y']){
+            let m = margins(this, axis)
+            if(m.start && !this.$explicitContentPos?.[axis]) this.$setContentPos(axis, -m.start)
+        }
     }
 
     $flickAxis(axis){
@@ -541,6 +682,7 @@ class Flickable extends Item {
         this.$write(Flickable.ATXEND, x >= bx.max)
         this.$write(Flickable.ATYBEGINNING, y <= by.min)
         this.$write(Flickable.ATYEND, y >= by.max)
+        updateVisibleArea(this)
     }
 
     resizeContent(width, height, center){
@@ -574,7 +716,44 @@ function wheelMovement(view){
     }, 100)
 }
 
+// QStyleHints::wheelScrollLines * 24: the pixels of a wheel step
+const WHEEL_SCROLL = 3 * 24
+// a wheel step (QQuickFlickable::wheelEvent with an angle delta and no scroll phase): the content moves by 72 pixels
+// a step, OutExpo over 3/4 of the fixup duration, then back into the bounds; at the bound it goes the event is not
+// accepted (the items below get it). The return: accepted
+function wheelStep(view, axis, delta){
+    let s = flickState(view)
+    let pos = view.$contentPos(axis)
+    let { min, max } = bounds(view, axis)
+    let move = -delta / 120 * WHEEL_SCROLL
+    if(move < 0 ? pos <= min : pos >= max) return false
+    let accept = true
+    if(view.$v[view.constructor.BOUNDSBEHAVIOR] === 0){
+        let est = pos + move
+        if(est < min){ move = min - pos; accept = false }
+        else if(est > max){ move = max - pos; accept = false }
+    }
+    resetTimeline(view, axis)
+    movementStarting(view)
+    s[axis].moved = true
+    s[axis].fixingUp = true
+    runTimeline(view, axis, [moveSegment(pos, pos + move, 3 * FIXUP_DURATION / 4, easeOutExpo)], () => fixup(view, axis))
+    return accept
+}
+
+// a step of a wheel: an angle delta with no pixels (a test, a browser in lines or pages) or a whole number of steps
+const isWheelStep = (angle, pixel) => angle !== 0 && (!pixel || angle % 120 === 0)
+
 function wheelScroll(view, angleDelta, pixelDelta){
+    let stepX = view.$flickAxis('x') && isWheelStep(angleDelta.x, pixelDelta.x)
+    let stepY = view.$flickAxis('y') && isWheelStep(angleDelta.y, pixelDelta.y)
+    if(stepX || stepY){
+        let accepted = false
+        if(stepY && wheelStep(view, 'y', angleDelta.y)) accepted = true
+        if(stepX && wheelStep(view, 'x', angleDelta.x)) accepted = true
+        return accepted
+    }
+    // pixels (a touchpad): the content follows them
     let dx = pixelDelta.x || angleDelta.x / 120 * 100
     let dy = pixelDelta.y || angleDelta.y / 120 * 100
     let bx = bounds(view, 'x'), by = bounds(view, 'y')
@@ -583,8 +762,8 @@ function wheelScroll(view, angleDelta, pixelDelta){
     let ny = view.$flickAxis('y') ? Math.max(by.min, Math.min(by.max, y - dy)) : y
     if(nx === x && ny === y) return false
     wheelMovement(view)
-    if(nx !== x) view.$setContentPos('x', nx)
-    if(ny !== y) view.$setContentPos('y', ny)
+    if(nx !== x) setPos(view, 'x', nx)
+    if(ny !== y) setPos(view, 'y', ny)
     return true
 }
 Flickable.$defaultParent = (flickable) => flickable.$content
@@ -606,14 +785,18 @@ const FLICK_PROPS = {
     dragging: { kind: 'bool', readonly: true },
     maximumFlickVelocity: { kind: 'real', initial: 2500 },
     flickDeceleration: { kind: 'real', initial: 1500 },
+    topMargin: { kind: 'real', effect: (view) => marginChanged(view, 'y') },
+    bottomMargin: { kind: 'real', effect: (view) => marginChanged(view, 'y') },
+    leftMargin: { kind: 'real', effect: (view) => marginChanged(view, 'x') },
+    rightMargin: { kind: 'real', effect: (view) => marginChanged(view, 'x') },
     pressDelay: 'int',
 }
 const FLICK_SIGNALS = ['movementStarted', 'movementEnded', 'flickStarted', 'flickEnded', 'dragStarted', 'dragEnded']
 
 defineType(Flickable, {
     props: Object.assign({
-        contentX: { kind: 'real', effect: moved },
-        contentY: { kind: 'real', effect: moved },
+        contentX: { kind: 'real', effect: moved, set(value){ externalMove(this, 'x'); this.$assign(Flickable.CONTENTX, value) } },
+        contentY: { kind: 'real', effect: moved, set(value){ externalMove(this, 'y'); this.$assign(Flickable.CONTENTY, value) } },
         contentWidth: { kind: 'real', initial: -1, effect: contentSize },
         contentHeight: { kind: 'real', initial: -1, effect: contentSize },
         originX: { kind: 'real', readonly: true },
@@ -635,9 +818,13 @@ Object.assign(Flickable, FLICK_ENUMS)
 {
     let base = Flickable.prototype.$write
     Flickable.prototype.$write = function(id, value){
+        let old = this.$v[id]
         base.call(this, id, value)
-        if(id === Item.WIDTH || id === Item.HEIGHT) this.$syncContentSize()
+        if(id === Item.WIDTH || id === Item.HEIGHT){
+            this.$syncContentSize()
+            if(old !== this.$v[id]) geometryFixup(this, id === Item.WIDTH ? 'x' : 'y')
+        }
     }
 }
 
-module.exports = { Flickable, wheelScroll, installFlick, flickDirection, flickState, fixup, FLICK_PROPS, FLICK_SIGNALS, FLICK_ENUMS, clock, DRAG_THRESHOLD }
+module.exports = { margins, Flickable, VisibleArea, updateVisibleArea, wheelScroll, externalMove, installFlick, flickDirection, flickState, fixup, FLICK_PROPS, FLICK_SIGNALS, FLICK_ENUMS, clock, DRAG_THRESHOLD }

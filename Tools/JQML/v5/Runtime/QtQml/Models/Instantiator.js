@@ -30,8 +30,9 @@ class Instantiator extends QtObject {
         this.$regenerate()
     }
 
+    // QQmlInstantiatorPrivate::clear: objectRemoved from the first object to the last
     $clear(){
-        for(let i = this.$objects.length - 1; i >= 0; i--){
+        for(let i = 0; i < this.$objects.length; i++){
             let obj = this.$objects[i]
             engine.emitArgs(this, Instantiator.SIGNAL_objectRemoved, [i, obj])
             if(obj) obj.$releaseLater()

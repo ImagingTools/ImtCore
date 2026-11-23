@@ -537,6 +537,78 @@ function cases(name, runtime){
         engine.batch(() => { input.cursorDelegate = delegate.constructor === undefined ? null : new types.Component(null, delegate.$build) })
         assert.equal(made, 2)
     })
+
+    // ---- selection by the mouse (QQuickTextInput::mousePressEvent, mouseMoveEvent) ----
+
+    // the field 100 px from the left of the viewport, the browser's own handling of the press counted
+    function mouseField(text, width, setup){
+        let input = make(TextInput, (it) => {
+            it.text = text
+            it.width = width
+            it.height = 30
+            if(setup) setup(it)
+        })
+        let control = nativeControl(input)
+        control.getBoundingClientRect = () => ({ left: 100, top: 0, right: 100 + width, bottom: 30 })
+        control.focused = 0
+        control.focus = () => { control.focused++ }
+        return input
+    }
+
+    function press(field, x, shiftKey = false){
+        let event = { button: 0, detail: 1, shiftKey, clientX: 100 + x, prevented: false, preventDefault(){ this.prevented = true } }
+        field.$mouseDown(event)
+        return event
+    }
+
+    test(name + ': a press puts the cursor at the mouse, a drag selects from there to the x of the mouse, also outside', () => {
+        let input = mouseField('abcdefghij', 200)
+        let event = press(input, 13)
+        // the browser neither focuses nor selects itself: it snapped a drag out of the field to an end
+        assert.equal(event.prevented, true)
+        assert.equal(input.$input.focused, 1)
+        assert.equal(input.cursorPosition, 2)
+        assert.equal(input.selectedText, '')
+        engine.batch(() => input.$dragSelectTo(100 + 31))
+        assert.deepEqual([input.selectionStart, input.selectionEnd, input.cursorPosition], [2, 5, 5])
+        // left of the field: the start of the text, the anchor stays
+        engine.batch(() => input.$dragSelectTo(50))
+        assert.deepEqual([input.selectionStart, input.selectionEnd, input.cursorPosition], [0, 2, 0])
+        assert.deepEqual([input.$input.selectionStart, input.$input.selectionEnd, input.$input.selectionDirection], [0, 2, 'backward'])
+        // below the field the y does not count: the x of the mouse, not the end of the text
+        engine.batch(() => input.$dragSelectTo(100 + 25))
+        assert.deepEqual([input.selectionStart, input.selectionEnd], [2, 4])
+    })
+
+    test(name + ': a press with Shift keeps the anchor (moveCursor with mark)', () => {
+        let input = mouseField('abcdefghij', 200)
+        engine.batch(() => input.select(2, 4))
+        press(input, 48, true)
+        assert.deepEqual([input.selectionStart, input.selectionEnd, input.cursorPosition], [2, 8, 8])
+    })
+
+    test(name + ': a drag past the edge scrolls the text just enough to show the cursor', () => {
+        let input = mouseField('abcdefghij', 30)
+        press(input, 6)
+        engine.batch(() => input.$dragSelectTo(100 + 60))
+        assert.deepEqual([input.selectionStart, input.selectionEnd], [1, 10])
+        // the cursor at 60 px of text, the last pixel of the field is 29
+        assert.equal(input.$input.scrollLeft, 31)
+        assert.equal(input.cursorRectangle.x, 29)
+    })
+
+    test(name + ': with mouseSelectionMode SelectWords a drag selects whole words', () => {
+        let input = mouseField('hello world foo', 200, (it) => { it.mouseSelectionMode = TextInput.SelectWords })
+        press(input, 6)
+        engine.batch(() => input.$dragSelectTo(100 + 48))
+        assert.equal(input.selectedText, 'hello world')
+    })
+
+    test(name + ': without selectByMouse a press leaves the selection to the browser and does not drag', () => {
+        let input = mouseField('abcdefghij', 200, (it) => { it.selectByMouse = false })
+        let event = press(input, 13)
+        assert.equal(event.prevented, false)
+    })
 }
 
 for(let [name, load] of runtimes) cases(name, load())

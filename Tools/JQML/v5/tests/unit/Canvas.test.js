@@ -295,6 +295,26 @@ function cases(name, runtime){
         assert.throws(() => ctx.drawFocusRing(), /not supported/)
     })
 
+    // QQuickJSContext2DPrototype::method_arc / method_arcTo: a finite negative radius throws THROW_DOM(INDEX_SIZE_ERR,
+    // "Incorrect argument radius"), an Error with the code; arcTo returns the context and reaches the canvas
+    test(name + ': arc and arcTo refuse a negative radius as Qt, arcTo returns the context', async () => {
+        let ctx = (await ready((it) => { it.contextType = '2d' })).context
+        let dom = ctx.canvas.$canvas.ctx
+        assert.equal(ctx.arcTo(10, 10, 20, 10, 5), ctx)
+        assert.deepEqual(dom.calls.filter((c) => c[0] === 'arcTo').pop(), ['arcTo', 10, 10, 20, 10, 5])
+        for(let call of [() => ctx.arcTo(10, 10, 20, 10, -3), () => ctx.arc(10, 10, -1, 0, Math.PI)]){
+            let error = null
+            try { call() } catch(e) { error = e }
+            assert.ok(error)
+            assert.equal(error.name, 'Error')
+            assert.equal(error.message, 'Incorrect argument radius')
+            assert.equal(error.code, 1)
+        }
+        // not a finite number: no check (qt_is_finite)
+        ctx.arcTo(0, 0, 1, 1, NaN)
+        assert.ok(Number.isNaN(dom.calls.filter((c) => c[0] === 'arcTo').pop()[5]))
+    })
+
     test(name + ': reset(): a new state, an empty stack, the canvas cleared', async () => {
         let ctx = (await ready((it) => { it.contextType = '2d' })).context
         let dom = ctx.canvas.$canvas.ctx

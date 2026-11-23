@@ -5,6 +5,7 @@
 // a context. The qualifier shows the script's top-level names with their current values.
 const fs = require('fs')
 const U = require('uglify-js')
+const { colorWrites } = require('./valueWrites')
 
 // A script whose top level only declares (literals, functions, its own names, JavaScript globals) does nothing
 // observable when it is made: made on its first use, it cannot be told from one made with the document
@@ -99,6 +100,7 @@ function emitScript(ref, fileName, url, env){
             return undefined
         }))
     }
+    ast = colorWrites(ast)
     let factory = ast.print_to_string({ beautify: false, comments: false, ascii_only: false }).replace(/;$/, '')
     let imports = '[' + script.imports.map(imp => env.importRef(imp, fileName)).join(',') + ']'
     let key = JSON.stringify(url || '')

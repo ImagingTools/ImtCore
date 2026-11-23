@@ -49,6 +49,16 @@ function injectStyle(){
 }
 
 const geometry = (bits) => (item) => engine.markDirty(item, bits)
+// the size that follows the implicit size (no explicit size)
+function implicitWrite(item, id, value){
+    item.$implicitWrite = true
+    try { item.$write(id, value) } finally { item.$implicitWrite = false }
+}
+
+// a layout follows the implicit size of its items, also of those it sized (QQuickLayout::itemImplicitWidthChanged)
+function implicitChanged(item){
+    if(item.$parent && item.$parent.$childImplicitChanged) item.$parent.$childImplicitChanged(item)
+}
 
 function sizeChanged(item){
     engine.markDirty(item, GEOMETRY)
@@ -62,6 +72,7 @@ class Item extends QtObject {
         this.$anchored = 0
         this.$anchorsReady = false
         this.$ownVisible = true
+        this.$ownEnabled = true     // enabled as set; the property holds the effective value (QQuickItemPrivate::effectiveEnable)
         this.$dirty = 0
         this.$deferred = 0          // dirty bits held while the item is hidden
         this.$polishQueued = false
@@ -78,7 +89,28 @@ class Item extends QtObject {
         engine.markDirty(this, ALL)
     }
 
+    // QQuickItemPrivate::setEffectiveEnableRecur: enabled reads false below a disabled item; each item whose effective value
+    // changes emits enabledChanged. The focus is updated once, from the item whose own value changed.
+    $setOwnEnabled(value){
+        this.$ownEnabled = !!value
+        this.$updateEnabled(true)
+    }
+    $updateEnabled(focus){
+        let parent = this.$parent
+        let effective = this.$ownEnabled && (!(parent instanceof Item) || parent.$v[Item.ENABLED])
+        if(this.$v[Item.ENABLED] === effective) return
+        cascadingEnable++
+        try {
+            super.$write(Item.ENABLED, effective)
+            if(this.$children) for(let child of this.$children) if(child instanceof Item) child.$updateEnabled(false)
+        } finally {
+            cascadingEnable--
+        }
+        if(focus) this.$enabledChanged()
+    }
+
     $parentChanged(old, parent){
+        if(parent instanceof Item || old instanceof Item) this.$updateEnabled(true)
         if(this.$dom){
             if(parent && parent.$dom) parent.$dom.appendChild(this.$dom)
             else if(this.$dom.parentNode) this.$dom.parentNode.removeChild(this.$dom)
@@ -92,9 +124,17 @@ class Item extends QtObject {
         if(parent instanceof Item){
             parent.$paintOrder = null
             engine.emit(parent, Item.SIGNAL_childrenChanged)
+            // a parent that takes its children elsewhere (Pane: its contentItem, Container: its contentModel)
+            if(parent.$childAdded) parent.$childAdded(this)
+        } else if(parent && parent.$childAdded){
+            // an object that shows its items in an item of its own (Popup: its popup item)
+            parent.$childAdded(this)
         }
         if(old && old.$childGeometryChanged) old.$childGeometryChanged(this)
         if(parent && parent.$childGeometryChanged) parent.$childGeometryChanged(this)
+        // QQuickContents::itemChildRemoved / itemChildAdded
+        if(old instanceof Item && old.$contents) old.$calcContents(null)
+        if(parent instanceof Item && parent.$contents) parent.$calcContents(this)
     }
 
     $assign(id, value){
@@ -113,12 +153,29 @@ class Item extends QtObject {
 
     // visible holds the effective visibility: own flag and the parent's
     $write(id, value){
+        // undefined resets the size (QQuickItem::resetWidth / resetHeight): it follows the implicit size again
+        if(id === Item.WIDTH || id === Item.HEIGHT){
+            let bit = id === Item.WIDTH ? EXPLICIT_WIDTH : EXPLICIT_HEIGHT
+            if(value === undefined){
+                this.$explicit &= ~bit
+                this.$sizeReset = (this.$sizeReset || 0) | bit
+                value = this.$v[id === Item.WIDTH ? Item.IMPLICITWIDTH : Item.IMPLICITHEIGHT]
+            } else if(this.$sizeReset & bit && !this.$implicitWrite){
+                // a size again after a reset: explicit again (QQuickItem::setWidth: widthValid)
+                this.$explicit |= bit
+                this.$sizeReset &= ~bit
+            }
+        }
         if(id === Item.STATE && Item.$states){
             Item.$states.write(this, value)
             return
         }
         if(id === Item.FOCUS){
             this.$setFocus(value)
+            return
+        }
+        if(id === Item.ENABLED){
+            this.$setOwnEnabled(value)
             return
         }
         if(id === Item.VISIBLE){
@@ -133,6 +190,38 @@ class Item extends QtObject {
             value = this.$ownVisible && (!parent || !(parent instanceof Item) || parent.$v[Item.VISIBLE])
         }
         super.$write(id, value)
+        // QQuickContents::itemGeometryChanged: the childrenRect of the parent is computed again
+        if(id <= Item.HEIGHT && id >= Item.X && this.$parent && this.$parent.$contents) this.$parent.$calcContents(null)
+    }
+
+    // QQuickContents: the rect of the children (all of them, the hidden ones too). A change of a child computes it
+    // again; a child added only widens it (calcGeometry(item))
+    $calcContents(added){
+        let c = this.$contents
+        let old = [c.x, c.y, c.w, c.h]
+        if(added){
+            let x = added.$v[Item.X], y = added.$v[Item.Y]
+            let right = Math.max(c.x + c.w, x + added.$v[Item.WIDTH]), bottom = Math.max(c.y + c.h, y + added.$v[Item.HEIGHT])
+            c.x = Math.min(c.x, x)
+            c.y = Math.min(c.y, y)
+            c.w = right - c.x
+            c.h = bottom - c.y
+        } else {
+            let children = (this.$children || []).filter(child => child instanceof Item)
+            let left = Number.MAX_VALUE, right = -Number.MAX_VALUE, top = Number.MAX_VALUE, bottom = -Number.MAX_VALUE
+            for(let child of children){
+                let v = child.$v
+                left = Math.min(left, v[Item.X]); right = Math.max(right, v[Item.X] + v[Item.WIDTH])
+                top = Math.min(top, v[Item.Y]); bottom = Math.max(bottom, v[Item.Y] + v[Item.HEIGHT])
+            }
+            if(children.length){
+                c.x = left
+                c.y = top
+            }
+            c.w = Math.max(right - left, 0)
+            c.h = Math.max(bottom - top, 0)
+        }
+        if(old[0] !== c.x || old[1] !== c.y || old[2] !== c.w || old[3] !== c.h) engine.emit(this, Item.SIGNAL_childrenRectChanged)
     }
 
     $componentComplete(){
@@ -156,7 +245,21 @@ class Item extends QtObject {
         }
     }
     get resources(){ return this.$children ? this.$children.filter(child => !(child instanceof Item)) : [] }
+    // resources_clear / resources_append
+    set resources(list){
+        for(let child of this.resources) child.$setParent(null)
+        for(let child of list || []){
+            if(child && child.$setParent) child.$setParent(this)
+        }
+    }
     get data(){ return this.$children ? this.$children.slice() : [] }
+    // data_clear (the resources and the children), then data_append of each object
+    set data(list){
+        for(let child of this.data) child.$setParent(null)
+        for(let child of list || []){
+            if(child && child.$setParent) child.$setParent(this)
+        }
+    }
 
     get left(){ return this.$line(LEFT) }
     get right(){ return this.$line(RIGHT) }
@@ -189,11 +292,27 @@ class Item extends QtObject {
         if(bits & GEOMETRY){
             // a default is not written: the browser keeps every inline declaration per element
             let transformed = v[Item.ROTATION] !== 0 || v[Item.SCALE] !== 1
-            let transform = v[Item.X] !== 0 || v[Item.Y] !== 0 || transformed ? 'translate(' + v[Item.X] + 'px,' + v[Item.Y] + 'px)' : ''
-            if(v[Item.ROTATION] !== 0) transform += ' rotate(' + v[Item.ROTATION] + 'deg)'
-            if(v[Item.SCALE] !== 1) transform += ' scale(' + v[Item.SCALE] + ')'
-            style.transform = transform
-            style.transformOrigin = transformed ? ORIGIN[v[Item.TRANSFORMORIGIN]] || '50% 50%' : ''
+            let list = v[Item.TRANSFORM] ? require('./Transform').transformsCss(v[Item.TRANSFORM]) : ''
+            if(list){
+                // QQuickItemPrivate::itemToParentTransform: the position, the transforms of Item.transform, then the
+                // scale and the rotation about the transform origin (worked out here: the CSS origin is 0 0)
+                let origin = (ORIGIN[v[Item.TRANSFORMORIGIN]] || '50% 50%').split(' ').map((p, i) => parseFloat(p) / 100 * v[i ? Item.HEIGHT : Item.WIDTH])
+                let transform = 'translate(' + v[Item.X] + 'px,' + v[Item.Y] + 'px)' + list
+                if(transformed){
+                    transform += ' translate(' + origin[0] + 'px,' + origin[1] + 'px)'
+                    if(v[Item.ROTATION] !== 0) transform += ' rotate(' + v[Item.ROTATION] + 'deg)'
+                    if(v[Item.SCALE] !== 1) transform += ' scale(' + v[Item.SCALE] + ')'
+                    transform += ' translate(' + -origin[0] + 'px,' + -origin[1] + 'px)'
+                }
+                style.transform = transform
+                style.transformOrigin = '0 0'
+            } else {
+                let transform = v[Item.X] !== 0 || v[Item.Y] !== 0 || transformed ? 'translate(' + v[Item.X] + 'px,' + v[Item.Y] + 'px)' : ''
+                if(v[Item.ROTATION] !== 0) transform += ' rotate(' + v[Item.ROTATION] + 'deg)'
+                if(v[Item.SCALE] !== 1) transform += ' scale(' + v[Item.SCALE] + ')'
+                style.transform = transform
+                style.transformOrigin = transformed ? ORIGIN[v[Item.TRANSFORMORIGIN]] || '50% 50%' : ''
+            }
             style.width = Math.max(0, v[Item.WIDTH]) + 'px'
             style.height = Math.max(0, v[Item.HEIGHT]) + 'px'
         }
@@ -220,6 +339,9 @@ class Item extends QtObject {
     }
 }
 
+// while the effective enabled of a subtree is updated: the focus is updated after it, once
+let cascadingEnable = 0
+
 defineType(Item, {
     props: {
         x: { kind: 'real', effect: geometry(GEOMETRY) },
@@ -233,12 +355,34 @@ defineType(Item, {
         },
         width: { kind: 'real', effect: sizeChanged },
         height: { kind: 'real', effect: sizeChanged },
-        implicitWidth: { kind: 'real', effect(item, value){ if(!(item.$explicit & EXPLICIT_WIDTH)) item.$write(Item.WIDTH, value) } },
-        implicitHeight: { kind: 'real', effect(item, value){ if(!(item.$explicit & EXPLICIT_HEIGHT)) item.$write(Item.HEIGHT, value) } },
+        // QQuickItem::childrenRect: made on its first read, computed then
+        childrenRect: {
+            kind: 'var',
+            readonly: true,
+            get(){
+                // made and computed before the reading binding depends on it: its first change is emitted to the
+                // others (QQuickContents::complete -> updateRect), not to that binding
+                if(!this.$contents){
+                    this.$contents = { x: 0, y: 0, w: 0, h: 0 }
+                    this.$calcContents(null)
+                }
+                engine.track(this, Item.SIGNAL_childrenRectChanged)
+                let c = this.$contents
+                return new (require('../Core/ValueTypes').QRectF)(c.x, c.y, c.w, c.h)
+            },
+        },
+        implicitWidth: { kind: 'real', effect(item, value){ if(!(item.$explicit & EXPLICIT_WIDTH)) implicitWrite(item, Item.WIDTH, value); implicitChanged(item) } },
+        implicitHeight: { kind: 'real', effect(item, value){ if(!(item.$explicit & EXPLICIT_HEIGHT)) implicitWrite(item, Item.HEIGHT, value); implicitChanged(item) } },
         opacity: { kind: 'real', initial: 1, effect: geometry(OPACITY) },
         scale: { kind: 'real', initial: 1, effect: geometry(GEOMETRY) },
         rotation: { kind: 'real', effect: geometry(GEOMETRY) },
         transformOrigin: { kind: 'int', initial: 4, effect: geometry(GEOMETRY) },
+        // Item.transform: Translate, Scale, Rotation, Matrix4x4 (Transform.js)
+        transform: { kind: 'var', initial: null, effect: (item, value, old) => {
+            // a list property: one transform is a list of one (QQmlListProperty<QQuickTransform>)
+            if(value && !Array.isArray(value)) value = item.$v[Item.TRANSFORM] = [value]
+            require('./Transform').setItemTransforms(item, value, old)
+        } },
         visible: {
             kind: 'bool',
             initial: true,
@@ -253,7 +397,7 @@ defineType(Item, {
                 if(item.$parent && item.$parent.$childGeometryChanged) item.$parent.$childGeometryChanged(item)
             },
         },
-        enabled: { kind: 'bool', initial: true, effect(item){ item.$enabledChanged() } },
+        enabled: { kind: 'bool', initial: true, effect(item){ if(!cascadingEnable) item.$enabledChanged() } },
         focus: 'bool',
         activeFocus: { kind: 'bool', readonly: true },
         activeFocusOnTab: 'bool',
@@ -271,9 +415,37 @@ defineType(Item, {
         KeyNavigation: { group: null },
         Drag: { group: null },      // set by Drag.js
         ListView: { group: null },  // set by ListView.js
+        PathView: { group: null },  // set by PathView.js
+        LayoutMirroring: { group: null },   // set by LayoutMirroring.js
+        TableView: { group: null }, // set by TableView.js
+        SelectionRectangle: { group: null }, // set by Controls/SelectionRectangle.js
+        ScrollBar: { group: null },         // set by Controls/ScrollBar.js
+        ScrollIndicator: { group: null },   // set by Controls/ScrollBar.js
+        Overlay: { group: null },           // set by Controls/Popup.js
+        ToolTip: { group: null },           // set by Controls/Popups.js
+        DialogButtonBox: { group: null },   // set by Controls/Popups.js
+        ButtonGroup: { group: null },       // set by Controls/Actions.js
+        ActionGroup: { group: null },       // set by Controls/Actions.js
+        StackView: { group: null },         // set by Controls/StackView.js
+        SplitView: { group: null },         // set by Controls/SplitView.js
+        SplitHandle: { group: null },       // set by Controls/SplitView.js
+        ApplicationWindow: { group: null }, // set by Controls/ApplicationWindow.js
+        Tumbler: { group: null },           // set by Controls/Tumbler.js
+        SwipeDelegate: { group: null },     // set by Controls/SwipeDelegate.js
+        ContextMenu: { group: null },       // set by Controls/ContextMenu.js
+        Accessible: { group: null },        // set by Accessible.js
+        EnterKey: { group: null },          // set by Accessible.js
+        Screen: { group: null },            // set by Screen.js
+        layer: { group: null },             // set by Effects.js
+        SwipeView: { group: null },         // set by Controls/Containers.js
+        // QQuickItem::palette (Qt 6): made when it is read or set (Palette.js)
+        palette: { group: require('./Palette').Palette },
     },
     signals: ['childrenChanged'],
 })
+
+// an item of the tree a palette and a font pass along (Palette.js)
+Item.prototype.$isItem = true
 
 // QQuickItemPrivate::culled: not painted, the visible property stays (a delegate in the reuse pool)
 Item.prototype.$culled = false
@@ -316,14 +488,26 @@ function margin(anchors, id){
 
 const field = (anchors, id) => anchors.$v[id]
 
+// LayoutMirroring (QQuickAnchorsPrivate::updateHorizontalAnchors, fillChanged, centerInChanged of a mirrored item): the
+// left anchor acts as a right one on the other line (reverseAnchorLine) with the left margin, the right as a left
+// one, the horizontal center offset is negated
+const isMirrored = (item) => require('./LayoutMirroring').mirrored(item)
+const reverse = (line) => (line && (line.line === LEFT || line.line === RIGHT) ? { item: line.item, line: line.line === LEFT ? RIGHT : LEFT } : line)
+const effLeft = (item, a) => (isMirrored(item) ? reverse(field(a, Anchors.RIGHT)) : field(a, Anchors.LEFT))
+const effRight = (item, a) => (isMirrored(item) ? reverse(field(a, Anchors.LEFT)) : field(a, Anchors.RIGHT))
+const effLeftMargin = (item, a) => margin(a, isMirrored(item) ? Anchors.RIGHTMARGIN : Anchors.LEFTMARGIN)
+const effRightMargin = (item, a) => margin(a, isMirrored(item) ? Anchors.LEFTMARGIN : Anchors.RIGHTMARGIN)
+const effCenterOffset = (item, a) => (isMirrored(item) ? -1 : 1) * field(a, Anchors.HORIZONTALCENTEROFFSET)
+
 const H = {
-    fillX: (item, a) => linePos(item, field(a, Anchors.FILL).left) + margin(a, Anchors.LEFTMARGIN),
+    fillX: (item, a) => linePos(item, field(a, Anchors.FILL).left) + effLeftMargin(item, a),
     fillWidth: (item, a) => field(a, Anchors.FILL).width - margin(a, Anchors.LEFTMARGIN) - margin(a, Anchors.RIGHTMARGIN),
-    centerX: (item, a) => linePos(item, field(a, Anchors.CENTERIN).horizontalCenter) - half(item, item.width) + field(a, Anchors.HORIZONTALCENTEROFFSET),
-    leftX: (item, a) => linePos(item, field(a, Anchors.LEFT)) + margin(a, Anchors.LEFTMARGIN),
-    leftRightWidth: (item, a) => linePos(item, field(a, Anchors.RIGHT)) - margin(a, Anchors.RIGHTMARGIN) - linePos(item, field(a, Anchors.LEFT)) - margin(a, Anchors.LEFTMARGIN),
-    rightX: (item, a) => linePos(item, field(a, Anchors.RIGHT)) - margin(a, Anchors.RIGHTMARGIN) - item.width,
-    hcenterX: (item, a) => linePos(item, field(a, Anchors.HORIZONTALCENTER)) - half(item, item.width) + field(a, Anchors.HORIZONTALCENTEROFFSET),
+    centerX: (item, a) => linePos(item, field(a, Anchors.CENTERIN).horizontalCenter) - half(item, item.width) + effCenterOffset(item, a),
+    // the anchors of one side: a left one (or a mirrored right one) gives x, the other side x from the right
+    leftX: (item, a) => (effLeft(item, a) ? linePos(item, effLeft(item, a)) + effLeftMargin(item, a) : linePos(item, effRight(item, a)) - effRightMargin(item, a) - item.width),
+    leftRightWidth: (item, a) => linePos(item, effRight(item, a)) - effRightMargin(item, a) - linePos(item, effLeft(item, a)) - effLeftMargin(item, a),
+    rightX: (item, a) => (effRight(item, a) ? linePos(item, effRight(item, a)) - effRightMargin(item, a) - item.width : linePos(item, effLeft(item, a)) + effLeftMargin(item, a)),
+    hcenterX: (item, a) => linePos(item, field(a, Anchors.HORIZONTALCENTER)) - half(item, item.width) + effCenterOffset(item, a),
 }
 
 const V = {
@@ -404,6 +588,8 @@ function updateAxes(anchors, axes){
     }
 }
 const axisOf = (axes) => (anchors) => updateAxes(anchors, axes)
+// the mirroring of the item changed (LayoutMirroring.js)
+const updateHorizontalAnchors = (anchors) => updateAxes(anchors, HORIZONTAL)
 
 // QQuickAnchors::setMargins: the sides not set explicitly take the value and notify, then the geometry
 function marginsWritten(anchors, value){
@@ -435,6 +621,12 @@ class Anchors extends GroupObject {
     $write(id, value){
         let prop = Anchors.$type.props[id]
         let bit = EXPLICIT_BITS[prop.name]
+        // undefined resets a margin (QQuickAnchors::resetLeftMargin): it follows margins again
+        if(bit && value === undefined){
+            this.$explicitMargins &= ~bit
+            return super.$write(id, this.$v[Anchors.MARGINS])
+        }
+        if(prop.name === 'margins' && value === undefined) value = 0
         if(bit) this.$explicitMargins |= bit
         // QQuickAnchors::setLeft, setFill: the signal first, then the geometry
         let axes = LINE_AXES[prop.name]
@@ -502,4 +694,4 @@ AXIS_IDS[HORIZONTAL | VERTICAL] = [Item.X, Item.Y, Item.WIDTH, Item.HEIGHT]
 // Q_OBJECT_COMPAT_PROPERTY of QQuickItemPrivate (Qt 6): bindings on them update before the notify signal
 Item.prototype.$bindableSignals = new Set([Item.SIGNAL_xChanged, Item.SIGNAL_yChanged, Item.SIGNAL_widthChanged, Item.SIGNAL_heightChanged])
 
-module.exports = { Item, Anchors, AnchorLine, bits: { GEOMETRY, VISIBILITY, OPACITY, Z, CLIP, STYLE } }
+module.exports = { updateHorizontalAnchors, Item, Anchors, AnchorLine, bits: { GEOMETRY, VISIBILITY, OPACITY, Z, CLIP, STYLE } }
