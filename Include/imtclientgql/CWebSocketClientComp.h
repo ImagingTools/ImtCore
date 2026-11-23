@@ -6,6 +6,8 @@
 #include <QtWebSockets/QWebSocket>
 #include <QtCore/QTimer>
 #include <QtCore/QReadWriteLock>
+#include <QtCore/QUrl>
+#include <QtNetwork/QSslConfiguration>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -159,10 +161,32 @@ protected:
 		ST_SHUTDOWN
 	};
 
+	/**
+		The settings that the connection is opened with: the address of the server and the encryption.
+	*/
+	struct SConnectionSettings
+	{
+		QUrl url;
+		bool isSecure = false;
+		QSslConfiguration sslConfiguration;
+
+		bool operator==(const SConnectionSettings& other) const
+		{
+			return (url == other.url) && (isSecure == other.isSecure) && (sslConfiguration == other.sslConfiguration);
+		}
+	};
+
+	SConnectionSettings GetConnectionSettings() const;
+
 	void SetState(State state);
 	void OpenConnection();
 	void ProcessConnectRequest();
 	void ProcessDisconnectRequest();
+
+	/**
+		Open the connection again if its settings are changed. A notification of the same settings (loaded again, or another part of the
+		settings is changed) keeps the connection.
+	*/
 	void ProcessSettingsChanged();
 
 	enum ModelId
@@ -225,6 +249,8 @@ private:
 	State m_state = ST_IDLE;
 	// A connection attempt failed: the retries are not logged until the client connects or the settings change
 	bool m_isRetrying = false;
+	// The settings of the last opened connection
+	SConnectionSettings m_connectionSettings;
 	// Identifies the current socket connection in the requests it delivers (publishers key the subscriptions by it)
 	QByteArray m_connectionId;
 	mutable QMap<QString, QByteArray> m_queryDataMap;
