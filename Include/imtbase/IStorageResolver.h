@@ -5,7 +5,6 @@
 // Qt includes
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
-#include <QtCore/QVariantMap>
 
 // ACF includes
 #include <istd/IChangeable.h>
@@ -31,7 +30,6 @@ public:
 	/**
 		Load the object with the given ID.
 		\return Valid pointer to the object or an invalid pointer if the object doesn't exist.
-		\sa IsSnapshotStorage
 	*/
 	virtual istd::IChangeableSharedPtr LoadObject(const Id& objectId) const = 0;
 
@@ -52,19 +50,6 @@ public:
 		Remove the object with the given ID from the storage.
 	*/
 	virtual bool RemoveObject(const Id& objectId) = 0;
-
-	/**
-		Get the storage-specific parameters of the object (e.g. table, bucket, URL).
-		The set of keys depends on the storage implementation, the key "storage" always contains the storage kind.
-	*/
-	virtual QVariantMap GetStorageParams(const Id& objectId) const = 0;
-
-	/**
-		Returns \c true, if LoadObject returns a copy of the stored data.
-		In this case the changes of the loaded object become persistent only after SaveObject.
-		If \c false, LoadObject returns the live stored instance.
-	*/
-	virtual bool IsSnapshotStorage() const = 0;
 };
 
 

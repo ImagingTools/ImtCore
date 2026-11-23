@@ -73,27 +73,6 @@ bool CCollectionStorageResolver::RemoveObject(const Id& objectId)
 }
 
 
-QVariantMap CCollectionStorageResolver::GetStorageParams(const Id& objectId) const
-{
-	QVariantMap params;
-	params[QStringLiteral("storage")] = QStringLiteral("collection");
-	params[QStringLiteral("objectId")] = objectId;
-
-	if (m_collectionPtr != nullptr){
-		params[QStringLiteral("typeId")] = m_collectionPtr->GetObjectTypeId(objectId);
-		params[QStringLiteral("name")] = m_collectionPtr->GetElementInfo(objectId, IObjectCollection::EIT_NAME);
-	}
-
-	return params;
-}
-
-
-bool CCollectionStorageResolver::IsSnapshotStorage() const
-{
-	return true;
-}
-
-
 } // namespace imtbase
 
 

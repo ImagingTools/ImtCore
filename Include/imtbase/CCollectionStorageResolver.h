@@ -40,8 +40,6 @@ public:
 	virtual bool SaveObject(const Id& objectId, const istd::IChangeable& object) override;
 	virtual Id InsertObject(const istd::IChangeableSharedPtr& objectPtr, const QString& name = QString()) override;
 	virtual bool RemoveObject(const Id& objectId) override;
-	virtual QVariantMap GetStorageParams(const Id& objectId) const override;
-	virtual bool IsSnapshotStorage() const override;
 
 private:
 	IObjectCollection* m_collectionPtr;

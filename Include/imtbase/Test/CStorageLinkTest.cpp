@@ -132,7 +132,6 @@ void CStorageLinkTest::testEmptyLink()
 	QVERIFY(!link.GetObject().IsValid());
 	QVERIFY(!link.Save());
 	QVERIFY(!link.Remove());
-	QVERIFY(link.GetStorageParams().isEmpty());
 }
 
 
@@ -333,27 +332,6 @@ void CStorageLinkTest::testTypeMismatch()
 	otherLink.SetResolver(&storage);
 
 	QVERIFY(otherLink.GetObject().IsValid());
-}
-
-
-void CStorageLinkTest::testStorageParams()
-{
-	imtbase::CObjectCollection collection;
-	SetupCollection(collection);
-
-	imtbase::CCollectionStorageResolver collectionResolver(collection, s_typeId);
-	imtbase::CMemoryStorageResolver memoryResolver;
-
-	DataLink collectionLink = CreateLink(collectionResolver, 1, QStringLiteral("Named item"));
-
-	QVariantMap params = collectionLink.GetStorageParams();
-	QCOMPARE(params[QStringLiteral("storage")].toString(), QStringLiteral("collection"));
-	QCOMPARE(params[QStringLiteral("objectId")].toByteArray(), collectionLink.GetObjectId());
-	QCOMPARE(params[QStringLiteral("typeId")].toByteArray(), s_typeId);
-	QCOMPARE(params[QStringLiteral("name")].toString(), QStringLiteral("Named item"));
-
-	DataLink memoryLink = CreateLink(memoryResolver, 1);
-	QCOMPARE(memoryLink.GetStorageParams()[QStringLiteral("storage")].toString(), QStringLiteral("memory"));
 }
 
 

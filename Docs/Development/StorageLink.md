@@ -8,7 +8,7 @@ The data model keeps only the link; the way of storing is chosen at run time by 
 | Type | Role |
 |---|---|
 | `TStorageLink<T>` / `CStorageLinkBase` | The link. Serializes only the object ID and the logical storage ID. `->` returns the object, loading it on demand. |
-| `IStorageResolver` | Loads, saves, inserts and removes objects by ID and reports storage parameters. |
+| `IStorageResolver` | Loads, saves, inserts and removes objects by ID. |
 | `IStorageResolverProvider` | Returns a resolver by the logical storage ID. |
 | `CStorageResolverRegistry` | Provider implementation filled by the application. |
 | `CStorageResolverRegistryComp` | Registry component filled by the composition. It is the application-wide provider while it exists. |
