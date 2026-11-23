@@ -981,6 +981,7 @@ inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const QByteArray& te
 	Returns nullptr when no request context is available.
 	The filter selects the data of the tenant of the context (\see imtgql::GetDataTenantId):
 	the organization of the session, otherwise the personal space of the user.
+	The superuser outside of organizations selects every personal space: a user filter without a user ID.
 	A context without a tenant gives an empty-tenant filter (no-organization isolation, NOT EXISTS binding).
 	The returned pointer is owned by the caller (ParamsSet takes ownership via SetEditableParameter).
 */
@@ -991,16 +992,21 @@ inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRe
 		return nullptr;
 	}
 
+	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
+	const bool isSuperuser = userInfoPtr != nullptr && userInfoPtr->IsAdmin();
+
 	imtbase::TenantType tenantType = imtbase::TT_ORGANIZATION;
-	const QByteArray tenantId = imtgql::GetDataTenantId(*gqlContextPtr, tenantType);
+	QByteArray tenantId = imtgql::GetDataTenantId(*gqlContextPtr, tenantType);
+	if (isSuperuser && tenantType == imtbase::TT_USER){
+		tenantId.clear();
+	}
 
 	imtauth::CTenantFilterParam* tenantFilterPtr = new imtauth::CTenantFilterParam();
 	tenantFilterPtr->SetTenantId(tenantId);
 	tenantFilterPtr->SetTenantType(tenantType);
 
 	// Owner and superuser see every document shared with the organization, regardless of the target groups
-	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
-	const bool isPrivilegedUser = gqlContextPtr->IsTenantOwner() || (userInfoPtr != nullptr && userInfoPtr->IsAdmin());
+	const bool isPrivilegedUser = gqlContextPtr->IsTenantOwner() || isSuperuser;
 	tenantFilterPtr->SetUserGroupIds(userInfoPtr != nullptr ? userInfoPtr->GetGroups() : QByteArrayList(), !isPrivilegedUser);
 
 	return tenantFilterPtr;

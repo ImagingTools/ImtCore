@@ -54,6 +54,7 @@ public:
 
 	/**
 		Kind of the tenant: an organization, or a user outside of any organization.
+		A user filter without a tenant ID selects every personal space: everything not bound to an organization.
 	*/
 	virtual imtbase::TenantType GetTenantType() const = 0;
 	virtual void SetTenantType(imtbase::TenantType tenantType) = 0;

@@ -1332,6 +1332,19 @@ QString CSqlDatabaseDocumentDelegateCompBase::CreateTenantBindingFilterQuery(con
 }
 
 
+QString CSqlDatabaseDocumentDelegateCompBase::CreatePersonalSpacesFilterQuery() const
+{
+	const QString organizationBindingsLookup = QStringLiteral(R"(SELECT 1 FROM %1 tenantBindings WHERE tenantBindings."EntityType" = '%2' AND tenantBindings."EntityId" = %3 AND tenantBindings."TenantType" = %4 AND COALESCE(tenantBindings."TenantId", '') <> '')")
+				.arg(
+							CreateTenantBindingTableName(),
+							SqlEncode(GetTableName()),
+							GetDocumentIdTextExpression(),
+							QString::number(static_cast<int>(imtbase::TT_ORGANIZATION)));
+
+	return QStringLiteral("NOT EXISTS (%1)").arg(organizationBindingsLookup);
+}
+
+
 QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateTenantBindingInsertQuery(
 			const QByteArray& tenantId,
 			const QByteArray& entityId,
@@ -1421,6 +1434,11 @@ QString CSqlDatabaseDocumentDelegateCompBase::CreateTenantFilterQuery(const imta
 
 	if (useTenantBindings || !tenantId.isEmpty()){
 		EnsureTenantBindingTableExists();
+	}
+
+	// Every personal space at once: the superuser outside of organizations
+	if (useTenantBindings && tenantType == imtbase::TT_USER && tenantId.isEmpty()){
+		return CreatePersonalSpacesFilterQuery();
 	}
 
 	const QString ownFilterQuery = CreateTenantBindingFilterQuery(tenantId, filterMode);

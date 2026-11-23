@@ -362,9 +362,10 @@ permissions(product, tenant) = user's roles in the product
 **Personal space (data outside of any organization).**
 - Outside of any organization the user is the tenant of their data: a document they create is bound in `TenantEntityBindings` to their user ID with `TenantType` = 1 (`imtbase::TT_USER`; organizations have 0). Each user sees only their own documents, in lists and by ID; an organization does not see them either. `imtgql::GetDataTenantId` picks the tenant: the organization of the session, otherwise the user; a server or an anonymous caller outside of any organization has none.
 - The session itself stays outside of any organization: permissions come from the global roles as before (section 8).
+- The superuser outside of organizations sees in the lists everything not bound to an organization: the own documents, the personal ones of all users and the unbound ones. Data of organizations shows only inside them. Its own new documents stay personal.
 - A personal space shares no documents and receives none; sharing works between organizations only.
 - Isolation is switched by one delegate attribute, `UseTenantEntityBindings`: on, a collection is isolated both by organization and by user; off, it has no bindings (users). Roles and user groups are personal too: outside of organizations a role is listed only for its creator, but it grants its permissions to everyone it is assigned to: outside of organizations every role and group not bound to an organization counts (`ITenantEntityBindingManager::HasOrganizationBinding`).
-- Documents created before this rule have no binding: they are in nobody's lists, but anyone can still open them by ID (`SS_ACCESSIBLE`, as for organizations).
+- Documents created before this rule have no binding: only the superuser outside of organizations lists them, but anyone can still open them by ID (`SS_ACCESSIBLE`, as for organizations).
 
 **Personal Access Tokens.**
 - Token scopes are a subset of the **creator's** permissions: `HasPermission(creator's effective permissions, scope)`. A superuser can issue any scopes; a limited token cannot create a broader one.

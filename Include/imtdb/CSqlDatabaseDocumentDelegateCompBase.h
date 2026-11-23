@@ -172,6 +172,10 @@ protected:
 	virtual QByteArray CreateTenantBindingTableInitializationQuery() const;
 	virtual void EnsureTenantBindingTableExists() const;
 	virtual QString CreateTenantBindingFilterQuery(const QByteArray& tenantId, imtauth::TenantFilterMode filterMode = imtauth::TFM_INCLUDE) const;
+	/**
+		Condition matching every document not bound to an organization: the own, the personal ones of all users and the unbound ones.
+	*/
+	QString CreatePersonalSpacesFilterQuery() const;
 	virtual QByteArray CreateTenantBindingInsertQuery(const QByteArray& tenantId, const QByteArray& entityId, const imtbase::IOperationContext* operationContextPtr) const;
 	virtual QByteArray CreateTenantBindingDeleteQuery(const QByteArrayList& entityIds) const;
 	virtual QString CreateDocumentShareTableName() const;
