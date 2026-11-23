@@ -6,6 +6,7 @@
 #include <atomic>
 
 // Qt includes
+#include <QtCore/QMutexLocker>
 #include <QtCore/QtGlobal>
 
 // ACF includes
@@ -22,7 +23,8 @@ static std::atomic<const IStorageResolverProvider*> s_defaultProviderPtr(nullptr
 
 CStorageLinkBase::CStorageLinkBase()
 	:m_resolverPtr(nullptr),
-	m_providerPtr(nullptr)
+	m_providerPtr(nullptr),
+	m_isObjectMissing(false)
 {
 }
 
@@ -31,8 +33,43 @@ CStorageLinkBase::CStorageLinkBase(const Id& objectId, const QByteArray& storage
 	:m_objectId(objectId),
 	m_storageId(storageId),
 	m_resolverPtr(nullptr),
-	m_providerPtr(nullptr)
+	m_providerPtr(nullptr),
+	m_isObjectMissing(false)
 {
+}
+
+
+CStorageLinkBase::CStorageLinkBase(const CStorageLinkBase& other)
+	:m_objectId(other.m_objectId),
+	m_storageId(other.m_storageId),
+	m_resolverPtr(other.m_resolverPtr),
+	m_providerPtr(other.m_providerPtr),
+	m_isObjectMissing(false)
+{
+	QMutexLocker locker(&other.m_dataMutex);
+
+	m_dataPtr = other.m_dataPtr;
+	m_isObjectMissing = other.m_isObjectMissing;
+}
+
+
+CStorageLinkBase& CStorageLinkBase::operator=(const CStorageLinkBase& other)
+{
+	if (this == &other){
+		return *this;
+	}
+
+	m_objectId = other.m_objectId;
+	m_storageId = other.m_storageId;
+	m_resolverPtr = other.m_resolverPtr;
+	m_providerPtr = other.m_providerPtr;
+
+	QMutexLocker locker(&other.m_dataMutex);
+
+	m_dataPtr = other.m_dataPtr;
+	m_isObjectMissing = other.m_isObjectMissing;
+
+	return *this;
 }
 
 
@@ -52,14 +89,16 @@ void CStorageLinkBase::SetLink(const Id& objectId, const QByteArray& storageId)
 {
 	m_objectId = objectId;
 	m_storageId = storageId;
-	m_dataPtr.Reset();
+
+	Unload();
 }
 
 
 void CStorageLinkBase::SetObjectId(const Id& objectId)
 {
 	m_objectId = objectId;
-	m_dataPtr.Reset();
+
+	Unload();
 }
 
 
@@ -72,14 +111,16 @@ bool CStorageLinkBase::IsNull() const
 void CStorageLinkBase::SetResolver(IStorageResolver* resolverPtr)
 {
 	m_resolverPtr = resolverPtr;
-	m_dataPtr.Reset();
+
+	Unload();
 }
 
 
 void CStorageLinkBase::SetResolverProvider(const IStorageResolverProvider* providerPtr)
 {
 	m_providerPtr = providerPtr;
-	m_dataPtr.Reset();
+
+	Unload();
 }
 
 
@@ -116,18 +157,25 @@ const IStorageResolverProvider* CStorageLinkBase::GetDefaultResolverProvider()
 
 bool CStorageLinkBase::IsLoaded() const
 {
+	QMutexLocker locker(&m_dataMutex);
+
 	return m_dataPtr.IsValid();
 }
 
 
 void CStorageLinkBase::Unload()
 {
+	QMutexLocker locker(&m_dataMutex);
+
 	m_dataPtr.Reset();
+	m_isObjectMissing = false;
 }
 
 
 bool CStorageLinkBase::Save() const
 {
+	QMutexLocker locker(&m_dataMutex);
+
 	if (m_objectId.isEmpty() || !m_dataPtr.IsValid()){
 		return false;
 	}
@@ -153,7 +201,8 @@ bool CStorageLinkBase::Remove()
 	}
 
 	m_objectId.clear();
-	m_dataPtr.Reset();
+
+	Unload();
 
 	return true;
 }
@@ -174,7 +223,7 @@ bool CStorageLinkBase::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.EndTag(storageIdTag);
 
 	if (!archive.IsStoring()){
-		m_dataPtr.Reset();
+		Unload();
 	}
 
 	return retVal;
@@ -188,7 +237,7 @@ bool CStorageLinkBase::SerializeObjectId(iser::IArchive& archive, const iser::CA
 	retVal = retVal && archive.EndTag(tag);
 
 	if (!archive.IsStoring()){
-		m_dataPtr.Reset();
+		Unload();
 	}
 
 	return retVal;
@@ -211,12 +260,20 @@ bool CStorageLinkBase::operator!=(const CStorageLinkBase& other) const
 
 istd::IChangeableSharedPtr CStorageLinkBase::LoadData() const
 {
-	if (!m_dataPtr.IsValid() && !m_objectId.isEmpty()){
-		const IStorageResolver* resolverPtr = GetResolver();
-		if (resolverPtr != nullptr){
-			m_dataPtr = resolverPtr->LoadObject(m_objectId);
-		}
+	QMutexLocker locker(&m_dataMutex);
+
+	if (m_dataPtr.IsValid() || m_isObjectMissing || m_objectId.isEmpty()){
+		return m_dataPtr;
 	}
+
+	// Without a resolver nothing is remembered: the binding can come later, for example with the default provider.
+	const IStorageResolver* resolverPtr = GetResolver();
+	if (resolverPtr == nullptr){
+		return m_dataPtr;
+	}
+
+	m_dataPtr = resolverPtr->LoadObject(m_objectId);
+	m_isObjectMissing = !m_dataPtr.IsValid();
 
 	return m_dataPtr;
 }
@@ -224,7 +281,10 @@ istd::IChangeableSharedPtr CStorageLinkBase::LoadData() const
 
 void CStorageLinkBase::SetData(const istd::IChangeableSharedPtr& dataPtr)
 {
+	QMutexLocker locker(&m_dataMutex);
+
 	m_dataPtr = dataPtr;
+	m_isObjectMissing = false;
 }
 
 

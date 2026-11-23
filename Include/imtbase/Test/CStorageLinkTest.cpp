@@ -4,8 +4,11 @@
 
 // STL includes
 #include <algorithm>
+#include <atomic>
 #include <memory>
 #include <optional>
+#include <thread>
+#include <vector>
 
 // Qt includes
 #include <QtCore/QList>
@@ -72,6 +75,26 @@ public:
 
 class COtherTestData: public istd::IChangeable
 {
+};
+
+
+/**
+	Memory storage that counts the loads, to see how often a link asks the storage.
+*/
+class CSimCountingResolver: public imtbase::CMemoryStorageResolver
+{
+public:
+	CSimCountingResolver(): m_loadCount(0) {}
+
+	mutable std::atomic<int> m_loadCount;
+
+	// reimplemented (imtbase::IStorageResolver)
+	virtual istd::IChangeableSharedPtr LoadObject(const Id& objectId) const override
+	{
+		++m_loadCount;
+
+		return CMemoryStorageResolver::LoadObject(objectId);
+	}
 };
 
 
@@ -591,6 +614,75 @@ void CStorageLinkTest::testSaveWithoutStoredObject()
 	QVERIFY(collectionResolver.RemoveObject(collectionLink.GetObjectId()));
 	QVERIFY(!collectionLink.Save());
 	QCOMPARE(collection.GetElementsCount(), 0);
+}
+
+
+void CStorageLinkTest::testMissingObjectLoadedOnce()
+{
+	CSimCountingResolver resolver;
+
+	DataLink link(QByteArrayLiteral("missing"));
+	link.SetResolver(&resolver);
+
+	// A missing object is looked up once, not on every access.
+	QVERIFY(!link.has_value());
+	QVERIFY(!link.GetObject().IsValid());
+	QVERIFY(!link.IsLoaded());
+	QCOMPARE(resolver.m_loadCount.load(), 1);
+
+	// A copy knows it too.
+	DataLink copy = link;
+	QVERIFY(!copy.has_value());
+	QCOMPARE(resolver.m_loadCount.load(), 1);
+
+	// Unloading looks again.
+	link.Unload();
+	QVERIFY(!link.has_value());
+	QCOMPARE(resolver.m_loadCount.load(), 2);
+
+	// A new target is looked up.
+	const QByteArray objectId = resolver.InsertObject(s_typeId, CreateData(5));
+	link.SetObjectId(objectId);
+	QVERIFY(link.has_value());
+	QCOMPARE(link->m_value, 5);
+	QCOMPARE(resolver.m_loadCount.load(), 3);
+
+	// Without a resolver nothing is remembered, so a later binding finds the object.
+	DataLink unboundLink(objectId);
+	QVERIFY(!unboundLink.has_value());
+	unboundLink.SetResolver(&resolver);
+	QVERIFY(unboundLink.has_value());
+}
+
+
+void CStorageLinkTest::testConcurrentLoading()
+{
+	CSimCountingResolver resolver;
+	const QByteArray objectId = resolver.InsertObject(s_typeId, CreateData(9));
+
+	DataLink link(objectId);
+	link.SetResolver(&resolver);
+
+	const DataLink& constLink = link;
+	std::atomic<int> failureCount(0);
+
+	std::vector<std::thread> threads;
+	for (int threadIndex = 0; threadIndex < 8; ++threadIndex){
+		threads.emplace_back([&constLink, &failureCount](){
+			for (int i = 0; i < 1000; ++i){
+				if (!constLink.has_value() || (constLink->m_value != 9)){
+					++failureCount;
+				}
+			}
+		});
+	}
+
+	for (std::thread& thread : threads){
+		thread.join();
+	}
+
+	QCOMPARE(failureCount.load(), 0);
+	QCOMPARE(resolver.m_loadCount.load(), 1);
 }
 
 
