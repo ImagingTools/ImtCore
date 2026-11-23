@@ -1,6 +1,6 @@
 // The scene: the root item, the frame (layout, bindings, painting) and the mouse input.
 
-import { DragHandler, flushLazyViews, getFocusItem, Item, setDestroyObserver, setFocusItem, setFrameLoop, WheelHandler } from './items.js';
+import { DragHandler, flushLazyViews, updateDrags, getFocusItem, Item, setDestroyObserver, setFocusItem, setFrameLoop, WheelHandler } from './items.js';
 
 const MAX_PASSES = 10;
 
@@ -98,6 +98,14 @@ export class Scene {
 	// Runs one frame; returns true if something was painted.
 	drawFrame(seconds) {
 		if (this.frameHandler !== null) this.frameHandler(seconds);
+		// An area that was hidden or disabled while its button is down loses the press.
+		const pressed = this.pressed;
+		if (pressed !== null && typeof pressed.$pressLost === 'function' && pressed.$pressLost()) {
+			this.pressed = null;
+			this.dragging = [];
+			pressed.$cancelPress();
+			this.syncCursor();
+		}
 		const root = this.root;
 		if ((!root.$updateRequested && this.engine.dirty.size === 0) || this.width <= 0 || this.height <= 0) {
 			this.layoutMs = 0;
@@ -125,6 +133,8 @@ export class Scene {
 				root.$updateRequested = true;
 			}
 			if (engine.auditMode && engine.auditSweep() > 0) root.$updateRequested = true;
+			// What the items that are dragged are over (DropArea) is known after the layout.
+			updateDrags();
 		} finally {
 			setFrameLoop(false);
 		}
@@ -165,7 +175,8 @@ export class Scene {
 			const target = this.pressed;
 			if (target !== null && target.$preventStealing !== true) {
 				this.pressed = null;
-				target.$pressChanged(false);
+				if (typeof target.$cancelPress === 'function') target.$cancelPress();
+				else target.$pressChanged(false);
 			}
 		}
 	}

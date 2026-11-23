@@ -6,8 +6,9 @@
 // and root of the enclosing components (delegates have a parent scope), and finally the globals
 // (Math, JSON, Date, console, Qt, Item, time).
 
-import { Animation, ANIMATION_TYPES, AnchorLine, BindingValue, BUILTIN_TYPES, COMPONENT_ENUM_VALUE, ComponentItem, Coordinate, createSdlObject, duringChange, FILE_DIALOG_MODES, flushDeclarativeFocus, getFocusItem, hooks, Item, ListModel, ListView, linkToOwner, Loader, MapItemView, modelCount, modelScopeData, modelVersion, Placeholder, POINTER_DEVICE, queueDeclarativeFocus, readRows, readUntracked, Repeater, resetFocus, setSceneActive, Stack, TestCase, Timer, TRANSFORM_ORIGIN, TreeItemModel } from './items.js';
+import { Animation, ANIMATION_TYPES, AnchorLine, BindingValue, BUILTIN_TYPES, COMPONENT_ENUM_VALUE, ComponentItem, Coordinate, createSdlObject, duringChange, FILE_DIALOG_MODES, flushDeclarativeFocus, getFocusItem, hooks, Item, ListModel, ListView, linkToOwner, Loader, MapItemView, modelCount, modelScopeData, modelVersion, Placeholder, POINTER_DEVICE, queueDeclarativeFocus, readRows, readUntracked, Repeater, Instantiator, resetDrags, resetFocus, updateDrags, setSceneActive, Stack, TestCase, Timer, TRANSFORM_ORIGIN, TreeItemModel } from './items.js';
 import { fonts } from './fonts.js';
+import { md5 } from './md5.js';
 import { KEY, MODIFIERS, NAMED_KEY_HANDLERS, qtKeyEvent, STANDARD_KEYS } from './keys.js';
 import { QmlError, escapeSourceBreaks, tokenize, topLevelNames } from './lexer.js';
 import { callableHandler, parseQmlDocument } from './parser.js';
@@ -592,6 +593,7 @@ export class Engine {
 		this.auditMode = false;
 		this.auditMisses = new Map(); // 'Type.property file:line' -> { count, reads }
 		this.timers = new Set();
+		this.holds = new Set(); // the MouseAreas that wait for pressAndHold
 		this.shortcuts = new Set(); // the Shortcut items, in the order they were made
 		this.completed = [];
 		this.documentScope = null;
@@ -737,6 +739,7 @@ export class Engine {
 			openUrlExternally: (url) => { window.open(String(url), '_blank'); return true; },
 			point: (x, y) => ({ x, y }),
 			size: (width, height) => ({ width, height }),
+			md5: (text) => md5(text),
 			rect: (x, y, width, height) => ({ x, y, width, height }),
 			callLater: (fn, ...args) => setTimeout(() => engine.guard(() => fn(...args), 'Qt.callLater', 0), 0),
 			binding: (fn) => {
@@ -792,7 +795,7 @@ export class Engine {
 			Locale: LOCALE_FORMAT,
 			XMLHttpRequest: typeof XMLHttpRequest === 'undefined' ? class XMLHttpRequest { open() {} send() {} setRequestHeader() {} } : XMLHttpRequest,
 			Animation: Object.freeze({ Infinite: -1, Forward: 'Forward', Backward: 'Backward' }),
-			Easing: enumObject(['Linear', 'InQuad', 'OutQuad', 'InOutQuad', 'OutInQuad', 'InCubic', 'OutCubic', 'InOutCubic', 'OutInCubic', 'InQuart', 'OutQuart', 'InOutQuart', 'InQuint', 'OutQuint', 'InOutQuint', 'InSine', 'OutSine', 'InOutSine', 'InExpo', 'OutExpo', 'InOutExpo', 'InCirc', 'OutCirc', 'InOutCirc', 'InElastic', 'OutElastic', 'InOutElastic', 'InBack', 'OutBack', 'InOutBack', 'InBounce', 'OutBounce', 'InOutBounce', 'BezierSpline']),
+			Easing: Object.freeze(Object.fromEntries(['Linear', 'InQuad', 'OutQuad', 'InOutQuad', 'OutInQuad', 'InCubic', 'OutCubic', 'InOutCubic', 'OutInCubic', 'InQuart', 'OutQuart', 'InOutQuart', 'OutInQuart', 'InQuint', 'OutQuint', 'InOutQuint', 'OutInQuint', 'InSine', 'OutSine', 'InOutSine', 'OutInSine', 'InExpo', 'OutExpo', 'InOutExpo', 'OutInExpo', 'InCirc', 'OutCirc', 'InOutCirc', 'OutInCirc', 'InElastic', 'OutElastic', 'InOutElastic', 'OutInElastic', 'InBack', 'OutBack', 'InOutBack', 'OutInBack', 'InBounce', 'OutBounce', 'InOutBounce', 'OutInBounce', 'InCurve', 'OutCurve', 'SineCurve', 'CosineCurve', 'BezierSpline'].map((name, number) => [name, number]))), // the numbers of QEasingCurve::Type
 			// Qt Quick Test's mouseMove fails the same way under offscreen qml: the call throws and the test catches it.
 			mouseMove() {
 				throw new Error('QtQuickTest::fail');
@@ -866,6 +869,8 @@ export class Engine {
 		hooks.defer = () => false;
 		hooks.syncModel = (model) => this.syncModelNow(model);
 		hooks.syncRepeater = (repeater) => this.syncRepeaterNow(repeater);
+		hooks.watchHold = (area) => this.holds.add(area);
+		hooks.now = () => this.time;
 		hooks.syncBinding = (item) => this.syncBindingItems(item);
 		hooks.syncConnection = (item) => this.syncConnections(item);
 		hooks.completing = () => this.completing > 0;
@@ -935,6 +940,8 @@ export class Engine {
 		this.inPass = false;
 		this.cursor = 0;
 		this.timers.clear();
+		this.holds.clear();
+		resetDrags();
 		this.changeHandlers = [];
 		this.loaders.clear();
 		this.repeaters.clear();
@@ -2371,6 +2378,8 @@ export class Engine {
 
 	setTime(seconds) {
 		this.time = seconds;
+		// the areas under a dragged item hear of its moves once, not for every write of x and y (Qt: after the script)
+		updateDrags();
 		this.flushQuiet(seconds);
 		if (this.animations.size > 0) {
 			for (const animation of [...this.animations]) {
@@ -2389,6 +2398,13 @@ export class Engine {
 			for (const item of [...this.carets]) {
 				if (item.$destroyed === true || !item.$active) this.carets.delete(item);
 				else item.$blink(seconds);
+			}
+		}
+		for (const area of [...this.holds]) {
+			if (area.$destroyed === true || !area.$pressed || area.$holdDeadline === 0) this.holds.delete(area);
+			else if (seconds >= area.$holdDeadline) {
+				this.holds.delete(area);
+				area.$fireHold();
 			}
 		}
 		if (this.timers.size === 0) return;
@@ -2531,8 +2547,8 @@ export class Engine {
 			item = new TreeItemModel();
 		} else if (this.lenient && type === 'ListModel') {
 			item = new ListModel();
-		} else if (this.lenient && (type === 'Repeater' || type === 'MapItemView')) {
-			item = type === 'MapItemView' ? new MapItemView() : new Repeater();
+		} else if (this.lenient && (type === 'Repeater' || type === 'MapItemView' || type === 'Instantiator')) {
+			item = type === 'MapItemView' ? new MapItemView() : type === 'Instantiator' ? new Instantiator() : new Repeater();
 			this.repeaters.add(item);
 		} else if (this.lenient && ANIMATION_TYPES.has(type)) {
 			item = new Animation(this, type);
@@ -2946,7 +2962,7 @@ export class Engine {
 			} else if (this.lenient && /^[A-Z]/.test(prop.name)) {
 				// `Layout.preferredWidth` and the rest of the attached layout spec. Other attached
 				// properties (Keys.enabled, ...) stay unsupported.
-				if (prop.name.startsWith('Layout.') || prop.name.startsWith('KeyNavigation.')) this.setValue(item, prop.name.split('.'), prop.text, scope, prop);
+				if (prop.name.startsWith('Layout.') || prop.name.startsWith('KeyNavigation.') || prop.name.startsWith('Drag.')) this.setValue(item, prop.name.split('.'), prop.text, scope, prop);
 				else this.noteIgnored(item, prop.name.split('.'));
 			} else {
 				this.setValue(item, prop.name.split('.'), prop.text, scope, prop, capture);
