@@ -46,10 +46,15 @@ function qtTestLines(file){
 function caseDocuments(file){
     if(path.basename(file) !== 'Main.qml' || path.basename(path.dirname(file)) === 'cases') return { 'Main.qml': fs.readFileSync(file, 'utf8') }
     let documents = {}
-    let dir = path.dirname(file)
-    for(let name of fs.readdirSync(dir)){
-        if(fs.statSync(path.join(dir, name)).isFile()) documents[name] = fs.readFileSync(path.join(dir, name), 'utf8')
+    // the files of the directory and of its subdirectories (modules of the case imported as "Dir")
+    let add = (dir, prefix) => {
+        for(let name of fs.readdirSync(dir)){
+            let full = path.join(dir, name)
+            if(fs.statSync(full).isDirectory()) add(full, prefix + name + '/')
+            else documents[prefix + name] = fs.readFileSync(full, 'utf8')
+        }
     }
+    add(path.dirname(file), '')
     return documents
 }
 
@@ -61,8 +66,14 @@ function caseFile(file){
 // Qt prints console.log as "qml: text" on stderr; the lines of v5 are collected from its console
 async function v5Lines(file){
     let lines = []
-    // console.log of Qt: the arguments as strings, null and undefined by name
-    let text = (args) => args.map(a => a === null ? 'null' : a === undefined ? 'undefined' : String(a)).join(' ')
+    // console.log of Qt (writeToConsole): the arguments as strings, an array as [a,b] (serializeArray, nested ones too)
+    let serialize = (array, seen) => {
+        seen.add(array)
+        let out = '[' + array.map(v => Array.isArray(v) ? (seen.has(v) ? '[Circular]' : serialize(v, seen)) : String(v)).join(',') + ']'
+        seen.delete(array)
+        return out
+    }
+    let text = (args) => args.map(a => Array.isArray(a) ? serialize(a, new Set()) : String(a)).join(' ')
     let testCase = isTestCase(file)
     // a failure of a TestCase: "FAIL!  : <test> message"
     let error = (...a) => {

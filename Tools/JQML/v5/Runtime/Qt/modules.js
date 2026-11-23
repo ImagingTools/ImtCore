@@ -3,7 +3,9 @@
 // QML type that has no instances (abstract, attached, an enum holder).
 
 const QML = ['QtObject', 'Component', 'Timer', 'Connections', 'Binding']
-const MODELS = ['ListModel', 'ListElement', 'Instantiator', 'ItemSelectionModel', 'DelegateChooser', 'DelegateChoice', 'DelegateModel', 'ObjectModel', 'SortFilterProxyModel', 'ValueFilter', 'FunctionFilter', 'RoleSorter', 'StringSorter', 'FunctionSorter']
+// SortFilterProxyModel and its filters and sorters: added to QtQml.Models in Qt 6.10
+const SORT_FILTER = ['SortFilterProxyModel', 'ValueFilter', 'FunctionFilter', 'RoleSorter', 'StringSorter', 'FunctionSorter']
+const MODELS = ['ListModel', 'ListElement', 'Instantiator', 'ItemSelectionModel', 'DelegateChooser', 'DelegateChoice', 'DelegateModel', 'ObjectModel', ...SORT_FILTER]
 const LABS_MODELS = ['TableModel', 'TableModelColumn', 'TreeModel', 'DelegateChooser', 'DelegateChoice']
 const QUICK = [
     'Item', 'FocusScope', 'Rectangle', 'Gradient', 'GradientStop', 'Text', 'TextInput', 'TextEdit', 'Image', 'Canvas',
@@ -65,7 +67,7 @@ const MODULES = {
 // (QQmlImports): the ones Qt added to QtQuick, QtQml.Models and Qt.labs.qmlmodels for tables, and the controls, whose
 // names a project of its own may use for a type (imtcontrols has a SortFilterProxyModel, a Button). The older types stay
 // visible without an import, as v5 always had them.
-const IMPORTED_TYPES = new Set(['ItemSelectionModel', 'ObjectModel', 'MultiEffect', 'TableView', 'TreeView', ...LABS_MODELS, ...CONTROLS, ...TEMPLATES, ...IMPL, ...SHAPES])
+const IMPORTED_TYPES = new Set(['ItemSelectionModel', 'ObjectModel', ...SORT_FILTER, 'MultiEffect', 'TableView', 'TreeView', ...LABS_MODELS, ...CONTROLS, ...TEMPLATES, ...IMPL, ...SHAPES])
 
 // { types: Set, uncreatable: Set, transitive: [module names], key(name): its name in JQ.types } of a Qt module, or null
 function qtModule(name){
