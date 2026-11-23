@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QByteArray>
+#include <QtCore/QMutex>
 #include <QtCore/QString>
 
 // ACF includes
@@ -33,8 +34,10 @@ namespace imtbase
 	2. The provider set directly via SetResolverProvider.
 	3. The application-wide provider set via SetDefaultResolverProvider.
 
+	The link remembers a missing object too, so the storage is asked once and not on every access, until the link is re-targeted, rebound or unloaded.
+
 	\note The link is a lightweight handle with the shared pointer semantic: copies of the link share the loaded object.
-	A single link instance is not thread-safe.
+	The const access, which loads the object on demand, can be used from several threads at once. Changing the link is not thread-safe.
 	\ingroup Collection
 */
 class CStorageLinkBase
@@ -44,6 +47,9 @@ public:
 
 	CStorageLinkBase();
 	CStorageLinkBase(const Id& objectId, const QByteArray& storageId = QByteArray());
+	CStorageLinkBase(const CStorageLinkBase& other);
+
+	CStorageLinkBase& operator=(const CStorageLinkBase& other);
 
 	/**
 		Get ID of the linked object in the storage.
@@ -102,7 +108,7 @@ public:
 	bool IsLoaded() const;
 
 	/**
-		Drop the loaded object. It will be loaded again on the next access.
+		Drop the loaded object or the knowledge that it is missing. It will be loaded again on the next access.
 	*/
 	void Unload();
 
@@ -146,7 +152,13 @@ private:
 	QByteArray m_storageId;
 	IStorageResolver* m_resolverPtr;
 	const IStorageResolverProvider* m_providerPtr;
+
+	/**
+		Guards the loaded object and the missing flag, which the const access changes when it loads the object.
+	*/
+	mutable QMutex m_dataMutex;
 	mutable istd::IChangeableSharedPtr m_dataPtr;
+	mutable bool m_isObjectMissing;
 };
 
 

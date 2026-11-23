@@ -93,10 +93,11 @@ Differences to `std::optional`: copies of a link refer to the same stored object
 ## Rules
 
 - Set the default provider once at the application start, before links are used from other threads. The provider and resolvers must outlive all links.
-- A single link instance is not thread-safe. Copies of a link share the loaded object.
+- The const access, which loads the object, can be used from several threads at once; changing a link cannot. Copies of a link share the loaded object.
 - Check `GetResolver()` or `GetObject().IsValid()` where the binding is not guaranteed; `operator->` asserts that the object exists.
 - Access through a link may be slow (database, network). Load explicitly with `GetObject()` in loops.
 - Removing an object does not update other links to it: they stay dangling and resolve to nothing.
+- A link remembers that its object is missing and does not ask the storage again until it is re-targeted, rebound or unloaded. Call `Unload()` to look again, for example after the object was created under that ID.
 - `Save()` writes only a loaded object and never creates one: it fails if nothing is loaded or the object is gone from the storage.
 
 ## Tests

@@ -32,5 +32,7 @@ private slots:
 	void testRegistryComponent();
 	void testCollectionResolverComponent();
 	void testSaveWithoutStoredObject();
+	void testMissingObjectLoadedOnce();
+	void testConcurrentLoading();
 	void cleanupTestCase();
 };
