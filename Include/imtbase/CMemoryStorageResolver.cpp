@@ -44,7 +44,10 @@ bool CMemoryStorageResolver::SaveObject(const Id& objectId, const istd::IChangea
 }
 
 
-IStorageResolver::Id CMemoryStorageResolver::InsertObject(const istd::IChangeableSharedPtr& objectPtr, const QString& /*name*/)
+IStorageResolver::Id CMemoryStorageResolver::InsertObject(
+			const QByteArray& /*typeId*/,
+			const istd::IChangeableSharedPtr& objectPtr,
+			const QString& /*name*/)
 {
 	if (!objectPtr.IsValid()){
 		return Id();

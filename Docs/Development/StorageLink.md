@@ -29,7 +29,7 @@ The resolver binding is run-time state: it is not serialized and must be restore
 
 ```cpp
 imtbase::CObjectCollection addresses;
-imtbase::CCollectionStorageResolver addressResolver(addresses, "Address");
+imtbase::CCollectionStorageResolver addressResolver(addresses);
 
 imtbase::CStorageResolverRegistry registry;
 registry.RegisterResolver(&addressResolver);
@@ -47,6 +47,7 @@ Different application profiles register different resolvers for the same storage
 In a composition, `ImtCorePck/StorageResolverRegistry` is the registry: the resolver at each position of `StorageResolvers` serves the storage ID at the same position of `StorageIds`.
 The component becomes the application-wide provider when it is created, so it must be created at the start, for example as a component to initialize.
 `ImtCorePck/CollectionStorageResolver` is the resolver over the collection given by `ObjectCollection`.
+`InsertObject()` takes the type-ID of the new object from the caller, as `IObjectCollection::InsertNewObject()` does, so one resolver serves a collection of several object types.
 
 ## Links as fields of a data model
 

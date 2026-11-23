@@ -12,17 +12,15 @@ CCollectionStorageResolver::CCollectionStorageResolver()
 }
 
 
-CCollectionStorageResolver::CCollectionStorageResolver(IObjectCollection& collection, const QByteArray& typeId)
-	:m_collectionPtr(&collection),
-	m_typeId(typeId)
+CCollectionStorageResolver::CCollectionStorageResolver(IObjectCollection& collection)
+	:m_collectionPtr(&collection)
 {
 }
 
 
-void CCollectionStorageResolver::SetCollection(IObjectCollection* collectionPtr, const QByteArray& typeId)
+void CCollectionStorageResolver::SetCollection(IObjectCollection* collectionPtr)
 {
 	m_collectionPtr = collectionPtr;
-	m_typeId = typeId;
 }
 
 
@@ -53,13 +51,21 @@ bool CCollectionStorageResolver::SaveObject(const Id& objectId, const istd::ICha
 }
 
 
-IStorageResolver::Id CCollectionStorageResolver::InsertObject(const istd::IChangeableSharedPtr& objectPtr, const QString& name)
+IStorageResolver::Id CCollectionStorageResolver::InsertObject(
+			const QByteArray& typeId,
+			const istd::IChangeableSharedPtr& objectPtr,
+			const QString& name)
 {
 	if ((m_collectionPtr == nullptr) || !objectPtr.IsValid()){
 		return Id();
 	}
 
-	return m_collectionPtr->InsertNewObject(m_typeId, name, QString(), objectPtr.GetPtr());
+	return m_collectionPtr->InsertNewObject(
+		typeId,
+		name,
+		QString(),
+		objectPtr.GetPtr()
+	);
 }
 
 

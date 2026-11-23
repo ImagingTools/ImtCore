@@ -28,7 +28,6 @@ public:
 	I_BEGIN_COMPONENT(CCollectionStorageResolverComp);
 		I_REGISTER_INTERFACE(IStorageResolver);
 		I_ASSIGN(m_collectionCompPtr, "ObjectCollection", "Collection used as the storage", true, "ObjectCollection");
-		I_ASSIGN(m_typeIdAttrPtr, "TypeId", "Type-ID of the objects inserted into the collection", false, "");
 	I_END_COMPONENT;
 
 protected:
@@ -37,7 +36,6 @@ protected:
 
 private:
 	I_REF(IObjectCollection, m_collectionCompPtr);
-	I_ATTR(QByteArray, m_typeIdAttrPtr);
 };
 
 
