@@ -63,7 +63,11 @@ CWebSocketThread::CWebSocketThread(CWebSocketServerComp* parent)
 
 void CWebSocketThread::SetWebSocket(QWebSocket* webSocketPtr)
 {
-	m_socket = webSocketPtr;
+	{
+		QMutexLocker lock(&m_socketMutex);
+
+		m_socket = webSocketPtr;
+	}
 
 	start();
 }
@@ -71,6 +75,8 @@ void CWebSocketThread::SetWebSocket(QWebSocket* webSocketPtr)
 
 const QWebSocket* CWebSocketThread::GetWebSocket() const
 {
+	QMutexLocker lock(&m_socketMutex);
+
 	return m_socket;
 }
 
@@ -118,6 +124,9 @@ void CWebSocketThread::run()
 	// connect(webSocketPtr.data(), &QWebSocket::disconnected, this, &CWebSocketThread::OnSocketDisconnected);
 
 	exec();
+
+	// The server that is destroyed quits the loop of a connected client: its subscriptions are released while the server waits
+	ReleaseRequests();
 }
 
 
@@ -273,13 +282,15 @@ void CWebSocketThread::ProcessTextMessage(const QString& textMessage)
 
 void CWebSocketThread::OnSocketDisconnected()
 {
-	// Explicitly clean up subscription requests parented to this thread.
-	// Their destructors call OnRequestDestroyed on publishers, cleanly
-	// unregistering subscriptions before the QWebSocket is destroyed.
-	qDeleteAll(m_requestList);
-	m_requestList.clear();
+	// The subscriptions are unregistered before the QWebSocket is destroyed
+	ReleaseRequests();
 
-	m_socket = nullptr;
+	{
+		QMutexLocker lock(&m_socketMutex);
+
+		m_socket = nullptr;
+	}
+
 	exit();
 }
 
@@ -321,9 +332,23 @@ void CWebSocketThread::OnTimeout()
 }
 
 
+void CWebSocketThread::ReleaseRequests()
+{
+	// Their destructors call OnRequestDestroyed on publishers, cleanly unregistering subscriptions
+	qDeleteAll(m_requestList);
+	m_requestList.clear();
+}
+
+
 QPointer<QWebSocket> CWebSocketThread::GetValidWebSocket() const
 {
-	QPointer<QWebSocket> webSocketPtr = m_socket;
+	QPointer<QWebSocket> webSocketPtr;
+	{
+		QMutexLocker lock(&m_socketMutex);
+
+		webSocketPtr = m_socket;
+	}
+
 	if (webSocketPtr.isNull() || !webSocketPtr->isValid()){
 		return {};
 	}
@@ -364,8 +389,15 @@ void CWebSocketThread::OnSslErrors(const QList<QSslError> &errors)
 
 void CWebSocketThread::OnSendTextMessage(const QByteArray& data) const
 {
-	if (!m_socket.isNull()){
-		m_socket->sendTextMessage(data);
+	QPointer<QWebSocket> webSocketPtr;
+	{
+		QMutexLocker lock(&m_socketMutex);
+
+		webSocketPtr = m_socket;
+	}
+
+	if (!webSocketPtr.isNull()){
+		webSocketPtr->sendTextMessage(data);
 	}
 }
 
