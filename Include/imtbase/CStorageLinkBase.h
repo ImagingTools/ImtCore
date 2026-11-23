@@ -5,7 +5,6 @@
 // Qt includes
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
-#include <QtCore/QVariantMap>
 
 // ACF includes
 #include <istd/IChangeable.h>
@@ -96,11 +95,6 @@ public:
 	*/
 	static void SetDefaultResolverProvider(const IStorageResolverProvider* providerPtr);
 	static const IStorageResolverProvider* GetDefaultResolverProvider();
-
-	/**
-		Get the storage-specific parameters of the linked object (see IStorageResolver::GetStorageParams).
-	*/
-	QVariantMap GetStorageParams() const;
 
 	/**
 		Returns \c true, if the linked object is already loaded.

@@ -68,22 +68,6 @@ bool CMemoryStorageResolver::RemoveObject(const Id& objectId)
 }
 
 
-QVariantMap CMemoryStorageResolver::GetStorageParams(const Id& objectId) const
-{
-	QVariantMap params;
-	params[QStringLiteral("storage")] = QStringLiteral("memory");
-	params[QStringLiteral("objectId")] = objectId;
-
-	return params;
-}
-
-
-bool CMemoryStorageResolver::IsSnapshotStorage() const
-{
-	return false;
-}
-
-
 } // namespace imtbase
 
 

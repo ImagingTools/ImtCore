@@ -24,7 +24,6 @@ private slots:
 	void testDefaultProvider();
 	void testUnknownStorageId();
 	void testTypeMismatch();
-	void testStorageParams();
 	void testSerialization();
 	void testLinksInContainer();
 	void testOptionalInterface();

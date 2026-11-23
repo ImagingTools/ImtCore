@@ -114,17 +114,6 @@ const IStorageResolverProvider* CStorageLinkBase::GetDefaultResolverProvider()
 }
 
 
-QVariantMap CStorageLinkBase::GetStorageParams() const
-{
-	const IStorageResolver* resolverPtr = GetResolver();
-	if (resolverPtr != nullptr && !m_objectId.isEmpty()){
-		return resolverPtr->GetStorageParams(m_objectId);
-	}
-
-	return QVariantMap();
-}
-
-
 bool CStorageLinkBase::IsLoaded() const
 {
 	return m_dataPtr.IsValid();
