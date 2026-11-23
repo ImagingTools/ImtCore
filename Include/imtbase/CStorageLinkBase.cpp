@@ -2,15 +2,15 @@
 #include <imtbase/CStorageLinkBase.h>
 
 
+// STL includes
+#include <atomic>
+
 // Qt includes
 #include <QtCore/QtGlobal>
 
 // ACF includes
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
-
-// std includes
-#include <atomic>
 
 
 namespace imtbase

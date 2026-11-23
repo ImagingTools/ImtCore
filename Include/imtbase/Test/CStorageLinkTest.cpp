@@ -2,7 +2,7 @@
 #include "CStorageLinkTest.h"
 
 
-// std includes
+// STL includes
 #include <algorithm>
 #include <memory>
 #include <optional>
@@ -75,11 +75,11 @@ class COtherTestData: public istd::IChangeable
 };
 
 
-typedef imtbase::TStorageLink<CLinkTestData> DataLink;
-typedef istd::TSingleFactory<istd::IChangeable, CLinkTestData> DataFactory;
-using MemoryResolverComp	= icomp::TMakeComponentWrap<imtbase::CMemoryStorageResolver, imtbase::IStorageResolver>;
-using RegistryComp			= icomp::TSimComponentWrap<imtbase::CStorageResolverRegistryComp>;
-using CollectionComp		= icomp::TMakeComponentWrap<imtbase::CObjectCollection, imtbase::IObjectCollection>;
+using DataLink					= imtbase::TStorageLink<CLinkTestData>;
+using DataFactory				= istd::TSingleFactory<istd::IChangeable, CLinkTestData>;
+using MemoryResolverComp		= icomp::TMakeComponentWrap<imtbase::CMemoryStorageResolver, imtbase::IStorageResolver>;
+using RegistryComp				= icomp::TSimComponentWrap<imtbase::CStorageResolverRegistryComp>;
+using CollectionComp			= icomp::TMakeComponentWrap<imtbase::CObjectCollection, imtbase::IObjectCollection>;
 using CollectionResolverComp	= icomp::TSimComponentWrap<imtbase::CCollectionStorageResolverComp>;
 
 const QByteArray s_typeId = QByteArrayLiteral("LinkTestData");

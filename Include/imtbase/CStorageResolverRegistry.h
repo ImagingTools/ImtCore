@@ -3,7 +3,7 @@
 
 
 // Qt includes
-#include <QtCore/QMap>
+#include <QtCore/QHash>
 #include <QtCore/QReadWriteLock>
 
 // ImtCore includes
@@ -40,7 +40,7 @@ public:
 
 private:
 	mutable QReadWriteLock m_lock;
-	QMap<QByteArray, IStorageResolver*> m_resolvers;
+	QHash<QByteArray, IStorageResolver*> m_resolvers;
 };
 
 
