@@ -18,9 +18,19 @@ void CStorageResolverRegistryComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	const int resolversCount = qMin(m_storageIdsAttrPtr.GetCount(), m_storageResolversCompPtr.GetCount());
+	const int storageIdsCount	= m_storageIdsAttrPtr.GetCount();
+	const int resolversCount	= qMin(storageIdsCount, m_storageResolversCompPtr.GetCount());
+	if (storageIdsCount != m_storageResolversCompPtr.GetCount()){
+		SendErrorMessage(0, QStringLiteral("StorageIds and StorageResolvers differ in count, only the first %1 storages are registered").arg(resolversCount));
+	}
+
 	for (int i = 0; i < resolversCount; ++i){
 		RegisterResolver(m_storageResolversCompPtr[i], m_storageIdsAttrPtr[i]);
+	}
+
+	const IStorageResolverProvider* previousProviderPtr = CStorageLinkBase::GetDefaultResolverProvider();
+	if ((previousProviderPtr != nullptr) && (previousProviderPtr != this)){
+		SendWarningMessage(0, QStringLiteral("Another storage resolver registry was the default provider of the storage links and is replaced"));
 	}
 
 	CStorageLinkBase::SetDefaultResolverProvider(this);
