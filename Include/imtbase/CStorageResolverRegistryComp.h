@@ -17,7 +17,7 @@ namespace imtbase
 	Registry of the storage resolvers filled by the composition.
 	The resolver at each position of StorageResolvers is registered for the logical storage ID at the same position of StorageIds.
 	The registry becomes the application-wide resolver provider of the storage links when it is created, and stops being it when it is destroyed.
-	\sa CStorageResolverRegistry, StorageLinkBase::SetDefaultResolverProvider
+	\sa CStorageResolverRegistry, CStorageLinkBase::SetDefaultResolverProvider
 	\ingroup Collection
 */
 class CStorageResolverRegistryComp:

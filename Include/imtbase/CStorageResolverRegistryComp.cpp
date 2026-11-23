@@ -3,7 +3,7 @@
 
 
 // ImtCore includes
-#include <imtbase/StorageLinkBase.h>
+#include <imtbase/CStorageLinkBase.h>
 
 
 namespace imtbase
@@ -23,14 +23,14 @@ void CStorageResolverRegistryComp::OnComponentCreated()
 		RegisterResolver(m_storageResolversCompPtr[i], m_storageIdsAttrPtr[i]);
 	}
 
-	StorageLinkBase::SetDefaultResolverProvider(this);
+	CStorageLinkBase::SetDefaultResolverProvider(this);
 }
 
 
 void CStorageResolverRegistryComp::OnComponentDestroyed()
 {
-	if (StorageLinkBase::GetDefaultResolverProvider() == this){
-		StorageLinkBase::SetDefaultResolverProvider(nullptr);
+	if (CStorageLinkBase::GetDefaultResolverProvider() == this){
+		CStorageLinkBase::SetDefaultResolverProvider(nullptr);
 	}
 
 	BaseClass::OnComponentDestroyed();

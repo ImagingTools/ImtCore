@@ -15,7 +15,7 @@
 #include <istd/TInterfacePtr.h>
 
 // ImtCore includes
-#include <imtbase/StorageLinkBase.h>
+#include <imtbase/CStorageLinkBase.h>
 
 
 namespace imtbase
@@ -33,7 +33,7 @@ namespace imtbase
 	\code
 	class CUser
 	{
-		imtbase::StorageLink<CAddress> address;
+		imtbase::TStorageLink<CAddress> address;
 	};
 
 	if (user.address){
@@ -50,23 +50,23 @@ namespace imtbase
 	- operator* and operator-> have no check in the release build, value() throws std::bad_optional_access.
 
 	\note Use IsLoaded or GetObject to control the loading explicitly.
-	\sa IStorageResolver, IStorageResolverProvider, StorageLinkBase
+	\sa IStorageResolver, IStorageResolverProvider, CStorageLinkBase
 	\ingroup Collection
 */
 template <class T>
-class StorageLink: public StorageLinkBase
+class TStorageLink: public CStorageLinkBase
 {
 public:
 	static_assert(std::is_base_of<istd::IChangeable, T>::value, "T must be derived from istd::IChangeable");
 
-	typedef StorageLinkBase BaseClass;
+	typedef CStorageLinkBase BaseClass;
 	typedef istd::TSharedInterfacePtr<T> ObjectPtr;
 
-	StorageLink();
-	StorageLink(std::nullopt_t);
-	StorageLink(const Id& objectId, const QByteArray& storageId = QByteArray());
+	TStorageLink();
+	TStorageLink(std::nullopt_t);
+	TStorageLink(const Id& objectId, const QByteArray& storageId = QByteArray());
 
-	StorageLink& operator=(std::nullopt_t);
+	TStorageLink& operator=(std::nullopt_t);
 
 	/**
 		Returns \c true, if the linked object is available. The object is loaded if necessary.
@@ -103,7 +103,7 @@ public:
 	/**
 		Replace the loaded object. The storage is updated only by Save.
 	*/
-	StorageLink& operator=(const ObjectPtr& objectPtr);
+	TStorageLink& operator=(const ObjectPtr& objectPtr);
 
 	/**
 		Unchecked access to the linked object. The object is valid as long as this link is alive and not unloaded or re-targeted.
@@ -120,26 +120,26 @@ private:
 // public methods
 
 template <class T>
-StorageLink<T>::StorageLink()
+TStorageLink<T>::TStorageLink()
 {
 }
 
 
 template <class T>
-StorageLink<T>::StorageLink(std::nullopt_t)
+TStorageLink<T>::TStorageLink(std::nullopt_t)
 {
 }
 
 
 template <class T>
-StorageLink<T>::StorageLink(const Id& objectId, const QByteArray& storageId)
+TStorageLink<T>::TStorageLink(const Id& objectId, const QByteArray& storageId)
 	:BaseClass(objectId, storageId)
 {
 }
 
 
 template <class T>
-StorageLink<T>& StorageLink<T>::operator=(std::nullopt_t)
+TStorageLink<T>& TStorageLink<T>::operator=(std::nullopt_t)
 {
 	reset();
 
@@ -148,21 +148,21 @@ StorageLink<T>& StorageLink<T>::operator=(std::nullopt_t)
 
 
 template <class T>
-bool StorageLink<T>::has_value() const
+bool TStorageLink<T>::has_value() const
 {
 	return GetObjectPtr() != nullptr;
 }
 
 
 template <class T>
-StorageLink<T>::operator bool() const
+TStorageLink<T>::operator bool() const
 {
 	return has_value();
 }
 
 
 template <class T>
-T& StorageLink<T>::value() const
+T& TStorageLink<T>::value() const
 {
 	T* objectPtr = GetObjectPtr();
 	if (objectPtr == nullptr){
@@ -175,7 +175,7 @@ T& StorageLink<T>::value() const
 
 template <class T>
 template <class U>
-T StorageLink<T>::value_or(U&& defaultValue) const
+T TStorageLink<T>::value_or(U&& defaultValue) const
 {
 	T* objectPtr = GetObjectPtr();
 	if (objectPtr != nullptr){
@@ -187,14 +187,14 @@ T StorageLink<T>::value_or(U&& defaultValue) const
 
 
 template <class T>
-void StorageLink<T>::reset()
+void TStorageLink<T>::reset()
 {
 	SetObjectId(Id());
 }
 
 
 template <class T>
-typename StorageLink<T>::ObjectPtr StorageLink<T>::GetObject() const
+typename TStorageLink<T>::ObjectPtr TStorageLink<T>::GetObject() const
 {
 	istd::IChangeableSharedPtr dataPtr = LoadData();
 
@@ -208,7 +208,7 @@ typename StorageLink<T>::ObjectPtr StorageLink<T>::GetObject() const
 
 
 template <class T>
-StorageLink<T>& StorageLink<T>::operator=(const ObjectPtr& objectPtr)
+TStorageLink<T>& TStorageLink<T>::operator=(const ObjectPtr& objectPtr)
 {
 	SetData(istd::IChangeableSharedPtr(objectPtr));
 
@@ -217,20 +217,20 @@ StorageLink<T>& StorageLink<T>::operator=(const ObjectPtr& objectPtr)
 
 
 template <class T>
-T* StorageLink<T>::operator->() const
+T* TStorageLink<T>::operator->() const
 {
 	T* objectPtr = GetObjectPtr();
-	Q_ASSERT_X(objectPtr != nullptr, "StorageLink::operator->", "Linked object is not available");
+	Q_ASSERT_X(objectPtr != nullptr, "TStorageLink::operator->", "Linked object is not available");
 
 	return objectPtr;
 }
 
 
 template <class T>
-T& StorageLink<T>::operator*() const
+T& TStorageLink<T>::operator*() const
 {
 	T* objectPtr = GetObjectPtr();
-	Q_ASSERT_X(objectPtr != nullptr, "StorageLink::operator*", "Linked object is not available");
+	Q_ASSERT_X(objectPtr != nullptr, "TStorageLink::operator*", "Linked object is not available");
 
 	return *objectPtr;
 }
@@ -239,7 +239,7 @@ T& StorageLink<T>::operator*() const
 // private methods
 
 template <class T>
-T* StorageLink<T>::GetObjectPtr() const
+T* TStorageLink<T>::GetObjectPtr() const
 {
 	// The loaded object is also referenced by the link itself, so the raw pointer stays valid.
 	return dynamic_cast<T*>(LoadData().GetPtr());

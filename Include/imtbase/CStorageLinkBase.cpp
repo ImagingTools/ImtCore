@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtbase/StorageLinkBase.h>
+#include <imtbase/CStorageLinkBase.h>
 
 
 // Qt includes
@@ -20,14 +20,14 @@ namespace imtbase
 static std::atomic<const IStorageResolverProvider*> s_defaultProviderPtr(nullptr);
 
 
-StorageLinkBase::StorageLinkBase()
+CStorageLinkBase::CStorageLinkBase()
 	:m_resolverPtr(nullptr),
 	m_providerPtr(nullptr)
 {
 }
 
 
-StorageLinkBase::StorageLinkBase(const Id& objectId, const QByteArray& storageId)
+CStorageLinkBase::CStorageLinkBase(const Id& objectId, const QByteArray& storageId)
 	:m_objectId(objectId),
 	m_storageId(storageId),
 	m_resolverPtr(nullptr),
@@ -36,19 +36,19 @@ StorageLinkBase::StorageLinkBase(const Id& objectId, const QByteArray& storageId
 }
 
 
-const StorageLinkBase::Id& StorageLinkBase::GetObjectId() const
+const CStorageLinkBase::Id& CStorageLinkBase::GetObjectId() const
 {
 	return m_objectId;
 }
 
 
-const QByteArray& StorageLinkBase::GetStorageId() const
+const QByteArray& CStorageLinkBase::GetStorageId() const
 {
 	return m_storageId;
 }
 
 
-void StorageLinkBase::SetLink(const Id& objectId, const QByteArray& storageId)
+void CStorageLinkBase::SetLink(const Id& objectId, const QByteArray& storageId)
 {
 	m_objectId = objectId;
 	m_storageId = storageId;
@@ -56,34 +56,34 @@ void StorageLinkBase::SetLink(const Id& objectId, const QByteArray& storageId)
 }
 
 
-void StorageLinkBase::SetObjectId(const Id& objectId)
+void CStorageLinkBase::SetObjectId(const Id& objectId)
 {
 	m_objectId = objectId;
 	m_dataPtr.Reset();
 }
 
 
-bool StorageLinkBase::IsNull() const
+bool CStorageLinkBase::IsNull() const
 {
 	return m_objectId.isEmpty();
 }
 
 
-void StorageLinkBase::SetResolver(IStorageResolver* resolverPtr)
+void CStorageLinkBase::SetResolver(IStorageResolver* resolverPtr)
 {
 	m_resolverPtr = resolverPtr;
 	m_dataPtr.Reset();
 }
 
 
-void StorageLinkBase::SetResolverProvider(const IStorageResolverProvider* providerPtr)
+void CStorageLinkBase::SetResolverProvider(const IStorageResolverProvider* providerPtr)
 {
 	m_providerPtr = providerPtr;
 	m_dataPtr.Reset();
 }
 
 
-IStorageResolver* StorageLinkBase::GetResolver() const
+IStorageResolver* CStorageLinkBase::GetResolver() const
 {
 	if (m_resolverPtr != nullptr){
 		return m_resolverPtr;
@@ -102,19 +102,19 @@ IStorageResolver* StorageLinkBase::GetResolver() const
 }
 
 
-void StorageLinkBase::SetDefaultResolverProvider(const IStorageResolverProvider* providerPtr)
+void CStorageLinkBase::SetDefaultResolverProvider(const IStorageResolverProvider* providerPtr)
 {
 	s_defaultProviderPtr.store(providerPtr);
 }
 
 
-const IStorageResolverProvider* StorageLinkBase::GetDefaultResolverProvider()
+const IStorageResolverProvider* CStorageLinkBase::GetDefaultResolverProvider()
 {
 	return s_defaultProviderPtr.load();
 }
 
 
-QVariantMap StorageLinkBase::GetStorageParams() const
+QVariantMap CStorageLinkBase::GetStorageParams() const
 {
 	const IStorageResolver* resolverPtr = GetResolver();
 	if (resolverPtr != nullptr && !m_objectId.isEmpty()){
@@ -125,19 +125,19 @@ QVariantMap StorageLinkBase::GetStorageParams() const
 }
 
 
-bool StorageLinkBase::IsLoaded() const
+bool CStorageLinkBase::IsLoaded() const
 {
 	return m_dataPtr.IsValid();
 }
 
 
-void StorageLinkBase::Unload()
+void CStorageLinkBase::Unload()
 {
 	m_dataPtr.Reset();
 }
 
 
-bool StorageLinkBase::Save() const
+bool CStorageLinkBase::Save() const
 {
 	if (m_objectId.isEmpty()){
 		return false;
@@ -161,7 +161,7 @@ bool StorageLinkBase::Save() const
 }
 
 
-bool StorageLinkBase::Remove()
+bool CStorageLinkBase::Remove()
 {
 	if (m_objectId.isEmpty()){
 		return false;
@@ -179,7 +179,7 @@ bool StorageLinkBase::Remove()
 }
 
 
-bool StorageLinkBase::Serialize(iser::IArchive& archive)
+bool CStorageLinkBase::Serialize(iser::IArchive& archive)
 {
 	bool retVal = true;
 
@@ -201,7 +201,7 @@ bool StorageLinkBase::Serialize(iser::IArchive& archive)
 }
 
 
-bool StorageLinkBase::SerializeObjectId(iser::IArchive& archive, const iser::CArchiveTag& tag)
+bool CStorageLinkBase::SerializeObjectId(iser::IArchive& archive, const iser::CArchiveTag& tag)
 {
 	bool retVal = archive.BeginTag(tag);
 	retVal = retVal && archive.Process(m_objectId);
@@ -215,13 +215,13 @@ bool StorageLinkBase::SerializeObjectId(iser::IArchive& archive, const iser::CAr
 }
 
 
-bool StorageLinkBase::operator==(const StorageLinkBase& other) const
+bool CStorageLinkBase::operator==(const CStorageLinkBase& other) const
 {
 	return (m_objectId == other.m_objectId) && (m_storageId == other.m_storageId);
 }
 
 
-bool StorageLinkBase::operator!=(const StorageLinkBase& other) const
+bool CStorageLinkBase::operator!=(const CStorageLinkBase& other) const
 {
 	return !operator==(other);
 }
@@ -229,7 +229,7 @@ bool StorageLinkBase::operator!=(const StorageLinkBase& other) const
 
 // protected methods
 
-istd::IChangeableSharedPtr StorageLinkBase::LoadData() const
+istd::IChangeableSharedPtr CStorageLinkBase::LoadData() const
 {
 	if (!m_dataPtr.IsValid() && !m_objectId.isEmpty()){
 		const IStorageResolver* resolverPtr = GetResolver();
@@ -242,7 +242,7 @@ istd::IChangeableSharedPtr StorageLinkBase::LoadData() const
 }
 
 
-void StorageLinkBase::SetData(const istd::IChangeableSharedPtr& dataPtr)
+void CStorageLinkBase::SetData(const istd::IChangeableSharedPtr& dataPtr)
 {
 	m_dataPtr = dataPtr;
 }

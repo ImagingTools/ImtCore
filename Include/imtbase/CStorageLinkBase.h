@@ -27,7 +27,7 @@ namespace imtbase
 
 
 /**
-	Type-independent part of the StorageLink.
+	Type-independent part of the TStorageLink.
 	The link keeps the object ID and the logical storage ID (the data to be serialized) and finds the storage resolver at the run time.
 	The resolver is searched in the following order:
 	1. The resolver set directly via SetResolver.
@@ -38,13 +38,13 @@ namespace imtbase
 	A single link instance is not thread-safe.
 	\ingroup Collection
 */
-class StorageLinkBase
+class CStorageLinkBase
 {
 public:
 	typedef IStorageResolver::Id Id;
 
-	StorageLinkBase();
-	StorageLinkBase(const Id& objectId, const QByteArray& storageId = QByteArray());
+	CStorageLinkBase();
+	CStorageLinkBase(const Id& objectId, const QByteArray& storageId = QByteArray());
 
 	/**
 		Get ID of the linked object in the storage.
@@ -132,8 +132,8 @@ public:
 	*/
 	bool SerializeObjectId(iser::IArchive& archive, const iser::CArchiveTag& tag);
 
-	bool operator==(const StorageLinkBase& other) const;
-	bool operator!=(const StorageLinkBase& other) const;
+	bool operator==(const CStorageLinkBase& other) const;
+	bool operator!=(const CStorageLinkBase& other) const;
 
 protected:
 	/**

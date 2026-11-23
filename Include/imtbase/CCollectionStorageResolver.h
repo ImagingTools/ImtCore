@@ -14,7 +14,7 @@ namespace imtbase
 /**
 	Storage resolver working on top of an object collection.
 	The resolver doesn't own the data: all operations are delegated to the collection, which is responsible for the thread safety.
-	The collection returns the copy of the stored data, so the resolver has the snapshot semantic: use StorageLink::Save to write the changes back.
+	The collection returns the copy of the stored data, so the resolver has the snapshot semantic: use TStorageLink::Save to write the changes back.
 	One resolver serves objects of a single collection type-ID.
 	\ingroup Collection
 */
