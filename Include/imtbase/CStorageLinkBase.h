@@ -41,7 +41,7 @@ namespace imtbase
 class CStorageLinkBase
 {
 public:
-	typedef IStorageResolver::Id Id;
+	using Id = IStorageResolver::Id;
 
 	CStorageLinkBase();
 	CStorageLinkBase(const Id& objectId, const QByteArray& storageId = QByteArray());

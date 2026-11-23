@@ -26,7 +26,7 @@ namespace imtbase
 class IStorageResolver: virtual public istd::IPolymorphic
 {
 public:
-	typedef QByteArray Id;
+	using Id = QByteArray;
 
 	/**
 		Load the object with the given ID.

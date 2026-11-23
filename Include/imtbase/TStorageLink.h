@@ -2,7 +2,7 @@
 #pragma once
 
 
-// std includes
+// STL includes
 #include <optional>
 #include <type_traits>
 #include <utility>
@@ -59,8 +59,8 @@ class TStorageLink: public CStorageLinkBase
 public:
 	static_assert(std::is_base_of<istd::IChangeable, T>::value, "T must be derived from istd::IChangeable");
 
-	typedef CStorageLinkBase BaseClass;
-	typedef istd::TSharedInterfacePtr<T> ObjectPtr;
+	using BaseClass	= CStorageLinkBase;
+	using ObjectPtr	= istd::TSharedInterfacePtr<T>;
 
 	TStorageLink();
 	TStorageLink(std::nullopt_t);
