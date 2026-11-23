@@ -198,6 +198,7 @@ private:
 		IGqlSubscriptionClient::SubscriptionStatus m_status = IGqlSubscriptionClient::SS_UNKNOWN;
 		bool m_isRegistrationSent = false; // over the current connection, the answer is awaited
 		bool m_isRefusalReported = false; // once, a retry is refused the same way
+		bool m_isRefusedForCredentials = false; // only a new token helps: no retry with the same one
 		QList<std::shared_ptr<ClientRegistration>> m_clients;
 	};
 

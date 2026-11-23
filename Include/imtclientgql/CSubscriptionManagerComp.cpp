@@ -19,6 +19,7 @@
 #include <imtbase/imtbase.h>
 #include <imtrest/CWebSocketRequest.h>
 #include <imtgql/CGqlResponse.h>
+#include <imtservergql/imtservergql.h>
 
 
 namespace imtclientgql
@@ -303,6 +304,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 			if (foundIt != m_registeredClients.end()){
 				foundIt->m_status = IGqlSubscriptionClient::SS_REGISTERED;
 				foundIt->m_isRefusalReported = false;
+				foundIt->m_isRefusedForCredentials = false;
 
 				// Dispatched outside the lock, like MT_DATA below.
 				locker.unlock();
@@ -377,6 +379,9 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 			const auto foundIt = m_registeredClients.find(subscriptionId);
 			if (foundIt != m_registeredClients.end()){
 				foundIt->m_status = IGqlSubscriptionClient::SS_REFUSED;
+				const QJsonArray errors = rootObject.value("payload").toArray();
+				const QByteArray code = errors.isEmpty() ? QByteArray() : errors.first().toObject().value("extensions").toObject().value("code").toString().toUtf8();
+				foundIt->m_isRefusedForCredentials = code == imtservergql::s_subscriptionUnauthorizedCode;
 				const QByteArray commandId = foundIt->m_request.GetCommandId();
 				const bool isReported = foundIt->m_isRefusalReported;
 				foundIt->m_isRefusalReported = true;
@@ -744,7 +749,7 @@ void CSubscriptionManagerComp::RetryRefusedSubscriptions() const
 		{
 			QMutexLocker locker(&m_registeredClientsMutex);
 			const auto foundIt = m_registeredClients.find(subscriptionId);
-			if (foundIt == m_registeredClients.end() || foundIt->m_status != IGqlSubscriptionClient::SS_REFUSED){
+			if (foundIt == m_registeredClients.end() || foundIt->m_status != IGqlSubscriptionClient::SS_REFUSED || foundIt->m_isRefusedForCredentials){
 				continue;
 			}
 

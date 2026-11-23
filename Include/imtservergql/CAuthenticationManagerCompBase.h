@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imod/IModel.h>
 #include <imtauth/ISessionAuthorizationProvider.h>
 #include <imtservergql/IServerTokenReceiver.h>
 
@@ -29,6 +30,8 @@ public:
 		I_ASSIGN(m_roleCollectionCompPtr, "RoleCollection", "Roles, read at their source for the check of a subscription", false, "RoleCollection");
 		I_ASSIGN(m_userGroupCollectionCompPtr, "UserGroupCollection", "User groups, read at their source for the check of a subscription", false, "UserGroupCollection");
 		I_ASSIGN(m_sessionAuthorizationProviderCompPtr, "SessionAuthorizationProvider", "Set on a product server whose users the authorization server computes: a session is authorized there, and the user of a personal token is read at its source with only the permissions it was handed out with", false, "SessionAuthorizationProvider");
+		I_ASSIGN(m_sessionCollectionModelCompPtr, "SessionCollection", "Sessions of this server: a removed session ends its access tokens at once, whoever removed it", false, "SessionCollection");
+		I_ASSIGN_MULTI_0(m_accessModelsCompPtr, "AccessModels", "Models whose changes may change the access of tokens: users, roles, groups, memberships, organizations. What was computed for the tokens is not used after a change", false);
 	I_END_COMPONENT;
 
 protected:
@@ -36,6 +39,8 @@ protected:
 	I_REF(imtbase::IObjectCollection, m_roleCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userGroupCollectionCompPtr);
 	I_REF(imtauth::ISessionAuthorizationProvider, m_sessionAuthorizationProviderCompPtr);
+	I_MULTIREF(imod::IModel, m_accessModelsCompPtr);
+	I_REF(imod::IModel, m_sessionCollectionModelCompPtr);
 };
 
 

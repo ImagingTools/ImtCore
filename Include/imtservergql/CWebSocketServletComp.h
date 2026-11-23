@@ -110,9 +110,7 @@ private:
 		bool isRecipientChannel = false;
 		const imtrest::IRequest* requestPtr = nullptr;
 
-		// Only compared: the request is destroyed with it
-		const QObject* connectionPtr = nullptr;
-
+		QByteArray connectionId;
 	};
 
 	bool IsSubscriberAllowed(const imtgql::IGqlSubscriberController& controller, const imtgql::CGqlRequest& gqlRequest) const;

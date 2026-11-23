@@ -24,6 +24,8 @@ private slots:
 	void NoCheckWithoutChangeBeforeTheControl();
 	void PassedSessionDeadlineIsNotUnknown();
 	void ChangeOfTheAccessChecksAgain();
+	void AccessChangeIsToldBothWays();
+	void SameAccessIsNotTold();
 	void ChangeOfAUserChecksItsSubscriptionsOnly();
 	void ChangesDuringACheckCoalesce();
 	void CheckDoesNotTriggerItself();

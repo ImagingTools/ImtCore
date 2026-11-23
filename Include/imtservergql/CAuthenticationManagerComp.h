@@ -100,6 +100,8 @@ private:
 		QByteArray clientProductId;
 		/// Of a session token.
 		QByteArray sessionId;
+		/// Of a session token taken expired for an established subscription.
+		bool isExpired = false;
 	};
 
 	// Organization data of a token
@@ -181,12 +183,18 @@ private:
 	*/
 	bool IsSessionClosed(const QByteArray& token, bool& isChecked) const;
 
+	/**
+		param[out] patProductId		The product a personal access token works for, from the check itself: a check that is not cached still tells it.
+		param[out] patClientProductId	The product whose server holds a token of a server.
+	*/
 	bool ResolveUserId(
 				const QByteArray& token,
 				QByteArray& userId,
 				QByteArray& tenantId,
 				QByteArrayList& scopes,
 				bool& isPat,
+				QByteArray& patProductId,
+				QByteArray& patClientProductId,
 				QString& errorMessage,
 				imtgql::IGqlContextCreator::ContextCreationStatus& status) const;
 
@@ -200,6 +208,8 @@ private:
 				QByteArray& tenantId,
 				QByteArrayList& scopes,
 				bool& isPat,
+				QByteArray& patProductId,
+				QByteArray& patClientProductId,
 				QString& errorMessage,
 				imtgql::IGqlContextCreator::ContextCreationStatus& status) const;
 	bool TryGetCachedToken(
@@ -221,7 +231,8 @@ private:
 				QByteArrayList& scopes,
 				imtgql::IGqlContextCreator::ContextCreationError& error) const;
 
-	bool GetCachedPatProducts(const QByteArray& token, QByteArray& productId, QByteArray& clientProductId) const;
+	/// Whether the access of the token changed after \c generation: a check started before may answer as before the change.
+	bool IsTokenChangedSince(const QByteArray& tokenId, qint64 generation) const;
 
 	/**
 		Cache lookup identical to TryGetCachedToken(), except it assumes
@@ -234,7 +245,9 @@ private:
 				QByteArray& userId,
 				QByteArray& tenantId,
 				QByteArrayList& scopes,
-				bool& isPat) const;
+				bool& isPat,
+				QByteArray& patProductId,
+				QByteArray& patClientProductId) const;
 
 	/**
 		Cache lookup used by ResolveUserId(). Unlike TryGetCachedToken(), a miss
@@ -253,6 +266,8 @@ private:
 				QByteArray& tenantId,
 				QByteArrayList& scopes,
 				bool& isPat,
+				QByteArray& patProductId,
+				QByteArray& patClientProductId,
 				JwtState& state) const;
 
 	/**
@@ -269,13 +284,15 @@ private:
 				const QByteArray& tokenId,
 				const QByteArrayList& scopes,
 				bool isPat,
-				qint64 jwtExpSecs = 0,
+				qint64 jwtExpSecs,
+				qint64 resolutionGeneration,
 				const QByteArray& patProductId = QByteArray(),
-				const QByteArray& patClientProductId = QByteArray(),
-				qint64 resolutionGeneration = 0) const;
+				const QByteArray& patClientProductId = QByteArray()) const;
 	void StoreExpiredToken(const QByteArray& token) const;
+	void InvalidateExpiredJwt(const QByteArray& token, bool expiryAccepted) const;
 	void InvalidateTokenCache(const QByteArray& token) const;
-	void InvalidateSessionTokenCache(const QByteArray& sessionId) const;
+	void InvalidateSessionTokenCache(const QByteArray& sessionId, bool notifyChange = true) const;
+	qint64 GetJwtCacheGeneration() const;
 
 	/**
 		Reads the organization data cached for 'token' while it is fresh. Returns false
@@ -363,8 +380,6 @@ private:
 				QByteArray& sessionId,
 				qint64& expSecs) const;
 
-	static QString MaskToken(const QByteArray& token);
-
 	void SetError(
 				imtgql::IGqlContextCreator::ContextCreationError& error,
 				imtgql::IGqlContextCreator::ContextCreationStatus status,
@@ -400,16 +415,19 @@ private:
 	// The answers of the authorization server for the requests of a session; a subscription is never served from here
 	mutable QHash<QByteArray, SessionAuthorizationCacheEntry> m_sessionAuthorizationCache;
 
-	// Session-IDs removed via RemoveSession(), mapped to the time until which
-	// StoreCachedToken() refuses to cache JWTs of that session. Guarded by
-	// m_tokenCacheMutex so an in-flight validation/refresh cannot restore a
-	// revoked session's token after InvalidateSessionTokenCache() swept it.
+	// Explicit removal also suppresses later JWT cache fills during the token cache TTL.
 	mutable QHash<QByteArray, qint64> m_revokedSessionIds;
+	// A refused read fences older cache fills without making its own subscription check AS_STALE.
+	mutable qint64 m_jwtRefusalGeneration = 0;
 
 	// The same for personal access tokens: when the token managers last changed; a validation started before is not cached
 	mutable qint64 m_tokenChangeGeneration = 0;
 	mutable qint64 m_lastGlobalTokenChangeGeneration = 0;
+	// When a personal token changed without its ID: a check of any token started before is repeated. A change of the access only keeps the answer out of the cache
+	mutable qint64 m_lastTokenSetChangeGeneration = 0;
 	mutable QHash<QByteArray, qint64> m_tokenChangeGenerations;
+	// A token read afresh while it was resolved: that resolution does not fill the cache, the access did not change
+	mutable QHash<QByteArray, qint64> m_tokenRereadGenerations;
 
 	// Tokens currently being resolved by some thread via ResolveUserId(), so
 	// concurrent callers for the same token can wait for that result instead

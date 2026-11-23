@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QObject>
+#include <QtCore/QTemporaryDir>
 #include <QtQml/QQmlEngine>
 
 // ImtCore includes
@@ -30,6 +31,8 @@ public Q_SLOTS:
 	void qmlEngineAvailable(QQmlEngine* enginePtr);
 
 private:
+	// QML Settings of the run, empty at its start
+	QTemporaryDir m_settingsDir;
 	CGqlTestTransport m_transport;
 	CGqlTestNetworkAccessManagerFactory m_networkAccessManagerFactory;
 };

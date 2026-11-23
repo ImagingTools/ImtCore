@@ -40,9 +40,10 @@ public:
 
 	/**
 		Register a request sent by the client.
+		\param responseStatus	HTTP status of the response: the next one queued for its command, otherwise \c responseStatus.
 		\return body of the response to it: the next one queued for its command, otherwise \c responseBody.
 	*/
-	QByteArray RegisterRequest(const QByteArray& requestBody, const QVariantMap& requestHeaders);
+	QByteArray RegisterRequest(const QByteArray& requestBody, const QVariantMap& requestHeaders, int& responseStatus, int& responseDelay);
 
 	Q_INVOKABLE void reset();
 
@@ -50,6 +51,21 @@ public:
 		Answer the next request of \a commandId with \a responseBody; several calls are answered in order.
 	*/
 	Q_INVOKABLE void queueResponse(const QString& commandId, const QString& responseBody);
+
+	/**
+		Answer the next request of \a commandId with the HTTP status \a status; several calls are answered in order.
+	*/
+	Q_INVOKABLE void queueStatus(const QString& commandId, int status);
+
+	/**
+		Answer the next request of \a commandId \a delay ms later; several calls are answered in order.
+	*/
+	Q_INVOKABLE void queueDelay(const QString& commandId, int delay);
+
+	/**
+		All requests since the last reset, in the order they were sent: {commandId, body, headers}; header names are lower case.
+	*/
+	Q_INVOKABLE QVariantList requests() const;
 
 	/**
 		Command IDs of all requests since the last reset, in the order they were sent.
@@ -74,7 +90,10 @@ private:
 	QByteArray m_responseBody;
 	int m_responseStatus;
 	QMap<QString, QList<QByteArray>> m_queuedResponses;
+	QMap<QString, QList<int>> m_queuedStatuses;
+	QMap<QString, QList<int>> m_queuedDelays;
 	QStringList m_requestedCommands;
+	QVariantList m_requests;
 };
 
 

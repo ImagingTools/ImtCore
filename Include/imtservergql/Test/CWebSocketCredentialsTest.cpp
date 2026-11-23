@@ -26,6 +26,7 @@
 #include <imtservergql/CWebSocketServletComp.h>
 #include <imtservergql/imtservergql.h>
 #include <imtservergql/IServerTokenReceiver.h>
+#include <imtservergql/CAccessChangePublisherComp.h>
 #include <imtauth/CPersonalAccessTokenManagerComp.h>
 #include <imtauthgql/CConnectionCodesNotificationPublisherComp.h>
 #include <imtauthgql/CCrossTenantMessageNotificationPublisherComp.h>
@@ -265,15 +266,17 @@ public:
 	I_END_COMPONENT
 
 	mutable std::atomic<int> responses{0};
+	std::atomic<bool> acceptResponses{true};
 	std::function<void(const QByteArray&)> onResponse;
 
 	bool SendResponse(const QByteArray&, imtrest::ConstResponsePtr& responsePtr) const override
 	{
+		const bool accepted = acceptResponses.load();
 		++responses;
 		if (onResponse && responsePtr.IsValid()){
 			onResponse(responsePtr->GetData());
 		}
-		return true;
+		return accepted;
 	}
 	bool SendRequest(const QByteArray&, imtrest::ConstRequestPtr&) const override { return false; }
 };
@@ -412,6 +415,7 @@ struct CSubscriptionFixture
 {
 	icomp::TSimSharedComponentPtr<CCredentialContextComp> creator;
 	icomp::TSimSharedComponentPtr<CSubscriptionControllerComp> controller;
+	icomp::TSimSharedComponentPtr<imtservergql::CAccessChangePublisherComp> accessChanges;
 	icomp::TSimSharedComponentPtr<CResponseDispatcherComp> dispatcher;
 	// A model of the access: a collection the authorization reads, changed when the access changes
 	icomp::TSimSharedComponentPtr<CAccessModelComp> users;
@@ -433,6 +437,9 @@ struct CSubscriptionFixture
 		creator->InitComponent();
 		controller->InitComponent();
 		dispatcher->InitComponent();
+		accessChanges->SetRef("RequestManager", dispatcher);
+		accessChanges->InsertMultiAttr("CommandIds", QByteArray("OnAccessChanged"));
+		accessChanges->InitComponent();
 		users->InitComponent();
 		serverTokens->InitComponent();
 		receiver->managerPtr = &*serverTokens;
@@ -440,6 +447,7 @@ struct CSubscriptionFixture
 		servlet->SetRef("ServerTokenReceiver", receiver);
 		servlet->SetRef("GqlContextCreator", creator);
 		servlet->SetRef("RequestManager", dispatcher);
+		servlet->InsertMultiRef("GqlSubscriberControllers", accessChanges);
 		if (publisherPtr != nullptr){
 			servlet->InsertMultiRef("GqlSubscriberControllers", *publisherPtr);
 		}
@@ -711,6 +719,50 @@ void CWebSocketCredentialsTest::ChangeOfTheAccessChecksAgain()
 	fixture.ChangeAccess();
 	QTRY_COMPARE_WITH_TIMEOUT(fixture.controller->removals.load(), 1, 2000);
 	QCOMPARE(fixture.DroppedCodes(), QByteArrayList{imtservergql::s_subscriptionPermissionsChangedCode});
+}
+
+
+// The channel of the changes of the access is told a granted and a taken permission, and is not ended by the narrowing
+void CWebSocketCredentialsTest::AccessChangeIsToldBothWays()
+{
+	CSubscriptionFixture fixture(300);
+	CSubscriptionFixture::Prepare(fixture.request, "access", "user-credential", "OnAccessChanged");
+	fixture.servlet->RegisterSubscription(fixture.request);
+	QVERIFY(fixture.servlet->response.contains("start_ack"));
+
+	fixture.dispatcher->acceptResponses = false;
+	++fixture.creator->access;
+	fixture.ChangeAccess();
+	QTRY_COMPARE_WITH_TIMEOUT(fixture.dispatcher->responses.load(), 1, 2000);
+
+	// No new grant: the unaccepted notification is still due at the next check.
+	fixture.dispatcher->acceptResponses = true;
+	fixture.ChangeAccess();
+	QTRY_COMPARE_WITH_TIMEOUT(fixture.dispatcher->responses.load(), 2, 2000);
+
+	fixture.creator->access = 0;
+	fixture.ChangeAccess();
+	QTRY_COMPARE_WITH_TIMEOUT(fixture.dispatcher->responses.load(), 3, 2000);
+	QVERIFY(fixture.DroppedCodes().isEmpty());
+
+	// Told against the access of the last message, not of the registration
+	++fixture.creator->access;
+	fixture.ChangeAccess();
+	QTRY_COMPARE_WITH_TIMEOUT(fixture.dispatcher->responses.load(), 4, 2000);
+}
+
+
+void CWebSocketCredentialsTest::SameAccessIsNotTold()
+{
+	CSubscriptionFixture fixture(300);
+	CSubscriptionFixture::Prepare(fixture.request, "access", "user-credential", "OnAccessChanged");
+	fixture.servlet->RegisterSubscription(fixture.request);
+	const int checks = fixture.creator->establishedChecks.load();
+
+	fixture.ChangeAccess();
+	QTRY_VERIFY_WITH_TIMEOUT(fixture.creator->establishedChecks.load() > checks, 2000);
+	QTest::qWait(200);
+	QCOMPARE(fixture.dispatcher->responses.load(), 0);
 }
 
 

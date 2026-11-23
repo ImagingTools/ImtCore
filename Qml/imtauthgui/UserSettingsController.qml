@@ -15,7 +15,9 @@ ParamsSetController {
 	signal settingsSaved()
 	signal settingsSaveFailed()
 	
-	function getSettings(){
+	// The callback is called when the settings are applied, or when the request failed
+	function getSettings(callback){
+		getSettingsQuery.callback = callback
 		getSettingsQuery.send()
 	}
 	
@@ -24,8 +26,16 @@ ParamsSetController {
 	}
 
 	property GqlSdlRequestSender getSettingsQuery: GqlSdlRequestSender {
+		property var callback: null
+
 		permissionPath: root.permissionPath
 		gqlCommandId: ImtbaseSettingsSdlCommandIds.s_getSettings
+
+		onFinished: {
+			if (callback){
+				callback()
+			}
+		}
 		inputObjectComp: Component {
 			GetSettingsInput {
 				m_userId: AuthorizationController.getUserId()

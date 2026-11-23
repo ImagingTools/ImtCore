@@ -5,6 +5,7 @@
 // ImtCore includes
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
 #include <imtauth/IExternalLoginCallbackHandler.h>
+#include <imtauth/IJwtSessionController.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization_fwd.h>
 
 
@@ -27,6 +28,7 @@ public:
 
 	I_BEGIN_COMPONENT(CRemoteAuthorizationControllerComp);
 		I_REGISTER_INTERFACE(imtauth::IExternalLoginCallbackHandler);
+		I_ASSIGN(m_jwtSessionControllerCompPtr, "JwtSessionController", "Sessions as this server knows them: a logout drops what it keeps of the token", false, "JwtSessionController");
 	I_END_COMPONENT;
 
 	// reimplemented (imtauth::IExternalLoginCallbackHandler)
@@ -83,6 +85,8 @@ protected:
 private:
 	// The accounts service knows no product tree, so what the permissions include is added here.
 	void AddImpliedPermissions(const imtgql::CGqlRequest& gqlRequest, sdl::V1_0::imtauth::CAuthorizationPayload& payload) const;
+
+	I_REF(imtauth::IJwtSessionController, m_jwtSessionControllerCompPtr);
 };
 
 

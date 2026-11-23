@@ -43,8 +43,14 @@
                     <AttributeInfo Id="JwtLifetime" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="3600"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="JwtLifetimeParam" Type="Reference" ExportId="JwtLifetimeParam">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="RefreshTokenLifetime" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="86400"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RefreshTokenLifetimeParam" Type="Reference" ExportId="RefreshTokenLifetimeParam">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SecretKeyParam" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Uuid"/>

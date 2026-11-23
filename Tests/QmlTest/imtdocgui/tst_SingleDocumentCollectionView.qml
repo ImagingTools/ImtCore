@@ -203,10 +203,11 @@ TestCase {
 		context.service.loadingResyncTimer.interval = 100
 		let listsBefore = listRequestCount()
 
-		openFromServer(context, true)
+		// Queued before the open: the resync timer starts with it and may ask before openFromServer returns
 		GqlTestTransport.queueResponse("GetOpenedDocumentList", listAnswer(true))
 		GqlTestTransport.queueResponse("GetOpenedDocumentList", listAnswer(true))
 		GqlTestTransport.queueResponse("GetOpenedDocumentList", listAnswer(false))
+		openFromServer(context, true)
 
 		tryVerify(function(){ return !context.service.documentIsLoading("doc") }, 5000, "Loaded at the third answer")
 		wait(500)
