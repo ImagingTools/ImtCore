@@ -30,6 +30,11 @@ void CPrivateAutoPersistenceComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
+	// Only the reload tells the own saves from the changes of other programs by their digests
+	if (*m_reloadOnFileChangeAttrPtr && !m_savedFileDigestProviderCompPtr.IsValid()){
+		SendWarningMessage(0, QStringLiteral("The digests of the saved files are not known (SavedFileDigestProvider): the own saves are loaded again"));
+	}
+
 	const QString filePath = GetFilePath();
 	if (*m_restoreOnBeginAttrPtr && QFileInfo::exists(filePath)){
 		LoadObject();
@@ -103,6 +108,26 @@ QString CPrivateAutoPersistenceComp::GetFilePath() const
 }
 
 
+QByteArray CPrivateAutoPersistenceComp::GetLoadableFileDigest(const QString& filePath) const
+{
+	// Without the loader nothing is loaded: the file is not read
+	if (!m_fileLoaderCompPtr.IsValid()){
+		return {};
+	}
+
+	// The file is read only if the loader takes it: in a folder that is not private another account could put a huge file there
+	if (!m_fileLoaderCompPtr->IsOperationSupported(
+				m_objectCompPtr.GetPtr(),
+				&filePath,
+				ifile::IFilePersistence::QF_LOAD | ifile::IFilePersistence::QF_FILE,
+				true)){
+		return {};
+	}
+
+	return CFileTools::GetFileDigest(filePath);
+}
+
+
 bool CPrivateAutoPersistenceComp::LoadObject()
 {
 	if (!m_objectCompPtr.IsValid() || !m_fileLoaderCompPtr.IsValid()){
@@ -114,7 +139,7 @@ bool CPrivateAutoPersistenceComp::LoadObject()
 	const QString filePath = GetFilePath();
 
 	// Taken before the load: if the file is changed meanwhile, the next change of it loads it once more
-	const QByteArray fileHash = CFileTools::GetFileDigest(filePath);
+	const QByteArray fileHash = GetLoadableFileDigest(filePath);
 
 	m_loadingThreadId = QThread::currentThreadId();
 	const int operationState = m_fileLoaderCompPtr->LoadFromFile(*m_objectCompPtr, filePath);
@@ -134,7 +159,7 @@ bool CPrivateAutoPersistenceComp::LoadObject()
 
 bool CPrivateAutoPersistenceComp::StoreObject()
 {
-	if (!m_objectCompPtr.IsValid() || !m_fileLoaderCompPtr.IsValid() || !m_savedFileDigestProviderCompPtr.IsValid()){
+	if (!m_objectCompPtr.IsValid() || !m_fileLoaderCompPtr.IsValid()){
 		return false;
 	}
 
@@ -147,8 +172,9 @@ bool CPrivateAutoPersistenceComp::StoreObject()
 		return false;
 	}
 
-	// The file read back could be of another program already: the digest of what has been written is told
-	m_fileHash = m_savedFileDigestProviderCompPtr->GetSavedFileDigest(filePath);
+	// The file read back could be of another program already: the digest of what has been written is told. Without it the next change
+	// of the file is taken as another one
+	m_fileHash = m_savedFileDigestProviderCompPtr.IsValid() ? m_savedFileDigestProviderCompPtr->GetSavedFileDigest(filePath) : QByteArray();
 
 	if (*m_reloadOnFileChangeAttrPtr){
 		WatchCreatedFile();
@@ -215,11 +241,13 @@ void CPrivateAutoPersistenceComp::OnFileSystemChanged()
 		return;
 	}
 
-	// The own saves and the other files of the folder change nothing. A special file (a FIFO) is not waited for, the loader refuses it
+	// The own saves and the other files of the folder change nothing. A special file (a FIFO) is not waited for, the loader refuses it.
+	// A file without a digest (it cannot be read, or the loader does not take it) is not the own one: the loader tells why
 	{
 		QMutexLocker locker(&m_fileMutex);
 
-		if (CFileTools::GetFileDigest(filePath) == m_fileHash){
+		const QByteArray fileHash = GetLoadableFileDigest(filePath);
+		if (!fileHash.isEmpty() && (fileHash == m_fileHash)){
 			return;
 		}
 	}

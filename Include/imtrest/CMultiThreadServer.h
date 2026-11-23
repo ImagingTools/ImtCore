@@ -63,6 +63,11 @@ public:
 	 */
 	void SetSslConfiguration(const QSslConfiguration& sslConfiguration);
 
+	/**
+		Get the SSL configuration of the next connections, see SetSslConfiguration().
+	*/
+	[[nodiscard]] QSslConfiguration GetSslConfiguration() const;
+
 	// reimplemented (imtrest::IResponseDispatcher)
 	virtual bool SendResponse(const QByteArray& requestId, ConstResponsePtr& response) const override;
 	virtual bool SendRequest(const QByteArray& requestId, ConstRequestPtr& request) const override;
@@ -74,7 +79,8 @@ public Q_SLOTS:
 	void Disconnected(QByteArray requestId);
 
 	/**
-		Stop the threads of the connections and wait for them. It can be called again, then it does nothing.
+		Stop the threads of the connections and wait for them. It can be called again, then it does nothing. The connections that wait
+		for a thread are closed, and so are the new ones: the server serves nothing after it.
 	*/
 	void ShutdownServer();
 

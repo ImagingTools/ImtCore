@@ -18,9 +18,6 @@ class CTcpServerConnectionTest: public QObject
 {
 	Q_OBJECT
 private slots:
-	// A simulated model with an attribute is destroyed without failure (see TSimModelComponentPtr)
-	void ModelWithAttributesIsDestroyedTest();
-
 	// The data of the next request must not pile up in the memory of the server while the current request is handled
 	void ReadBufferIsLimitedWhileRequestIsHandledTest();
 	void NextRequestIsReceivedAfterResponseTest();
@@ -40,6 +37,12 @@ private slots:
 	void BusyPortKeepsServerTest();
 	void StoppedServerStaysStoppedTest();
 	void StartedServerMovesTest();
+	void OnlyChangedPortMovesServerTest();
+
+	// The SSL settings: the server is not open without the encryption, it is changed in its own thread
+	void RefusedEncryptionStopsMovedServerTest();
+	void StoppedServerStaysStoppedOnSslChangeTest();
+	void SslChangeInAnotherThreadIsQueuedTest();
 
 	// The threads of the connections are stopped before the component loses its references and attributes
 	void ConnectionsStopWhenComponentIsDestroyedTest();

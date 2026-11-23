@@ -97,20 +97,13 @@ void CTcpServerComp::OnModelChanged(int modelId, const istd::IChangeable::Change
 		return;
 	}
 
+	// The server is changed in its own thread: the settings can be changed in the thread of a request
 	if (modelId == MI_SERVER_CONNECTION){
-		// The server is moved in its own thread: the port can be changed in the thread of a request
 		QMetaObject::invokeMethod(this, [this](){ MoveToConfiguredPort(); }, Qt::AutoConnection);
-
-		return;
 	}
-
-	if (!m_startServerOnCreateAttrPtr.IsValid() || !*m_startServerOnCreateAttrPtr){
-		return;
+	else{
+		QMetaObject::invokeMethod(this, [this](){ RestartForSslConfiguration(); }, Qt::AutoConnection);
 	}
-
-	Q_ASSERT_X(m_sslConfigurationCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid(), "Update server's SSL configuration", "SSL configuration or manager is not set!");
-
-	EnsureServerStarted();
 }
 
 
@@ -153,14 +146,15 @@ void CTcpServerComp::OnComponentCreated()
 
 void CTcpServerComp::OnComponentDestroyed()
 {
+	// First: a notification from another thread does not start the server again while the threads are stopped
+	BaseClass2::UnregisterAllModels();
+
 	// The threads of the connections use the references and the attributes of the component: they are stopped here, while the
-	// component has them, not later in the destructor. A queued move to another port does nothing then
+	// component has them, not later in the destructor. A queued change of the settings does nothing then
 	m_isStartRequested = false;
 
 	m_serverPtr->close();
 	m_serverPtr->ShutdownServer();
-
-	BaseClass2::UnregisterAllModels();
 
 	BaseClass::OnComponentDestroyed();
 }
@@ -244,31 +238,14 @@ bool CTcpServerComp::EnsureServerStarted()
 		return false;
 	}
 
-	QSslConfiguration sslConfiguration;
-	iprm::TParamsPtr<iprm::IEnableableParam> sslEnableParamPtr(m_sslConfigurationCompPtr.GetPtr(), imtcom::ISslConfigurationManager::ParamKeys::s_enableSslModeParamKey);
-	if (sslEnableParamPtr.IsValid() && sslEnableParamPtr->IsEnabled()){
-		if (m_sslConfigurationManagerCompPtr->CreateSslConfiguration(*m_sslConfigurationCompPtr, sslConfiguration)){
-			m_serverPtr->EnableSecureConnection();
-
-			m_serverPtr->SetSslConfiguration(sslConfiguration);
-
-			QString message = QStringLiteral("Secure connection (SSL) enabled on Tcp server");
-			SendInfoMessage(0, message);
-		}
-		else{
-			// The server that is asked to be secure must not work without the encryption: the clients would send the data as plain text
-			QString message = QStringLiteral("Could not enable secure connection (SSL) on Tcp server, the server is not started");
-			SendErrorMessage(0, message);
-
-			return false;
-		}
-	}
-	else{
-		m_serverPtr->EnableSecureConnection(false);
+	if (!ApplySecureConnection()){
+		return false;
 	}
 
 	if (m_serverConnnectionInterfaceCompPtr.IsValid()){
 		int port = m_serverConnnectionInterfaceCompPtr->GetPort(imtcom::IServerConnectionInterface::PT_HTTP);
+
+		m_requestedPort = port;
 
 		return StartListening(QHostAddress::Any, port);
 	}
@@ -280,6 +257,45 @@ bool CTcpServerComp::EnsureServerStarted()
 }
 
 
+bool CTcpServerComp::GetSecureConnection(bool& isSecure, QSslConfiguration& sslConfiguration) const
+{
+	iprm::TParamsPtr<iprm::IEnableableParam> sslEnableParamPtr(m_sslConfigurationCompPtr.GetPtr(), imtcom::ISslConfigurationManager::ParamKeys::s_enableSslModeParamKey);
+
+	isSecure = sslEnableParamPtr.IsValid() && sslEnableParamPtr->IsEnabled();
+	if (!isSecure){
+		return true;
+	}
+
+	return m_sslConfigurationManagerCompPtr.IsValid() && m_sslConfigurationManagerCompPtr->CreateSslConfiguration(*m_sslConfigurationCompPtr, sslConfiguration);
+}
+
+
+bool CTcpServerComp::ApplySecureConnection()
+{
+	bool isSecure = false;
+	QSslConfiguration sslConfiguration;
+	if (!GetSecureConnection(isSecure, sslConfiguration)){
+		// The server that is asked to be secure must not work without the encryption: the clients would send the data as plain text
+		SendErrorMessage(0, QStringLiteral("Could not enable secure connection (SSL) on Tcp server, the server is not started"));
+
+		return false;
+	}
+
+	if (isSecure){
+		m_serverPtr->EnableSecureConnection();
+
+		m_serverPtr->SetSslConfiguration(sslConfiguration);
+
+		SendInfoMessage(0, QStringLiteral("Secure connection (SSL) enabled on Tcp server"));
+	}
+	else{
+		m_serverPtr->EnableSecureConnection(false);
+	}
+
+	return true;
+}
+
+
 void CTcpServerComp::MoveToConfiguredPort()
 {
 	// Checked when the queued call runs: the server can be stopped meanwhile
@@ -287,20 +303,66 @@ void CTcpServerComp::MoveToConfiguredPort()
 		return;
 	}
 
+	// The notification can be of the host, of another protocol or of the same settings loaded again: only another port moves the server.
+	// The port of the system (0) would be another one each time, a protocol without a port has -1
 	const int port = m_serverConnnectionInterfaceCompPtr->GetPort(imtcom::IServerConnectionInterface::PT_HTTP);
+	if (port <= 0){
+		return;
+	}
+
 	const bool isListening = m_serverPtr->isListening();
 	if (isListening && (m_serverPtr->serverPort() == port)){
+		m_requestedPort = port;
+
 		return;
 	}
+
+	// The port that could not be listened on is tried again only when it is set again after another one
+	if (port == m_requestedPort){
+		return;
+	}
+
+	m_requestedPort = port;
 
 	const quint16 previousPort = isListening ? m_serverPtr->serverPort() : 0;
-	if (EnsureServerStarted() || (previousPort == 0)){
+
+	m_serverPtr->close();
+
+	// The server that cannot be secure as it is asked does not listen at all, also not on the previous port
+	if (!ApplySecureConnection()){
 		return;
 	}
 
-	SendErrorMessage(0, QStringLiteral("Tcp server stays on port %1").arg(previousPort));
+	if (StartListening(QHostAddress::Any, quint16(port)) || (previousPort == 0)){
+		return;
+	}
 
-	StartListening(QHostAddress::Any, previousPort);
+	if (StartListening(QHostAddress::Any, previousPort)){
+		SendErrorMessage(0, QStringLiteral("Tcp server stays on port %1").arg(previousPort));
+	}
+	else{
+		SendErrorMessage(0, QStringLiteral("Tcp server could not return to port %1, it does not listen").arg(previousPort));
+	}
+}
+
+
+void CTcpServerComp::RestartForSslConfiguration()
+{
+	// The server that is stopped (StopServer) stays stopped. Checked when the queued call runs: the server can be stopped meanwhile
+	if (!m_isStartRequested){
+		return;
+	}
+
+	bool isSecure = false;
+	QSslConfiguration sslConfiguration;
+	if (		m_serverPtr->isListening() &&
+				GetSecureConnection(isSecure, sslConfiguration) &&
+				(isSecure == m_serverPtr->IsSecureConnection()) &&
+				(!isSecure || (sslConfiguration == m_serverPtr->GetSslConfiguration()))){
+		return;
+	}
+
+	EnsureServerStarted();
 }
 
 

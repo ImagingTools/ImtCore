@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "CTcpServerConnectionTest.h"
+#include "SslTestComponents.h"
 #include "TSimModelComponentPtr.h"
 
 
 // STL includes
 #include <atomic>
 #include <memory>
+#include <thread>
 
 // Qt includes
 #include <QtCore/QElapsedTimer>
@@ -18,10 +20,10 @@
 
 // ACF includes
 #include <icomp/CComponentBase.h>
-#include <icomp/TModelCompWrap.h>
 #include <icomp/TSimComponentWrap.h>
 #include <iser/CMemoryReadArchive.h>
 #include <iser/CMemoryWriteArchive.h>
+#include <istd/CChangeNotifier.h>
 
 // ImtCore includes
 #include <imtcom/CServerConnectionInterfaceParamComp.h>
@@ -195,51 +197,13 @@ private:
 };
 
 
-/**
-	Data with an attribute and a reference of the component, the data are the first base as in the interface of the connection: the
-	simplest model that fails in its destructor with MSVC if it has its context still (see TSimModelComponentPtr).
-*/
-class CNumberData: virtual public istd::IChangeable
-{
-public:
-	int number = 0;
-};
-
-
-class CNumberDataComp:
-			public CNumberData,
-			public icomp::CComponentBase
-{
-public:
-	typedef icomp::CComponentBase BaseClass;
-
-	I_BEGIN_COMPONENT(CNumberDataComp);
-		I_REGISTER_INTERFACE(istd::IChangeable);
-		I_ASSIGN(m_numberAttrPtr, "Number", "Initial number", false, 1);
-		I_ASSIGN(m_slaveCompPtr, "Slave", "Unused reference", false, "Slave");
-	I_END_COMPONENT;
-
-protected:
-	// reimplemented (icomp::CComponentBase)
-	void OnComponentCreated() override
-	{
-		BaseClass::OnComponentCreated();
-
-		number = *m_numberAttrPtr;
-	}
-
-private:
-	I_ATTR(int, m_numberAttrPtr);
-	I_REF(istd::IChangeable, m_slaveCompPtr);
-};
-
-
-typedef TSimModelComponentPtr<CNumberDataComp> NumberModel;
 typedef icomp::TSimSharedComponentPtr<CHoldingServletComp> Servlet;
 typedef icomp::TSimSharedComponentPtr<CSlowBodyPolicyComp> SlowBodyPolicy;
 typedef icomp::TSimSharedComponentPtr<imtrest::CHttpProtocolEngineComp> Engine;
 // A model, as the package of the component makes it: the server follows the changes of its port
 typedef TSimModelComponentPtr<imtcom::CServerConnectionInterfaceParamComp> Connection;
+typedef TSimModelComponentPtr<CTestSslParamsComp> SslParams;
+typedef icomp::TSimSharedComponentPtr<CTestSslManagerComp> SslManager;
 typedef icomp::TSimComponentWrap<imtrest::CTcpServerComp> TcpServer;
 
 
@@ -260,7 +224,10 @@ int FindFreePort()
 */
 struct SServer
 {
-	explicit SServer(int threadsLimit, bool isSlowBody = false, bool startOnCreate = true)
+	/**
+		\param hasSslSettings	the server gets the SSL settings (a model) and their manager, the encryption is off.
+	*/
+	explicit SServer(int threadsLimit, bool isSlowBody = false, bool startOnCreate = true, bool hasSslSettings = false)
 	{
 		port = FindFreePort();
 
@@ -276,12 +243,36 @@ struct SServer
 		connection->SetIntAttr("DefaultHttpPort", port);
 		connection->InitComponent();
 
+		if (hasSslSettings){
+			sslParams->InitComponent();
+			sslManager->InitComponent();
+
+			server.SetRef("SslConfiguration", sslParams);
+			server.SetRef("SslConfigurationManager", sslManager);
+		}
+
 		server.SetIntAttr("ThreadsLimit", threadsLimit);
 		server.SetBoolAttr("StartServerOnCreate", startOnCreate);
 		server.SetRef("RequestHandler", servlet);
 		server.SetRef("ProtocolEngine", engine);
 		server.SetRef("ServerInterface", connection);
 		server.InitComponent();
+	}
+
+	/**
+		Change the SSL settings: the encryption is on or off. The server is told about it only if \c isNotified, otherwise it finds it out
+		when it is started again.
+	*/
+	void SetSecure(bool isSecure, bool isNotified = true)
+	{
+		if (isNotified){
+			istd::CChangeNotifier notifier(&*sslParams);
+
+			sslParams->enableParam.SetEnabled(isSecure);
+		}
+		else{
+			sslParams->enableParam.SetEnabled(isSecure);
+		}
 	}
 
 	bool IsListening() const
@@ -333,6 +324,8 @@ struct SServer
 	SlowBodyPolicy bodyPolicy;
 	Engine engine;
 	Connection connection;
+	SslParams sslParams;
+	SslManager sslManager;
 	TcpServer server;
 };
 
@@ -521,17 +514,6 @@ QtMessageHandler CThreadWarningCatcher::s_previousHandler = nullptr;
 
 
 } // namespace
-
-
-// The model of the test is created and destroyed: it takes the attribute on creation and leaves its context before its destructor
-void CTcpServerConnectionTest::ModelWithAttributesIsDestroyedTest()
-{
-	NumberModel model;
-	model->SetIntAttr("Number", 7);
-	model->InitComponent();
-
-	QCOMPARE(model->number, 7);
-}
 
 
 // While the first request is handled, the client sends 32 MiB of the next one. Qt does not limit the read buffer by default,
@@ -873,6 +855,111 @@ void CTcpServerConnectionTest::StartedServerMovesTest()
 	QCOMPARE(server.RespondToHeld(), 1);
 	QTRY_COMPARE_WITH_TIMEOUT(client.GetResponseCount(), 1, 5000);
 	client.Disconnect();
+}
+
+
+// Only a changed port moves the server. The port of the system (0) would be another one on each notification; a port that could not
+// be listened on is not tried again when another part of the settings changes (or the same settings are loaded again)
+void CTcpServerConnectionTest::OnlyChangedPortMovesServerTest()
+{
+	SServer server(2);
+	QVERIFY(server.IsListening());
+	const int firstPort = server.port;
+
+	server.connection->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, 0);
+	CClient firstClient;
+	QVERIFY(firstClient.Connect(firstPort));
+	firstClient.Disconnect();
+
+	QTcpServer otherProgram;
+	QVERIFY(otherProgram.listen(QHostAddress::Any, 0));
+	const int busyPort = otherProgram.serverPort();
+	QTest::ignoreMessage(QtDebugMsg, QRegularExpression(QStringLiteral("Tcp server could not be started on port")));
+	server.connection->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, busyPort);
+
+	// The port is free now, but it is not set again
+	otherProgram.close();
+	server.connection->SetHost(QStringLiteral("other"));
+
+	CClient client;
+	QVERIFY(client.Connect(firstPort));
+	client.SendGet("/stays");
+	QTRY_COMPARE_WITH_TIMEOUT(server.servlet->GetHeld().size(), 1, 5000);
+	QCOMPARE(server.RespondToHeld(), 1);
+	QTRY_COMPARE_WITH_TIMEOUT(client.GetResponseCount(), 1, 5000);
+	client.Disconnect();
+}
+
+
+// The server that is asked to be secure and cannot be does not listen when it moves to another port: also not on the previous port
+// without the encryption. The SSL settings that are not a model tell nothing about their change before
+void CTcpServerConnectionTest::RefusedEncryptionStopsMovedServerTest()
+{
+	SServer server(2, false, true, true);
+	QVERIFY(server.IsListening());
+
+	server.SetSecure(true, false);
+
+	const int newPort = FindFreePort();
+	QVERIFY(newPort != 0 && newPort != server.port);
+	server.connection->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, newPort);
+
+	const imtrest::IServer* serverPtr = &server.server;
+	QCOMPARE(serverPtr->GetServerStatus(), imtrest::IServer::SS_NOT_STARTED);
+
+	CClient oldPortClient;
+	QVERIFY(!oldPortClient.Connect(server.port));
+
+	CClient newPortClient;
+	QVERIFY(!newPortClient.Connect(newPort));
+}
+
+
+// The server stopped by StopServer stays stopped when the SSL settings change. The server started by StartServer follows them
+void CTcpServerConnectionTest::StoppedServerStaysStoppedOnSslChangeTest()
+{
+	SServer server(2, false, true, true);
+	imtrest::IServer* serverPtr = &server.server;
+	QVERIFY(serverPtr->StopServer());
+
+	server.SetSecure(false);
+	QCoreApplication::processEvents();
+	QCOMPARE(serverPtr->GetServerStatus(), imtrest::IServer::SS_NOT_STARTED);
+
+	SServer startedServer(2, false, false, true);
+	imtrest::IServer* startedServerPtr = &startedServer.server;
+	QVERIFY(startedServerPtr->StartServer());
+
+	startedServer.SetSecure(true);
+	QTRY_COMPARE_WITH_TIMEOUT(startedServerPtr->GetServerStatus(), imtrest::IServer::SS_NOT_STARTED, 5000);
+}
+
+
+// The SSL settings changed in another thread (a request of a client) restart the server in its own thread: the server and its sockets
+// are not touched from the other thread
+void CTcpServerConnectionTest::SslChangeInAnotherThreadIsQueuedTest()
+{
+	SServer server(2, false, true, true);
+	QVERIFY(server.IsListening());
+	server.sslManager->isFailing = false;
+
+	CThreadWarningCatcher catcher;
+
+	std::thread changer([&server](){ server.SetSecure(true); });
+	changer.join();
+
+	// The restart is queued to the thread of the server
+	QCoreApplication::processEvents();
+	QVERIFY(server.IsListening());
+
+	// The server expects the encryption now: a request without it is not served
+	CClient client;
+	QVERIFY(client.Connect(server.port));
+	client.SendGet("/plain");
+	QTest::qWait(300);
+	QCOMPARE(server.servlet->GetHeld().size(), 0);
+
+	QVERIFY2(catcher.GetMessages().isEmpty(), qPrintable(catcher.GetMessages().join(QLatin1Char('\n'))));
 }
 
 

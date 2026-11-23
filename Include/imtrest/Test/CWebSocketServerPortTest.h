@@ -25,6 +25,12 @@ private slots:
 	void StoppedServerStaysStoppedTest();
 	void StartedServerMovesTest();
 	void BusyStartPortThenFreePortServesClientsTest();
+	void SystemPortKeepsServerTest();
+	void RefusedEncryptionDoesNotStartServerTest();
+	void UnchangedSslSettingsKeepConnectionsTest();
+	void ConnectionThreadsStopWhenComponentIsDestroyedTest();
+	void UnchangedSslSettingsKeepConnectionsOfNotListeningServerTest();
+	void SubscriptionsAreReleasedWhenComponentIsDestroyedTest();
 };
 
 

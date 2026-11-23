@@ -37,6 +37,11 @@ namespace imtfile
 
 QString CSystemConfigLocationComp::GetSystemConfigPath(const QString& companyName, const QString& applicationName)
 {
+	// Without the names the path would be the configuration folder of the whole system (/etc, ProgramData)
+	if (companyName.trimmed().isEmpty() && applicationName.trimmed().isEmpty()){
+		return {};
+	}
+
 #if defined(Q_OS_WIN) || defined(Q_OS_MACOS)
 #ifdef Q_OS_MACOS
 	// The files of an application belong to Application Support (Preferences is for the property lists of the system): Qt gives the

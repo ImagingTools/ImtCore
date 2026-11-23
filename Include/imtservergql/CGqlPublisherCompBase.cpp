@@ -253,8 +253,8 @@ bool CGqlPublisherCompBase::PublishDataFiltered(
 	std::function<bool(const imtgql::CGqlRequest&)> predicate) const
 {
 	// The push MUST run while holding m_mutex, not after releasing it. Each stored
-	// const imtrest::IRequest* is a raw pointer to a CWebSocketRequest that is parented to its
-	// QWebSocket and cascade-destroyed the instant that socket disconnects; CWebSocketRequest's dtor
+	// const imtrest::IRequest* is a raw pointer to a CWebSocketRequest that the thread of its connection
+	// deletes the instant that socket disconnects (or the server is destroyed); CWebSocketRequest's dtor
 	// calls OnRequestDestroyed() -> UnregisterSubscription(), which removes the entry under THIS same
 	// m_mutex before the object's memory is freed. A previous version copied the raw pointers into a
 	// local list, released the lock "to keep the server responsive", and dereferenced them afterwards -

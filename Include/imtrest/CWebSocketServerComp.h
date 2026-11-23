@@ -3,6 +3,7 @@
 
 
 // Qt includes
+#include <QtNetwork/QSslConfiguration>
 #include <QtWebSockets/QWebSocket>
 #include <QtCore/QSharedPointer>
 
@@ -126,9 +127,20 @@ private:
 	};
 
 	bool EnsureServerStarted();
+
+	/**
+		Listen with a new server object, secure as the SSL configuration asks. If it asks for the encryption and it cannot be made, the
+		server does not listen and has no server object: it is not started without the encryption.
+	*/
 	bool StartListening(const QHostAddress& address = QHostAddress::Any, quint16 port = 0);
 
 	void StopListening();
+
+	/**
+		Get the encryption that the SSL configuration asks for.
+		\return \c false if it is asked for, but cannot be made.
+	*/
+	bool GetSecureConnection(bool& isSecure, QSslConfiguration& sslConfiguration) const;
 
 	/**
 		Close the connections and listen again: after a change of the SSL configuration the clients connect again with it. The connections
@@ -137,11 +149,22 @@ private:
 	bool RestartServer();
 
 	/**
-		Listen on the port of the server connection interface, if it is another one and the server is to work (started on creation or
+		Start the server again with the changed SSL configuration, if the server is to work. The same configuration (the settings are
+		loaded again) changes nothing, the connections stay.
+	*/
+	void RestartForSslConfiguration();
+
+	/**
+		Listen on the port of the server connection interface, if the port is changed and the server is to work (started on creation or
 		by StartServer and not stopped). The established connections stay. When the new port cannot be listened on, the server stays
-		on the previous port.
+		on the previous port. A port of the system (0) or of no protocol (-1) is not followed.
 	*/
 	void MoveToConfiguredPort();
+
+	/**
+		Stop the threads of the connections and wait for them: they use the component.
+	*/
+	void StopConnectionThreads();
 
 	/**
 		Listen on another port with the same server object: the sockets of the established connections belong to it.
@@ -183,6 +206,12 @@ private:
 		The server is started (on creation or by StartServer) and not stopped by StopServer: a new port is taken by it.
 	*/
 	std::atomic<bool> m_isStartRequested = false;
+
+	/**
+		The port of the server connection interface that the server has tried last, -1 before. A port that could not be listened on is
+		not tried again on each notification, only a changed one.
+	*/
+	int m_requestedPort = -1;
 };
 
 

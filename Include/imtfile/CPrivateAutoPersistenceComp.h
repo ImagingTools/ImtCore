@@ -30,8 +30,10 @@ namespace imtfile
 	Unlike ifile::CAutoPersistenceComp the data never go to the temporary folder of the system, where other accounts can create files:
 	the loader is given the file itself, it must replace the file as a whole and keep it private.
 	The own saves are not loaded again: \c SavedFileDigestProvider tells the digest of what the loader has written (usually the loader
-	itself), the file is not read back, another program could have changed it already. A special file in place of the file (a FIFO) is
-	not waited for.
+	itself), the file is not read back, another program could have changed it already. Without it the own saves are loaded again; only
+	the reload (\c AutoReload) needs it. A changed file is read for its digest only if the
+	loader takes it (IFilePersistence::IsOperationSupported() with the path to load): the private persistence does not take a file that
+	is not private. A file without a digest is loaded. A special file in place of the file (a FIFO) is not waited for.
 	\note The component has no interface: activate 'Automatically create instance' or initialize it explicitly.
 */
 class CPrivateAutoPersistenceComp:
@@ -52,7 +54,7 @@ public:
 		I_ASSIGN(m_objectCompPtr, "Object", "Object that is restored from the file and stored into it", true, "Object");
 		I_ASSIGN_TO(m_objectModelCompPtr, m_objectCompPtr, false);
 		I_ASSIGN(m_fileLoaderCompPtr, "FileLoader", "Persistence of the file that replaces it as a whole", true, "FileLoader");
-		I_ASSIGN(m_savedFileDigestProviderCompPtr, "SavedFileDigestProvider", "Digest of the contents that the file loader has saved: the own saves are not loaded again", true, "SavedFileDigestProvider");
+		I_ASSIGN(m_savedFileDigestProviderCompPtr, "SavedFileDigestProvider", "Digest of the contents that the file loader has saved: the own saves are not loaded again (AutoReload)", false, "SavedFileDigestProvider");
 		I_ASSIGN(m_filePathCompPtr, "FilePath", "File of the object", true, "FilePath");
 		I_ASSIGN_TO(m_filePathModelCompPtr, m_filePathCompPtr, false);
 		I_ASSIGN(m_restoreOnBeginAttrPtr, "RestoreOnBegin", "Restore the object from the file on begin", true, true);
@@ -73,6 +75,12 @@ protected:
 
 private:
 	QString GetFilePath() const;
+
+	/**
+		The digest of the file, empty if there is no loader, the loader does not take the file or it cannot be read.
+	*/
+	QByteArray GetLoadableFileDigest(const QString& filePath) const;
+
 	bool LoadObject();
 	bool StoreObject();
 

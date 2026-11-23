@@ -96,6 +96,11 @@ public:
 
 	mutable int saveCount = 0;
 
+	/**
+		The loads that reached the serializer: it opens the path that it gets.
+	*/
+	mutable int loadCount = 0;
+
 	// reimplemented (ifile::IFilePersistence)
 	bool IsOperationSupported(const istd::IChangeable* /*dataObjectPtr*/, const QString* /*filePathPtr*/, int /*flags*/, bool /*beQuiet*/) const override
 	{
@@ -104,6 +109,8 @@ public:
 
 	OperationState LoadFromFile(istd::IChangeable& data, const QString& filePath, ibase::IProgressManager* /*progressManagerPtr*/) const override
 	{
+		++loadCount;
+
 		QFile file(filePath);
 		if (!file.open(QIODevice::ReadOnly)){
 			return OS_FAILED;
@@ -167,6 +174,11 @@ public:
 		I_REGISTER_INTERFACE(ilog::IMessageConsumer);
 	I_END_COMPONENT;
 
+	/**
+		The warnings and the errors.
+	*/
+	std::atomic<int> problemCount{0};
+
 	// reimplemented (ilog::IMessageConsumer)
 	bool IsMessageSupported(int /*messageCategory*/, int /*messageId*/, const istd::IInformationProvider* /*messagePtr*/) const override
 	{
@@ -177,6 +189,10 @@ public:
 	{
 		if (messagePtr.IsValid()){
 			qWarning().noquote() << messagePtr->GetInformationDescription();
+
+			if (messagePtr->GetInformationCategory() >= istd::IInformationProvider::IC_WARNING){
+				++problemCount;
+			}
 		}
 	}
 };
@@ -285,18 +301,24 @@ typedef icomp::TSimComponentWrap<imtfile::CPrivateFilePersistenceComp> PrivatePe
 */
 struct SPersistence
 {
-	explicit SPersistence(const QString& path)
+	/**
+		\param areAdministratorsTrusted	the data of the computer (\c TrustAdministrators).
+		\param pathType					the type of the path of \c FilePath (ifile::IFileNameParam::PathType).
+	*/
+	explicit SPersistence(const QString& path, bool areAdministratorsTrusted = false, int pathType = ifile::IFileNameParam::PT_FILE)
 	{
 		log->InitComponent();
 
 		slave->InitComponent();
 
+		filePath->SetIntAttr("PathType", pathType);
 		filePath->InitComponent();
 		filePath->SetPath(path);
 
 		persistence.SetRef("Log", log);
 		persistence.SetRef("SlavePersistence", slave);
 		persistence.SetRef("FilePath", filePath);
+		persistence.SetBoolAttr("TrustAdministrators", areAdministratorsTrusted);
 		persistence.InitComponent();
 	}
 
@@ -359,6 +381,49 @@ struct SAutoPersistence
 	FilePath filePath;
 	PrivatePersistencePtr loader;
 	InterferedPersistence interferedLoader;
+	TextObject object;
+	PrivateAutoPersistence persistence;
+};
+
+
+/**
+	The automatic persistence of a composition that lacks references: the digests of the saves (\c SavedFileDigestProvider) and, if
+	\c hasLoader is \c false, the loader. The automatic persistence has its own log.
+*/
+struct SIncompleteAutoPersistence
+{
+	SIncompleteAutoPersistence(const QString& path, bool autoReload, bool hasLoader = true)
+	{
+		log->InitComponent();
+		loaderLog->InitComponent();
+
+		slave->InitComponent();
+
+		filePath->InitComponent();
+		filePath->SetPath(path);
+
+		loader->SetRef("Log", loaderLog);
+		loader->SetRef("SlavePersistence", slave);
+		loader->SetRef("FilePath", filePath);
+		loader->InitComponent();
+
+		object->InitComponent();
+
+		persistence.SetRef("Log", log);
+		persistence.SetRef("Object", object);
+		if (hasLoader){
+			persistence.SetRef("FileLoader", loader);
+		}
+		persistence.SetRef("FilePath", filePath);
+		persistence.SetBoolAttr("AutoReload", autoReload);
+		persistence.InitComponent();
+	}
+
+	TestLog log;
+	TestLog loaderLog;
+	TextPersistence slave;
+	FilePath filePath;
+	PrivatePersistencePtr loader;
 	TextObject object;
 	PrivateAutoPersistence persistence;
 };
@@ -531,6 +596,75 @@ bool IsOwnerOnly(const QString& path)
 	::LocalFree(descriptorPtr);
 
 	return retVal;
+}
+
+
+/**
+	The accounts of the entries that allow something, as SDDL.
+*/
+QStringList GetAccessSidStrings(const QString& path)
+{
+	QStringList retVal;
+
+	PACL daclPtr = nullptr;
+	PSECURITY_DESCRIPTOR descriptorPtr = nullptr;
+	const std::wstring nativePath = QDir::toNativeSeparators(path).toStdWString();
+	if (::GetNamedSecurityInfoW(nativePath.c_str(), SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, nullptr, nullptr, &daclPtr, nullptr, &descriptorPtr) != ERROR_SUCCESS){
+		return retVal;
+	}
+
+	for (DWORD index = 0; (daclPtr != nullptr) && (index < daclPtr->AceCount); ++index){
+		ACE_HEADER* headerPtr = nullptr;
+		LPWSTR sidStringPtr = nullptr;
+		if (		::GetAce(daclPtr, index, reinterpret_cast<LPVOID*>(&headerPtr)) &&
+					(headerPtr->AceType == ACCESS_ALLOWED_ACE_TYPE) &&
+					::ConvertSidToStringSidW(&reinterpret_cast<ACCESS_ALLOWED_ACE*>(headerPtr)->SidStart, &sidStringPtr)){
+			retVal.append(QString::fromWCharArray(sidStringPtr));
+
+			::LocalFree(sidStringPtr);
+		}
+	}
+
+	::LocalFree(descriptorPtr);
+
+	return retVal;
+}
+
+
+QString GetOwnerSidString(const QString& path)
+{
+	PSID ownerSidPtr = nullptr;
+	PSECURITY_DESCRIPTOR descriptorPtr = nullptr;
+	const std::wstring nativePath = QDir::toNativeSeparators(path).toStdWString();
+	if (::GetNamedSecurityInfoW(nativePath.c_str(), SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &ownerSidPtr, nullptr, nullptr, nullptr, &descriptorPtr) != ERROR_SUCCESS){
+		return QString();
+	}
+
+	QString retVal;
+
+	LPWSTR sidStringPtr = nullptr;
+	if (::ConvertSidToStringSidW(ownerSidPtr, &sidStringPtr)){
+		retVal = QString::fromWCharArray(sidStringPtr);
+
+		::LocalFree(sidStringPtr);
+	}
+
+	::LocalFree(descriptorPtr);
+
+	return retVal;
+}
+
+
+/**
+	The process has the rights of the administrators: the system, or an administrator started "as administrator".
+*/
+bool IsProcessAdministrator()
+{
+	BYTE administratorsSid[SECURITY_MAX_SID_SIZE];
+	DWORD size = sizeof(administratorsSid);
+	BOOL isMember = FALSE;
+
+	return ::CreateWellKnownSid(WinBuiltinAdministratorsSid, nullptr, administratorsSid, &size) && ::CheckTokenMembership(nullptr, administratorsSid, &isMember) && (isMember != FALSE);
 }
 
 
@@ -1039,6 +1173,194 @@ void CPrivateFilePersistenceTest::LoadRefusesSharedFolderTest()
 }
 
 
+// A file that does not exist is not given to the serializer: another account could put a file there before the serializer opens it
+void CPrivateFilePersistenceTest::LoadOfMissingFileDoesNotReachSlaveTest()
+{
+	QTemporaryDir root(GetTestRootTemplate());
+	QVERIFY(root.isValid());
+	QVERIFY(SetAccess(root.path(), A_OWNER_ONLY));
+	const QString filePath = root.filePath(QStringLiteral("Secrets.xml"));
+
+	SPersistence persistence(filePath);
+	CTextData loaded;
+	QCOMPARE(persistence.persistence.LoadFromFile(loaded), ifile::IFilePersistence::OS_FAILED);
+	QCOMPARE(persistence.slave->loadCount, 0);
+}
+
+
+// A link in place of the file is refused even if it leads nowhere: Qt takes it for no file, but another account could create what it
+// leads to before the serializer opens it
+void CPrivateFilePersistenceTest::LoadRefusesDanglingLinkTest()
+{
+#ifdef Q_OS_WIN
+	QSKIP("A link to a file needs a privilege on Windows");
+#else
+	QTemporaryDir root(GetTestRootTemplate());
+	QVERIFY(root.isValid());
+	QVERIFY(SetAccess(root.path(), A_OWNER_ONLY));
+	const QString filePath = root.filePath(QStringLiteral("Secrets.xml"));
+	const QString targetPath = root.filePath(QStringLiteral("Planted.xml"));
+	QVERIFY(QFile::link(targetPath, filePath));
+
+	SPersistence persistence(filePath);
+	CTextData loaded;
+	QCOMPARE(persistence.persistence.LoadFromFile(loaded), ifile::IFilePersistence::OS_FAILED);
+	QCOMPARE(persistence.slave->loadCount, 0);
+
+	// What the link leads to appears: the link is still refused
+	QVERIFY(WriteFile(targetPath, "planted"));
+	QVERIFY(SetAccess(targetPath, A_OWNER_ONLY));
+	QCOMPARE(persistence.persistence.LoadFromFile(loaded), ifile::IFilePersistence::OS_FAILED);
+	QCOMPARE(persistence.slave->loadCount, 0);
+	QVERIFY(loaded.text.isEmpty());
+#endif
+}
+
+
+// The question whether a file can be loaded is answered as the load answers it: the caller does not read a file that is not loaded
+void CPrivateFilePersistenceTest::OperationSupportChecksFileToLoadTest()
+{
+	QTemporaryDir root(GetTestRootTemplate());
+	QVERIFY(root.isValid());
+	QVERIFY(SetAccess(root.path(), A_OWNER_ONLY));
+	const QString filePath = root.filePath(QStringLiteral("Secrets.xml"));
+	const QString missingPath = root.filePath(QStringLiteral("Missing.xml"));
+	QVERIFY(WriteShared(filePath, "secret"));
+
+	SPersistence persistence(filePath);
+	CTextData data;
+	const int loadFlags = ifile::IFilePersistence::QF_LOAD | ifile::IFilePersistence::QF_FILE;
+	QVERIFY(!persistence.persistence.IsOperationSupported(&data, &filePath, loadFlags));
+
+	QVERIFY(SetAccess(filePath, A_OWNER_ONLY));
+	QVERIFY(persistence.persistence.IsOperationSupported(&data, &filePath, loadFlags));
+
+	// Nothing to load; the save checks the path itself
+	QVERIFY(!persistence.persistence.IsOperationSupported(&data, &missingPath, loadFlags));
+	QVERIFY(persistence.persistence.IsOperationSupported(&data, &missingPath, ifile::IFilePersistence::QF_SAVE | ifile::IFilePersistence::QF_FILE));
+	QCOMPARE(persistence.slave->loadCount, 0);
+}
+
+
+// The path of a folder (as the location of the system configuration gives it) is not taken for the file: the folder above it would be
+// the private one, the file would be put next to it
+void CPrivateFilePersistenceTest::FolderPathIsRefusedTest()
+{
+	QTemporaryDir root(GetTestRootTemplate());
+	QVERIFY(root.isValid());
+	QVERIFY(SetAccess(root.path(), A_OWNER_ONLY));
+	const QString folderPath = root.filePath(QStringLiteral("Settings.xml"));
+
+	SPersistence persistence(folderPath, false, ifile::IFileNameParam::PT_DIRECTORY);
+	CTextData data;
+	data.text = "secret";
+	QCOMPARE(persistence.persistence.SaveToFile(data), ifile::IFilePersistence::OS_FAILED);
+	QVERIFY(QDir(root.path()).entryList(QDir::AllEntries | QDir::Hidden | QDir::NoDotAndDotDot).isEmpty());
+}
+
+
+// The data of the computer that the system or an administrator saves are for the system and the administrators only, not for the account
+// that saves them: a service and the program of an administrator accept the files of each other. Another account keeps its access
+void CPrivateFilePersistenceTest::AdministratorsTrustedSaveTest()
+{
+#ifndef Q_OS_WIN
+	QSKIP("The access of the administrators is of Windows: on Unix the files belong to the account of the process");
+#else
+	QTemporaryDir root(GetTestRootTemplate());
+	QVERIFY(root.isValid());
+	const QString folderPath = root.filePath(QStringLiteral("Private"));
+	const QString filePath = folderPath + QStringLiteral("/Secrets.xml");
+	const QString systemSid = QStringLiteral("S-1-5-18");
+	const QString administratorsSid = QStringLiteral("S-1-5-32-544");
+
+	SPersistence persistence(filePath, true);
+	CTextData data;
+	data.text = "secret";
+	QCOMPARE(persistence.persistence.SaveToFile(data), ifile::IFilePersistence::OS_OK);
+	QVERIFY(IsOwnerOnly(folderPath));
+	QVERIFY(IsOwnerOnly(filePath));
+
+	const QString userSid = GetUserSidString();
+	for (const QString& path : {folderPath, filePath}){
+		const QStringList sids = GetAccessSidStrings(path);
+		QVERIFY2(sids.contains(systemSid) && sids.contains(administratorsSid), qPrintable(path + QStringLiteral(": ") + sids.join(QLatin1Char(' '))));
+
+		if (!IsProcessAdministrator()){
+			QVERIFY2(sids.contains(userSid), qPrintable(path + QStringLiteral(": ") + sids.join(QLatin1Char(' '))));
+		}
+		else if (userSid != systemSid){
+			QVERIFY2(!sids.contains(userSid), qPrintable(path + QStringLiteral(": ") + sids.join(QLatin1Char(' '))));
+			QCOMPARE(GetOwnerSidString(path), administratorsSid);
+		}
+	}
+
+	CTextData loaded;
+	QCOMPARE(persistence.persistence.LoadFromFile(loaded), ifile::IFilePersistence::OS_OK);
+	QCOMPARE(loaded.text, QByteArray("secret"));
+
+	// Without it the account that saves is in the list
+	const QString ownFilePath = root.filePath(QStringLiteral("Own/Secrets.xml"));
+	SPersistence ownPersistence(ownFilePath);
+	QCOMPARE(ownPersistence.persistence.SaveToFile(data), ifile::IFilePersistence::OS_OK);
+	QVERIFY(GetAccessSidStrings(ownFilePath).contains(userSid));
+#endif
+}
+
+
+// The missing folders above the private folder are not writable by the others whatever the umask is: with the umask 002 of the groups
+// of one user they would be writable by the group and refused right after they are created
+void CPrivateFilePersistenceTest::ParentFoldersIgnoreUmaskTest()
+{
+#ifdef Q_OS_WIN
+	QSKIP("The umask is of Unix");
+#else
+	QTemporaryDir root(GetTestRootTemplate());
+	QVERIFY(root.isValid());
+	const QString parentPath = root.filePath(QStringLiteral("Parent"));
+	const QString folderPath = parentPath + QStringLiteral("/Inner/Private");
+
+	const mode_t previousUmask = ::umask(002);
+	QString errorMessage;
+	const bool isCreated = imtfile::CPrivateFilePersistenceComp::EnsurePrivateFolder(folderPath, errorMessage);
+	::umask(previousUmask);
+
+	QVERIFY2(isCreated, qPrintable(errorMessage));
+	const QFileDevice::Permissions writePermissions = QFileDevice::WriteGroup | QFileDevice::WriteOther;
+	QCOMPARE(QFile::permissions(parentPath) & writePermissions, QFileDevice::Permissions());
+	QCOMPARE(QFile::permissions(parentPath + QStringLiteral("/Inner")) & writePermissions, QFileDevice::Permissions());
+	QVERIFY(IsOwnerOnly(folderPath));
+#endif
+}
+
+
+// A new folder does not take what its parent gives to the new folders (macOS: the inherited entries of the access list): the private
+// folder would be open from the start and refused
+void CPrivateFilePersistenceTest::NewFolderDropsInheritedAccessTest()
+{
+#ifndef Q_OS_MACOS
+	QSKIP("The inherited access list of a new folder is of macOS: on Windows the new folder has its own protected list");
+#else
+	QTemporaryDir root(GetTestRootTemplate());
+	QVERIFY(root.isValid());
+	const QString parentPath = root.filePath(QStringLiteral("Shared"));
+	QVERIFY(MakeFolder(parentPath, A_READABLE_BY_OTHERS));
+	QCOMPARE(QProcess::execute(QStringLiteral("/bin/chmod"), {QStringLiteral("+a"), QStringLiteral("everyone allow list,search,read,file_inherit,directory_inherit"), parentPath}), 0);
+
+	const QString folderPath = parentPath + QStringLiteral("/Inner/Private");
+	QString errorMessage;
+	QVERIFY2(imtfile::CPrivateFilePersistenceComp::EnsurePrivateFolder(folderPath, errorMessage), qPrintable(errorMessage));
+	QVERIFY(IsOwnerOnly(folderPath));
+
+	acl_t acl = ::acl_get_file(QFile::encodeName(parentPath + QStringLiteral("/Inner")).constData(), ACL_TYPE_EXTENDED);
+	if (acl != nullptr){
+		::acl_free(acl);
+
+		QFAIL("The new folder above the private folder has an access list");
+	}
+#endif
+}
+
+
 // The object is stored into the file itself: no copy in the temporary folder of the system, no working file left
 void CPrivateFilePersistenceTest::AutoPersistenceStoresInPlaceTest()
 {
@@ -1237,6 +1559,96 @@ void CPrivateFilePersistenceTest::AutoPersistenceIgnoresSpecialFileTest()
 	QVERIFY(elapsed < writerDelay);
 	QVERIFY(!isLoaded);
 #endif
+}
+
+
+// A file without a digest (it cannot be read for it) is not taken for the own one, also before the first load or save: the loader is
+// asked and tells why
+void CPrivateFilePersistenceTest::AutoPersistenceLoadsFileWithoutDigestTest()
+{
+#ifdef Q_OS_WIN
+	QSKIP("A file that its owner cannot read is made on Unix");
+#else
+	QTemporaryDir root(GetTestRootTemplate());
+	QVERIFY(root.isValid());
+	QVERIFY(SetAccess(root.path(), A_OWNER_ONLY));
+	const QString folderPath = root.filePath(QStringLiteral("Private"));
+	QVERIFY(MakeFolder(folderPath, A_OWNER_ONLY));
+	const QString filePath = folderPath + QStringLiteral("/Secrets.xml");
+
+	SAutoPersistence persistence(filePath, true, false);
+	QCOMPARE(persistence.slave->loadCount, 0);
+
+	// Another program puts a file that cannot be read yet: it is made next to the folder, so that it appears at once
+	const QString readyPath = root.filePath(QStringLiteral("Ready.xml"));
+	QVERIFY(WriteFile(readyPath, "other"));
+	QVERIFY(::chmod(QFile::encodeName(readyPath).constData(), 0) == 0);
+	QVERIFY(QFile::rename(readyPath, filePath));
+
+	QTRY_VERIFY_WITH_TIMEOUT(persistence.slave->loadCount > 0, 5000);
+#endif
+}
+
+
+// Without the digests of the saves the object is still stored: only the own saves are loaded again
+void CPrivateFilePersistenceTest::AutoPersistenceStoresWithoutDigestProviderTest()
+{
+	QTemporaryDir root(GetTestRootTemplate());
+	QVERIFY(root.isValid());
+	const QString filePath = root.filePath(QStringLiteral("Private/Secrets.xml"));
+
+	SIncompleteAutoPersistence persistence(filePath, false);
+	{
+		istd::CChangeNotifier notifier(&*persistence.object);
+		persistence.object->text = "secret";
+	}
+
+	QCOMPARE(ReadFile(filePath), QByteArray("secret"));
+}
+
+
+// Only the reload needs the digests of the saves: without it the composition without them is not warned about
+void CPrivateFilePersistenceTest::AutoPersistenceWarnsWithoutDigestProviderOnlyForReloadTest()
+{
+	QTemporaryDir root(GetTestRootTemplate());
+	QVERIFY(root.isValid());
+	const QString filePath = root.filePath(QStringLiteral("Private/Secrets.xml"));
+
+	{
+		SIncompleteAutoPersistence persistence(filePath, false);
+		QCOMPARE(persistence.log->problemCount.load(), 0);
+	}
+
+	{
+		SIncompleteAutoPersistence persistence(filePath, true);
+		QCOMPARE(persistence.log->problemCount.load(), 1);
+	}
+}
+
+
+// A composition without the loader does not fail when another program changes the file: nothing is read or loaded
+void CPrivateFilePersistenceTest::AutoPersistenceWithoutLoaderIgnoresChangesTest()
+{
+	QTemporaryDir root(GetTestRootTemplate());
+	QVERIFY(root.isValid());
+	const QString filePath = root.filePath(QStringLiteral("Private/Secrets.xml"));
+
+	SPersistence otherProgram(filePath);
+	CTextData data;
+	data.text = "other";
+	QCOMPARE(otherProgram.persistence.SaveToFile(data), ifile::IFilePersistence::OS_OK);
+
+	SIncompleteAutoPersistence persistence(filePath, true, false);
+
+	// The complete automatic persistence of the same file tells when the change is noticed
+	SAutoPersistence witness(filePath, true, false);
+
+	data.text = "again";
+	QCOMPARE(otherProgram.persistence.SaveToFile(data), ifile::IFilePersistence::OS_OK);
+	QTRY_COMPARE(witness.object->text, QByteArray("again"));
+	QTest::qWait(200);
+
+	QVERIFY(persistence.object->text.isEmpty());
 }
 
 

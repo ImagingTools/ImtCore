@@ -3,6 +3,7 @@
 
 
 // Qt includes
+#include <QtNetwork/QSslConfiguration>
 #include <QtNetwork/QTcpServer>
 #include <QtNetwork/QTcpSocket>
 
@@ -119,10 +120,29 @@ private:
 	bool EnsureServerStarted();
 
 	/**
-		Listen on the port of the server connection interface, if it is another one and the server is to work (started on creation or
-		by StartServer and not stopped). When the new port cannot be listened on, the server stays on the previous port.
+		Get the encryption that the SSL configuration asks for.
+		\return \c false if it is asked for, but cannot be made.
+	*/
+	bool GetSecureConnection(bool& isSecure, QSslConfiguration& sslConfiguration) const;
+
+	/**
+		Set the encryption of the next connections as the SSL configuration asks.
+		\return \c false if it is asked for, but cannot be made: the server must not listen then.
+	*/
+	bool ApplySecureConnection();
+
+	/**
+		Listen on the port of the server connection interface, if the port is changed and the server is to work (started on creation or
+		by StartServer and not stopped). When the new port cannot be listened on, the server stays on the previous port. A port of the
+		system (0) or of no protocol (-1) is not followed.
 	*/
 	void MoveToConfiguredPort();
+
+	/**
+		Start the server again with the changed SSL configuration, if the server is to work. The same configuration (the settings are
+		loaded again) changes nothing.
+	*/
+	void RestartForSslConfiguration();
 
 private Q_SLOTS:
 	void OnNewThreadConnection(const IRequest* request, const QByteArray& subCommandId);
@@ -156,6 +176,12 @@ private:
 		The server is started (on creation or by StartServer) and not stopped by StopServer: a new port is taken by it.
 	*/
 	std::atomic<bool> m_isStartRequested = false;
+
+	/**
+		The port of the server connection interface that the server has tried last, -1 before. A port that could not be listened on is
+		not tried again on each notification, only a changed one.
+	*/
+	int m_requestedPort = -1;
 };
 
 

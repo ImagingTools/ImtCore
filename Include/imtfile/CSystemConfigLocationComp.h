@@ -36,7 +36,7 @@ public:
 
 	/**
 		Get the configuration folder of the application for the whole computer, from the names of the company and of the application.
-		The names of QCoreApplication are not used and not changed. Empty, if the system has no such folder.
+		The names of QCoreApplication are not used and not changed. Empty, if the system has no such folder or neither name is given.
 	*/
 	static QString GetSystemConfigPath(const QString& companyName, const QString& applicationName);
 

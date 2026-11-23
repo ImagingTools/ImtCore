@@ -24,6 +24,7 @@
 #include <climits>
 #include <cstdio>
 #include <cstring>
+#include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #ifdef Q_OS_MACOS
@@ -121,6 +122,45 @@ SidBuffer GetProcessUserSid()
 std::vector<SidBuffer> GetPrivateSids()
 {
 	return {GetProcessUserSid(), GetWellKnownSid(WinLocalSystemSid), GetWellKnownSid(WinBuiltinAdministratorsSid)};
+}
+
+
+/**
+	The process has the rights of the administrators: it works as the system or as an administrator with the full rights (a program
+	started "as administrator"). An administrator without them (the usual start under UAC) does not.
+*/
+bool IsAdministrator()
+{
+	const SidBuffer administratorsSid = GetWellKnownSid(WinBuiltinAdministratorsSid);
+	BOOL isMember = FALSE;
+
+	return !administratorsSid.empty() && ::CheckTokenMembership(nullptr, const_cast<BYTE*>(administratorsSid.data()), &isMember) && (isMember != FALSE);
+}
+
+
+/**
+	The process works as the system.
+*/
+bool IsSystem()
+{
+	const SidBuffer userSid = GetProcessUserSid();
+	const SidBuffer systemSid = GetWellKnownSid(WinLocalSystemSid);
+
+	return !userSid.empty() && !systemSid.empty() && ::EqualSid(const_cast<BYTE*>(userSid.data()), const_cast<BYTE*>(systemSid.data()));
+}
+
+
+/**
+	The accounts that get access to the new private folders and files. The data of the computer (\c areAdministratorsTrusted) that the
+	system or an administrator creates are for the system and the administrators only: the same whoever of them creates them.
+*/
+std::vector<SidBuffer> GetCreatorSids(bool areAdministratorsTrusted)
+{
+	if (areAdministratorsTrusted && IsAdministrator()){
+		return {GetWellKnownSid(WinLocalSystemSid), GetWellKnownSid(WinBuiltinAdministratorsSid)};
+	}
+
+	return GetPrivateSids();
 }
 
 
@@ -235,12 +275,12 @@ bool CheckSecurity(const QString& path, bool isPrivate, QString& errorMessage)
 
 
 /**
-	The access list of the account of the process, the system and the administrators only, \c nullptr if it cannot be made. Free it
-	with LocalFree.
+	The access list of the account of the process, the system and the administrators only (see GetCreatorSids()), \c nullptr if it
+	cannot be made. Free it with LocalFree.
 */
-PACL CreatePrivateAcl(DWORD inheritance)
+PACL CreatePrivateAcl(DWORD inheritance, bool areAdministratorsTrusted)
 {
-	const std::vector<SidBuffer> sids = GetPrivateSids();
+	const std::vector<SidBuffer> sids = GetCreatorSids(areAdministratorsTrusted);
 
 	std::vector<EXPLICIT_ACCESSW> entries;
 	for (const SidBuffer& sid : sids){
@@ -268,12 +308,34 @@ PACL CreatePrivateAcl(DWORD inheritance)
 
 
 /**
-	Create a folder (\c isFolder) or a new empty file with the private access list: the access of the parent folder is not inherited.
-	A file or a link with this name is not opened.
+	Create a folder or a new empty file with the given security.
 */
-bool CreatePrivateEntry(const QString& path, bool isFolder)
+bool CreateEntry(const std::wstring& nativePath, bool isFolder, SECURITY_DESCRIPTOR& descriptor)
 {
-	PACL aclPtr = CreatePrivateAcl(isFolder ? SUB_CONTAINERS_AND_OBJECTS_INHERIT : NO_INHERITANCE);
+	SECURITY_ATTRIBUTES attributes = {sizeof(SECURITY_ATTRIBUTES), &descriptor, FALSE};
+	if (isFolder){
+		return ::CreateDirectoryW(nativePath.c_str(), &attributes) != 0;
+	}
+
+	const HANDLE fileHandle = ::CreateFileW(nativePath.c_str(), GENERIC_WRITE, 0, &attributes, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, nullptr);
+	if (fileHandle == INVALID_HANDLE_VALUE){
+		return false;
+	}
+
+	::CloseHandle(fileHandle);
+
+	return true;
+}
+
+
+/**
+	Create a folder (\c isFolder) or a new empty file with the private access list: the access of the parent folder is not inherited.
+	A file or a link with this name is not opened. The data of the computer (\c areAdministratorsTrusted) that an administrator creates
+	belong to the administrators: the other administrators and the system accept them.
+*/
+bool CreatePrivateEntry(const QString& path, bool isFolder, bool areAdministratorsTrusted)
+{
+	PACL aclPtr = CreatePrivateAcl(isFolder ? SUB_CONTAINERS_AND_OBJECTS_INHERIT : NO_INHERITANCE, areAdministratorsTrusted);
 	if (aclPtr == nullptr){
 		return false;
 	}
@@ -284,17 +346,25 @@ bool CreatePrivateEntry(const QString& path, bool isFolder)
 				::SetSecurityDescriptorDacl(&descriptor, TRUE, aclPtr, FALSE) &&
 				::SetSecurityDescriptorControl(&descriptor, SE_DACL_PROTECTED, SE_DACL_PROTECTED);
 	if (retVal){
-		SECURITY_ATTRIBUTES attributes = {sizeof(SECURITY_ATTRIBUTES), &descriptor, FALSE};
 		const std::wstring nativePath = QDir::toNativeSeparators(path).toStdWString();
-		if (isFolder){
-			retVal = ::CreateDirectoryW(nativePath.c_str(), &attributes) != 0;
+
+		// The administrators usually own what an administrator creates already, but the policy of the computer can make the account
+		// the owner: then the others would refuse it. The system owns what it creates
+		SidBuffer administratorsSid;
+		if (areAdministratorsTrusted && IsAdministrator() && !IsSystem()){
+			administratorsSid = GetWellKnownSid(WinBuiltinAdministratorsSid);
+		}
+
+		if (!administratorsSid.empty() && ::SetSecurityDescriptorOwner(&descriptor, administratorsSid.data(), FALSE)){
+			retVal = CreateEntry(nativePath, isFolder, descriptor);
+
+			// The account may be not allowed to give the administrators what it creates: the owner is chosen by the system then
+			if (!retVal && (::GetLastError() == ERROR_INVALID_OWNER)){
+				retVal = ::SetSecurityDescriptorOwner(&descriptor, nullptr, FALSE) && CreateEntry(nativePath, isFolder, descriptor);
+			}
 		}
 		else{
-			const HANDLE fileHandle = ::CreateFileW(nativePath.c_str(), GENERIC_WRITE, 0, &attributes, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, nullptr);
-			retVal = fileHandle != INVALID_HANDLE_VALUE;
-			if (retVal){
-				::CloseHandle(fileHandle);
-			}
+			retVal = CreateEntry(nativePath, isFolder, descriptor);
 		}
 	}
 
@@ -350,9 +420,31 @@ bool CheckFile(const QString& filePath, QString& errorMessage)
 /**
 	Create a new empty file with its own private access list: what its folder would give to the new files is not taken.
 */
-bool CreatePrivateFile(const QString& filePath)
+bool CreatePrivateFile(const QString& filePath, bool areAdministratorsTrusted)
 {
-	return CreatePrivateEntry(filePath, false);
+	return CreatePrivateEntry(filePath, false, areAdministratorsTrusted);
+}
+
+
+bool CreateFolder(const QString& folderPath, bool areAdministratorsTrusted)
+{
+	return CreatePrivateEntry(folderPath, true, areAdministratorsTrusted);
+}
+
+
+/**
+	Something is at the path: a file, a folder, a link (also one that leads nowhere) or an entry that cannot be checked.
+*/
+bool IsEntryPresent(const QString& path)
+{
+	const std::wstring nativePath = QDir::toNativeSeparators(path).toStdWString();
+	if (::GetFileAttributesW(nativePath.c_str()) != INVALID_FILE_ATTRIBUTES){
+		return true;
+	}
+
+	const DWORD errorCode = ::GetLastError();
+
+	return (errorCode != ERROR_FILE_NOT_FOUND) && (errorCode != ERROR_PATH_NOT_FOUND);
 }
 
 
@@ -380,11 +472,43 @@ QString GetErrorText(DWORD errorCode)
 
 
 /**
+	Write the data of the file from the cache to the disk.
+*/
+bool FlushFile(const QString& filePath, QString& errorMessage)
+{
+	const std::wstring nativePath = QDir::toNativeSeparators(filePath).toStdWString();
+	const HANDLE fileHandle = ::CreateFileW(nativePath.c_str(), GENERIC_WRITE, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+	if (fileHandle == INVALID_HANDLE_VALUE){
+		errorMessage = QStringLiteral("The file '%1' cannot be written to the disk: %2").arg(filePath, GetErrorText(::GetLastError()));
+
+		return false;
+	}
+
+	const bool retVal = ::FlushFileBuffers(fileHandle) != 0;
+	if (!retVal){
+		errorMessage = QStringLiteral("The file '%1' cannot be written to the disk: %2").arg(filePath, GetErrorText(::GetLastError()));
+	}
+
+	::CloseHandle(fileHandle);
+
+	return retVal;
+}
+
+
+/**
+	The replacement of a file is written to the disk by the replacement itself (MOVEFILE_WRITE_THROUGH).
+*/
+void FlushFolder(const QString& /*folderPath*/)
+{
+}
+
+
+/**
 	Replace the file by the new one. Another program can keep the file open for a moment and not allow to delete it, for example an
 	antivirus or the indexer checks a file that has just been written: then the replacement is tried again for a while. A save waits
 	for it at most \c maxWaitMs.
 */
-bool ReplaceFile(const QString& sourcePath, const QString& targetPath, QString& errorMessage)
+bool ReplacePrivateFile(const QString& sourcePath, const QString& targetPath, QString& errorMessage)
 {
 	const qint64 maxWaitMs = 1000;
 	const unsigned long retryDelayMs = 20;
@@ -703,7 +827,7 @@ bool CheckFile(const QString& filePath, QString& errorMessage)
 /**
 	Create a new empty file that only its owner can read and write. A file or a link with this name is not opened.
 */
-bool CreatePrivateFile(const QString& filePath)
+bool CreatePrivateFile(const QString& filePath, bool /*areAdministratorsTrusted*/)
 {
 	const QFileDevice::Permissions ownerPermissions = QFileDevice::ReadOwner | QFileDevice::WriteOwner;
 
@@ -725,9 +849,101 @@ bool CreatePrivateFile(const QString& filePath)
 
 
 /**
+	Create a folder with the mode at once: the umask can only take rights away. On macOS what the parent gives to the new folders (its
+	inherited access list) is removed: the access list gives its rights before the mode.
+*/
+bool CreateFolderWithMode(const QString& folderPath, mode_t mode)
+{
+	const QByteArray nativePath = QFile::encodeName(folderPath);
+	if (::mkdir(nativePath.constData(), mode) != 0){
+		return false;
+	}
+
+#ifdef Q_OS_MACOS
+	acl_t acl = ::acl_init(0);
+	if (acl == nullptr){
+		return false;
+	}
+
+	// A file system without the access lists has nothing to remove
+	const bool retVal = (::acl_set_file(nativePath.constData(), ACL_TYPE_EXTENDED, acl) == 0) || (errno == ENOTSUP) || (errno == EOPNOTSUPP);
+
+	::acl_free(acl);
+
+	return retVal;
+#else
+	return true;
+#endif
+}
+
+
+bool CreateFolder(const QString& folderPath, bool /*areAdministratorsTrusted*/)
+{
+	return CreateFolderWithMode(folderPath, 0700);
+}
+
+
+/**
+	Something is at the path: a file, a folder, a link (also one that leads nowhere) or an entry that cannot be checked.
+*/
+bool IsEntryPresent(const QString& path)
+{
+	struct stat info;
+
+	return (::lstat(QFile::encodeName(path).constData(), &info) == 0) || ((errno != ENOENT) && (errno != ENOTDIR));
+}
+
+
+/**
+	Write the data of a file or the entries of a folder from the cache to the disk: on macOS fsync leaves them in the cache of the disk.
+*/
+bool Flush(const QString& path)
+{
+	const int descriptor = ::open(QFile::encodeName(path).constData(), O_RDONLY | O_CLOEXEC);
+	if (descriptor < 0){
+		return false;
+	}
+
+#ifdef Q_OS_MACOS
+	const bool retVal = (::fcntl(descriptor, F_FULLFSYNC) == 0) || (::fsync(descriptor) == 0);
+#else
+	const bool retVal = ::fsync(descriptor) == 0;
+#endif
+
+	::close(descriptor);
+
+	return retVal;
+}
+
+
+bool FlushFile(const QString& filePath, QString& errorMessage)
+{
+	if (!Flush(filePath)){
+		const int errorCode = errno;
+
+		errorMessage = QStringLiteral("The file '%1' cannot be written to the disk: %2 (error %3)").arg(filePath, QString::fromLocal8Bit(std::strerror(errorCode))).arg(errorCode);
+
+		return false;
+	}
+
+	return true;
+}
+
+
+/**
+	The new entry of the folder (the replaced file) is written to the disk. Some file systems cannot do it for a folder: the file is
+	replaced anyway.
+*/
+void FlushFolder(const QString& folderPath)
+{
+	Flush(folderPath);
+}
+
+
+/**
 	Replace the file by the new one: the file that other programs have open is replaced as well.
 */
-bool ReplaceFile(const QString& sourcePath, const QString& targetPath, QString& errorMessage)
+bool ReplacePrivateFile(const QString& sourcePath, const QString& targetPath, QString& errorMessage)
 {
 	if (::rename(QFile::encodeName(sourcePath).constData(), QFile::encodeName(targetPath).constData()) != 0){
 		const int errorCode = errno;
@@ -749,34 +965,27 @@ bool ReplaceFile(const QString& sourcePath, const QString& targetPath, QString& 
 */
 bool CreateParentFolders(const QString& folderPath)
 {
-#if !defined(Q_OS_WIN) && (QT_VERSION >= QT_VERSION_CHECK(6, 3, 0))
-	const QFileDevice::Permissions parentPermissions =
-				QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner |
-				QFileDevice::ReadGroup | QFileDevice::ExeGroup |
-				QFileDevice::ReadOther | QFileDevice::ExeOther;
-
+#ifdef Q_OS_WIN
+	return QDir().mkpath(folderPath);
+#else
 	for (const QString& path : GetFolderChain(folderPath)){
-		if (!QFileInfo::exists(path) && !QDir().mkdir(path, parentPermissions)){
+		// Another program can create the folder meanwhile
+		if (!QFileInfo::exists(path) && !CreateFolderWithMode(path, 0755) && !QFileInfo(path).isDir()){
 			return false;
 		}
 	}
 
 	return true;
-#else
-	return QDir().mkpath(folderPath);
 #endif
 }
 
 
-bool CreateFolder(const QString& folderPath)
+/**
+	The file and its folder are private, no other account can replace a folder on the way to them.
+*/
+bool CheckFileToLoad(const QString& filePath, QString& errorMessage)
 {
-#if defined(Q_OS_WIN)
-	return CreatePrivateEntry(folderPath, true);
-#elif QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
-	return QDir().mkdir(folderPath, QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner);
-#else
-	return QDir().mkdir(folderPath) && QFile::setPermissions(folderPath, QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner);
-#endif
+	return CheckFolderChain(QFileInfo(filePath).absolutePath(), true, errorMessage) && CheckFile(filePath, errorMessage);
 }
 
 
@@ -789,7 +998,7 @@ namespace imtfile
 
 // public static methods
 
-bool CPrivateFilePersistenceComp::EnsurePrivateFolder(const QString& folderPath, QString& errorMessage)
+bool CPrivateFilePersistenceComp::EnsurePrivateFolder(const QString& folderPath, QString& errorMessage, bool areAdministratorsTrusted)
 {
 	const QString absolutePath = QDir::cleanPath(QFileInfo(folderPath).absoluteFilePath());
 	if (!QFileInfo::exists(absolutePath)){
@@ -816,7 +1025,7 @@ bool CPrivateFilePersistenceComp::EnsurePrivateFolder(const QString& folderPath,
 			return false;
 		}
 
-		if (!CreateFolder(absolutePath)){
+		if (!CreateFolder(absolutePath, areAdministratorsTrusted)){
 			errorMessage = QStringLiteral("The folder '%1' cannot be created for its owner only").arg(absolutePath);
 
 			return false;
@@ -857,7 +1066,24 @@ bool CPrivateFilePersistenceComp::IsOperationSupported(
 			int flags,
 			bool beQuiet) const
 {
-	return m_slavePersistenceCompPtr.IsValid() && m_slavePersistenceCompPtr->IsOperationSupported(dataObjectPtr, filePathPtr, flags, beQuiet);
+	if (!m_slavePersistenceCompPtr.IsValid()){
+		return false;
+	}
+
+	// The file to load is checked as LoadFromFile() checks it: the caller does not read a file that is not loaded
+	if ((filePathPtr != nullptr) && ((flags & (QF_LOAD | QF_SAVE)) == QF_LOAD)){
+		QString path;
+		QString errorMessage;
+		if (!GetPrivatePath(*filePathPtr, path, errorMessage) || !IsEntryPresent(path) || !CheckFileToLoad(path, errorMessage)){
+			if (!beQuiet && !errorMessage.isEmpty()){
+				SendErrorMessage(0, QStringLiteral("The file is not loaded: %1").arg(errorMessage));
+			}
+
+			return false;
+		}
+	}
+
+	return m_slavePersistenceCompPtr->IsOperationSupported(dataObjectPtr, filePathPtr, flags, beQuiet);
 }
 
 
@@ -874,7 +1100,14 @@ ifile::IFilePersistence::OperationState CPrivateFilePersistenceComp::LoadFromFil
 		return OS_FAILED;
 	}
 
-	if (QFileInfo::exists(path) && (!CheckFolderChain(QFileInfo(path).absolutePath(), true, errorMessage) || !CheckFile(path, errorMessage))){
+	// The slave does not get a path where nothing is: another account could put a file or a link there before the slave opens it
+	if (!IsEntryPresent(path)){
+		SendWarningMessage(0, QStringLiteral("The file '%1' does not exist").arg(path));
+
+		return OS_FAILED;
+	}
+
+	if (!CheckFileToLoad(path, errorMessage)){
 		SendErrorMessage(0, QStringLiteral("The file '%1' is not loaded: %2").arg(path, errorMessage));
 
 		return OS_FAILED;
@@ -891,7 +1124,8 @@ ifile::IFilePersistence::OperationState CPrivateFilePersistenceComp::SaveToFile(
 {
 	QString path;
 	QString errorMessage;
-	if (!GetPrivatePath(filePath, path, errorMessage) || !EnsurePrivateFolder(QFileInfo(path).absolutePath(), errorMessage)){
+	const bool areAdministratorsTrusted = *m_trustAdministratorsAttrPtr;
+	if (!GetPrivatePath(filePath, path, errorMessage) || !EnsurePrivateFolder(QFileInfo(path).absolutePath(), errorMessage, areAdministratorsTrusted)){
 		SendErrorMessage(0, QStringLiteral("The data are not saved: %1").arg(errorMessage));
 
 		return OS_FAILED;
@@ -906,7 +1140,7 @@ ifile::IFilePersistence::OperationState CPrivateFilePersistenceComp::SaveToFile(
 		workingPath += QLatin1Char('.') + fileInfo.suffix();
 	}
 
-	if (!CreatePrivateFile(workingPath)){
+	if (!CreatePrivateFile(workingPath, areAdministratorsTrusted)){
 		SendErrorMessage(0, QStringLiteral("The data are not saved: the file '%1' cannot be created for its owner only").arg(workingPath));
 
 		return OS_FAILED;
@@ -932,12 +1166,15 @@ ifile::IFilePersistence::OperationState CPrivateFilePersistenceComp::SaveToFile(
 
 			retVal = OS_FAILED;
 		}
+		else if (!FlushFile(workingPath, errorMessage)){
+			retVal = OS_FAILED;
+		}
 		else{
 			// The replacement and its digest are published together: the digest of a concurrent save cannot be overwritten by an
 			// older one
 			QMutexLocker locker(&m_savedDigestsMutex);
 
-			if (ReplaceFile(workingPath, path, errorMessage)){
+			if (ReplacePrivateFile(workingPath, path, errorMessage)){
 				m_savedDigests[path] = digest;
 			}
 			else{
@@ -945,7 +1182,10 @@ ifile::IFilePersistence::OperationState CPrivateFilePersistenceComp::SaveToFile(
 			}
 		}
 
-		if (retVal != OS_OK){
+		if (retVal == OS_OK){
+			FlushFolder(fileInfo.absolutePath());
+		}
+		else{
 			SendErrorMessage(0, QStringLiteral("The data are not saved: %1").arg(errorMessage));
 		}
 	}
@@ -985,6 +1225,13 @@ bool CPrivateFilePersistenceComp::GetPrivatePath(const QString& filePath, QStrin
 	const QString targetPath = m_filePathCompPtr->GetPath();
 	if (targetPath.isEmpty()){
 		errorMessage = QStringLiteral("The file has no path");
+
+		return false;
+	}
+
+	// The private folder would be the folder above it, the file would be put next to it
+	if (m_filePathCompPtr->GetPathType() == ifile::IFileNameParam::PT_DIRECTORY){
+		errorMessage = QStringLiteral("'%1' is the path of a folder: the persistence needs the path of a file").arg(targetPath);
 
 		return false;
 	}

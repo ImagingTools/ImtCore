@@ -33,6 +33,13 @@ private slots:
 	void SavedFileDigestTest();
 	void LoadRefusesSharedFileTest();
 	void LoadRefusesSharedFolderTest();
+	void LoadOfMissingFileDoesNotReachSlaveTest();
+	void LoadRefusesDanglingLinkTest();
+	void OperationSupportChecksFileToLoadTest();
+	void FolderPathIsRefusedTest();
+	void AdministratorsTrustedSaveTest();
+	void ParentFoldersIgnoreUmaskTest();
+	void NewFolderDropsInheritedAccessTest();
 	void AutoPersistenceStoresInPlaceTest();
 	void AutoPersistenceReloadTest();
 	void AutoPersistenceStoresWholeObjectChangeTest();
@@ -40,6 +47,10 @@ private slots:
 	void AutoPersistenceWatchesFolderCreatedByOtherProgramTest();
 	void AutoPersistenceReloadsChangeAfterOwnSaveTest();
 	void AutoPersistenceIgnoresSpecialFileTest();
+	void AutoPersistenceLoadsFileWithoutDigestTest();
+	void AutoPersistenceStoresWithoutDigestProviderTest();
+	void AutoPersistenceWarnsWithoutDigestProviderOnlyForReloadTest();
+	void AutoPersistenceWithoutLoaderIgnoresChangesTest();
 	void SystemConfigPathTest();
 };
 
