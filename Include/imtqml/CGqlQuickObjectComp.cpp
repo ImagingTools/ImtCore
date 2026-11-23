@@ -25,7 +25,10 @@ bool CGqlQuickObjectComp::InitializeEngine(QQmlEngine& qmlEngine) const
 {
 	// The item does not exist yet, so SetBaseUrl() cannot reach the engine through it. Requests sent while the
 	// root item is created (Component.onCompleted) would otherwise go to the default base URL - the local folder of the application.
-	qmlEngine.setBaseUrl(CalculateBaseUrl());
+	const QString baseUrl = CalculateBaseUrl();
+	if (!baseUrl.isEmpty()){
+		qmlEngine.setBaseUrl(baseUrl);
+	}
 
 	return true;
 }
