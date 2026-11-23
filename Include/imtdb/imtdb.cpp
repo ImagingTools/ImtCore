@@ -6,6 +6,8 @@
 #include <QtCore/QTimeZone>
 #include <QtCore/QUuid>
 #include <QtCore/QVariant>
+#include <QtSql/QSqlError>
+#include <QtSql/QSqlQuery>
 
 
 namespace imtdb
@@ -164,6 +166,46 @@ void GetTimeFilterBounds(const imtbase::ITimeFilterParam& timeFilter, const QDat
 		begin = AddTimeUnits(end, unit, -1);
 		break;
 	}
+}
+
+
+bool AddTenantTypeColumn(const IDatabaseEngine& databaseEngine, const QString& tableName)
+{
+	const QByteArray driverId = databaseEngine.GetDatabaseDriverId();
+
+	// SQLite has no ADD COLUMN IF NOT EXISTS
+	if (driverId.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0){
+		QSqlError columnsError;
+		QSqlQuery columnsQuery = databaseEngine.ExecSqlQuery(QStringLiteral("PRAGMA table_info(%1)").arg(tableName).toUtf8(), &columnsError);
+		if (columnsError.type() != QSqlError::NoError || !columnsQuery.isActive()){
+			return false;
+		}
+
+		bool hasTenantType = false;
+		while (columnsQuery.next()){
+			hasTenantType = hasTenantType || columnsQuery.value(QStringLiteral("name")).toString() == QStringLiteral("TenantType");
+		}
+		columnsQuery.finish();
+
+		if (hasTenantType){
+			return true;
+		}
+
+		QSqlError alterError;
+		databaseEngine.ExecSqlQuery(QStringLiteral(R"(ALTER TABLE %1 ADD COLUMN "TenantType" INTEGER NOT NULL DEFAULT 0)").arg(tableName).toUtf8(), &alterError);
+
+		return alterError.type() == QSqlError::NoError;
+	}
+
+	// DuckDB takes no constraint in ADD COLUMN
+	const bool isDuckDb = driverId.contains("DUCK");
+	const QString query = QStringLiteral(R"(ALTER TABLE %1 ADD COLUMN IF NOT EXISTS "TenantType" INTEGER %2DEFAULT 0)")
+				.arg(tableName, isDuckDb ? QString() : QStringLiteral("NOT NULL "));
+
+	QSqlError alterError;
+	databaseEngine.ExecSqlQuery(query.toUtf8(), &alterError);
+
+	return alterError.type() == QSqlError::NoError;
 }
 
 

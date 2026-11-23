@@ -117,6 +117,7 @@ void CDocumentShareTest::testTenantFilter_DefaultsSelectOwnDocuments()
 	imtauth::CTenantFilterParam filter;
 
 	QCOMPARE(filter.GetSharingScope(), imtauth::SS_OWN);
+	QCOMPARE(filter.GetTenantType(), imtbase::TT_ORGANIZATION);
 	QCOMPARE(filter.GetMinimumAccessLevel(), imtauth::IDocumentShareInfo::DAL_VIEW);
 	QVERIFY(!filter.IsGroupRestrictionEnabled());
 	QVERIFY(filter.GetUserGroupIds().isEmpty());
@@ -127,6 +128,7 @@ void CDocumentShareTest::testTenantFilter_SerializeRoundTrip()
 {
 	imtauth::CTenantFilterParam source;
 	source.SetTenantId("tenant-1");
+	source.SetTenantType(imtbase::TT_USER);
 	source.SetSharingScope(imtauth::SS_INCOMING);
 	source.SetMinimumAccessLevel(imtauth::IDocumentShareInfo::DAL_EDIT);
 	source.SetUserGroupIds(QByteArrayList{"group-1", "group-2"}, true);
@@ -135,6 +137,7 @@ void CDocumentShareTest::testTenantFilter_SerializeRoundTrip()
 	QVERIFY(DeserializeFromBytes(target, SerializeToBytes(source)));
 
 	QCOMPARE(target.GetTenantId(), QByteArray("tenant-1"));
+	QCOMPARE(target.GetTenantType(), imtbase::TT_USER);
 	QCOMPARE(target.GetSharingScope(), imtauth::SS_INCOMING);
 	QCOMPARE(target.GetMinimumAccessLevel(), imtauth::IDocumentShareInfo::DAL_EDIT);
 	QCOMPARE(target.GetUserGroupIds(), QByteArrayList({"group-1", "group-2"}));
@@ -164,6 +167,12 @@ void CDocumentShareTest::testTenantFilter_SerializationDiffersBySharing()
 	// Users of different groups must not share a cached selection
 	QVERIFY(SerializeToBytes(groupFilter) != SerializeToBytes(otherGroupFilter));
 	QVERIFY(SerializeToBytes(groupFilter) != SerializeToBytes(scopeFilter));
+
+	// A personal space must not share a cached selection with an organization of the same ID
+	imtauth::CTenantFilterParam userFilter;
+	QVERIFY(userFilter.CopyFrom(baseFilter));
+	userFilter.SetTenantType(imtbase::TT_USER);
+	QVERIFY(SerializeToBytes(userFilter) != baseData);
 }
 
 
@@ -171,6 +180,7 @@ void CDocumentShareTest::testTenantFilter_CopyFrom()
 {
 	imtauth::CTenantFilterParam source;
 	source.SetTenantId("tenant-1");
+	source.SetTenantType(imtbase::TT_USER);
 	source.SetFilterMode(imtauth::TFM_EXCLUDE);
 	source.SetSharingScope(imtauth::SS_OUTGOING);
 	source.SetMinimumAccessLevel(imtauth::IDocumentShareInfo::DAL_OWNER);
@@ -178,9 +188,11 @@ void CDocumentShareTest::testTenantFilter_CopyFrom()
 
 	imtauth::CTenantFilterParam target;
 	QVERIFY(target.CopyFrom(source));
+	QCOMPARE(target.GetTenantType(), imtbase::TT_USER);
 	QCOMPARE(SerializeToBytes(target), SerializeToBytes(source));
 
 	QVERIFY(target.ResetData());
+	QCOMPARE(target.GetTenantType(), imtbase::TT_ORGANIZATION);
 	QCOMPARE(target.GetSharingScope(), imtauth::SS_OWN);
 	QVERIFY(!target.IsGroupRestrictionEnabled());
 }

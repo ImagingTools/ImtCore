@@ -279,6 +279,16 @@ QString SqlValue(double value, bool useDefaultIfEmpty = false);
 void GetTimeFilterBounds(const imtbase::ITimeFilterParam& timeFilter, const QDateTime& now, QDateTime& begin, QDateTime& end);
 
 
+/**
+ * \brief Adds the column "TenantType" to an existing table of tenant entity bindings that was created without it.
+ *
+ * \param databaseEngine  The engine of the database holding the table.
+ * \param tableName       The quoted table name, with the schema if any (e.g. "TenantEntityBindings").
+ * \return False if the columns could not be read or the column could not be added.
+ */
+bool AddTenantTypeColumn(const IDatabaseEngine& databaseEngine, const QString& tableName);
+
+
 } // namespace imtdb
 
 

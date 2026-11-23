@@ -24,6 +24,7 @@
 #include <iqt/ITranslationManager.h>
 #include <iqt/iqt.h>
 #include <imtgql/CGqlRequest.h>
+#include <imtgql/imtgql.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Permissions.h>
 #include <imtauthgql/CAssignmentCollector.h>
@@ -978,8 +979,9 @@ inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const QByteArray& te
 /**
 	Create an optional tenant filter param from the GQL request context.
 	Returns nullptr when no request context is available.
-	When tenant id is empty (NoOrganization), returns an empty-tenant filter so
-	storage delegates can apply no-organization isolation (NOT EXISTS binding).
+	The filter selects the data of the tenant of the context (\see imtgql::GetDataTenantId):
+	the organization of the session, otherwise the personal space of the user.
+	A context without a tenant gives an empty-tenant filter (no-organization isolation, NOT EXISTS binding).
 	The returned pointer is owned by the caller (ParamsSet takes ownership via SetEditableParameter).
 */
 inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRequest& gqlRequest)
@@ -989,8 +991,12 @@ inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRe
 		return nullptr;
 	}
 
+	imtbase::TenantType tenantType = imtbase::TT_ORGANIZATION;
+	const QByteArray tenantId = imtgql::GetDataTenantId(*gqlContextPtr, tenantType);
+
 	imtauth::CTenantFilterParam* tenantFilterPtr = new imtauth::CTenantFilterParam();
-	tenantFilterPtr->SetTenantId(gqlContextPtr->GetTenantId());
+	tenantFilterPtr->SetTenantId(tenantId);
+	tenantFilterPtr->SetTenantType(tenantType);
 
 	// Owner and superuser see every document shared with the organization, regardless of the target groups
 	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
@@ -1097,7 +1103,7 @@ inline bool ShouldKeepEntityForTenant(
 
 	bool isRead = true;
 	const bool retVal = tenantId.isEmpty()
-				? !bindingManager->HasAnyTenantBinding(entityType, entityId, &isRead)
+				? !bindingManager->HasOrganizationBinding(entityType, entityId, &isRead)
 				: bindingManager->HasBinding(tenantId, entityType, entityId, &isRead);
 	if (!isRead && isCompletePtr != nullptr){
 		*isCompletePtr = false;

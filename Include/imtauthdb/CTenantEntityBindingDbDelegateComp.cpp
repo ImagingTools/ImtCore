@@ -203,6 +203,20 @@ bool CTenantEntityBindingDbDelegateComp::SetCollectionItemMetaInfoFromRecord(
 }
 
 
+// reimplemented (icomp::CComponentBase)
+
+void CTenantEntityBindingDbDelegateComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	// The table may come from before the column; the lookups by the tenant type need it
+	const QString tableName = QString::fromUtf8(GetTableName());
+	if (m_databaseEngineCompPtr.IsValid() && TableExists(tableName) && !imtdb::AddTenantTypeColumn(*m_databaseEngineCompPtr, QStringLiteral(R"("%1")").arg(tableName))){
+		SendErrorMessage(0, QStringLiteral("The column 'TenantType' could not be added to the table '%1'").arg(tableName));
+	}
+}
+
+
 idoc::MetaInfoPtr CTenantEntityBindingDbDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
 {
 	idoc::MetaInfoPtr metaInfoPtr(new idoc::CStandardDocumentMetaInfo);

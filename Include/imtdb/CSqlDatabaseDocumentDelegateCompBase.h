@@ -57,7 +57,7 @@ public:
 		I_REGISTER_INTERFACE(imtbase::IRevisionController);
 		I_REGISTER_INTERFACE(imtdb::IDependentMetaInfoController);
 		I_ASSIGN(m_useDataMetaInfoAttrPtr, "UseDataMetaInfo", "If true - documents will be searched and sorted by the 'DataMetaInfo' column,\n else - otherwise according to the contents of the 'Document' column", true, false);
-		I_ASSIGN(m_useTenantEntityBindingsAttrPtr, "UseTenantEntityBindings", "If true - the delegate auto-creates bindings in TenantEntityBindings on object insert/update and applies tenant binding filters. Set false (e.g. for Users) to disable auto-binding creation and binding-based tenant filters (global list view).", true, true);
+		I_ASSIGN(m_useTenantEntityBindingsAttrPtr, "UseTenantEntityBindings", "If true - the documents are isolated by tenant: a new document is bound to the organization of the session, outside of organizations to the user, and the lists show only the documents of that tenant. Set false (e.g. for Users) for a collection without isolation.", true, true);
 		I_ASSIGN_MULTI_0(m_documentFactoriesCompPtr, "DocumentFactories", "Factory list used for creation of the new document instance according to the given type-ID", true);
 		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Creator of metainformation of object data", false, "MetaInfoCreator");
 		I_ASSIGN(m_jsonBasedMetaInfoDelegateCompPtr, "JsonBasedMetaInfoDelegate", "Delegate for converting document metainfo to JSON representation", false, "JsonBasedMetaInfoDelegate");

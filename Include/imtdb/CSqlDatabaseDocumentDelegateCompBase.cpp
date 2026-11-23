@@ -1250,6 +1250,12 @@ void CSqlDatabaseDocumentDelegateCompBase::EnsureTenantBindingTableExists() cons
 		return;
 	}
 
+	if (!AddTenantTypeColumn(*m_databaseEngineCompPtr, CreateTenantBindingTableName())){
+		qWarning() << __FILE__ << __LINE__
+					<< "\n\t| TenantType column could not be added to TenantEntityBindings";
+		return;
+	}
+
 	m_tenantBindingTableInitialized = true;
 }
 
@@ -1337,8 +1343,10 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateTenantBindingInsertQuery(
 	}
 
 	QByteArray ownerId;
+	imtbase::TenantType tenantType = imtbase::TT_ORGANIZATION;
 	if (operationContextPtr != nullptr){
 		ownerId = operationContextPtr->GetOperationOwnerId().id;
+		tenantType = operationContextPtr->GetTenantType();
 	}
 
 	const QByteArray databaseDriverId = m_databaseEngineCompPtr.IsValid() ? m_databaseEngineCompPtr->GetDatabaseDriverId() : QByteArray();
@@ -1350,17 +1358,18 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateTenantBindingInsertQuery(
 			? QString()
 			: QStringLiteral(R"( ON CONFLICT ("TenantId", "EntityType", "EntityId") DO NOTHING)");
 
-	const QString query = QStringLiteral(R"(%1 %2 ("Id", "TenantId", "EntityType", "EntityId", "CreatedAt", "CreatedByUserId") VALUES ('%3', '%4', '%5', '%6', '%7', %8)%9;)")
+	const QString query = QStringLiteral(R"(%1 %2 ("Id", "TenantId", "TenantType", "EntityType", "EntityId", "CreatedAt", "CreatedByUserId") VALUES ('%3', '%4', %5, '%6', '%7', '%8', %9)%10;)")
 								.arg(
 									/*1*/ conflictClause,
 									/*2*/ CreateTenantBindingTableName(),
 									/*3*/ QUuid::createUuid().toString(QUuid::WithoutBraces),
 									/*4*/ SqlEncode(tenantId),
-									/*5*/ SqlEncode(GetTableName()),
-									/*6*/ SqlEncode(entityId),
-									/*7*/ QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs),
-									/*8*/ ownerId.isEmpty() ? QStringLiteral("NULL") : QStringLiteral("'%1'").arg(SqlEncode(ownerId)),
-									/*9*/ onConflictClause
+									/*5*/ QString::number(static_cast<int>(tenantType)),
+									/*6*/ SqlEncode(GetTableName()),
+									/*7*/ SqlEncode(entityId),
+									/*8*/ QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs),
+									/*9*/ ownerId.isEmpty() ? QStringLiteral("NULL") : QStringLiteral("'%1'").arg(SqlEncode(ownerId)),
+									/*10*/ onConflictClause
 								);
 
 	EnsureTenantBindingTableExists();
@@ -1403,9 +1412,12 @@ QString CSqlDatabaseDocumentDelegateCompBase::CreateDocumentShareTableName() con
 
 QString CSqlDatabaseDocumentDelegateCompBase::CreateTenantFilterQuery(const imtauth::ITenantFilterParam& tenantFilter) const
 {
-	const QByteArray tenantId = tenantFilter.GetTenantId();
+	const imtbase::TenantType tenantType = tenantFilter.GetTenantType();
 	const imtauth::TenantFilterMode filterMode = tenantFilter.GetFilterMode();
 	const bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
+
+	// A collection without isolation has no personal spaces; an organization still reaches its own filter (e.g. the members of Users)
+	const QByteArray tenantId = (tenantType == imtbase::TT_USER && !useTenantBindings) ? QByteArray() : tenantFilter.GetTenantId();
 
 	if (useTenantBindings || !tenantId.isEmpty()){
 		EnsureTenantBindingTableExists();
@@ -1428,6 +1440,22 @@ QString CSqlDatabaseDocumentDelegateCompBase::CreateTenantFilterQuery(const imta
 					+ QStringLiteral(R"( AND COALESCE(tenantBindings."TenantId", '') <> '' AND tenantBindings."TenantId" <> ')") + SqlEncode(tenantId) + '\'';
 
 		accessibleFilterQuery = QStringLiteral("(%1) OR NOT EXISTS (%2)").arg(ownFilterQuery, foreignBindingsLookup);
+	}
+
+	// A user shares no documents and receives none
+	if (tenantType == imtbase::TT_USER){
+		switch (sharingScope){
+		case imtauth::SS_ACCESSIBLE:
+			return accessibleFilterQuery;
+		case imtauth::SS_INCOMING:
+		case imtauth::SS_OUTGOING:
+			return QStringLiteral("1 = 0");
+		case imtauth::SS_OWN:
+		case imtauth::SS_ALL:
+			break;
+		}
+
+		return ownFilterQuery;
 	}
 
 	if (sharingScope != imtauth::SS_OWN && !EnsureDocumentShareTableExists()){
@@ -1506,6 +1534,7 @@ QString CSqlDatabaseDocumentDelegateCompBase::CreateReceivedDocumentFilterQuery(
 
 	const bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
 	if (		!useTenantBindings ||
+				tenantFilterPtr->GetTenantType() != imtbase::TT_ORGANIZATION ||
 				tenantFilterPtr->GetTenantId().isEmpty() ||
 				tenantFilterPtr->GetFilterMode() == imtauth::TFM_EXCLUDE ||
 				tenantFilterPtr->GetSharingScope() == imtauth::SS_OWN ||

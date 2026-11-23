@@ -410,7 +410,9 @@ sdl::V1_0::imtauth::CSetProfileResponse CProfileControllerComp::OnSetProfile(
 			operationContext.SetOperationOwnerId(ownerInfo);
 		}
 
-		operationContext.SetTenantId(gqlContextPtr->GetTenantId());
+		imtbase::TenantType tenantType = imtbase::TT_ORGANIZATION;
+		const QByteArray tenantId = imtgql::GetDataTenantId(*gqlContextPtr, tenantType);
+		operationContext.SetTenantId(tenantId, tenantType);
 	}
 
 	if (m_userChangeGeneratorCompPtr.IsValid()){

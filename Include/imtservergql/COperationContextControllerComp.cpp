@@ -7,6 +7,7 @@
 #include <imtauth/CUserInfo.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/IGqlRequestProvider.h>
+#include <imtgql/imtgql.h>
 
 
 namespace imtservergql
@@ -59,8 +60,9 @@ imtbase::IOperationContext* COperationContextControllerComp::CreateOperationCont
 
 	operationContextPtr->SetOperationOwnerId(objectInfo);
 
-	QByteArray tenantId = requestContextPtr->GetTenantId();
-	operationContextPtr->SetTenantId(tenantId);
+	imtbase::TenantType tenantType = imtbase::TT_ORGANIZATION;
+	const QByteArray tenantId = imtgql::GetDataTenantId(*requestContextPtr, tenantType);
+	operationContextPtr->SetTenantId(tenantId, tenantType);
 
 	if (m_documentChangeGeneratorCompPtr.IsValid()){
 		imtbase::CObjectCollection* changeCollectionPtr = dynamic_cast<imtbase::CObjectCollection*>(operationContextPtr->GetChangesCollection());

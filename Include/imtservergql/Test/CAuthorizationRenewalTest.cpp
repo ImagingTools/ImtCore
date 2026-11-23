@@ -762,7 +762,7 @@ public:
 		return isReadable && bindings.contains(tenantId + '/' + entityType + '/' + entityId);
 	}
 	QByteArrayList GetEntityIds(const QByteArray&, const QByteArray&) const override { return QByteArrayList(); }
-	bool HasAnyTenantBinding(const QByteArray& entityType, const QByteArray& entityId, bool* isReadPtr) const override
+	bool HasOrganizationBinding(const QByteArray& entityType, const QByteArray& entityId, bool* isReadPtr) const override
 	{
 		if (isReadPtr != nullptr){
 			*isReadPtr = isReadable;

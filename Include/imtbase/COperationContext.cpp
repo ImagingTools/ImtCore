@@ -17,6 +17,7 @@ namespace imtbase
 // public methods
 
 COperationContext::COperationContext()
+	:m_tenantType(TT_ORGANIZATION)
 {
 	typedef istd::TSingleFactory<istd::IChangeable, imtbase::COperationDescription> FactoryOperationDescriptionImpl;
 	m_changesCollection.RegisterFactory<FactoryOperationDescriptionImpl>("OperationInfo");
@@ -33,12 +34,13 @@ void COperationContext::SetOperationOwnerId(const imtbase::IOperationContext::Id
 }
 
 
-void COperationContext::SetTenantId(const QByteArray& tenantId)
+void COperationContext::SetTenantId(const QByteArray& tenantId, TenantType tenantType)
 {
-	if (m_tenantId != tenantId){
+	if (m_tenantId != tenantId || m_tenantType != tenantType){
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_tenantId = tenantId;
+		m_tenantType = tenantType;
 	}
 }
 
@@ -64,6 +66,12 @@ imtbase::IOperationContext::IdentifableObjectInfo COperationContext::GetOperatio
 QByteArray COperationContext::GetTenantId() const
 {
 	return m_tenantId;
+}
+
+
+TenantType COperationContext::GetTenantType() const
+{
+	return m_tenantType;
 }
 
 
