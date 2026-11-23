@@ -46,6 +46,8 @@ Different application profiles register different resolvers for the same storage
 
 In a composition, `ImtCorePck/StorageResolverRegistry` is the registry: the resolver at each position of `StorageResolvers` serves the storage ID at the same position of `StorageIds`.
 The component becomes the application-wide provider when it is created, so it must be created at the start, for example as a component to initialize.
+The default provider is one per process: a second registry component replaces the first one and logs a warning, so an application has exactly one.
+The component logs an error if `StorageIds` and `StorageResolvers` differ in count.
 `ImtCorePck/CollectionStorageResolver` is the resolver over the collection given by `ObjectCollection`.
 `InsertObject()` takes the type-ID of the new object from the caller, as `IObjectCollection::InsertNewObject()` does, so one resolver serves a collection of several object types.
 

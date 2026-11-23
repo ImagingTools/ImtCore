@@ -3,7 +3,7 @@
 
 
 // ACF includes
-#include <icomp/CComponentBase.h>
+#include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
 #include <imtbase/CStorageResolverRegistry.h>
@@ -21,11 +21,11 @@ namespace imtbase
 	\ingroup Collection
 */
 class CStorageResolverRegistryComp:
-			public icomp::CComponentBase,
+			public ilog::CLoggerComponentBase,
 			public CStorageResolverRegistry
 {
 public:
-	using BaseClass = icomp::CComponentBase;
+	using BaseClass = ilog::CLoggerComponentBase;
 
 	I_BEGIN_COMPONENT(CStorageResolverRegistryComp);
 		I_REGISTER_INTERFACE(IStorageResolverProvider);
