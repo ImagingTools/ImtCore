@@ -16,7 +16,32 @@ class Window extends Item {
     $componentComplete(){
         super.$componentComplete()
         this.$showTopLevel()
+        this.$followPage()
         if(this.$ownVisible) this.requestActivate()
+    }
+    // A window of the page is as large as the page, as QQuickView sizes the root to the window: the size the platform
+    // gives a window whose document sets none (Qt: the default geometry of the platform window, here the viewport),
+    // following the page as it is resized. A width or height set by the document is the size it asks for and is kept.
+    $followPage(){
+        let page = this.$parent
+        if(this.$pageOf === page) return
+        for(let link of this.$pageLinks || []) engine.disconnect(link.source, link.signal, link.fn, null, this)
+        this.$pageLinks = null
+        this.$pageOf = null
+        if(!(page instanceof Item) || !this.$isTopLevel() || this.$f & engine.DESTROYED) return
+        this.$pageOf = page
+        this.$pageLinks = []
+        for(let [id, signal, bit] of [[Item.WIDTH, Item.SIGNAL_widthChanged, 1], [Item.HEIGHT, Item.SIGNAL_heightChanged, 2]]){
+            if(this.$explicit & bit) continue
+            let fn = () => {
+                if(this.$explicit & bit || this.$pageOf !== page) return
+                this.$implicitWrite = true
+                try { this.$write(id, page.$v[id]) } finally { this.$implicitWrite = false }
+            }
+            engine.connect(page, signal, fn, null, engine.PRIORITY_NORMAL, this)
+            this.$pageLinks.push({ source: page, signal, fn })
+            fn()
+        }
     }
     // a top-level window (made with no parent: Qt.createComponent(...).createObject(null), a C++ QQmlComponent::create of
     // main.cpp) is a window of the screen in Qt: here it goes on the page, as the root object does
@@ -29,6 +54,7 @@ class Window extends Item {
     show(){
         this.visible = true
         this.$showTopLevel()
+        this.$followPage()
         this.requestActivate()
     }
     hide(){ this.visible = false }
@@ -47,7 +73,10 @@ class Window extends Item {
             return
         }
         super.$write(id, value)
-        if(id === Item.VISIBLE && this.$f & engine.COMPLETED) this.$showTopLevel()
+        if(id === Item.VISIBLE && this.$f & engine.COMPLETED){
+            this.$showTopLevel()
+            this.$followPage()
+        }
     }
 
     // a window of the page: not inside an item of the document (the root object, or one made with no parent)
