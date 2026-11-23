@@ -27,7 +27,7 @@
 #include <imtbase/CStorageResolverRegistry.h>
 #include <imtbase/CStorageResolverRegistryComp.h>
 #include <imtbase/CCollectionStorageResolverComp.h>
-#include <imtbase/StorageLink.h>
+#include <imtbase/TStorageLink.h>
 
 
 namespace
@@ -75,7 +75,7 @@ class COtherTestData: public istd::IChangeable
 };
 
 
-typedef imtbase::StorageLink<CLinkTestData> DataLink;
+typedef imtbase::TStorageLink<CLinkTestData> DataLink;
 typedef istd::TSingleFactory<istd::IChangeable, CLinkTestData> DataFactory;
 using MemoryResolverComp	= icomp::TMakeComponentWrap<imtbase::CMemoryStorageResolver, imtbase::IStorageResolver>;
 using RegistryComp			= icomp::TSimComponentWrap<imtbase::CStorageResolverRegistryComp>;
@@ -112,13 +112,13 @@ void SetupCollection(imtbase::CObjectCollection& collection)
 
 void CStorageLinkTest::initTestCase()
 {
-	imtbase::StorageLinkBase::SetDefaultResolverProvider(nullptr);
+	imtbase::CStorageLinkBase::SetDefaultResolverProvider(nullptr);
 }
 
 
 void CStorageLinkTest::cleanupTestCase()
 {
-	imtbase::StorageLinkBase::SetDefaultResolverProvider(nullptr);
+	imtbase::CStorageLinkBase::SetDefaultResolverProvider(nullptr);
 }
 
 
@@ -259,7 +259,7 @@ void CStorageLinkTest::testResolverPriority()
 
 	imtbase::CStorageResolverRegistry defaultRegistry;
 	defaultRegistry.RegisterResolver(&defaultStorage);
-	imtbase::StorageLinkBase::SetDefaultResolverProvider(&defaultRegistry);
+	imtbase::CStorageLinkBase::SetDefaultResolverProvider(&defaultRegistry);
 
 	DataLink link(QByteArrayLiteral("someId"));
 	QVERIFY(link.GetResolver() == &defaultStorage);
@@ -273,7 +273,7 @@ void CStorageLinkTest::testResolverPriority()
 	link.SetResolver(nullptr);
 	QVERIFY(link.GetResolver() == &providerStorage);
 
-	imtbase::StorageLinkBase::SetDefaultResolverProvider(nullptr);
+	imtbase::CStorageLinkBase::SetDefaultResolverProvider(nullptr);
 }
 
 
@@ -288,12 +288,12 @@ void CStorageLinkTest::testDefaultProvider()
 	DataLink link(objectId);
 	QVERIFY(link.GetObject().GetPtr() == nullptr);
 
-	imtbase::StorageLinkBase::SetDefaultResolverProvider(&registry);
-	QVERIFY(imtbase::StorageLinkBase::GetDefaultResolverProvider() == &registry);
+	imtbase::CStorageLinkBase::SetDefaultResolverProvider(&registry);
+	QVERIFY(imtbase::CStorageLinkBase::GetDefaultResolverProvider() == &registry);
 
 	QCOMPARE(link->m_value, 42);
 
-	imtbase::StorageLinkBase::SetDefaultResolverProvider(nullptr);
+	imtbase::CStorageLinkBase::SetDefaultResolverProvider(nullptr);
 }
 
 
@@ -329,7 +329,7 @@ void CStorageLinkTest::testTypeMismatch()
 
 	QVERIFY(!link.GetObject().IsValid());
 
-	imtbase::StorageLink<COtherTestData> otherLink(objectId);
+	imtbase::TStorageLink<COtherTestData> otherLink(objectId);
 	otherLink.SetResolver(&storage);
 
 	QVERIFY(otherLink.GetObject().IsValid());
@@ -550,7 +550,7 @@ void CStorageLinkTest::testRegistryComponent()
 	registryPtr->InitComponent();
 
 	// The created registry is the application-wide provider of the links
-	QVERIFY(imtbase::StorageLinkBase::GetDefaultResolverProvider() == registryPtr.get());
+	QVERIFY(imtbase::CStorageLinkBase::GetDefaultResolverProvider() == registryPtr.get());
 
 	DataLink link(objectId, QByteArrayLiteral("images"));
 	QCOMPARE(link->m_value, 3);
@@ -561,7 +561,7 @@ void CStorageLinkTest::testRegistryComponent()
 
 	// The destroyed registry is not the provider anymore
 	registryPtr.reset();
-	QVERIFY(imtbase::StorageLinkBase::GetDefaultResolverProvider() == nullptr);
+	QVERIFY(imtbase::CStorageLinkBase::GetDefaultResolverProvider() == nullptr);
 	QVERIFY(link.GetResolver() == nullptr);
 }
 

@@ -20,7 +20,7 @@ namespace imtbase
 	Interface for resolving of the stored objects by their IDs.
 	The resolver encapsulates the knowledge about the place and the way of the object storing
 	(in-memory container, object collection, database, external storage etc.).
-	It is used by imtbase::StorageLink to access the linked objects.
+	It is used by imtbase::TStorageLink to access the linked objects.
 	\ingroup Collection
 */
 class IStorageResolver: virtual public istd::IPolymorphic

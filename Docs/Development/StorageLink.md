@@ -1,13 +1,13 @@
-# StorageLink
+# TStorageLink
 
-`imtbase::StorageLink<T>` is a typed link to an object stored somewhere else (object collection, memory, database, external storage).
+`imtbase::TStorageLink<T>` is a typed link to an object stored somewhere else (object collection, memory, database, external storage).
 The data model keeps only the link; the way of storing is chosen at run time by a storage resolver.
 
 ## Parts
 
 | Type | Role |
 |---|---|
-| `StorageLink<T>` / `StorageLinkBase` | The link. Serializes only the object ID and the logical storage ID. `->` returns the object, loading it on demand. |
+| `TStorageLink<T>` / `CStorageLinkBase` | The link. Serializes only the object ID and the logical storage ID. `->` returns the object, loading it on demand. |
 | `IStorageResolver` | Loads, saves, inserts and removes objects by ID and reports storage parameters. |
 | `IStorageResolverProvider` | Returns a resolver by the logical storage ID. |
 | `CStorageResolverRegistry` | Provider implementation filled by the application. |
@@ -22,7 +22,7 @@ A link finds its resolver in this order:
 
 1. `SetResolver()` on the link.
 2. `SetResolverProvider()` on the link.
-3. The application-wide provider set with `StorageLinkBase::SetDefaultResolverProvider()`.
+3. The application-wide provider set with `CStorageLinkBase::SetDefaultResolverProvider()`.
 
 An empty storage ID selects the default resolver of the provider. An unknown non-empty storage ID is not resolved at all.
 The resolver binding is run-time state: it is not serialized and must be restored after loading.
@@ -33,9 +33,9 @@ imtbase::CCollectionStorageResolver addressResolver(addresses, "Address");
 
 imtbase::CStorageResolverRegistry registry;
 registry.RegisterResolver(&addressResolver);
-imtbase::StorageLinkBase::SetDefaultResolverProvider(&registry);
+imtbase::CStorageLinkBase::SetDefaultResolverProvider(&registry);
 
-imtbase::StorageLink<CAddress> link(addressId);
+imtbase::TStorageLink<CAddress> link(addressId);
 if (link){
 	link->SetCity("Berlin");
 	link.Save();
@@ -74,7 +74,7 @@ So an existing ID field can become a link without changing the stored data. `Ser
 
 ## Optional-like interface
 
-`StorageLink<T>` follows `std::optional<T>`:
+`TStorageLink<T>` follows `std::optional<T>`:
 
 | Member | Meaning |
 |---|---|
