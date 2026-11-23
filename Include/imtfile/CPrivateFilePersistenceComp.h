@@ -127,7 +127,8 @@ private:
 	I_REF(ifile::IFileNameParam, m_filePathCompPtr);
 
 	/**
-		The digests of the last saves by the path of the file. The saves can run in several threads.
+		The digests of the last saves by the path of the file. The saves can run in several threads: the mutex is held across the
+		replacement of the file and the publication of its digest, they stay in the same order.
 	*/
 	mutable QMutex m_savedDigestsMutex;
 	mutable QMap<QString, QByteArray> m_savedDigests;

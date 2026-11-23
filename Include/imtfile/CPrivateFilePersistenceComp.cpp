@@ -932,13 +932,17 @@ ifile::IFilePersistence::OperationState CPrivateFilePersistenceComp::SaveToFile(
 
 			retVal = OS_FAILED;
 		}
-		else if (!ReplaceFile(workingPath, path, errorMessage)){
-			retVal = OS_FAILED;
-		}
 		else{
+			// The replacement and its digest are published together: the digest of a concurrent save cannot be overwritten by an
+			// older one
 			QMutexLocker locker(&m_savedDigestsMutex);
 
-			m_savedDigests[path] = digest;
+			if (ReplaceFile(workingPath, path, errorMessage)){
+				m_savedDigests[path] = digest;
+			}
+			else{
+				retVal = OS_FAILED;
+			}
 		}
 
 		if (retVal != OS_OK){

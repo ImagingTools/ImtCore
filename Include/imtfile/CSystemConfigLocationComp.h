@@ -31,14 +31,14 @@ public:
 	I_BEGIN_COMPONENT(CSystemConfigLocationComp);
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_REGISTER_INTERFACE(ifile::IFileNameParam);
-		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info: the names of the company and of the application", false, "ApplicationInfo");
+		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info: the names of the company and of the application (the ones of QCoreApplication if not set)", false, "ApplicationInfo");
 	I_END_COMPONENT;
 
 	/**
-		Get the configuration folder of the application for the whole computer, from the names of the company and of the application
-		of QCoreApplication. Empty, if the system has no such folder.
+		Get the configuration folder of the application for the whole computer, from the names of the company and of the application.
+		The names of QCoreApplication are not used and not changed. Empty, if the system has no such folder.
 	*/
-	static QString GetSystemConfigPath();
+	static QString GetSystemConfigPath(const QString& companyName, const QString& applicationName);
 
 	// reimplemented (ifile::IFileNameParam)
 	virtual int GetPathType() const override;

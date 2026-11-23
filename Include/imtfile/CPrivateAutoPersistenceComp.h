@@ -77,13 +77,14 @@ private:
 	bool StoreObject();
 
 	/**
-		Watch the file and its folder: a file that is replaced (renamed over) is watched again.
+		Watch the file and its folder: a file that is replaced (renamed over) is watched again. Until the folder exists, its nearest
+		existing ancestor is watched: the folder created (also again, after it has been deleted) by another program is noticed.
 	*/
 	void WatchFile();
 
 	/**
-		Watch the file and its folder that a save has created: before they existed there was nothing to watch. In the thread of the
-		watcher, it is not thread safe.
+		Watch the file and its folder that a save has created: before they existed only an ancestor of the folder was watched. In the
+		thread of the watcher, it is not thread safe.
 	*/
 	void WatchCreatedFile();
 

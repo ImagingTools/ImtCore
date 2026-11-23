@@ -1137,6 +1137,33 @@ void CPrivateFilePersistenceTest::AutoPersistenceWatchesCreatedFolderTest()
 }
 
 
+// The folder of the file does not exist on begin and nothing is stored: the folder and the file created by another program are
+// loaded, also when the folder is deleted and created again
+void CPrivateFilePersistenceTest::AutoPersistenceWatchesFolderCreatedByOtherProgramTest()
+{
+	QTemporaryDir root(GetTestRootTemplate());
+	QVERIFY(root.isValid());
+	const QString folderPath = root.filePath(QStringLiteral("Settings/Private"));
+	const QString filePath = folderPath + QStringLiteral("/Secrets.xml");
+
+	SAutoPersistence persistence(filePath, true, false);
+	QVERIFY(!QFileInfo::exists(folderPath));
+
+	SPersistence otherProgram(filePath);
+	CTextData data;
+	data.text = "other";
+	QCOMPARE(otherProgram.persistence.SaveToFile(data), ifile::IFilePersistence::OS_OK);
+	QTRY_COMPARE(persistence.object->text, QByteArray("other"));
+
+	QVERIFY(QDir(folderPath).removeRecursively());
+	QTest::qWait(500);
+
+	data.text = "again";
+	QCOMPARE(otherProgram.persistence.SaveToFile(data), ifile::IFilePersistence::OS_OK);
+	QTRY_COMPARE(persistence.object->text, QByteArray("again"));
+}
+
+
 // Another program writes the file right after the own save, before the saver could read it back: its contents are loaded, they are
 // not taken for the own ones
 void CPrivateFilePersistenceTest::AutoPersistenceReloadsChangeAfterOwnSaveTest()
@@ -1218,15 +1245,16 @@ void CPrivateFilePersistenceTest::SystemConfigPathTest()
 {
 	const QString organizationName = QCoreApplication::organizationName();
 	const QString applicationName = QCoreApplication::applicationName();
-	QCoreApplication::setOrganizationName(QStringLiteral("TestCompany"));
-	QCoreApplication::setApplicationName(QStringLiteral("Test Application"));
 
-	const QString path = imtfile::CSystemConfigLocationComp::GetSystemConfigPath();
-	const QString userConfigPath = QDir::cleanPath(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation));
-	const QString userDataPath = QDir::cleanPath(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+	const QString path = imtfile::CSystemConfigLocationComp::GetSystemConfigPath(QStringLiteral("TestCompany"), QStringLiteral("Test Application"));
 
-	QCoreApplication::setOrganizationName(organizationName);
-	QCoreApplication::setApplicationName(applicationName);
+	// The identity of the whole application is not changed: QStandardPaths and QSettings keep their folders
+	QCOMPARE(QCoreApplication::organizationName(), organizationName);
+	QCOMPARE(QCoreApplication::applicationName(), applicationName);
+
+	const QString applicationPath = QStringLiteral("/TestCompany/Test Application");
+	const QString userConfigPath = QDir::cleanPath(QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation)) + applicationPath;
+	const QString userDataPath = QDir::cleanPath(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation)) + applicationPath;
 
 	QVERIFY(path != userConfigPath && path != userDataPath);
 	QVERIFY(!path.contains(QStringLiteral("/Users/Public"), Qt::CaseInsensitive));
@@ -1241,11 +1269,7 @@ void CPrivateFilePersistenceTest::SystemConfigPathTest()
 #else
 	// The folder of services in kebab-case, the same in any environment of a session (XDG_CONFIG_DIRS is not used)
 	qputenv("XDG_CONFIG_DIRS", "/etc/xdg/desktop:/etc/xdg");
-	QCoreApplication::setOrganizationName(QStringLiteral("TestCompany"));
-	QCoreApplication::setApplicationName(QStringLiteral(" Test  Application_Server "));
-	const QString servicePath = imtfile::CSystemConfigLocationComp::GetSystemConfigPath();
-	QCoreApplication::setOrganizationName(organizationName);
-	QCoreApplication::setApplicationName(applicationName);
+	const QString servicePath = imtfile::CSystemConfigLocationComp::GetSystemConfigPath(QStringLiteral("TestCompany"), QStringLiteral(" Test  Application_Server "));
 	qunsetenv("XDG_CONFIG_DIRS");
 
 	QCOMPARE(path, QStringLiteral("/etc/testcompany/test-application"));

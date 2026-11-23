@@ -37,6 +37,7 @@ private slots:
 	void AutoPersistenceReloadTest();
 	void AutoPersistenceStoresWholeObjectChangeTest();
 	void AutoPersistenceWatchesCreatedFolderTest();
+	void AutoPersistenceWatchesFolderCreatedByOtherProgramTest();
 	void AutoPersistenceReloadsChangeAfterOwnSaveTest();
 	void AutoPersistenceIgnoresSpecialFileTest();
 	void SystemConfigPathTest();

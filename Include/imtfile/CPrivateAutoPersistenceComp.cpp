@@ -176,9 +176,18 @@ void CPrivateAutoPersistenceComp::WatchFile()
 		m_fileWatcher.addPath(fileInfo.absoluteFilePath());
 	}
 
-	if (QFileInfo::exists(fileInfo.absolutePath())){
-		m_fileWatcher.addPath(fileInfo.absolutePath());
+	// Until the folder exists (it is not created yet or it has been deleted), its nearest existing ancestor tells about its creation
+	QString folderPath = fileInfo.absolutePath();
+	while (!QFileInfo(folderPath).isDir()){
+		const QString parentPath = QFileInfo(folderPath).absolutePath();
+		if (parentPath == folderPath){
+			return;
+		}
+
+		folderPath = parentPath;
 	}
+
+	m_fileWatcher.addPath(folderPath);
 }
 
 
@@ -187,8 +196,9 @@ void CPrivateAutoPersistenceComp::WatchCreatedFile()
 	QMetaObject::invokeMethod(
 				&m_fileWatcher,
 				[this](){
-					// The folder that is watched already tells about the new file itself
-					if (m_fileWatcher.directories().isEmpty()){
+					// The folder of the file that is watched already tells about the new file itself, an ancestor of the folder does not
+					const QString filePath = GetFilePath();
+					if (!filePath.isEmpty() && !m_fileWatcher.directories().contains(QFileInfo(filePath).absolutePath())){
 						WatchFile();
 					}
 				},
