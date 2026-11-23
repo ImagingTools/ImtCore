@@ -93,7 +93,7 @@ istd::TSharedInterfacePtr<CLinkTestData> CreateData(int value)
 
 DataLink CreateLink(imtbase::IStorageResolver& resolver, int value, const QString& name = QString())
 {
-	DataLink link(resolver.InsertObject(CreateData(value), name));
+	DataLink link(resolver.InsertObject(s_typeId, CreateData(value), name));
 	link.SetResolver(&resolver);
 
 	return link;
@@ -163,7 +163,7 @@ void CStorageLinkTest::testCollectionResolverSnapshot()
 	imtbase::CObjectCollection collection;
 	SetupCollection(collection);
 
-	imtbase::CCollectionStorageResolver resolver(collection, s_typeId);
+	imtbase::CCollectionStorageResolver resolver(collection);
 
 	DataLink link = CreateLink(resolver, 5, QStringLiteral("Item"));
 	QCOMPARE(collection.GetElementsCount(), 1);
@@ -198,9 +198,10 @@ void CStorageLinkTest::testCollectionResolverInsertAndRemove()
 	imtbase::CObjectCollection collection;
 	SetupCollection(collection);
 
-	imtbase::CCollectionStorageResolver resolver(collection, s_typeId);
+	imtbase::CCollectionStorageResolver resolver(collection);
 
 	DataLink link = CreateLink(resolver, 1);
+	QCOMPARE(collection.GetObjectTypeId(link.GetObjectId()), s_typeId);
 
 	DataLink copy = link;
 
@@ -226,8 +227,8 @@ void CStorageLinkTest::testRegistryLateBinding()
 	imtbase::CStorageResolverRegistry serverProfile;
 	serverProfile.RegisterResolver(&serverStorage, QByteArrayLiteral("images"));
 
-	const QByteArray desktopId = desktopStorage.InsertObject(CreateData(1));
-	const QByteArray serverId = serverStorage.InsertObject(CreateData(2));
+	const QByteArray desktopId = desktopStorage.InsertObject(s_typeId, CreateData(1));
+	const QByteArray serverId = serverStorage.InsertObject(s_typeId, CreateData(2));
 
 	DataLink desktopLink(desktopId, QByteArrayLiteral("images"));
 	desktopLink.SetResolverProvider(&desktopProfile);
@@ -282,7 +283,7 @@ void CStorageLinkTest::testDefaultProvider()
 	imtbase::CStorageResolverRegistry registry;
 	registry.RegisterResolver(&storage);
 
-	const QByteArray objectId = storage.InsertObject(CreateData(42));
+	const QByteArray objectId = storage.InsertObject(s_typeId, CreateData(42));
 
 	DataLink link(objectId);
 	QVERIFY(link.GetObject().GetPtr() == nullptr);
@@ -302,7 +303,7 @@ void CStorageLinkTest::testUnknownStorageId()
 	imtbase::CStorageResolverRegistry registry;
 	registry.RegisterResolver(&storage);
 
-	const QByteArray objectId = storage.InsertObject(CreateData(1));
+	const QByteArray objectId = storage.InsertObject(s_typeId, CreateData(1));
 
 	// An unknown non-empty storage ID must not fall back to the default resolver
 	DataLink link(objectId, QByteArrayLiteral("unknown"));
@@ -321,7 +322,7 @@ void CStorageLinkTest::testTypeMismatch()
 {
 	imtbase::CMemoryStorageResolver storage;
 
-	const QByteArray objectId = storage.InsertObject(istd::IChangeableSharedPtr(new COtherTestData));
+	const QByteArray objectId = storage.InsertObject(s_typeId, istd::IChangeableSharedPtr(new COtherTestData));
 
 	DataLink link(objectId);
 	link.SetResolver(&storage);
@@ -450,8 +451,8 @@ void CStorageLinkTest::testStorageIdKept()
 	imtbase::CStorageResolverRegistry registry;
 	registry.RegisterResolver(&storage, QByteArrayLiteral("images"));
 
-	const QByteArray firstId = storage.InsertObject(CreateData(1));
-	const QByteArray secondId = storage.InsertObject(CreateData(2));
+	const QByteArray firstId = storage.InsertObject(s_typeId, CreateData(1));
+	const QByteArray secondId = storage.InsertObject(s_typeId, CreateData(2));
 
 	DataLink link(firstId, QByteArrayLiteral("images"));
 	link.SetResolverProvider(&registry);
@@ -477,7 +478,7 @@ void CStorageLinkTest::testStorageIdKept()
 void CStorageLinkTest::testSerializeObjectId()
 {
 	imtbase::CMemoryStorageResolver storage;
-	const QByteArray objectId = storage.InsertObject(CreateData(7));
+	const QByteArray objectId = storage.InsertObject(s_typeId, CreateData(7));
 
 	const iser::CArchiveTag tag(QByteArrayLiteral("AddressId"), QByteArrayLiteral("Address Id"), iser::CArchiveTag::TT_LEAF);
 
@@ -518,7 +519,7 @@ void CStorageLinkTest::testRegistryComponent()
 	icomp::TSimSharedComponentPtr<MemoryResolverComp> defaultStoragePtr;
 	defaultStoragePtr->InitComponent();
 
-	const QByteArray objectId = imagesStoragePtr->InsertObject(CreateData(3));
+	const QByteArray objectId = imagesStoragePtr->InsertObject(s_typeId, CreateData(3));
 
 	std::unique_ptr<RegistryComp> registryPtr(new RegistryComp);
 	registryPtr->InsertMultiAttr(QByteArrayLiteral("StorageIds"), QByteArrayLiteral("images"));
@@ -554,7 +555,6 @@ void CStorageLinkTest::testCollectionResolverComponent()
 	const QByteArray objectId = collectionPtr->InsertNewObject(s_typeId, QStringLiteral("Item"), QString(), &data);
 	QVERIFY(!objectId.isEmpty());
 
-	// The compositions that only read the linked objects leave the type-ID out.
 	std::unique_ptr<CollectionResolverComp> resolverPtr(new CollectionResolverComp);
 	resolverPtr->SetRef(QByteArrayLiteral("ObjectCollection"), collectionPtr);
 	resolverPtr->InitComponent();

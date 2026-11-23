@@ -40,11 +40,15 @@ public:
 
 	/**
 		Insert a new object into the storage.
+		\param typeId		Type-ID of the object in the storage, as for IObjectCollection::InsertNewObject. Storages without object types ignore it.
 		\param objectPtr	Object to be inserted. Storages with the snapshot semantic copy it, other storages can keep the instance.
 		\param name			Optional name of the object in the storage.
 		\return ID of the new object or an empty ID if the operation failed.
 	*/
-	virtual Id InsertObject(const istd::IChangeableSharedPtr& objectPtr, const QString& name = QString()) = 0;
+	virtual Id InsertObject(
+				const QByteArray& typeId,
+				const istd::IChangeableSharedPtr& objectPtr,
+				const QString& name = QString()) = 0;
 
 	/**
 		Remove the object with the given ID from the storage.
