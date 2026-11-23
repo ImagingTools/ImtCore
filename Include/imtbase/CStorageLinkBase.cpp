@@ -128,22 +128,13 @@ void CStorageLinkBase::Unload()
 
 bool CStorageLinkBase::Save() const
 {
-	if (m_objectId.isEmpty()){
+	if (m_objectId.isEmpty() || !m_dataPtr.IsValid()){
 		return false;
 	}
 
 	IStorageResolver* resolverPtr = GetResolver();
 	if (resolverPtr == nullptr){
 		return false;
-	}
-
-	// The object must already exist in the storage
-	if (!resolverPtr->LoadObject(m_objectId).IsValid()){
-		return false;
-	}
-
-	if (!m_dataPtr.IsValid()){
-		return true;
 	}
 
 	return resolverPtr->SaveObject(m_objectId, *m_dataPtr);

@@ -31,5 +31,6 @@ private slots:
 	void testSerializeObjectId();
 	void testRegistryComponent();
 	void testCollectionResolverComponent();
+	void testSaveWithoutStoredObject();
 	void cleanupTestCase();
 };
