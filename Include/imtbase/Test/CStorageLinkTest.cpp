@@ -566,4 +566,32 @@ void CStorageLinkTest::testCollectionResolverComponent()
 }
 
 
+void CStorageLinkTest::testSaveWithoutStoredObject()
+{
+	imtbase::CMemoryStorageResolver memoryResolver;
+
+	imtbase::CObjectCollection collection;
+	SetupCollection(collection);
+
+	imtbase::CCollectionStorageResolver collectionResolver(collection);
+
+	// Without a loaded object nothing is written.
+	DataLink unloadedLink = CreateLink(memoryResolver, 1);
+	QVERIFY(!unloadedLink.IsLoaded());
+	QVERIFY(!unloadedLink.Save());
+
+	// An object removed from the storage after loading is not created again.
+	DataLink memoryLink = CreateLink(memoryResolver, 2);
+	QVERIFY(memoryLink.has_value());
+	QVERIFY(memoryResolver.RemoveObject(memoryLink.GetObjectId()));
+	QVERIFY(!memoryLink.Save());
+
+	DataLink collectionLink = CreateLink(collectionResolver, 3);
+	QVERIFY(collectionLink.has_value());
+	QVERIFY(collectionResolver.RemoveObject(collectionLink.GetObjectId()));
+	QVERIFY(!collectionLink.Save());
+	QCOMPARE(collection.GetElementsCount(), 0);
+}
+
+
 I_ADD_TEST(CStorageLinkTest);

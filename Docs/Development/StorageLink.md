@@ -95,6 +95,7 @@ Differences to `std::optional`: copies of a link refer to the same stored object
 - Check `GetResolver()` or `GetObject().IsValid()` where the binding is not guaranteed; `operator->` asserts that the object exists.
 - Access through a link may be slow (database, network). Load explicitly with `GetObject()` in loops.
 - Removing an object does not update other links to it: they stay dangling and resolve to nothing.
+- `Save()` writes only a loaded object and never creates one: it fails if nothing is loaded or the object is gone from the storage.
 
 ## Tests
 

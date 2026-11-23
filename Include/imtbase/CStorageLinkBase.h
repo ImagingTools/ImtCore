@@ -107,8 +107,8 @@ public:
 	void Unload();
 
 	/**
-		Update the stored object with the loaded data.
-		\return \c false, if the link is empty, not bound, the object doesn't exist in the storage or the storage rejected the data. If the object is not loaded, there is nothing to save and the result is \c true.
+		Update the stored object with the loaded data. The object is never created in the storage.
+		\return \c false, if the link is empty, nothing is loaded, the link is not bound, the object doesn't exist in the storage or the storage rejected the data.
 	*/
 	bool Save() const;
 

@@ -43,7 +43,8 @@ istd::IChangeableSharedPtr CCollectionStorageResolver::LoadObject(const Id& obje
 
 bool CCollectionStorageResolver::SaveObject(const Id& objectId, const istd::IChangeable& object)
 {
-	if (m_collectionPtr == nullptr){
+	// A database collection reports success for an update of no rows, so an unknown ID is rejected here.
+	if ((m_collectionPtr == nullptr) || m_collectionPtr->GetObjectTypeId(objectId).isEmpty()){
 		return false;
 	}
 

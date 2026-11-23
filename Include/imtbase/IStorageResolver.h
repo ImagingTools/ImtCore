@@ -34,7 +34,7 @@ public:
 	virtual istd::IChangeableSharedPtr LoadObject(const Id& objectId) const = 0;
 
 	/**
-		Save the object under the given ID. The object must already exist in the storage.
+		Save the object under the given ID. The object must already exist in the storage: the call fails for an unknown ID and never creates an object.
 	*/
 	virtual bool SaveObject(const Id& objectId, const istd::IChangeable& object) = 0;
 
