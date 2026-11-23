@@ -39,15 +39,9 @@ QtObject {
 	signal profileReceived(var profile)
 	signal profileSaved()
 
-	// --- Organizations ---
-	// list: plain JS array of { id, name, description, isDelegated }
-	property var lastOrganizations: []
-	signal organizationsReceived(var list)
-
-	// --- Invitations / leave ---
+	// --- Invitations ---
 	signal invitationAccepted()
 	signal invitationRejected()
-	signal leftTenant(string tenantId)
 
 	// --- Personal Access Tokens ---
 	// tokens: the PersonalAccessTokenList model (opaque to pages, used as table elements)
@@ -65,7 +59,7 @@ QtObject {
 
 	// --- Errors, scoped by concern so each page can listen only to what's
 	// relevant to its own actions (a token-page error must never surface a
-	// banner on the Organizations page, and vice versa). ---
+	// banner on the General page, and vice versa). Invitation errors go to the account menu. ---
 	signal profileOperationFailed(string message)
 	signal organizationOperationFailed(string message)
 	signal tokenOperationFailed(string message)
@@ -74,11 +68,8 @@ QtObject {
 	function getProfile() {}
 	function setProfile(id, name, email) {}
 
-	function getOrganizations() {}
-
 	function acceptInvitation(invitationId) {}
 	function rejectInvitation(invitationId) {}
-	function leaveTenant(tenantId) {}
 
 	function getTokenList() {}
 	function createToken(name, description, scopes, expiresAt) {}

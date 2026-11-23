@@ -17,6 +17,10 @@ CREATE TABLE IF NOT EXISTS "TenantConnectionRequests" (
 	"Status" INTEGER NOT NULL DEFAULT 0,
 	"CreatedAt" TEXT NOT NULL,
 	"RespondedAt" TEXT,
+	"RelationshipProposed" INTEGER NOT NULL DEFAULT 0,
+	"ProposedSourceRole" INTEGER,
+	"ProposedTargetRole" INTEGER,
+	"ProposedScope" TEXT,
 	FOREIGN KEY ("SourceTenantId") REFERENCES "Tenants" ("Id") ON DELETE CASCADE,
 	FOREIGN KEY ("TargetTenantId") REFERENCES "Tenants" ("Id") ON DELETE CASCADE
 );

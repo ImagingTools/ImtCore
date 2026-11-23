@@ -211,7 +211,9 @@ void CTenantEntityBindingDbDelegateComp::OnComponentCreated()
 
 	// The table may come from before the column; the lookups by the tenant type need it
 	const QString tableName = QString::fromUtf8(GetTableName());
-	if (m_databaseEngineCompPtr.IsValid() && TableExists(tableName) && !imtdb::AddTenantTypeColumn(*m_databaseEngineCompPtr, QStringLiteral(R"("%1")").arg(tableName))){
+	if (		m_databaseEngineCompPtr.IsValid() &&
+				TableExists(tableName) &&
+				!imtdb::AddColumnIfMissing(*m_databaseEngineCompPtr, QStringLiteral(R"("%1")").arg(tableName), QStringLiteral("TenantType"), QStringLiteral("INTEGER"), QStringLiteral("0"))){
 		SendErrorMessage(0, QStringLiteral("The column 'TenantType' could not be added to the table '%1'").arg(tableName));
 	}
 }

@@ -60,8 +60,9 @@ public:
 				const QByteArray& sourceTenantId,
 				const QString& connectionCode,
 				const QString& message = QString(),
-				QString* errorMessagePtr = nullptr) override;
-	virtual QByteArray ApproveConnectionRequest(const QByteArray& requestId, const QByteArray& approvingTenantId) override;
+				QString* errorMessagePtr = nullptr,
+				const ITenantRelationshipProposalInfo* proposedRelationshipPtr = nullptr) override;
+	virtual QByteArray ApproveConnectionRequest(const QByteArray& requestId, const QByteArray& approvingTenantId, QByteArray* relationshipIdPtr = nullptr) override;
 	virtual bool RejectConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId) override;
 	virtual bool CancelConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId) override;
 	virtual QByteArrayList GetConnectionRequestIds(const QByteArray& tenantId) const override;
@@ -96,6 +97,11 @@ private:
 	bool ConnectionExists(const QByteArray& tenantAId, const QByteArray& tenantBId) const;
 	bool PendingRequestExists(const QByteArray& tenantAId, const QByteArray& tenantBId) const;
 	QByteArray CreateConnection(const QByteArray& tenantAId, const QByteArray& tenantBId);
+	/**
+		Bring the relationship a connection request proposes into force over its connection.
+		\return The relationship, empty when it did not come into force.
+	*/
+	QByteArray ApplyRequestedRelationship(const ITenantConnectionRequestInfo& request, const QByteArray& connectionId);
 	QByteArray ApplyRelationshipProposal(const ITenantRelationshipProposalInfo* proposalPtr);
 	/// False when a relationship of the connection could not be read or archived.
 	bool ArchiveRelationshipsForConnection(const QByteArray& connectionId);

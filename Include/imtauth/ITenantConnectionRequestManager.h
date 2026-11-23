@@ -40,9 +40,22 @@ public:
 	/**
 		Create a connection request to the organization with the given connection code.
 		\param errorMessagePtr Receives the reason when the request is refused.
+		\param proposedRelationshipPtr [optional] Terms of the relationship the request proposes along: roles (the source role is
+			the one of the requesting organization) and scope. The approval of the request then brings the relationship into force too.
 	*/
-	virtual QByteArray CreateConnectionRequest(const QByteArray& sourceTenantId, const QString& connectionCode, const QString& message = QString(), QString* errorMessagePtr = nullptr) = 0;
-	virtual QByteArray ApproveConnectionRequest(const QByteArray& requestId, const QByteArray& approvingTenantId) = 0;
+	virtual QByteArray CreateConnectionRequest(
+				const QByteArray& sourceTenantId,
+				const QString& connectionCode,
+				const QString& message = QString(),
+				QString* errorMessagePtr = nullptr,
+				const ITenantRelationshipProposalInfo* proposedRelationshipPtr = nullptr) = 0;
+	/**
+		Approve a connection request: the organizations get connected, and the relationship the request proposes comes into force.
+		A request whose relationship cannot come into force stays pending, and a connection made for it is removed again.
+		\param relationshipIdPtr [optional] Receives the relationship of a request that proposes one.
+		\return The connection, empty when the request is not approved.
+	*/
+	virtual QByteArray ApproveConnectionRequest(const QByteArray& requestId, const QByteArray& approvingTenantId, QByteArray* relationshipIdPtr = nullptr) = 0;
 	virtual bool RejectConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId) = 0;
 	virtual bool CancelConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId) = 0;
 	virtual QByteArrayList GetConnectionRequestIds(const QByteArray& tenantId) const = 0;
