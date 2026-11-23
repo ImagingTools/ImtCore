@@ -36,6 +36,9 @@ export const hooks = {
 	syncModel: null,
 	// (repeater) => void: its delegate component was replaced and the items must exist before the next line.
 	syncRepeater: null,
+	// (area) => void: a MouseArea waits for pressAndHold; () => seconds: the time of the engine.
+	watchHold: null,
+	now: () => 0,
 	// (item) => void: a Binding or Connections item changed and must apply before the next statement.
 	syncBinding: null,
 	syncConnection: null,
@@ -2971,6 +2974,14 @@ export class MouseArea extends Item {
 		this.$mouseY = 0;
 		this.$sceneX = NaN;
 		this.$sceneY = NaN;
+		this.$mouseDrag = new MouseDrag(this);
+		this.$dragFrom = null; // where the button went down, while it is down
+		this.$dragStart = null; // where the target was when the drag began
+		this.$dragRef = null; // where the pointer was when it went farther than the threshold
+		this.$dragged = false;
+		this.$holdInterval = 800;
+		this.$holdDeadline = 0; // seconds of the engine time at which pressAndHold is sent; 0 when it is not awaited
+		this.$held = false;
 		this.$declareSignal('clicked', ['mouse']);
 		this.$declareSignal('pressed', ['mouse']);
 		this.$declareSignal('released', ['mouse']);
@@ -2979,11 +2990,13 @@ export class MouseArea extends Item {
 		this.$declareSignal('entered', []);
 		this.$declareSignal('exited', []);
 		this.$declareSignal('wheel', ['wheel']);
+		this.$declareSignal('pressAndHold', ['mouse']);
+		this.$declareSignal('canceled', []);
 	}
 
 	$mouseEvent() {
 		const button = this.$pressButton === 2 ? 'RightButton' : 'LeftButton';
-		return { x: this.$mouseX, y: this.$mouseY, button, buttons: button, modifiers: 0, accepted: true, wasHeld: false, isClick: true };
+		return { x: this.$mouseX, y: this.$mouseY, button, buttons: button, modifiers: 0, accepted: true, wasHeld: this.$held, isClick: true };
 	}
 
 	get $acceptsMouse() {
@@ -2996,12 +3009,104 @@ export class MouseArea extends Item {
 
 	$mousePressAt(sceneX, sceneY) {
 		this.$trackMouse(sceneX, sceneY, false);
+		this.$dragFrom = { x: sceneX, y: sceneY };
+		this.$dragStart = null;
+		this.$dragRef = null;
+		this.$dragged = false;
+		this.$held = false;
+		this.$holdDeadline = 0;
 		this.$emit('pressed', [this.$mouseEvent()]);
+		// As in Qt the wait for a hold starts only when something listens to pressAndHold (and then a hold is no click).
+		const hold = this.$sigs === null ? undefined : this.$sigs.get('pressAndHold');
+		if (hold !== undefined && hold.handlers.length > 0 && this.$pressed && hooks.watchHold !== null) {
+			this.$holdDeadline = hooks.now() + this.$holdInterval / 1000;
+			hooks.watchHold(this);
+		}
+	}
+
+	// The engine calls it when the button has been held for pressAndHoldInterval.
+	// Qt (measured): the time runs while the button is down wherever the pointer goes; the hold is sent only if the pointer is in the area then.
+	$fireHold() {
+		if (!this.$pressed || this.$holdDeadline === 0) return;
+		this.$holdDeadline = 0;
+		if (this.$mouseX < 0 || this.$mouseY < 0 || this.$mouseX >= this.$aw || this.$mouseY >= this.$ah) return;
+		this.$held = true;
+		this.$emit('pressAndHold', [this.$mouseEvent()]);
+	}
+
+	// True when the press can no longer go on: the area or one of its parents was hidden while the button is down. A disabled area keeps the
+	// press and gets its release and click (measured in Qt with QtTest).
+	$pressLost() {
+		if (!this.$pressed) return false;
+		for (let item = this; item !== null; item = item.$parent) {
+			if (!item.$visible) return true;
+		}
+		return false;
+	}
+
+	// The press is taken away (the area was hidden, another item took the drag): `canceled`, and no `released` or `clicked` follow.
+	$cancelPress() {
+		if (!this.$pressed) return;
+		this.$pressed = false;
+		this.$held = false;
+		this.$holdDeadline = 0;
+		this.$dragEnd();
+		markReaders(this, 'pressed');
+		markReaders(this, 'containsPress');
+		if (!this.$hoverEnabled && this.$containsMouse) {
+			this.$containsMouse = false;
+			markReaders(this, 'containsMouse');
+			this.$emit('exited', []);
+		}
+		this.$update();
+		this.$emit('canceled', []);
 	}
 
 	$mouseMoveAt(sceneX, sceneY) {
 		// Without hoverEnabled, Qt only reports moves while a button is held.
 		this.$trackMouse(sceneX, sceneY, this.$pressed || this.$hoverEnabled);
+		if (this.$pressed) this.$dragTo(sceneX, sceneY);
+	}
+
+	// The target of `drag.target` follows the pointer after it has moved the threshold along an axis that is allowed.
+	$dragTo(sceneX, sceneY) {
+		const drag = this.$mouseDrag;
+		const target = drag.$target;
+		if (this.$dragFrom === null || target === null) return;
+		if (!drag.$active) {
+			// Qt (measured): the move that goes farther than the threshold from the press only takes the pointer as the reference; the drag
+			// starts with the next move, and the target follows the pointer from the reference.
+			if (this.$dragRef === null) {
+				const dx = sceneX - this.$dragFrom.x;
+				const dy = sceneY - this.$dragFrom.y;
+				const over = ((drag.$axis & 1) !== 0 && Math.abs(dx) > drag.$threshold) || ((drag.$axis & 2) !== 0 && Math.abs(dy) > drag.$threshold);
+				if (over) {
+					this.$dragRef = { x: sceneX, y: sceneY };
+					this.$dragged = true; // the grab is taken: a release now is no click, though the drag has not started
+				}
+				return;
+			}
+			this.$dragStart = { x: target.$x, y: target.$y };
+			this.$dragged = true;
+			drag.$active = true;
+			markReaders(this, 'drag.active');
+			noteWrite(this, 'drag.active');
+		}
+		if (this.$dragStart === null || this.$dragRef === null) return;
+		const dx = sceneX - this.$dragRef.x;
+		const dy = sceneY - this.$dragRef.y;
+		if ((drag.$axis & 1) !== 0) target.x = Math.min(Math.max(this.$dragStart.x + dx, drag.$minX), drag.$maxX);
+		if ((drag.$axis & 2) !== 0) target.y = Math.min(Math.max(this.$dragStart.y + dy, drag.$minY), drag.$maxY);
+	}
+
+	$dragEnd() {
+		this.$dragFrom = null;
+		this.$dragRef = null;
+		this.$dragStart = null;
+		if (!this.$mouseDrag.$active) return;
+		this.$mouseDrag.$active = false;
+		markReaders(this, 'drag.active');
+		noteWrite(this, 'drag.active');
 	}
 
 	$trackMouse(sceneX, sceneY, notify) {
@@ -3046,11 +3151,22 @@ export class MouseArea extends Item {
 				this.$emit(pressed ? 'entered' : 'exited', []);
 			}
 			this.$update();
-			if (!pressed) this.$emit('released', [this.$mouseEvent()]);
+			if (!pressed) {
+				this.$holdDeadline = 0;
+				this.$emit('released', [this.$mouseEvent()]);
+				// the drag ends after `released`: its handler may still drop the item (`onReleased: tile.Drag.drop()`)
+				this.$dragEnd();
+			}
 		}
 	}
 
 	$mouseClicked() {
+		// a press that was held, or that dragged the target, is no click
+		if (this.$held || this.$dragged) {
+			this.$held = false;
+			this.$dragged = false;
+			return;
+		}
 		this.$emit('clicked', [this.$mouseEvent()]);
 	}
 
@@ -3072,6 +3188,19 @@ defineReadOnly(MouseArea.prototype, 'containsPress', function () {
 }, undefined, true);
 defineField(MouseArea.prototype, 'hoverEnabled', '$hoverEnabled', toBool);
 defineField(MouseArea.prototype, 'preventStealing', '$preventStealing', toBool);
+defineReadOnly(
+	MouseArea.prototype,
+	'drag',
+	function () {
+		return this.$mouseDrag;
+	},
+	undefined,
+	true,
+);
+defineField(MouseArea.prototype, 'pressAndHoldInterval', '$holdInterval', (value) => {
+	const interval = Number(value);
+	return Number.isFinite(interval) && interval >= 0 ? interval : 800;
+});
 // `Qt.LeftButton | Qt.RightButton` is 0 here (the enumerations are names), which stands for every button.
 defineProp(
 	MouseArea.prototype,
@@ -3093,6 +3222,366 @@ defineReadOnly(MouseArea.prototype, 'mouseX', function () {
 defineReadOnly(MouseArea.prototype, 'mouseY', function () {
 	return this.$mouseY;
 });
+
+// ----- Drag, DropArea and MouseArea.drag -----
+
+// The drags that are going on (an item with `Drag.active`): what the DropAreas below them are told of, once for every frame and when the drag
+// starts, ends or drops.
+const activeDrags = new Set();
+
+export function resetDrags() {
+	activeDrags.clear();
+}
+
+function topOf(item) {
+	let top = item;
+	while (top.$parent !== null) top = top.$parent;
+	return top;
+}
+
+// The hot spot of a drag in the scene. A move that the layout has not caught up with yet is taken from the position of the parent.
+function dragPoint(drag) {
+	const item = drag.$owner;
+	const parent = item.$parent;
+	const pending = parent !== null && topOf(item).$updateRequested === true;
+	const x = pending ? parent.$sx + item.$x : item.$sx;
+	const y = pending ? parent.$sy + item.$y : item.$sy;
+	return { x: x + drag.$hotSpot.$x, y: y + drag.$hotSpot.$y };
+}
+
+function dropAreaAt(item, x, y, drag, skip) {
+	if (item === skip || !item.$visible) return null;
+	for (let i = item.$children.length - 1; i >= 0; i--) {
+		const hit = dropAreaAt(item.$children[i], x, y, drag, skip);
+		if (hit !== null) return hit;
+	}
+	if (item.$isDropArea === true && item.$enabled !== false && x >= item.$sx && y >= item.$sy && x < item.$sx + item.$aw && y < item.$sy + item.$ah && item.$takes(drag.$keys)) return item;
+	return null;
+}
+
+function dragEvent(drag, area, point, accepted) {
+	const keys = drag.$keys.slice();
+	return {
+		x: point.x - area.$sx,
+		y: point.y - area.$sy,
+		source: drag.source,
+		keys,
+		formats: keys,
+		supportedActions: drag.$supportedActions,
+		proposedAction: drag.$proposedAction,
+		action: drag.$proposedAction,
+		accepted,
+		hasText: false,
+		hasHtml: false,
+		hasUrls: false,
+		hasColor: false,
+		text: '',
+		html: '',
+		urls: [],
+		accept() {
+			this.accepted = true;
+		},
+		acceptProposedAction() {
+			this.accepted = true;
+		},
+		getDataAsString() {
+			return '';
+		},
+	};
+}
+
+// Tells the areas what the drag did since the last time: it came over one, left it or moved inside it.
+function evaluateDrag(drag) {
+	const point = dragPoint(drag);
+	const area = dropAreaAt(topOf(drag.$owner), point.x, point.y, drag, drag.$owner);
+	if (area !== drag.$target) {
+		const old = drag.$target;
+		drag.$target = area;
+		drag.$last = point;
+		if (old !== null) old.$leave();
+		if (area !== null) area.$enter(dragEvent(drag, area, point, true));
+		noteWrite(drag.$owner, 'Drag.target');
+		return;
+	}
+	if (area !== null && (drag.$last.x !== point.x || drag.$last.y !== point.y)) {
+		drag.$last = point;
+		area.$move(dragEvent(drag, area, point, true));
+	}
+	drag.$last = point;
+}
+
+// One step for every drag that is going on; the scene calls it after the layout of a frame.
+export function updateDrags() {
+	for (const drag of [...activeDrags]) evaluateDrag(drag);
+}
+
+// The hot spot of a drag: `Drag.hotSpot.x`, `Drag.hotSpot.y`.
+class DragHotSpot {
+	constructor(owner) {
+		this.$owner = owner;
+		this.$x = 0;
+		this.$y = 0;
+	}
+}
+DragHotSpot.prototype.$group = 'Drag.hotSpot';
+for (const [name, field] of [['x', '$x'], ['y', '$y']]) {
+	defineGroupProp(
+		DragHotSpot.prototype,
+		'Drag.hotSpot',
+		name,
+		function () {
+			return this[field];
+		},
+		function (value) {
+			this[field] = toFloat(value);
+		},
+	);
+}
+
+// `Drag` attached to an item. `active` starts a drag sequence (the areas under the hot spot are told: entered, positionChanged, exited) and
+// ends it, which is a cancel: no drop is sent. `drop()` sends the drop to the area under the hot spot and ends the sequence.
+export class DragAttached {
+	constructor(item) {
+		this.$owner = item;
+		this.$active = false;
+		this.$hotSpot = new DragHotSpot(item);
+		this.$keys = [];
+		this.$dragType = 2; // Drag.Internal in Qt is the default of Drag.dragType only for a script; Automatic needs the system
+		this.$source = null;
+		this.$target = null;
+		this.$last = { x: NaN, y: NaN };
+		this.$supportedActions = 7; // Qt::CopyAction | MoveAction | LinkAction
+		this.$proposedAction = 2; // Qt::MoveAction
+		this.$mimeData = {};
+	}
+
+	get hotSpot() {
+		return this.$hotSpot;
+	}
+
+	get target() {
+		noteRead(this.$owner, 'Drag.target', true);
+		return this.$target;
+	}
+
+	$begin() {
+		if (this.$active) return;
+		this.$active = true;
+		activeDrags.add(this);
+		markReaders(this.$owner, 'Drag.active');
+		noteWrite(this.$owner, 'Drag.active');
+		evaluateDrag(this);
+	}
+
+	// The drag ends without a drop: the area under it is told that it left.
+	cancel() {
+		if (!this.$active) return;
+		this.$active = false;
+		activeDrags.delete(this);
+		const area = this.$target;
+		this.$target = null;
+		if (area !== null) area.$leave();
+		markReaders(this.$owner, 'Drag.active');
+		noteWrite(this.$owner, 'Drag.active');
+		noteWrite(this.$owner, 'Drag.target');
+	}
+
+	// Sends the drop to the area under the hot spot and ends the drag; answers the action that the area accepted (Qt.IgnoreAction, 0, when none).
+	drop() {
+		if (!this.$active) return 0;
+		evaluateDrag(this);
+		const area = this.$target;
+		let action = 0;
+		this.$active = false;
+		activeDrags.delete(this);
+		this.$target = null;
+		if (area !== null) {
+			const event = dragEvent(this, area, this.$last, false);
+			area.$drop(event);
+			if (event.accepted) action = event.action;
+		}
+		markReaders(this.$owner, 'Drag.active');
+		noteWrite(this.$owner, 'Drag.active');
+		noteWrite(this.$owner, 'Drag.target');
+		return action;
+	}
+
+	start() {
+		this.$begin();
+	}
+}
+DragAttached.prototype.$group = 'Drag';
+for (const [name, value] of [['None', 0], ['Automatic', 1], ['Internal', 2], ['XAxis', 1], ['YAxis', 2], ['XAndYAxis', 3]]) {
+	Object.defineProperty(DragAttached.prototype, name, { value, enumerable: false });
+}
+defineGroupProp(
+	DragAttached.prototype,
+	'Drag',
+	'active',
+	function () {
+		return this.$active;
+	},
+	function (value) {
+		if (toBool(value)) this.$begin();
+		else this.cancel();
+	},
+);
+for (const [name, field, coerce] of [
+	['dragType', '$dragType', (value) => (typeof value === 'number' ? value : 2)],
+	['supportedActions', '$supportedActions', toFloat],
+	['proposedAction', '$proposedAction', toFloat],
+	['keys', '$keys', (value) => (Array.isArray(value) ? value.map(String) : [])],
+	['mimeData', '$mimeData', (value) => value],
+	['source', '$source', (value) => value],
+]) {
+	defineGroupProp(
+		DragAttached.prototype,
+		'Drag',
+		name,
+		function () {
+			return name === 'source' && this.$source === null ? this.$owner : this[field];
+		},
+		function (value) {
+			this[field] = coerce(value);
+		},
+	);
+}
+Object.defineProperty(Item.prototype, 'Drag', {
+	get() {
+		if (this.$drag === undefined) this.$drag = new DragAttached(this);
+		return this.$drag;
+	},
+	enumerable: true,
+	configurable: true,
+});
+
+// `DropArea`: takes the items that are dragged over it (an item with `Drag.active`, or the target of a MouseArea.drag that has it). An area with
+// `keys` takes the drags that have one of them, an area with no keys takes every drag.
+export class DropArea extends Item {
+	constructor() {
+		super();
+		this.$typeName = 'DropArea';
+		this.$isDropArea = true;
+		this.$keys = [];
+		this.$containsDrag = false;
+		this.$dragInfo = { source: null, x: 0, y: 0 };
+		this.$declareSignal('entered', ['drag']);
+		this.$declareSignal('exited', []);
+		this.$declareSignal('dropped', ['drop']);
+		this.$declareSignal('positionChanged', ['drag']);
+	}
+
+	$takes(keys) {
+		if (this.$keys.length === 0) return true;
+		return keys.some((key) => this.$keys.includes(key));
+	}
+
+	$setContains(value) {
+		if (this.$containsDrag === value) return;
+		this.$containsDrag = value;
+		markReaders(this, 'containsDrag');
+		this.$update();
+	}
+
+	$info(event) {
+		this.$dragInfo = { source: event.source, x: event.x, y: event.y };
+		markReaders(this, 'drag');
+	}
+
+	$enter(event) {
+		this.$setContains(true);
+		this.$info(event);
+		this.$emit('entered', [event]);
+	}
+
+	$move(event) {
+		this.$info(event);
+		this.$emit('positionChanged', [event]);
+	}
+
+	$leave() {
+		this.$setContains(false);
+		this.$emit('exited', []);
+	}
+
+	$drop(event) {
+		this.$info(event);
+		this.$setContains(false);
+		this.$emit('dropped', [event]);
+	}
+}
+defineField(DropArea.prototype, 'keys', '$keys', (value) => (Array.isArray(value) ? value.map(String) : []));
+defineReadOnly(
+	DropArea.prototype,
+	'containsDrag',
+	function () {
+		return this.$containsDrag;
+	},
+	undefined,
+	true,
+);
+defineReadOnly(
+	DropArea.prototype,
+	'drag',
+	function () {
+		return this.$dragInfo;
+	},
+	undefined,
+	true,
+);
+
+// `MouseArea.drag`: `drag.target` follows the pointer once it has moved `drag.threshold` along an allowed `drag.axis`, between the minimum and the
+// maximum of each axis; `drag.active` tells that it does.
+class MouseDrag {
+	constructor(owner) {
+		this.$owner = owner;
+		this.$target = null;
+		this.$axis = 3;
+		this.$active = false;
+		this.$threshold = 10;
+		this.$minX = -3.4028234663852886e38; // FLT_MAX, as Qt answers
+		this.$maxX = 3.4028234663852886e38;
+		this.$minY = -3.4028234663852886e38;
+		this.$maxY = 3.4028234663852886e38;
+		this.$filterChildren = false;
+		this.$smoothed = true;
+	}
+}
+MouseDrag.prototype.$group = 'drag';
+for (const [name, field, coerce] of [
+	['target', '$target', (value) => (value !== null && typeof value === 'object' ? value : null)],
+	['axis', '$axis', (value) => (typeof value === 'number' ? value : 3)],
+	['threshold', '$threshold', toFloat],
+	['minimumX', '$minX', toFloat],
+	['maximumX', '$maxX', toFloat],
+	['minimumY', '$minY', toFloat],
+	['maximumY', '$maxY', toFloat],
+	['filterChildren', '$filterChildren', toBool],
+	['smoothed', '$smoothed', toBool],
+]) {
+	defineGroupProp(
+		MouseDrag.prototype,
+		'drag',
+		name,
+		function () {
+			return this[field];
+		},
+		function (value) {
+			this[field] = coerce(value);
+		},
+	);
+}
+defineGroupProp(
+	MouseDrag.prototype,
+	'drag',
+	'active',
+	function () {
+		return this.$active;
+	},
+	function () {
+		throw new QmlError("Cannot assign to read-only property 'active'");
+	},
+);
 
 // ----- Qt Quick Layouts -----
 
@@ -4530,7 +5019,7 @@ export class ImageItem extends Item {
 		this.$status = 0;
 		this.$page = null;
 		this.$pageKey = '';
-		this.sourceSize = { width: 0, height: 0 };
+		this.$sourceSize = new SourceSize(this);
 	}
 
 	$setImage(img, status) {
@@ -4538,15 +5027,63 @@ export class ImageItem extends Item {
 		this.$status = status;
 		this.$page = null;
 		this.$pageKey = '';
+		// what a picture of the size it has makes of `sourceSize` and of the implicit size
+		markReaders(this, 'sourceSize.width');
+		markReaders(this, 'sourceSize.height');
 		this.$update();
 	}
 
-	get $naturalWidth() {
+	// The size of the picture as it was loaded.
+	get $rawWidth() {
 		return this.$img === null ? 0 : this.$img.naturalWidth || this.$img.width || 0;
 	}
 
-	get $naturalHeight() {
+	get $rawHeight() {
 		return this.$img === null ? 0 : this.$img.naturalHeight || this.$img.height || 0;
+	}
+
+	// The size Qt loads the picture at for `sourceSize` (measured in Qt 6.11, test/qt-measure/image). Both sides of the request unset: the size of the picture.
+	// A picture made of pixels is only made smaller: one side asked for keeps the proportions, both sides fit the picture into the box, with
+	// PreserveAspectFit or PreserveAspectCrop the picture covers the box (and may be made larger). A vector picture (.svg) is made to the size asked for:
+	// both sides are exactly the box, one side keeps the proportions.
+	$loadedSize() {
+		const nw = this.$rawWidth;
+		const nh = this.$rawHeight;
+		const rw = this.$sourceSize.$w;
+		const rh = this.$sourceSize.$h;
+		if (nw <= 0 || nh <= 0 || (rw <= 0 && rh <= 0)) return { w: nw, h: nh };
+		const vector = /\.svgz?(?:[?#]|$)/i.test(this.$source);
+		const cover = this.$fillMode === 1 || this.$fillMode === 2;
+		let w;
+		let h;
+		if (rw > 0 && rh > 0) {
+			if (cover) {
+				const scale = Math.max(rw / nw, rh / nh);
+				w = nw * scale;
+				h = nh * scale;
+			} else if (vector) {
+				w = rw;
+				h = rh;
+			} else {
+				const scale = Math.min(rw / nw, rh / nh, 1);
+				w = nw * scale;
+				h = nh * scale;
+			}
+		} else {
+			let scale = rw > 0 ? rw / nw : rh / nh;
+			if (!vector) scale = Math.min(scale, 1);
+			w = nw * scale;
+			h = nh * scale;
+		}
+		return { w: Math.max(1, Math.round(w)), h: Math.max(1, Math.round(h)) };
+	}
+
+	get $naturalWidth() {
+		return this.$loadedSize().w;
+	}
+
+	get $naturalHeight() {
+		return this.$loadedSize().h;
 	}
 
 	get $implicitWidth() {
@@ -4604,8 +5141,8 @@ export class ImageItem extends Item {
 		const full = { w: fit.w / (fit.u1 - fit.u0), h: fit.h / (fit.v1 - fit.v0) };
 		const pw = Math.min(2048, Math.max(1, Math.round(full.w * k)));
 		const ph = Math.min(2048, Math.max(1, Math.round(full.h * k)));
-		const nw = this.$naturalWidth;
-		const nh = this.$naturalHeight;
+		const nw = this.$rawWidth;
+		const nh = this.$rawHeight;
 		// Integer (or near-1:1) scales keep bitmap icons crisp; fractional scales need smoothing.
 		const sx = nw > 0 ? pw / nw : 0;
 		const sy = nh > 0 ? ph / nh : 0;
@@ -4671,6 +5208,67 @@ defineProp(
 			this.$update();
 		}
 	},
+);
+// `sourceSize` of an Image: the size the picture is read at (`sourceSize.width: 20`, `sourceSize: Qt.size(16, 8)`). The width and height read back as
+// written; when neither is set they are the size of the loaded picture (Qt). The implicit size of the image follows them (see $loadedSize).
+class SourceSize {
+	constructor(owner) {
+		this.$owner = owner;
+		this.$w = 0;
+		this.$h = 0;
+		this.$asked = false; // written at least once: what it holds is read back as it is, even 0 and 0 (Qt)
+	}
+
+	// A size is a value in Qt: after a change the item holds a new one, which is what the handlers of sourceSizeChanged compare.
+	$changed() {
+		const next = new SourceSize(this.$owner);
+		next.$w = this.$w;
+		next.$h = this.$h;
+		next.$asked = true;
+		this.$owner.$sourceSize = next;
+		markReaders(this.$owner, 'sourceSize.width');
+		markReaders(this.$owner, 'sourceSize.height');
+		reportHandlerChange(this.$owner, 'sourceSize');
+		this.$owner.$update(); // the implicit size follows
+	}
+
+	$set(width, height) {
+		if (this.$w === width && this.$h === height && this.$asked) return;
+		this.$w = width;
+		this.$h = height;
+		this.$changed();
+	}
+}
+SourceSize.prototype.$group = 'sourceSize';
+for (const [name, field] of [['width', '$w'], ['height', '$h']]) {
+	defineGroupProp(
+		SourceSize.prototype,
+		'sourceSize',
+		name,
+		function () {
+			// neither side asked for: the size of the picture that is loaded
+			if (!this.$asked) return name === 'width' ? this.$owner.$rawWidth : this.$owner.$rawHeight;
+			return this[field];
+		},
+		function (value) {
+			const size = Math.max(0, toFloat(value));
+			if (this[field] === size && this.$asked) return;
+			this[field] = size;
+			this.$changed();
+		},
+	);
+}
+defineProp(
+	ImageItem.prototype,
+	'sourceSize',
+	function () {
+		return this.$sourceSize;
+	},
+	function (value) {
+		if (value === null || typeof value !== 'object') return;
+		this.$sourceSize.$set(Math.max(0, toFloat(value.width)), Math.max(0, toFloat(value.height)));
+	},
+	true,
 );
 defineField(ImageItem.prototype, 'horizontalAlignment', '$hAlign', toFloat);
 defineField(ImageItem.prototype, 'verticalAlignment', '$vAlign', toFloat);
@@ -6297,6 +6895,134 @@ export const ANIMATION_TYPES = new Set([
 // All animation types. A leaf animation moves `property` of `target` linearly from `from` to `to` in
 // `duration` ms (an easing curve is not applied); a Sequential/ParallelAnimation runs its child animations;
 // a PauseAnimation only waits. The engine ticks the running animations with its clock.
+// The curves of QEasingCurve (qeasingcurve.cpp): the progress 0..1 of the time as a progress of the value. `type` is the number of Easing.*;
+// the curves that are no function of the time (InCurve ...) and the spline are linear.
+const EASING_FAMILIES = [null, 'Quad', 'Cubic', 'Quart', 'Quint', 'Sine', 'Expo', 'Circ', 'Elastic', 'Back', 'Bounce'];
+const EASING_IN = {
+	Quad: (t) => t * t,
+	Cubic: (t) => t * t * t,
+	Quart: (t) => t * t * t * t,
+	Quint: (t) => t * t * t * t * t,
+	Sine: (t) => -Math.cos((t * Math.PI) / 2) + 1,
+	Expo: (t) => (t === 0 ? 0 : 2 ** (10 * (t - 1)) - 0.001),
+	Circ: (t) => -(Math.sqrt(1 - t * t) - 1),
+};
+const EASING_OUT = {
+	Quad: (t) => -t * (t - 2),
+	Cubic: (t) => (t - 1) ** 3 + 1,
+	Quart: (t) => -((t - 1) ** 4 - 1),
+	Quint: (t) => (t - 1) ** 5 + 1,
+	Sine: (t) => Math.sin((t * Math.PI) / 2),
+	Expo: (t) => (t === 1 ? 1 : 1.001 * (-(2 ** (-10 * t)) + 1)),
+	Circ: (t) => Math.sqrt(1 - (t - 1) * (t - 1)),
+};
+function elasticParameters(amplitude, period, fallback) {
+	const p = period > 0 ? period : fallback;
+	let a = amplitude;
+	let s;
+	if (a < 1) {
+		a = 1;
+		s = p / 4;
+	} else {
+		s = (p / (2 * Math.PI)) * Math.asin(1 / a);
+	}
+	return { a, s, p };
+}
+function bounceOut(t) {
+	if (t < 1 / 2.75) return 7.5625 * t * t;
+	if (t < 2 / 2.75) {
+		t -= 1.5 / 2.75;
+		return 7.5625 * t * t + 0.75;
+	}
+	if (t < 2.5 / 2.75) {
+		t -= 2.25 / 2.75;
+		return 7.5625 * t * t + 0.9375;
+	}
+	t -= 2.625 / 2.75;
+	return 7.5625 * t * t + 0.984375;
+}
+function easingIn(family, t, amplitude, overshoot, period) {
+	if (family === 'Elastic') {
+		if (t === 0) return 0;
+		if (t === 1) return 1;
+		const { a, s, p } = elasticParameters(amplitude, period, 0.3);
+		t -= 1;
+		return -(a * 2 ** (10 * t) * Math.sin(((t - s) * 2 * Math.PI) / p));
+	}
+	if (family === 'Back') return t * t * ((overshoot + 1) * t - overshoot);
+	if (family === 'Bounce') return 1 - bounceOut(1 - t);
+	return EASING_IN[family](t);
+}
+function easingOut(family, t, amplitude, overshoot, period) {
+	if (family === 'Elastic') {
+		if (t === 0) return 0;
+		if (t === 1) return 1;
+		const { a, s, p } = elasticParameters(amplitude, period, 0.3);
+		return a * 2 ** (-10 * t) * Math.sin(((t - s) * 2 * Math.PI) / p) + 1;
+	}
+	if (family === 'Back') {
+		t -= 1;
+		return t * t * ((overshoot + 1) * t + overshoot) + 1;
+	}
+	if (family === 'Bounce') return bounceOut(t);
+	return EASING_OUT[family](t);
+}
+export function easingValue(type, t, amplitude = 1, overshoot = 1.70158, period = 0.3) {
+	if (!(type >= 1 && type <= 40) || t <= 0 || t >= 1) return t < 0 ? 0 : t > 1 ? 1 : t;
+	const family = EASING_FAMILIES[Math.floor((type - 1) / 4) + 1];
+	const kind = (type - 1) % 4; // 0 in, 1 out, 2 in-out, 3 out-in
+	if (kind === 0) return easingIn(family, t, amplitude, overshoot, period);
+	if (kind === 1) return easingOut(family, t, amplitude, overshoot, period);
+	if (kind === 2) {
+		if (family === 'Elastic') {
+			const { a, s, p } = elasticParameters(amplitude, period, 0.3 * 1.5);
+			t *= 2;
+			if (t < 1) {
+				t -= 1;
+				return -0.5 * (a * 2 ** (10 * t) * Math.sin(((t - s) * 2 * Math.PI) / p));
+			}
+			t -= 1;
+			return a * 2 ** (-10 * t) * Math.sin(((t - s) * 2 * Math.PI) / p) * 0.5 + 1;
+		}
+		if (family === 'Back') {
+			const s = overshoot * 1.525;
+			t *= 2;
+			if (t < 1) return 0.5 * (t * t * ((s + 1) * t - s));
+			t -= 2;
+			return 0.5 * (t * t * ((s + 1) * t + s) + 2);
+		}
+		return t < 0.5 ? 0.5 * easingIn(family, 2 * t, amplitude, overshoot, period) : 0.5 + 0.5 * easingOut(family, 2 * t - 1, amplitude, overshoot, period);
+	}
+	// OutInElastic follows the samples of Qt (6.11) with the amplitude doubled
+	if (family === 'Elastic') amplitude *= 2;
+	return t < 0.5 ? 0.5 * easingOut(family, 2 * t, amplitude, overshoot, period) : 0.5 + 0.5 * easingIn(family, 2 * t - 1, amplitude, overshoot, period);
+}
+
+// `easing.type`, `easing.amplitude`, `easing.overshoot`, `easing.period` of an animation.
+class EasingGroup {
+	constructor(owner) {
+		this.$owner = owner;
+		this.$type = 0;
+		this.$amplitude = 1;
+		this.$overshoot = 1.70158;
+		this.$period = 0.3;
+	}
+}
+EasingGroup.prototype.$group = 'easing';
+for (const [name, field] of [['type', '$type'], ['amplitude', '$amplitude'], ['overshoot', '$overshoot'], ['period', '$period']]) {
+	defineGroupProp(
+		EasingGroup.prototype,
+		'easing',
+		name,
+		function () {
+			return this[field];
+		},
+		function (value) {
+			this[field] = toFloat(value);
+		},
+	);
+}
+
 export class Animation extends Item {
 	constructor(engine, kind) {
 		super();
@@ -6316,6 +7042,7 @@ export class Animation extends Item {
 		this.$began = 0;
 		this.$pausedAt = 0;
 		this.$captured = null;
+		this.$easing = new EasingGroup(this);
 		this.$declareSignal('started', []);
 		this.$declareSignal('stopped', []);
 		this.$declareSignal('finished', []);
@@ -6392,7 +7119,9 @@ export class Animation extends Item {
 		const target = this.$resolveTarget();
 		if (target === null || target === undefined || this.$to === undefined) return;
 		if (intermediate && target instanceof Item && target.visible === false) return;
-		const progress = this.$duration > 0 ? Math.min(Math.max(t / this.$duration, 0), 1) : 1;
+		const linear = this.$duration > 0 ? Math.min(Math.max(t / this.$duration, 0), 1) : 1;
+		const curve = this.$easing;
+		const progress = curve.$type === 0 ? linear : easingValue(curve.$type, linear, curve.$amplitude, curve.$overshoot, curve.$period);
 		if (this.$captured === null) this.$captured = Object.create(null);
 		// Animation writes are not script assignments: they must not drop a binding on the
 		// animated property (width/opacity/… are in BREAKS_BINDING for real script writes).
@@ -6484,6 +7213,15 @@ export class Animation extends Item {
 }
 
 defineField(Animation.prototype, 'duration', '$duration', toFloat);
+defineReadOnly(
+	Animation.prototype,
+	'easing',
+	function () {
+		return this.$easing;
+	},
+	undefined,
+	true,
+);
 defineField(Animation.prototype, 'loops', '$loops', toFloat);
 defineField(Animation.prototype, 'property', '$property', (v) => (v === undefined || v === null ? '' : String(v)));
 defineField(Animation.prototype, 'properties', '$properties', (v) => (v === undefined || v === null ? '' : String(v)));
@@ -6764,6 +7502,68 @@ defineReadOnly(Repeater.prototype, 'count', function () {
 	return this.$built.length;
 });
 
+// `Instantiator` (QtQml): makes an object of the delegate for every row of the model, like a Repeater does for items. The objects are
+// not drawn (a QtObject, a MenuItem); `objectAdded(index, object)` / `objectRemoved(index, object)` are the signals of itemAdded / itemRemoved,
+// `objectAt(index)` is itemAt. While `active` is false there are no objects.
+export class Instantiator extends Repeater {
+	constructor() {
+		super();
+		this.$typeName = 'Instantiator';
+		this.$active = true;
+		this.$declareSignal('objectAdded', ['index', 'object']);
+		this.$declareSignal('objectRemoved', ['index', 'object']);
+		this.$rawModel = 0;
+		Object.defineProperty(this, '$model', {
+			get: () => (this.$active ? this.$rawModel : 0),
+			set: (value) => {
+				this.$rawModel = value;
+			},
+		});
+	}
+
+	$emit(name, args = []) {
+		if (name === 'itemAdded') name = 'objectAdded';
+		else if (name === 'itemRemoved') name = 'objectRemoved';
+		super.$emit(name, args);
+	}
+
+	objectAt(index) {
+		return this.itemAt(index);
+	}
+}
+// A change of the model or of `active` makes the objects before the next line of the script, as in Qt.
+defineProp(
+	Instantiator.prototype,
+	'model',
+	function () {
+		return this.$rawModel;
+	},
+	function (value) {
+		if (value === this.$rawModel) return;
+		noteListModelWatcher(this.$rawModel, -1);
+		this.$model = value;
+		noteListModelWatcher(value, 1);
+		this.$update();
+		if (!this.$constructing && hooks.syncRepeater !== null) hooks.syncRepeater(this);
+	},
+	true,
+);
+defineProp(
+	Instantiator.prototype,
+	'active',
+	function () {
+		return this.$active;
+	},
+	function (value) {
+		const active = toBool(value);
+		if (active === this.$active) return;
+		this.$active = active;
+		this.$update();
+		if (!this.$constructing && hooks.syncRepeater !== null) hooks.syncRepeater(this);
+	},
+	true,
+);
+
 // A type the engine does not implement (Connections, an unknown component ...): an
 // item that only keeps its properties and children, draws nothing and ignores unknown handlers.
 export class Placeholder extends Item {
@@ -6875,8 +7675,24 @@ export class TreeItemModel extends Item {
 		hooks.touch();
 		markReaders(this, '$rows');
 		markReaders(this, 'count');
+		if (this.$updatesOff === true) return;
 		notifyViews(this);
 		if (this.$sigs.get('modelChanged').handlers.length > 0) this.$emit('modelChanged', []);
+	}
+
+	// The model that holds this one as the value of a key (CTreeItemModel::GetParent), null for the top one.
+	getParent() {
+		return this.$ownerModel || null;
+	}
+
+	// While it is false the model does not tell its views and handlers about changes (m_isUpdateEnabled); the data is written all the same.
+	setUpdateEnabled(enabled) {
+		this.$updatesOff = !toBool(enabled);
+	}
+
+	$adopt(value) {
+		if (value instanceof TreeItemModel && value !== this && !value.$wrapped) value.$ownerModel = this;
+		return value;
 	}
 
 	static $wrap(value) {
@@ -6931,14 +7747,14 @@ export class TreeItemModel extends Item {
 	}
 
 	setData(key, value, index = 0) {
-		this.$ensureRow(index)[key] = value;
+		this.$ensureRow(index)[key] = this.$adopt(value);
 		this.$touch();
 		return true;
 	}
 
 	addTreeModel(key, index = 0) {
 		const model = new TreeItemModel();
-		this.$ensureRow(index)[key] = model;
+		this.$ensureRow(index)[key] = this.$adopt(model);
 		this.$touch();
 		return model;
 	}
@@ -6953,6 +7769,15 @@ export class TreeItemModel extends Item {
 		this.$rows.splice(at, 0, {});
 		this.$touch();
 		return at;
+	}
+
+	// A row at `index` with the keys of the object; an index out of range is ignored (CTreeItemModel::InsertNewItemWithParameters).
+	insertNewItemWithParameters(index, parameters) {
+		if (!(index >= 0 && index <= this.$rows.length)) return;
+		const row = {};
+		for (const key of Object.keys(parameters || {})) row[key] = this.$adopt(parameters[key]);
+		this.$rows.splice(index, 0, row);
+		this.$touch();
 	}
 
 	removeItem(index) {
@@ -8462,6 +9287,79 @@ defineProp(
 	},
 	true,
 );
+
+// `FolderDialog` (Qt.labs.platform) backed by the browser chooser of a folder, which is an `<input type=file webkitdirectory>`. The browser gives
+// the files of the folder, not its path: `folder` is `file:///<name of the folder>`, which the QML of ImtCore cuts down to the name
+// (`folder.toString().replace('file:///', '')`). `currentFolder` follows it, like `currentFile` follows the file of FileDialog.
+export class FolderDialog extends FileDialog {
+	constructor() {
+		super();
+		this.$typeName = 'FolderDialog';
+	}
+
+	open() {
+		if (typeof document === 'undefined') return;
+		this.$shown = true;
+		const input = document.createElement('input');
+		input.type = 'file';
+		input.webkitdirectory = true;
+		input.addEventListener('change', () => {
+			const files = [...input.files];
+			if (files.length === 0) this.$reject();
+			else this.$acceptFolder(files);
+		});
+		input.addEventListener('cancel', () => this.$reject());
+		input.click();
+	}
+
+	$acceptFolder(files) {
+		this.$shown = false;
+		const path = String(files[0].webkitRelativePath || '');
+		const name = path.includes('/') ? path.slice(0, path.indexOf('/')) : '';
+		this.folder = `file:///${name}`;
+		this.currentFolder = this.folder;
+		this.$emit('accepted');
+	}
+}
+
+// `FileIO` (imtqml::CFileIO: `source`, `read()`, `write(data)`). The browser has no file system: `write` saves the data as a download named after
+// the last part of `source` and answers true, `read` has no file to read and answers an empty string.
+export class FileIO extends Item {
+	constructor() {
+		super();
+		this.$typeName = 'FileIO';
+		this.$nonVisual = true;
+		this.$defineCustom('source', '');
+	}
+
+	read() {
+		return '';
+	}
+
+	write(data) {
+		if (typeof document === 'undefined' || typeof Blob === 'undefined' || typeof URL === 'undefined' || !URL.createObjectURL) return false;
+		const text = String(data === undefined || data === null ? '' : data);
+		// A string that holds bytes (the result of Qt.atob) is saved as they are; any other text as UTF-8.
+		let bytes = new Uint8Array(text.length);
+		for (let i = 0; i < text.length; i++) {
+			const code = text.charCodeAt(i);
+			if (code > 0xff) {
+				bytes = new TextEncoder().encode(text);
+				break;
+			}
+			bytes[i] = code;
+		}
+		const parts = String(this.source || '').split(/[\\/]/);
+		const link = document.createElement('a');
+		link.href = URL.createObjectURL(new Blob([bytes]));
+		link.download = parts[parts.length - 1] || 'file';
+		if (document.body) document.body.appendChild(link);
+		link.click();
+		if (document.body) document.body.removeChild(link);
+		if (URL.revokeObjectURL) URL.revokeObjectURL(link.href);
+		return true;
+	}
+}
 
 // `StackLayout`: one visible child, resized to the stack. `currentIndex` applies before the next read.
 export class StackLayout extends Item {
@@ -10433,6 +11331,10 @@ export const BUILTIN_TYPES = new Map([
 	['BaseClass', BaseClass],
 	['BaseModel', BaseModel],
 	['FileDialog', FileDialog],
+	['DropArea', DropArea],
+	['Instantiator', Instantiator],
+	['FolderDialog', FolderDialog],
+	['FileIO', FileIO],
 	['Item', Item],
 	['Rectangle', Rectangle],
 	['DropShadow', DropShadow],

@@ -9,7 +9,7 @@ export const KEY = {
 	Key_Shift: 0x01000020, Key_Control: 0x01000021, Key_Meta: 0x01000022, Key_Alt: 0x01000023, Key_CapsLock: 0x01000024,
 	Key_F1: 0x01000030, Key_F2: 0x01000031, Key_F3: 0x01000032, Key_F4: 0x01000033, Key_F5: 0x01000034, Key_F6: 0x01000035,
 	Key_F7: 0x01000036, Key_F8: 0x01000037, Key_F9: 0x01000038, Key_F10: 0x01000039, Key_F11: 0x0100003a, Key_F12: 0x0100003b,
-	Key_Space: 0x20, Key_Plus: 0x2b, Key_Minus: 0x2d, Key_Period: 0x2e, Key_Comma: 0x2c, Key_Slash: 0x2f,
+	Key_Space: 0x20, Key_Asterisk: 0x2a, Key_Plus: 0x2b, Key_Minus: 0x2d, Key_Period: 0x2e, Key_Comma: 0x2c, Key_Slash: 0x2f,
 };
 for (let c = 0x41; c <= 0x5a; c++) KEY[`Key_${String.fromCharCode(c)}`] = c;
 for (let c = 0x30; c <= 0x39; c++) KEY[`Key_${String.fromCharCode(c)}`] = c;
@@ -74,7 +74,7 @@ export function qtKeyEvent(e) {
 export const NAMED_KEY_HANDLERS = new Map(
 	[
 		'Escape', 'Tab', 'Backtab', 'Backspace', 'Return', 'Enter', 'Insert', 'Delete', 'Home', 'End', 'Left', 'Up', 'Right',
-		'Down', 'PageUp', 'PageDown', 'Space', 'Plus', 'Minus', 'Period', 'Comma', 'Slash',
+		'Down', 'PageUp', 'PageDown', 'Space', 'Asterisk', 'Plus', 'Minus', 'Period', 'Comma', 'Slash',
 		'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12',
 	].map((name) => [`Keys.on${name}Pressed`, KEY[`Key_${name}`]]),
 );
