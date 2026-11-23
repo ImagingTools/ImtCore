@@ -53,7 +53,8 @@ DecoratorBase {
 	}
 
 	Connections {
-		target: tabPanelDecorator.baseElement;
+		// baseElement is set after the decorator is created; until then null, else Connections listens to the decorator itself
+		target: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement : null;
 
 		function onStartContentLoading(){
 			tabPanelDecorator.signalLoading = true;

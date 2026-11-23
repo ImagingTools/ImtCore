@@ -52,6 +52,7 @@ private:
 	void OnServerConnectionParamChanged(const istd::IChangeable::ChangeSet& changeSet, const imtcom::IServerConnectionInterface* serverConnectionParamPtr);
 	void OnApplicationInfoChanged(const istd::IChangeable::ChangeSet& changeSet, const ibase::IApplicationInfo* applicationInfoPtr);
 	virtual void SetBaseUrl() const;
+	QString CalculateBaseUrl() const;
 
 private:
 	class QuickItemCreated : public iprm::IEnableableParam
