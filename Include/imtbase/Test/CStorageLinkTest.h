@@ -16,9 +16,8 @@ class CStorageLinkTest: public QObject
 private slots:
 	void initTestCase();
 	void testEmptyLink();
-	void testMemoryResolverLiveObject();
 	void testCollectionResolverSnapshot();
-	void testCollectionResolverInsertAndRemove();
+	void testRemovedObject();
 	void testRegistryLateBinding();
 	void testResolverPriority();
 	void testDefaultProvider();
@@ -36,3 +35,4 @@ private slots:
 	void testConcurrentLoading();
 	void cleanupTestCase();
 };
+

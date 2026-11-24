@@ -52,34 +52,6 @@ bool CCollectionStorageResolver::SaveObject(const Id& objectId, const istd::ICha
 }
 
 
-IStorageResolver::Id CCollectionStorageResolver::InsertObject(
-			const QByteArray& typeId,
-			const istd::IChangeableSharedPtr& objectPtr,
-			const QString& name)
-{
-	if ((m_collectionPtr == nullptr) || !objectPtr.IsValid()){
-		return Id();
-	}
-
-	return m_collectionPtr->InsertNewObject(
-		typeId,
-		name,
-		QString(),
-		objectPtr.GetPtr()
-	);
-}
-
-
-bool CCollectionStorageResolver::RemoveObject(const Id& objectId)
-{
-	if (m_collectionPtr == nullptr){
-		return false;
-	}
-
-	return m_collectionPtr->RemoveElements(IObjectCollection::Ids() << objectId);
-}
-
-
 } // namespace imtbase
 
 

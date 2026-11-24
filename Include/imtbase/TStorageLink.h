@@ -46,7 +46,7 @@ namespace imtbase
 	- The value is not owned by the link: copies of the link refer to the same stored object and share the loaded instance.
 	- has_value(), operator bool, operator*, operator->, value() and value_or() load the object on the first call and may be slow (database, network).
 	  Use IsNull() to check, whether the link points to something, without loading.
-	- reset() only clears the link target. The object stays in the storage, use Remove() to delete it.
+	- reset() only clears the link target. The object stays in the storage.
 	- operator* and operator-> have no check in the release build, value() throws std::bad_optional_access.
 
 	\note Use IsLoaded or GetObject to control the loading explicitly.

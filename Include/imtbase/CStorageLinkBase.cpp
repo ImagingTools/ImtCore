@@ -189,25 +189,6 @@ bool CStorageLinkBase::Save() const
 }
 
 
-bool CStorageLinkBase::Remove()
-{
-	if (m_objectId.isEmpty()){
-		return false;
-	}
-
-	IStorageResolver* resolverPtr = GetResolver();
-	if ((resolverPtr == nullptr) || !resolverPtr->RemoveObject(m_objectId)){
-		return false;
-	}
-
-	m_objectId.clear();
-
-	Unload();
-
-	return true;
-}
-
-
 bool CStorageLinkBase::Serialize(iser::IArchive& archive)
 {
 	bool retVal = true;
