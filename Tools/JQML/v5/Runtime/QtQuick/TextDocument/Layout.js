@@ -523,14 +523,15 @@ class Layouter {
             item.flow = flow
             let h = flow.y + pad(item.cell, 'top') + pad(item.cell, 'bottom') + 2 * cellBorder
             heights.set(item.cell, h)
-            if(item.cell.rowSpan === 1) rowHeights[item.cell.row] = Math.max(rowHeights[item.cell.row], h)
+            if(item.cell.rowSpan === 1 && item.cell.row >= 0 && item.cell.row < rowCount) rowHeights[item.cell.row] = Math.max(rowHeights[item.cell.row], h)
         }
         for(let item of laid){
             let cell = item.cell
-            if(cell.rowSpan === 1) continue
-            let have = rowHeights.slice(cell.row, cell.row + cell.rowSpan).reduce((a, b) => a + b, 0) + spacing * (cell.rowSpan - 1)
+            if(cell.rowSpan === 1 || cell.row < 0 || cell.row >= rowCount) continue
+            let endRow = Math.min(rowCount, cell.row + cell.rowSpan)
+            let have = rowHeights.slice(cell.row, endRow).reduce((a, b) => a + b, 0) + spacing * (endRow - cell.row - 1)
             let need = heights.get(cell) - have
-            if(need > 0) rowHeights[cell.row + cell.rowSpan - 1] += need
+            if(need > 0) rowHeights[endRow - 1] += need
         }
         let rowY = []
         let ry = y + border + spacing

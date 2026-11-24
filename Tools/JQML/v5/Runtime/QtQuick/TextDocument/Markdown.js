@@ -13,7 +13,7 @@ const { BLOCK, SPAN, TEXT, ALIGN } = MD
 // qtmi_BlockQuoteIndent
 const BLOCK_QUOTE_INDENT = 40
 // hard safety limit for generated quote prefixes to avoid unbounded allocations
-const MAX_BLOCK_QUOTE_LEVEL = 1024
+const MAX_BLOCK_QUOTE_LEVEL = 128
 // QPalette::link of the default palette
 const LINK_COLOR = '#0000ff'
 // QFontDatabase::systemFont(QFontDatabase::FixedFont)
@@ -765,7 +765,9 @@ class MarkdownWriter {
             }
         }
         if(blockFmt.headingLevel){
-            let headingLevel = Math.max(1, Math.min(6, Math.floor(Number(blockFmt.headingLevel) || 0)))
+            let rawHeadingLevel = Number(blockFmt.headingLevel)
+            let headingLevel = Number.isFinite(rawHeadingLevel) ? Math.floor(rawHeadingLevel) : 0
+            headingLevel = Math.max(1, Math.min(6, headingLevel))
             if(headingLevel > 0){
                 this.out += '#'.repeat(headingLevel) + ' '
                 wrap = false
