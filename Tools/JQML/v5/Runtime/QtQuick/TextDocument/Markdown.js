@@ -12,6 +12,8 @@ const { BLOCK, SPAN, TEXT, ALIGN } = MD
 
 // qtmi_BlockQuoteIndent
 const BLOCK_QUOTE_INDENT = 40
+// hard safety limit for generated quote prefixes to avoid unbounded allocations
+const MAX_BLOCK_QUOTE_LEVEL = 1024
 // QPalette::link of the default palette
 const LINK_COLOR = '#0000ff'
 // QFontDatabase::systemFont(QFontDatabase::FixedFont)
@@ -481,7 +483,7 @@ function createLinkTitle(title){
     let lines = title.split(/(?<=\r\n|\n|\r)/)
     for(let line of lines){
         if(/^[ \t]*(\r\n|\n|\r)?$/.test(line)) continue
-        out += line.replace(/"/g, '\\"')
+        out += line.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
     }
     return out + '"'
 }
@@ -673,7 +675,9 @@ class MarkdownWriter {
     }
 
     setLinePrefixForBlockQuote(level){
-        this.linePrefix = level > 0 ? '> '.repeat(level) : ''
+        let safeLevel = Number.isFinite(level) ? Math.floor(level) : 0
+        safeLevel = Math.max(0, Math.min(MAX_BLOCK_QUOTE_LEVEL, safeLevel))
+        this.linePrefix = safeLevel > 0 ? '> '.repeat(safeLevel) : ''
     }
 
     // writeBlock: the block's prefix (quote, list item, code fence, heading), its fragments with their markers, wrapped
@@ -761,8 +765,11 @@ class MarkdownWriter {
             }
         }
         if(blockFmt.headingLevel){
-            this.out += '#'.repeat(blockFmt.headingLevel) + ' '
-            wrap = false
+            let headingLevel = Math.max(1, Math.min(6, Math.floor(Number(blockFmt.headingLevel) || 0)))
+            if(headingLevel > 0){
+                this.out += '#'.repeat(headingLevel) + ' '
+                wrap = false
+            }
         }
         let wrapIndentString = this.linePrefix + ' '.repeat(this.wrappedLineIndent)
         let col = wrapIndentString.length
