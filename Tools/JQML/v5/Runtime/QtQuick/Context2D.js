@@ -152,7 +152,7 @@ function fontString(f){
 
 // the CSS font of a QFont
 function fontCss(f){
-    let family = GENERIC_FAMILIES.has(f.family) ? f.family : '"' + f.family.replace(/"/g, '\\"') + '"'
+    let family = GENERIC_FAMILIES.has(f.family) ? f.family : '"' + f.family.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"'
     return (f.style === 1 ? 'italic ' : f.style === 2 ? 'oblique ' : '') + (f.capitalization === 3 ? 'small-caps ' : '') + f.weight + ' '
         + (f.pixelSize > 0 ? f.pixelSize + 'px ' : f.pointSize + 'pt ') + family
 }
@@ -178,7 +178,7 @@ function hasFamily(family){
     let ctx = familyProbe.ctx
     let text = 'mmmmmmmmmmlliWW@#0O'
     let width = (font) => { ctx.font = font; return ctx.measureText(text).width }
-    let quoted = '"' + family.replace(/"/g, '\\"') + '"'
+    let quoted = '"' + family.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"'
     let found = ['monospace', 'serif', 'sans-serif'].some(fallback => width('72px ' + quoted + ', ' + fallback) !== width('72px ' + fallback))
     // a family not there now may come later (a font loading): only the ones found are kept
     if(found) familyProbe.known.set(family, true)
