@@ -17,6 +17,12 @@ import imtbaseFileSystemSdl 1.0
     Selection: single by default. With multiSelect the rows carry checkboxes and
     support Ctrl-click (toggle), Shift-click (range) and a select-all header box.
     On confirm both pathSelected(path) and pathsSelected(paths) are emitted.
+
+    Options (both off by default):
+    - restrictToStartFolder: Up stops at the folder the dialog opens in; nothing
+      above it can be opened.
+    - showOnlyFolders: the files of a folder are not listed, only folders (links,
+      drives). Without it files are listed and pathKind decides what is pickable.
 */
 
 Dialog {
@@ -47,6 +53,14 @@ Dialog {
 	// folders always listed for navigation. Sent verbatim to the server.
 	property string extensionFilter: ""
 	readonly property bool hasExtensionFilter: root.extensionFilter !== ""
+	// Going up above the folder the dialog opens in (the first folder loaded - the
+	// folder that holds startPath) is not offered. Default false: the whole file
+	// system the server exposes can be browsed.
+	property bool restrictToStartFolder: false
+	// Only containers (folders, links, drives) are listed; the files of a folder are
+	// not shown at all. Default false: files are listed too (pickable only when
+	// pathKind allows files).
+	property bool showOnlyFolders: false
 
 	property string currentPath: ""
 	// Whether a parent exists, kept apart from parentPath: an EMPTY parentPath is
@@ -54,6 +68,15 @@ Dialog {
 	// can no longer mean "nowhere to go up to".
 	property bool hasParent: false
 	property string parentPath: ""
+	// The folder the dialog opened in (server-resolved path of the first successful
+	// listing): the upper bound of restrictToStartFolder. Kept apart from its
+	// emptiness, since "" is a real address (the virtual drives root).
+	property string startFolder: ""
+	property bool startFolderKnown: false
+	// Up is available: there is a parent, and it is not above the start folder
+	// when restrictToStartFolder is set. atDrivesRoot backstops hasParent - see browseUp().
+	readonly property bool canGoUp: root.hasParent && !root.atDrivesRoot
+		&& !(root.restrictToStartFolder && root.startFolderKnown && root.isSamePath(root.currentPath, root.startFolder))
 	// The virtual drives root ("This PC"), served only by a whole-file-system
 	// provider. It has no real path, so Date/Size are meaningless there and the
 	// columns switch to volume capacity instead.
@@ -148,9 +171,10 @@ Dialog {
 		return (root.pathKind & Enums.pathKindFile) !== 0
 	}
 
-	// In directory-only pick mode plain files are hidden (only navigable entries).
+	// With showOnlyFolders plain files are hidden (only navigable entries); otherwise
+	// everything is listed and pathKind only decides what may be picked.
 	function isListableEntry(entryType){
-		if ((root.pathKind & Enums.pathKindFile) !== 0)
+		if (!root.showOnlyFolders)
 			return true
 		return root.isDirectoryEntry(entryType)
 	}
@@ -214,6 +238,33 @@ Dialog {
 	// Normalize separators; browse/reveal compare against server forward-slash paths.
 	function normalizePath(path){
 		return path ? String(path).replace(/\\/g, "/") : ""
+	}
+
+	// Path for comparisons: forward slashes, no trailing slash (except a root such
+	// as "/" or "C:/"), lower case for a Windows path (case-insensitive there).
+	function comparablePath(path){
+		var norm = root.normalizePath(path)
+		while (norm.length > 1 && norm.endsWith("/") && !/^[A-Za-z]:\/$/.test(norm))
+			norm = norm.slice(0, -1)
+		if (/^[A-Za-z]:/.test(norm))
+			norm = norm.toLowerCase()
+		return norm
+	}
+
+	function isSamePath(path1, path2){
+		return root.comparablePath(path1) === root.comparablePath(path2)
+	}
+
+	// Whether the path is the folder or lies inside it. Everything lies inside the
+	// virtual drives root ("").
+	function isPathWithin(path, folder){
+		var base = root.comparablePath(folder)
+		if (base === "")
+			return true
+		var target = root.comparablePath(path)
+		if (target === base)
+			return true
+		return target.indexOf(base.endsWith("/") ? base : base + "/") === 0
 	}
 
 	// Parent directory of a path, keeping drive roots valid ("C:/foo" -> "C:/").
@@ -526,6 +577,10 @@ Dialog {
 		if (root.isLoading)
 			return
 
+		// Nothing above the start folder is opened (restrictToStartFolder).
+		if (root.restrictToStartFolder && root.startFolderKnown && !root.isPathWithin(path, root.startFolder))
+			return
+
 		root.__appending = append === true
 		// Fresh navigation into a different folder: clear the name filter.
 		// Sort preference is kept across folders (Explorer-like).
@@ -576,11 +631,12 @@ Dialog {
 	// Going up keeps the folder we are leaving selected, so Enter-into / Backspace-out
 	// returns the cursor to where it was (Explorer behaviour).
 	function browseUp(){
-		// atDrivesRoot is a second, independent guard alongside hasParent: the
-		// server always resolves the virtual drives root to an empty currentPath,
-		// so this catches it even if hasParent's presence-tracking (has_value on
-		// an omitted parentPath) does not survive the web build faithfully.
-		if (root.isLoading || !root.hasParent || root.atDrivesRoot)
+		// canGoUp checks atDrivesRoot as a second, independent guard alongside
+		// hasParent: the server always resolves the virtual drives root to an empty
+		// currentPath, so this catches it even if hasParent's presence-tracking
+		// (has_value on an omitted parentPath) does not survive the web build
+		// faithfully. It also stops at the start folder (restrictToStartFolder).
+		if (root.isLoading || !root.canGoUp)
 			return
 		root.__revealTarget = root.normalizePath(root.currentPath)
 		root.browse(root.parentPath, false)
@@ -604,6 +660,11 @@ Dialog {
 		var freshLoad = !root.__appending
 
 		root.currentPath = payload.m_path
+		// The first folder opened is the start folder (the upper bound of restrictToStartFolder).
+		if (!root.startFolderKnown){
+			root.startFolder = payload.m_path
+			root.startFolderKnown = true
+		}
 		// Presence, not emptiness: an empty parentPath still addresses the virtual
 		// drives root, so hasParent is what decides whether Up is available.
 		// At the drives root the server omits parentPath entirely → Up disabled.
@@ -623,10 +684,13 @@ Dialog {
 
 		if (payload.hasEntries() && payload.m_entries){
 			var count = payload.m_entries.getItemsCount()
+			var fileSkipped = false
 			for (var i = 0; i < count; i++){
 				var entryType = payload.m_entries.getData("m_entryType", i)
-				if (!root.isListableEntry(entryType))
+				if (!root.isListableEntry(entryType)){
+					fileSkipped = true
 					continue
+				}
 				var name = payload.m_entries.getData("m_name", i)
 				var path = payload.m_entries.getData("m_path", i)
 				var sizeValue = payload.m_entries.getData("m_size", i)
@@ -650,6 +714,12 @@ Dialog {
 			// Advance the page offset by the raw server count (not the filtered
 			// view) so the next page starts after the full server slice.
 			root.loadedCount += count
+
+			// The server lists containers above files whatever the sort
+			// (CFileSystemStructureProviderComp), so past the first hidden file
+			// there is no folder left: the next pages would be files only.
+			if (fileSkipped)
+				root.hasMore = false
 		}
 
 		if (freshLoad)
@@ -852,6 +922,13 @@ Dialog {
 	// Explorer-style "N items" for the whole filtered/sorted folder (not just the
 	// page loaded so far - loaded-vs-total is a paging detail nobody needs to see).
 	function itemCountLabel(){
+		// totalCount counts the hidden files too: with showOnlyFolders the listed folders
+		// are counted instead ("+" while more of them may follow).
+		if (root.showOnlyFolders){
+			if (!root.hasMore && entriesModel.count === 1)
+				return qsTr("1 item")
+			return qsTr("%1 items").arg(root.hasMore ? entriesModel.count + "+" : entriesModel.count)
+		}
 		return root.totalCount === 1 ? qsTr("1 item") : qsTr("%1 items").arg(root.totalCount)
 	}
 
@@ -1063,8 +1140,8 @@ Dialog {
 					Button {
 						id: upButton
 						widthFromDecorator: true
-						// atDrivesRoot backstops hasParent - see browseUp()'s comment.
-						enabled: root.hasParent && !root.isLoading && !root.atDrivesRoot
+						// canGoUp: a parent below the start folder bound - see browseUp()'s comment.
+						enabled: root.canGoUp && !root.isLoading
 						iconSource: "../../../" + Style.getIconPath("Icons/Up", Icon.State.On,
 							enabled ? Icon.Mode.Normal : Icon.Mode.Disabled)
 						decorator: Component {
@@ -1574,7 +1651,7 @@ Dialog {
 						text: emptyState.loadFailed ? qsTr("Can't load this location")
 							: (emptyState.nameFilterEmpty ? qsTr("No matching items")
 								: (emptyState.extensionEmpty ? qsTr("No files of the allowed types")
-									: qsTr("This folder is empty")))
+									: (root.showOnlyFolders ? qsTr("This folder has no subfolders") : qsTr("This folder is empty"))))
 						color: Style.textColor
 						font.pixelSize: Style.fontSizeL
 						opacity: 0.8
@@ -1591,7 +1668,7 @@ Dialog {
 								? qsTr("Try a different filter, or clear it to see all items")
 								: (emptyState.extensionEmpty
 									? root.extensionFilterHint()
-									: ((root.hasParent && !root.atDrivesRoot) ? qsTr("Go up or pick another location") : qsTr("Pick another location"))))
+									: (root.canGoUp ? qsTr("Go up or pick another location") : qsTr("Pick another location"))))
 						color: Style.textColor
 						font.pixelSize: Style.fontSizeS
 						opacity: 0.5

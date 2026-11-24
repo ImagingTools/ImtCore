@@ -6173,6 +6173,10 @@
         <translation>Эта папка пуста</translation>
     </message>
     <message>
+        <source>This folder has no subfolders</source>
+        <translation>В этой папке нет подпапок</translation>
+    </message>
+    <message>
         <location line="+14"/>
         <source>Try a different filter, or clear it to see all items</source>
         <translation>Попробуйте другой фильтр или очистите его, чтобы увидеть все элементы</translation>
@@ -13373,6 +13377,10 @@ ID входных данных: </translation>
         <location line="+1"/>
         <source>This folder is empty</source>
         <translation>Эта папка пуста</translation>
+    </message>
+    <message>
+        <source>This folder has no subfolders</source>
+        <translation>В этой папке нет подпапок</translation>
     </message>
     <message>
         <location line="+1"/>
