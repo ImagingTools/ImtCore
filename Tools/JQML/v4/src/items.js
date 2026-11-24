@@ -2450,6 +2450,7 @@ export class Text extends Item {
 		this.$wrap = 0;
 		this.$elide = 3;
 		this.$hAlign = 1;
+		this.$vAlign = 0x20; // AlignTop
 		this.$format = 'PlainText';
 		this.$lineHeight = 1;
 		this.$font = null;
@@ -2671,11 +2672,20 @@ export class Text extends Item {
 	$paint(r, opacity) {
 		if (this.$text.length === 0 || this.$pixelSize <= 0) return;
 		const left = this.$padding('$padL');
-		const top = this.$padding('$padT');
+		const top = this.$padding('$padT') + this.$verticalShift();
 		r.translate(left, top);
 		if (this.$kind() !== 'plain') this.$paintRich(r, opacity);
 		else this.$paintPlain(r, opacity);
 		r.translate(-left, -top);
+	}
+
+	// How far verticalAlignment moves the text down from the top padding: the room that the height leaves under the text, all of it
+	// (AlignBottom) or half of it, half rounded up (AlignVCenter). The room is negative for a text higher than the item (measured in Qt).
+	$verticalShift() {
+		const align = this.$vAlign;
+		if ((align & 0xc0) === 0) return 0;
+		const free = this.$ah - this.$padding('$padT') - this.$padding('$padB') - this.$metrics().contentHeight;
+		return (align & 0x40) !== 0 ? free : Math.floor(free / 2 + 0.5);
 	}
 
 	$paintPlain(r, opacity) {
@@ -2748,6 +2758,14 @@ const toElideMode = (value) => {
 defineField(Text.prototype, 'wrapMode', '$wrap', toWrapMode);
 defineField(Text.prototype, 'elide', '$elide', toElideMode);
 defineField(Text.prototype, 'horizontalAlignment', '$hAlign', toFloat);
+// Qt::Alignment: AlignTop 0x20, AlignBottom 0x40, AlignVCenter 0x80
+const toVerticalAlign = (value) => {
+	if (value === 'AlignBottom') return 0x40;
+	if (value === 'AlignVCenter') return 0x80;
+	if (value === 'AlignTop' || value === undefined || value === null) return 0x20;
+	return toFloat(value);
+};
+defineField(Text.prototype, 'verticalAlignment', '$vAlign', toVerticalAlign);
 defineField(Text.prototype, 'textFormat', '$format', (value) => (value === undefined || value === null ? 'PlainText' : String(value)));
 defineField(Text.prototype, 'lineHeight', '$lineHeight', toFloat);
 const TEXT_PADDING = [['leftPadding', '$padL'], ['rightPadding', '$padR'], ['topPadding', '$padT'], ['bottomPadding', '$padB']];
