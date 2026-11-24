@@ -18,8 +18,8 @@ public:
 	// reimplemented (imtauth::ITenantFilterParam)
 	virtual QByteArray GetTenantId() const override;
 	virtual void SetTenantId(const QByteArray& tenantId) override;
-	virtual QByteArray GetOwnerId() const override;
-	virtual void SetOwnerId(const QByteArray& ownerId) override;
+	virtual imtbase::TenantType GetTenantType() const override;
+	virtual void SetTenantType(imtbase::TenantType tenantType) override;
 	virtual TenantFilterMode GetFilterMode() const override;
 	virtual void SetFilterMode(TenantFilterMode mode) override;
 	virtual SharingScope GetSharingScope() const override;
@@ -46,7 +46,7 @@ public:
 
 private:
 	QByteArray m_tenantId;
-	QByteArray m_ownerId;
+	imtbase::TenantType m_tenantType;
 	TenantFilterMode m_filterMode;
 	SharingScope m_sharingScope;
 	IDocumentShareInfo::AccessLevel m_minimumAccessLevel;

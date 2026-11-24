@@ -324,7 +324,7 @@ permissions(product, tenant) = user's roles in the product
 ```
 
 - **R8.1. Permissions are product-specific** (`IRole::GetProductId`, `IPrincipal::GetRoles(productId)`, `GetPermissions(productId)`). The server determines the request product from its configuration, not the client (13.13). Roles in another product do not grant access to this product's commands.
-- **R8.2. Organization (tenant).** For an organization, only roles, groups, and permissions **assigned** to it are considered; for “no organization,” only unassigned (global) ones apply. A parent role/group from another organization grants nothing. A delegated role (cross-org delegation) counts only when its product matches (`imtauthgql::AdaptUserForTenant`, `GetEffectiveUserPermissions`, `GetTenantUserPermissions`). This also applies when checking commands, including in Puma itself (13.14).
+- **R8.2. Organization (tenant).** For an organization, only roles, groups, and permissions **assigned** to it are considered; for “no organization,” only the ones not bound to an organization apply (global and personal ones). A parent role/group from another organization grants nothing. A delegated role (cross-org delegation) counts only when its product matches (`imtauthgql::AdaptUserForTenant`, `GetEffectiveUserPermissions`, `GetTenantUserPermissions`). This also applies when checking commands, including in Puma itself (13.14).
 - **R8.3. Role and group cycles are forbidden:** a parent role/group that closes a cycle is rejected with an error (`CreatesRoleCycle`, `CreatesGroupCycle`).
 - **R8.4. Prohibitions** are stored but **not applied** when calculating permissions (13.8). Do not use them.
 - **R8.5.** For remote consumers (ProLife, etc.), role-derived permissions are **materialized** in a serializable copy of the user (`CUserCollectionControllerComp::CreateAdaptedObjectData`); otherwise, a PAT user without roles has no permissions.
@@ -358,6 +358,14 @@ permissions(product, tenant) = user's roles in the product
 - `GetProductPermissions(productId, tenantId)` returns the tree limited by organization permissions; `GetUserPermissions(productId)` returns the current user's permissions (the superuser receives the whole tree).
 - “Global” permissions in the authorization response are the user's permissions that are not part of any organization they belong to (`CalculateGlobalPermissions`).
 - Organization management uses a separate tree (R3.6); the owner/creator is considered an organization administrator.
+
+**Personal space (data outside of any organization).**
+- Outside of any organization the user is the tenant of their data: a document they create is bound in `TenantEntityBindings` to their user ID with `TenantType` = 1 (`imtbase::TT_USER`; organizations have 0). Each user sees only their own documents, in lists and by ID; an organization does not see them either. `imtgql::GetDataTenantId` picks the tenant: the organization of the session, otherwise the user; a server or an anonymous caller outside of any organization has none.
+- The session itself stays outside of any organization: permissions come from the global roles as before (section 8).
+- The superuser outside of organizations sees in the lists everything not bound to an organization: the own documents, the personal ones of all users and the unbound ones. Data of organizations shows only inside them. Its own new documents stay personal.
+- A personal space shares no documents and receives none; sharing works between organizations only.
+- Isolation is switched by one delegate attribute, `UseTenantEntityBindings`: on, a collection is isolated both by organization and by user; off, it has no bindings (users). Roles and user groups are personal too: outside of organizations a role is listed only for its creator, but it grants its permissions to everyone it is assigned to: outside of organizations every role and group not bound to an organization counts (`ITenantEntityBindingManager::HasOrganizationBinding`).
+- Documents created before this rule have no binding: only the superuser outside of organizations lists them, but anyone can still open them by ID (`SS_ACCESSIBLE`, as for organizations).
 
 **Personal Access Tokens.**
 - Token scopes are a subset of the **creator's** permissions: `HasPermission(creator's effective permissions, scope)`. A superuser can issue any scopes; a limited token cannot create a broader one.

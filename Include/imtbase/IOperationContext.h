@@ -5,6 +5,9 @@
 // ACF includes
 #include <istd/IChangeable.h>
 
+// ImtCore includes
+#include <imtbase/TenantType.h>
+
 
 namespace imtbase
 {
@@ -52,6 +55,11 @@ public:
 		Get tenant-ID of the operation.
 	*/
 	virtual QByteArray GetTenantId() const = 0;
+
+	/**
+		Get the kind of the tenant of the operation.
+	*/
+	virtual TenantType GetTenantType() const = 0;
 
 	/**
 		Description related to the operation.

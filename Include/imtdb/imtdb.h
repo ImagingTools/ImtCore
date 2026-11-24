@@ -279,6 +279,27 @@ QString SqlValue(double value, bool useDefaultIfEmpty = false);
 void GetTimeFilterBounds(const imtbase::ITimeFilterParam& timeFilter, const QDateTime& now, QDateTime& begin, QDateTime& end);
 
 
+/**
+ * \brief Adds a column to an existing table that was created before the column existed.
+ *
+ * A table created by its auto-creation script is never created again, so a column added to the script reaches
+ * the old tables only this way.
+ *
+ * \param databaseEngine  The engine of the database holding the table.
+ * \param tableName       The quoted table name, with the schema if any (e.g. "TenantEntityBindings").
+ * \param columnName      The column name, unquoted.
+ * \param columnType      The SQL type of the column, e.g. INTEGER or TEXT.
+ * \param defaultValue    [optional] The SQL literal of the default; with one the column is NOT NULL (where the database allows it).
+ * \return False if the columns could not be read or the column could not be added.
+ */
+bool AddColumnIfMissing(
+			const IDatabaseEngine& databaseEngine,
+			const QString& tableName,
+			const QString& columnName,
+			const QString& columnType,
+			const QString& defaultValue = QString());
+
+
 } // namespace imtdb
 
 

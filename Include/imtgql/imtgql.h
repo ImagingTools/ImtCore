@@ -6,6 +6,7 @@
 #include <iqt/ITranslationManager.h>
 
 // ImtCore includes
+#include <imtbase/TenantType.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/IGqlContext.h>
 
@@ -33,6 +34,12 @@ imtauth::IUserInfo::FeatureIds CollectTenantOwnerPermissions(const IGqlContext& 
 	Empty for a request of a user, sent directly or forwarded by a server, and for an anonymous request a server forwards.
 */
 QByteArray GetSenderServerProductId(const IGqlContext& gqlContext);
+
+/**
+	Get the tenant that owns the data of the context: the organization of the session, otherwise the user itself.
+	A context of a server or of an anonymous caller outside of any organization has no tenant.
+*/
+QByteArray GetDataTenantId(const IGqlContext& gqlContext, imtbase::TenantType& tenantType);
 
 /**
 	The given permissions limited to the permission scope of the organization of the context.

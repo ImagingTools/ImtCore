@@ -13,7 +13,8 @@ namespace imtauth
 
 
 CTenantFilterParam::CTenantFilterParam()
-	: m_filterMode(TFM_INCLUDE),
+	: m_tenantType(imtbase::TT_ORGANIZATION),
+	m_filterMode(TFM_INCLUDE),
 	m_sharingScope(SS_OWN),
 	m_minimumAccessLevel(IDocumentShareInfo::DAL_VIEW),
 	m_isGroupRestrictionEnabled(false),
@@ -41,18 +42,18 @@ void CTenantFilterParam::SetTenantId(const QByteArray& tenantId)
 }
 
 
-QByteArray CTenantFilterParam::GetOwnerId() const
+imtbase::TenantType CTenantFilterParam::GetTenantType() const
 {
-	return m_ownerId;
+	return m_tenantType;
 }
 
 
-void CTenantFilterParam::SetOwnerId(const QByteArray& ownerId)
+void CTenantFilterParam::SetTenantType(imtbase::TenantType tenantType)
 {
-	if (m_ownerId != ownerId){
+	if (m_tenantType != tenantType){
 		istd::CChangeNotifier notifier(this);
 
-		m_ownerId = ownerId;
+		m_tenantType = tenantType;
 	}
 }
 
@@ -180,10 +181,12 @@ bool CTenantFilterParam::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_tenantId);
 	retVal = retVal && archive.EndTag(tenantIdTag);
 
-	iser::CArchiveTag ownerIdTag("OwnerId", "Owner ID", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(ownerIdTag);
-	retVal = retVal && archive.Process(m_ownerId);
-	retVal = retVal && archive.EndTag(ownerIdTag);
+	iser::CArchiveTag tenantTypeTag("TenantType", "Tenant type", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(tenantTypeTag);
+	int tenantTypeInt = static_cast<int>(m_tenantType);
+	retVal = retVal && archive.Process(tenantTypeInt);
+	m_tenantType = static_cast<imtbase::TenantType>(tenantTypeInt);
+	retVal = retVal && archive.EndTag(tenantTypeTag);
 
 	iser::CArchiveTag filterModeTag("FilterMode", "Filter Mode", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(filterModeTag);
@@ -260,7 +263,7 @@ bool CTenantFilterParam::CopyFrom(const IChangeable& object, CompatibilityMode /
 		istd::CChangeNotifier notifier(this);
 
 		m_tenantId = sourcePtr->GetTenantId();
-		m_ownerId = sourcePtr->GetOwnerId();
+		m_tenantType = sourcePtr->GetTenantType();
 		m_filterMode = sourcePtr->GetFilterMode();
 		m_sharingScope = sourcePtr->GetSharingScope();
 		m_minimumAccessLevel = sourcePtr->GetMinimumAccessLevel();
@@ -293,7 +296,7 @@ bool CTenantFilterParam::ResetData(CompatibilityMode /*mode*/)
 	istd::CChangeNotifier notifier(this);
 
 	m_tenantId.clear();
-	m_ownerId.clear();
+	m_tenantType = imtbase::TT_ORGANIZATION;
 	m_filterMode = TFM_INCLUDE;
 	m_sharingScope = SS_OWN;
 	m_minimumAccessLevel = IDocumentShareInfo::DAL_VIEW;

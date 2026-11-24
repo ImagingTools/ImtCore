@@ -166,6 +166,15 @@ QtObject {
 	function fetchTenantPermissions(tenantId) {}
 	function invalidateTenantPermissions() {}
 
+	// Organization management permissions: the tree, the ones of the requested member and the level Administrator
+	property var organizationPermissions: []
+	property var memberOrganizationPermissions: []
+	property var administratorOrganizationPermissions: []
+	signal organizationPermissionsReceived()
+	function fetchOrganizationPermissions(tenantId, userId) {}
+	signal memberPermissionsUpdated()
+	function setMemberOrganizationPermissionsByUser(tenantId, userId, permissions) {}
+
 	// --- Cross-org grants ---
 	property var crossOrgGrantDocumentManager: null
 	property var crossOrgGrantsListDataProvider: null
@@ -189,7 +198,8 @@ QtObject {
 	// --- Connection Requests ---
 	property var connectionRequestsModel: null
 	function fetchConnectionRequests(tenantId) {}
-	function createConnectionRequest(sourceTenantId, connectionCode, message) {}
+	// The roles propose a relationship along (both or none); the source role is the one of the requesting organization
+	function createConnectionRequest(sourceTenantId, connectionCode, message, proposedSourceRole, proposedTargetRole, proposedScope) {}
 	function approveConnectionRequest(requestId, tenantId) {}
 	function rejectConnectionRequest(requestId, tenantId) {}
 	function cancelConnectionRequest(requestId, tenantId) {}

@@ -62,15 +62,17 @@ bool CRoleDocumentValidatorComp::ValidateDocumentData(
 	}
 
 	QByteArray tenantId;
+	imtbase::TenantType tenantType = imtbase::TT_ORGANIZATION;
 	if (operationContextPtr != nullptr){
 		tenantId = operationContextPtr->GetTenantId().trimmed();
+		tenantType = operationContextPtr->GetTenantType();
 	}
 
-	if (!CheckRoleIdUnique(*m_roleCollectionCompPtr, objectId, roleId, productId, tenantId, errorMessage, translationManagerPtr, languageId)){
+	if (!CheckRoleIdUnique(*m_roleCollectionCompPtr, objectId, roleId, productId, tenantId, tenantType, errorMessage, translationManagerPtr, languageId)){
 		return false;
 	}
 
-	if (!CheckParentRolesInTenant(*m_roleCollectionCompPtr, roleInfoPtr->GetIncludedRoles(), tenantId, errorMessage, translationManagerPtr, languageId)){
+	if (!CheckParentRolesInTenant(*m_roleCollectionCompPtr, roleInfoPtr->GetIncludedRoles(), tenantId, tenantType, errorMessage, translationManagerPtr, languageId)){
 		return false;
 	}
 
@@ -78,7 +80,8 @@ bool CRoleDocumentValidatorComp::ValidateDocumentData(
 		return false;
 	}
 
-	if (!tenantId.isEmpty()){
+	// A personal space has no permission scope
+	if (!tenantId.isEmpty() && tenantType == imtbase::TT_ORGANIZATION){
 		if (!m_tenantManagerCompPtr.IsValid()){
 			errorMessage = QStringLiteral("Tenant manager is not configured for tenant-scoped role permissions validation");
 			return false;
@@ -118,12 +121,14 @@ bool CRoleDocumentValidatorComp::CheckRoleIdUnique(
 			const QByteArray& roleId,
 			const QByteArray& productId,
 			const QByteArray& tenantId,
+			imtbase::TenantType tenantType,
 			QString& errorMessage,
 			const iqt::ITranslationManager* translationManagerPtr,
 			const QByteArray& languageId)
 {
 	imtauth::CTenantFilterParam tenantFilter;
 	tenantFilter.SetTenantId(tenantId);
+	tenantFilter.SetTenantType(tenantType);
 
 	imtbase::CComplexCollectionFilter::FilterExpression filterExpr;
 	filterExpr.logicalOperation = imtbase::IComplexCollectionFilter::LO_AND;
@@ -154,6 +159,7 @@ bool CRoleDocumentValidatorComp::CheckParentRolesInTenant(
 			const imtbase::IObjectCollection& roleCollection,
 			const QByteArrayList& parentRoleIds,
 			const QByteArray& tenantId,
+			imtbase::TenantType tenantType,
 			QString& errorMessage,
 			const iqt::ITranslationManager* translationManagerPtr,
 			const QByteArray& languageId)
@@ -164,6 +170,7 @@ bool CRoleDocumentValidatorComp::CheckParentRolesInTenant(
 
 	imtauth::CTenantFilterParam tenantFilter;
 	tenantFilter.SetTenantId(tenantId);
+	tenantFilter.SetTenantType(tenantType);
 
 	imtbase::CComplexCollectionFilter::FilterExpression filterExpr;
 	filterExpr.logicalOperation = imtbase::IComplexCollectionFilter::LO_OR;

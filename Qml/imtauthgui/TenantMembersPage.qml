@@ -115,6 +115,19 @@ SimpleCollectionPage {
 		)
 	}
 
+	// The member whose permissions are being written, kept until the server answers
+	property string __pendingPermissionsUserId: ""
+	property var __pendingPermissions: []
+
+	function applyMemberPermissions(userId, permissions) {
+		var tid = membersPage.model ? membersPage.model.m_id : ""
+		if (!userId || !tid || !membersPage.apiClient)
+			return
+		membersPage.__pendingPermissionsUserId = userId
+		membersPage.__pendingPermissions = permissions
+		membersPage.apiClient.setMemberOrganizationPermissionsByUser(tid, userId, permissions)
+	}
+
 	function showMemberOrgPermissionsPopup(memberData) {
 		orgPermsPopup.currentMember = memberData
 		orgPermsPopup.__checkedCount = 0
@@ -302,15 +315,9 @@ SimpleCollectionPage {
 						variant: "primary"
 						onClicked: {
 							var selected = orgPermsTable.getCheckedIds ? orgPermsTable.getCheckedIds() : []
-							var tid = membersPage.model ? membersPage.model.m_id : ""
 							var uid = orgPermsPopup.currentMember ? orgPermsPopup.currentMember.id : ""
-							if (uid && tid && membersPage.apiClient) {
-								membersPage.apiClient.setMemberOrganizationPermissionsByUser(tid, uid, selected)
-							}
+							membersPage.applyMemberPermissions(uid, selected)
 							orgPermsPopup.close()
-							if (membersPage.stateManager) {
-								membersPage.stateManager.loadMembersFromModel()
-							}
 						}
 					}
 				}
@@ -333,10 +340,21 @@ SimpleCollectionPage {
 				orgPermsPopup.__checkedCount = orgPermsTable.getCheckedIds().length
 				permsLoading.stop()
 			}
+			// The level Administrator comes with the tree
+			membersPage.__rebuildCombinedModel()
+		}
+
+		function onMemberPermissionsUpdated() {
+			if (membersPage.__pendingPermissionsUserId !== "" && membersPage.stateManager)
+				membersPage.stateManager.setMemberOrganizationPermissions(membersPage.__pendingPermissionsUserId, membersPage.__pendingPermissions)
+			membersPage.__pendingPermissionsUserId = ""
+			membersPage.__pendingPermissions = []
 		}
 
 		function onRequestFailed(message) {
 			permsLoading.stop()
+			membersPage.__pendingPermissionsUserId = ""
+			membersPage.__pendingPermissions = []
 		}
 	}
 
@@ -608,6 +626,56 @@ SimpleCollectionPage {
 		return "Pending"
 	}
 
+	// A list from C++ or from another object is no JS array: Array.isArray and indexOf are not to be relied on
+	function __toList(value) {
+		var list = []
+		var count = value ? (value.length || 0) : 0
+		for (var i = 0; i < count; i++)
+			list.push(value[i])
+		return list
+	}
+
+	function __isSamePermissions(left, right) {
+		if (left.length !== right.length)
+			return false
+		for (var i = 0; i < left.length; i++) {
+			if (right.indexOf(left[i]) < 0)
+				return false
+		}
+		return true
+	}
+
+	// Owner, Creator, Administrator, Member or Special; empty when the permissions of the members are not given
+	function memberLevel(data) {
+		var userId = data.id || ""
+		var tenant = membersPage.model
+		if (tenant && userId === tenant.m_ownerId)
+			return "Owner"
+		if (tenant && tenant.m_creatorId !== "" && userId === tenant.m_creatorId)
+			return "Creator"
+		if (!membersPage.stateManager || !membersPage.stateManager.canViewOrganizationPermissions)
+			return ""
+		var permissions = membersPage.__toList(data.organizationPermissions)
+		if (permissions.length === 0)
+			return "Member"
+		var administratorPermissions = membersPage.__toList(membersPage.apiClient ? membersPage.apiClient.administratorOrganizationPermissions : [])
+		if (membersPage.__isSamePermissions(permissions, administratorPermissions))
+			return "Administrator"
+		return "Special"
+	}
+
+	function memberLevelText(level) {
+		if (level === "Owner")
+			return qsTr("Owner")
+		if (level === "Creator")
+			return qsTr("Creator")
+		if (level === "Administrator")
+			return qsTr("Administrator")
+		if (level === "Special")
+			return qsTr("Special permissions")
+		return qsTr("Member")
+	}
+
 	function createRow(item) {
 		var data = item.sourceData || item
 		var tenant = membersPage.model
@@ -629,18 +697,14 @@ SimpleCollectionPage {
 		}
 
 		var userId = data.id || ""
-		row.role = qsTr("Member")
-		if (tenant && userId === tenant.m_ownerId)
-			row.role = qsTr("Owner")
-		else if (tenant && tenant.m_creatorId !== "" && userId === tenant.m_creatorId)
-			row.role = qsTr("Creator")
+		var level = membersPage.memberLevel(data)
+		row.role = membersPage.memberLevelText(level)
 		row.status = qsTr("Active")
-		var permissionCount = Array.isArray(data.organizationPermissions) ? data.organizationPermissions.length : 0
 		var details = []
 		if (membersPage.__isCurrentUser(userId))
 			details.push(qsTr("You"))
-		if (permissionCount > 0)
-			details.push(qsTr("%1 organization permission(s)").arg(permissionCount))
+		if (level === "Special")
+			details.push(qsTr("%1 organization permission(s)").arg(membersPage.__toList(data.organizationPermissions).length))
 		row.details = details.join(" · ")
 		return row
 	}
@@ -666,13 +730,25 @@ SimpleCollectionPage {
 			items.push("leave")
 			return items
 		}
-		if (stateManager && (stateManager.canChangeOrganizationMemberRole || stateManager.canManageOrganizationMembers))
+		if (stateManager && stateManager.canEditOrganizationMemberPermissions) {
+			var level = membersPage.memberLevel(membersPage.__findMemberData(userId))
+			var administratorPermissions = membersPage.apiClient ? (membersPage.apiClient.administratorOrganizationPermissions || []) : []
+			if (level !== "Administrator" && administratorPermissions.length > 0)
+				items.push("makeAdministrator")
+			if (level !== "Member")
+				items.push("makeMember")
 			items.push("managePermissions")
+		}
 		if (stateManager && stateManager.canExcludeOrganizationMember)
 			items.push("remove")
 		if (stateManager && stateManager.isOwner)
 			items.push("transfer")
 		return items
+	}
+
+	function __findMemberData(userId) {
+		var item = membersPage.__findItemById(userId)
+		return item ? (item.sourceData || item) : {"id": userId}
 	}
 
 	function __invitationMenuItems(invitation) {
@@ -724,6 +800,8 @@ SimpleCollectionPage {
 			return
 		memberActionMenu.targetUserId = data.id || ""
 		memberActionMenu.targetUserName = data.name || data.id || ""
+		memberActionMenu.showMakeAdministrator = actions.indexOf("makeAdministrator") >= 0
+		memberActionMenu.showMakeMember = actions.indexOf("makeMember") >= 0
 		memberActionMenu.showManagePermissions = actions.indexOf("managePermissions") >= 0
 		memberActionMenu.showExclude = actions.indexOf("remove") >= 0
 		memberActionMenu.showTransfer = actions.indexOf("transfer") >= 0
@@ -771,9 +849,12 @@ SimpleCollectionPage {
 		function fillModel(){
 			memberActionContextModel.clear()
 
-			if (memberActionMenu.showManagePermissions) {
-				memberActionContextModel.append({"id": "ManagePermissions", "name": qsTr("Manage Organization Permissions..."), "icon": "", "isEnabled": true})
-			}
+			if (memberActionMenu.showMakeAdministrator)
+				memberActionContextModel.append({"id": "MakeAdministrator", "name": qsTr("Make Administrator"), "icon": "", "isEnabled": true})
+			if (memberActionMenu.showMakeMember)
+				memberActionContextModel.append({"id": "MakeMember", "name": qsTr("Make Member"), "icon": "", "isEnabled": true})
+			if (memberActionMenu.showManagePermissions)
+				memberActionContextModel.append({"id": "ManagePermissions", "name": qsTr("Permissions in Detail..."), "icon": "", "isEnabled": true})
 
 			if (memberActionMenu.showExclude || memberActionMenu.showTransfer || memberActionMenu.showLeave) {
 				if (memberActionContextModel.count > 0)
@@ -795,7 +876,13 @@ SimpleCollectionPage {
 		PopupMenuDialog {
 			id: memberActionPopupDialog
 			onFinished: {
-				if (commandId === "ManagePermissions") {
+				if (commandId === "MakeAdministrator") {
+					membersPage.applyMemberPermissions(memberActionMenu.targetUserId, membersPage.apiClient ? (membersPage.apiClient.administratorOrganizationPermissions || []) : [])
+				}
+				else if (commandId === "MakeMember") {
+					membersPage.applyMemberPermissions(memberActionMenu.targetUserId, [])
+				}
+				else if (commandId === "ManagePermissions") {
 					var uid = memberActionMenu.targetUserId
 					var items = membersPage.__combinedModel
 					for (var i = 0; i < items.length; i++) {
@@ -852,6 +939,8 @@ SimpleCollectionPage {
 		id: memberActionMenu
 		property string targetUserId: ""
 		property string targetUserName: ""
+		property bool showMakeAdministrator: false
+		property bool showMakeMember: false
 		property bool showManagePermissions: false
 		property bool showExclude: false
 		property bool showTransfer: false

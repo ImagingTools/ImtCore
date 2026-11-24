@@ -45,6 +45,21 @@ QByteArray GetSenderServerProductId(const IGqlContext& gqlContext)
 }
 
 
+QByteArray GetDataTenantId(const IGqlContext& gqlContext, imtbase::TenantType& tenantType)
+{
+	tenantType = imtbase::TT_ORGANIZATION;
+
+	const QByteArray tenantId = gqlContext.GetTenantId();
+	if (!tenantId.isEmpty() || gqlContext.GetPrincipalKind() != IGqlContext::PK_USER){
+		return tenantId;
+	}
+
+	tenantType = imtbase::TT_USER;
+
+	return gqlContext.GetUserId();
+}
+
+
 imtauth::IUserInfo::FeatureIds CollectTenantOwnerPermissions(const IGqlContext& gqlContext)
 {
 	if (!gqlContext.IsTenantOwner() || gqlContext.GetTenantId().isEmpty()){

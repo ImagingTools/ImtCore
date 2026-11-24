@@ -6,6 +6,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
 #include <QtCore/QMutableListIterator>
+#include <QtNetwork/QTcpSocket>
 
 // ImtCore includes
 #include <imtrest/IProtocolEngine.h>
@@ -14,6 +15,25 @@
 #include <imtrest/CHttpResponse.h>
 #include <imtrest/CHttpSender.h>
 #include <imtrest/IStreamingResponse.h>
+
+
+namespace
+{
+
+
+/**
+	Close a connection that is not served: the client is not left waiting for an answer.
+*/
+void CloseSocketDescriptor(qintptr socketDescriptor)
+{
+	QTcpSocket socket;
+	if (socket.setSocketDescriptor(socketDescriptor)){
+		socket.abort();
+	}
+}
+
+
+} // namespace
 
 
 namespace imtrest
@@ -94,6 +114,12 @@ void CMultiThreadServer::SetSslConfiguration(const QSslConfiguration& sslConfigu
 	}
 
 	m_sslConfiguration = sslConfiguration;
+}
+
+
+QSslConfiguration CMultiThreadServer::GetSslConfiguration() const
+{
+	return m_sslConfiguration;
 }
 
 
@@ -178,7 +204,8 @@ void CMultiThreadServer::Disconnected(QByteArray requestId)
 		}
 	}
 
-	if (m_descriptorList.isEmpty()){
+	// The stopped server starts no thread: the waiting connections are closed by ShutdownServer()
+	if (!m_isActive || m_descriptorList.isEmpty()){
 		return;
 	}
 
@@ -212,6 +239,14 @@ void CMultiThreadServer::ShutdownServer()
 
 		threadSocketIterator.remove();
 	}
+
+	QMutexLocker lock(&m_descriptorListMutex);
+
+	for (qintptr socketDescriptor : std::as_const(m_descriptorList)){
+		CloseSocketDescriptor(socketDescriptor);
+	}
+
+	m_descriptorList.clear();
 }
 
 
@@ -240,6 +275,8 @@ qintptr CMultiThreadServer::PopSocketDescriptor()
 void CMultiThreadServer::incomingConnection(qintptr socketDescriptor)
 {
 	if (!m_isActive){
+		CloseSocketDescriptor(socketDescriptor);
+
 		return;
 	}
 

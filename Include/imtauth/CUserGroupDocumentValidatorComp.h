@@ -8,6 +8,7 @@
 // ImtCore includes
 #include <imtdoc/IDocumentValidator.h>
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/TenantType.h>
 
 
 namespace imtauth
@@ -42,6 +43,7 @@ public:
 				const QByteArray& objectId,
 				const QString& name,
 				const QByteArray& tenantId,
+				imtbase::TenantType tenantType,
 				QString& errorMessage);
 
 	/**
@@ -51,6 +53,7 @@ public:
 				const imtbase::IObjectCollection& userGroupCollection,
 				const QByteArrayList& parentGroupIds,
 				const QByteArray& tenantId,
+				imtbase::TenantType tenantType,
 				QString& errorMessage);
 
 private:

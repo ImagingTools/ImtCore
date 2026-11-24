@@ -1535,6 +1535,11 @@ sdl::V1_0::imtauth::CGetConnectionRequestsPayload CTenantManagerControllerComp::
 			data.respondedAt = reqPtr->GetRespondedAt();
 			data.sourceTenantName = reqPtr->GetSourceTenantName();
 			data.targetTenantName = reqPtr->GetTargetTenantName();
+			if (reqPtr->IsRelationshipProposed()){
+				data.proposedSourceRole = imtauthgql::ToSdlRelationshipRole(reqPtr->GetProposedSourceRole());
+				data.proposedTargetRole = imtauthgql::ToSdlRelationshipRole(reqPtr->GetProposedTargetRole());
+				data.proposedScope = reqPtr->GetProposedScope();
+			}
 
 			// Resolve tenant names from tenant manager (handles legacy data where names were not stored)
 			if (m_tenantManagerCompPtr.IsValid()){
@@ -1590,6 +1595,28 @@ sdl::V1_0::imtauth::CCreateConnectionRequestPayload CTenantManagerControllerComp
 		response.errorMessage = QStringLiteral("Source tenant ID is required");
 		return response;
 	}
+
+	// The terms of a relationship proposed along: both roles or none
+	const bool hasSourceRole = arguments.input->proposedSourceRole.has_value();
+	const bool hasTargetRole = arguments.input->proposedTargetRole.has_value();
+	if (hasSourceRole != hasTargetRole){
+		response.errorMessage = QStringLiteral("A proposed relationship needs the roles of both organizations");
+		return response;
+	}
+
+	imtauth::ITenantRelationshipProposalInfoUniquePtr proposedRelationshipPtr;
+	if (hasSourceRole){
+		proposedRelationshipPtr = m_proposalFactoryCompPtr.CreateInstance();
+		if (!proposedRelationshipPtr.IsValid()){
+			response.errorMessage = QStringLiteral("Failed to create proposal info instance");
+			return response;
+		}
+		proposedRelationshipPtr->SetProposedSourceRole(imtauthgql::FromSdlRelationshipRole(*arguments.input->proposedSourceRole));
+		proposedRelationshipPtr->SetProposedTargetRole(imtauthgql::FromSdlRelationshipRole(*arguments.input->proposedTargetRole));
+		if (arguments.input->proposedScope){
+			proposedRelationshipPtr->SetProposedScope(*arguments.input->proposedScope);
+		}
+	}
 	if (!imtbase::isValidUuid(sourceTenantId)){
 		response.errorMessage = QStringLiteral("Invalid source tenant ID format");
 		return response;
@@ -1615,7 +1642,7 @@ sdl::V1_0::imtauth::CCreateConnectionRequestPayload CTenantManagerControllerComp
 	}
 	
 	QString refusalReason;
-	QByteArray requestId = m_connectionRequestManagerCompPtr->CreateConnectionRequest(sourceTenantId, connectionCode, message, &refusalReason);
+	QByteArray requestId = m_connectionRequestManagerCompPtr->CreateConnectionRequest(sourceTenantId, connectionCode, message, &refusalReason, proposedRelationshipPtr.GetPtr());
 	if (requestId.isEmpty()){
 		response.errorMessage = refusalReason.isEmpty() ? QStringLiteral("Failed to create connection request") : refusalReason;
 	} else {
@@ -1669,11 +1696,15 @@ sdl::V1_0::imtauth::CApproveConnectionRequestPayload CTenantManagerControllerCom
 		return response;
 	}
 	
-	QByteArray connectionId = m_connectionRequestManagerCompPtr->ApproveConnectionRequest(requestId, tenantId);
+	QByteArray relationshipId;
+	QByteArray connectionId = m_connectionRequestManagerCompPtr->ApproveConnectionRequest(requestId, tenantId, &relationshipId);
 	if (connectionId.isEmpty()){
 		response.errorMessage = QStringLiteral("Failed to approve connection request");
 	} else {
 		response.connectionId = connectionId;
+		if (!relationshipId.isEmpty()){
+			response.relationshipId = relationshipId;
+		}
 	}
 	
 	return response;

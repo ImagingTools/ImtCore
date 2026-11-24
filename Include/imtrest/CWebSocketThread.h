@@ -75,11 +75,18 @@ private:
 	// (e.g. synchronous auth I/O) cannot recurse back into message processing.
 	void ProcessTextMessage(const QString& textMessage);
 
+	/**
+		Release the requests of the subscriptions of the connection, in the thread of the connection: they were created there.
+	*/
+	void ReleaseRequests();
+
 	CWebSocketServerComp* m_server;
 	imtrest::IProtocolEngine* m_enginePtr;
 	mutable QMutex m_socketDescriptorMutex;
 	mutable QMutex m_statusMutex;
 	Status m_status;
+	// The socket is set and read in the thread of the server, forgotten in this thread
+	mutable QMutex m_socketMutex;
 	QPointer<QWebSocket> m_socket;
 	bool m_isSecureConnection;
 	QList<CWebSocketRequest*> m_requestList;
