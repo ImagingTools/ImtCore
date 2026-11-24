@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="{{csp}}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{css}}">
+    <title>JQML 4 Composer</title>
+</head>
+<body>
+    <div id="banner" class="banner" hidden></div>
+    <div class="shell">
+        <aside class="pane left">
+            <section class="section palette">
+                <div class="pane-head">Types</div>
+                <input id="type-search" type="search" placeholder="Search">
+                <div id="palette" class="palette-list"></div>
+            </section>
+            <section class="section outline">
+                <div class="pane-head">Objects</div>
+                <div id="tree" class="tree"></div>
+            </section>
+        </aside>
+        <main class="center">
+            <div class="toolbar">
+                <button id="up" type="button" title="Move up">Up</button>
+                <button id="down" type="button" title="Move down">Down</button>
+                <button id="delete" type="button" title="Delete the selected object">Delete</button>
+                <span class="sep"></span>
+                <label for="extends">Extends</label>
+                <select id="extends" title="The schema that this one inherits"></select>
+                <label for="imports">Imports</label>
+                <input id="imports" type="text" class="imports" placeholder="QtQuick 2.12, ..." title="The modules that the generated QML imports, separated by commas">
+                <span class="spacer"></span>
+                <button id="generate" type="button" class="primary" title="Generate the application from this schema">Generate</button>
+                <label for="zoom">Zoom</label>
+                <select id="zoom">
+                    <option value="0.5">50%</option>
+                    <option value="0.75">75%</option>
+                    <option value="1" selected>100%</option>
+                    <option value="1.5">150%</option>
+                    <option value="2">200%</option>
+                </select>
+            </div>
+            <div id="canvas-scroll" class="canvas-scroll">
+                <div id="canvas-holder" class="canvas-holder">
+                    <div id="canvas" class="canvas"></div>
+                </div>
+                <div id="empty" class="empty" hidden>The file has no root object.</div>
+            </div>
+        </main>
+        <aside class="pane right">
+            <div class="pane-head">Properties</div>
+            <div id="inspector" class="inspector"></div>
+        </aside>
+    </div>
+    <script nonce="{{nonce}}" src="{{js}}"></script>
+</body>
+</html>

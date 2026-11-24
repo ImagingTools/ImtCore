@@ -3,6 +3,8 @@
 The JQML 4 language extension lives in `Tools/JQML/v4/plugins/jqml-vscode`. `Tools/JQML/v4/plugins` is the
 folder for the tools that are built around JQML 4 (the next plugins go next to it). The extension for JQML 3 is
 described in [VSCodeExtension.md](VSCodeExtension.md).
+The visual composer of schemas that generates an application is a separate extension, `Tools/JQML/v4/plugins/jqml-composer`,
+described in [VSCodeComposerV4.md](VSCodeComposerV4.md).
 
 It uses the real JQML 4 lexer and parser (`v4/src/lexer.js`, `v4/src/parser.js`) for syntax errors, and the list
 of the built-in types and their members is read from the engine classes (`v4/src/items.js`) when the extension
