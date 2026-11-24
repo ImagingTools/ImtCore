@@ -2450,6 +2450,7 @@ export class Text extends Item {
 		this.$wrap = 0;
 		this.$elide = 3;
 		this.$hAlign = 1;
+		this.$vAlign = 0x20; // AlignTop
 		this.$format = 'PlainText';
 		this.$lineHeight = 1;
 		this.$font = null;
@@ -2671,11 +2672,20 @@ export class Text extends Item {
 	$paint(r, opacity) {
 		if (this.$text.length === 0 || this.$pixelSize <= 0) return;
 		const left = this.$padding('$padL');
-		const top = this.$padding('$padT');
+		const top = this.$padding('$padT') + this.$verticalShift();
 		r.translate(left, top);
 		if (this.$kind() !== 'plain') this.$paintRich(r, opacity);
 		else this.$paintPlain(r, opacity);
 		r.translate(-left, -top);
+	}
+
+	// How far verticalAlignment moves the text down from the top padding: the room that the height leaves under the text, all of it
+	// (AlignBottom) or half of it, half rounded up (AlignVCenter). The room is negative for a text higher than the item (measured in Qt).
+	$verticalShift() {
+		const align = this.$vAlign;
+		if ((align & 0xc0) === 0) return 0;
+		const free = this.$ah - this.$padding('$padT') - this.$padding('$padB') - this.$metrics().contentHeight;
+		return (align & 0x40) !== 0 ? free : Math.floor(free / 2 + 0.5);
 	}
 
 	$paintPlain(r, opacity) {
@@ -2748,6 +2758,14 @@ const toElideMode = (value) => {
 defineField(Text.prototype, 'wrapMode', '$wrap', toWrapMode);
 defineField(Text.prototype, 'elide', '$elide', toElideMode);
 defineField(Text.prototype, 'horizontalAlignment', '$hAlign', toFloat);
+// Qt::Alignment: AlignTop 0x20, AlignBottom 0x40, AlignVCenter 0x80
+const toVerticalAlign = (value) => {
+	if (value === 'AlignBottom') return 0x40;
+	if (value === 'AlignVCenter') return 0x80;
+	if (value === 'AlignTop' || value === undefined || value === null) return 0x20;
+	return toFloat(value);
+};
+defineField(Text.prototype, 'verticalAlignment', '$vAlign', toVerticalAlign);
 defineField(Text.prototype, 'textFormat', '$format', (value) => (value === undefined || value === null ? 'PlainText' : String(value)));
 defineField(Text.prototype, 'lineHeight', '$lineHeight', toFloat);
 const TEXT_PADDING = [['leftPadding', '$padL'], ['rightPadding', '$padR'], ['topPadding', '$padT'], ['bottomPadding', '$padB']];
@@ -5653,7 +5671,7 @@ class TextEditor extends Item {
 		for (const name of LAYOUT_DEPENDENT) noteWrite(this, name);
 	}
 
-	// Rich text is shown as plain text and cannot be edited or selected by the mouse.
+	// Rich text is laid out and painted like the rich text of a Text (colors, backgrounds); it cannot be edited or selected by the mouse.
 	get $rich() {
 		return this.$multi && this.$format === 'RichText';
 	}
@@ -5701,7 +5719,8 @@ class TextEditor extends Item {
 			if (w > 0) limit = w;
 		}
 		const cached = this.$cache;
-		if (cached !== null && cached.info === info && cached.version === fonts.version && cached.shown === shown && cached.limit === limit) return cached;
+		const source = this.$rich ? this.$text : '';
+		if (cached !== null && cached.info === info && cached.version === fonts.version && cached.shown === shown && cached.limit === limit && cached.source === source) return cached;
 		const step = this.$multi && shown !== '' ? info.lineSpacing : info.lineHeight;
 		const lines = this.$multi ? textRanges(info, shown, limit, this.$wrap === 3 || this.$wrap === 4) : [{ start: 0, end: shown.length }];
 		let width = 0;
@@ -5709,9 +5728,35 @@ class TextEditor extends Item {
 			line.width = textWidth(info, shown.slice(line.start, line.end));
 			width = Math.max(width, line.width);
 		}
-		const lay = { info, version: fonts.version, shown, limit, step, lines, width, height: lines.length * step, natural: -1 };
+		const lay = { info, version: fonts.version, shown, limit, step, lines, width, height: lines.length * step, natural: -1, source, rich: null };
+		if (this.$rich) {
+			// the size is that of the marked up text
+			const rich = this.$richLayout(limit, family);
+			lay.rich = rich;
+			lay.width = rich.contentWidth;
+			lay.height = rich.contentHeight;
+			lay.natural = rich.naturalWidth;
+		}
 		this.$cache = lay;
 		return lay;
+	}
+
+	// The layout of the marked up text for a width (Infinity: none), kept while nothing it depends on changes.
+	$richLayout(limit, family) {
+		const size = this.$pixelSize > 0 ? this.$pixelSize : 12;
+		const wrap = limit === Infinity ? 'none' : this.$wrap === 1 || this.$wrap === 'WordWrap' ? 'word' : 'anywhere';
+		const width = limit === Infinity ? 0 : limit;
+		const key = [family, size, this.$bold, this.$italic, width, wrap, this.$hAlign, fonts.version].join('|');
+		let state = this.$richState;
+		if (state === undefined) state = this.$richState = { docKey: null, doc: null, key: null, layout: null };
+		if (state.key === key && state.docKey === this.$text) return state.layout;
+		if (state.docKey !== this.$text) {
+			state.doc = parseRichText(this.$text, false);
+			state.docKey = this.$text;
+		}
+		state.layout = layoutRichText(state.doc, { fonts, family, size, bold: this.$bold, italic: this.$italic, width, wrap, styled: false, lineHeightFactor: 1, align: this.$hAlign });
+		state.key = key;
+		return state.layout;
 	}
 
 	// The widest line without wrapping.
@@ -6406,7 +6451,22 @@ class TextEditor extends Item {
 		const selectionBack = r.pack(this.$selColor, opacity);
 		const selectionText = r.pack(this.$selTextColor, opacity);
 		const y0 = this.$originY(lay);
-		for (let row = 0; row < lay.lines.length; row++) {
+		if (lay.rich !== null) {
+			r.translate(this.$padL, y0);
+			paintRichText(r, lay.rich, {
+				fonts,
+				family: this.$family !== '' ? this.$family : fonts.defaultFamily(),
+				size: this.$pixelSize > 0 ? this.$pixelSize : 12,
+				bold: this.$bold,
+				italic: this.$italic,
+				width: lay.limit === Infinity ? 0 : lay.limit,
+				pack: (value) => r.pack(toColor(value), opacity),
+				baseColor: lay.rich.baseColor !== null ? r.pack(toColor(lay.rich.baseColor), opacity) : color,
+				linkColor: r.pack(toColor('#0000ff'), opacity),
+			});
+			r.translate(-this.$padL, -y0);
+		}
+		for (let row = 0; lay.rich === null && row < lay.lines.length; row++) {
 			const line = lay.lines[row];
 			const top = y0 + row * lay.step;
 			const x0 = this.$originX(lay, line);
