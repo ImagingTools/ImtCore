@@ -1,13 +1,13 @@
-// Canvas on a native <canvas>, after qquickcanvasitem.cpp (Qt 6.8): available once the item is in a window (queued,
+// Canvas on a native <canvas>, after qquickcanvasitem.cpp (Qt 6.12): available once the item is in a window (queued,
 // QQuickCanvasItem::itemChange ItemSceneChange -> sceneGraphInitialized); paint(region) is emitted at polish for the
-// dirty rect, painted() once the commands are on the canvas. The context is the DOM one with Qt's behaviour
-// (Context2D.js).
+// dirty rect, painted() when the commands go to the canvas (after the polish, and at once when the pixels are read:
+// getImageData, toDataURL). The context is Qt's Context2D drawing on the DOM canvas (Context2D.js).
 const engine = require('../Core/engine')
 const { defineType } = require('../Core/type')
 const { Item } = require('./Item')
 const { QtObject } = require('../Core/QtObject')
 const { QSizeF, QRectF } = require('../Core/ValueTypes')
-const { extendContext } = require('./Context2D')
+const { Context2D } = require('./Context2D')
 const { resolveUrl } = require('../Core/Resources')
 
 // QQuickPixmap cache: a url loaded once is ready for every canvas (loadImage of a ready url emits nothing)
@@ -16,9 +16,6 @@ const READY = 1, LOADING = 2, ERROR = 3
 
 // QQuickCanvasItem::requestAnimationFrame: one counter for every canvas (static int id)
 let nextCallbackId = 0
-
-// the methods of a context that put something on the canvas (QQuickContext2DCommandBuffer not empty)
-const DRAWING = ['fill', 'stroke', 'fillRect', 'strokeRect', 'clearRect', 'fillText', 'strokeText', 'drawImage', 'putImageData', 'reset']
 
 function inWindow(item){
     let top = item
@@ -142,19 +139,14 @@ class Canvas extends Item {
         let w = Math.max(0, Math.round(size.width * ratio)), h = Math.max(0, Math.round(size.height * ratio))
         if(canvas.width === w && canvas.height === h) return
         let ctx = this.$context
-        let current = ctx ? ctx.$snapshot() : null
         canvas.width = w
         canvas.height = h
+        // the device pixels of a pixel of the item (an image of the canvas is at the item's size)
+        canvas.$jqRatio = ratio
         canvas.style.width = size.width + 'px'
         canvas.style.height = size.height + 'px'
-        if(!ctx) return
-        // the DOM state went with the old backing store: the saved states, then the current one
-        let save = Object.getPrototypeOf(ctx).save
-        for(let state of ctx.$stack){
-            ctx.$apply(state)
-            save.call(ctx)
-        }
-        ctx.$apply(current)
+        // the DOM state went with the old backing store (the context keeps Qt's): the clips of the states again
+        if(ctx) ctx.$restoreDom(canvas.getContext('2d'))
     }
 
     // QQuickCanvasItem::getContext: the context of the type, made if there is none; another type: a warning
@@ -183,30 +175,25 @@ class Canvas extends Item {
             this.$write(Canvas.CONTEXTTYPE, '2d')
             this.$settingType = false
         }
-        let ctx = this.$canvas.getContext('2d')
-        let ratio = this.$ratio()
-        ctx.setTransform(ratio, 0, 0, ratio, 0, 0)
-        extendContext(ctx, this, () => this.$ratio())
-        // the commands put on the canvas: painted() after the polish (textureChanged)
-        for(let name of DRAWING){
-            let fn = ctx[name]
-            if(typeof fn !== 'function') continue
-            let item = this
-            ctx[name] = function(...args){
-                item.$drawn = true
-                return fn.apply(this, args)
-            }
-        }
+        // QQuickContext2D::init: reset() (a command: painted() after the first polish)
+        let ctx = new Context2D(this, this.$canvas.getContext('2d'), () => this.$ratio())
+        ctx.reset()
         this.$context = ctx
         this.$write(Canvas.CONTEXT, ctx)
         return true
     }
 
+    // drawImage takes an Image or a Canvas of the objects of QML (another one is a type mismatch)
+    $isImageSource(source){
+        if(!(source instanceof QtObject)) return true
+        return source instanceof Canvas || source.$url !== undefined
+    }
+
     // an image of drawImage / createPattern: a url (loaded by loadImage, an unloaded one starts loading), an Image item,
-    // another Canvas, a CanvasImageData
+    // another Canvas; another object is its string as a url
     $imageSource(source){
         if(source == null) return null
-        if(typeof source === 'string' || (typeof source === 'object' && source.constructor && source.constructor.name === 'URL')){
+        if(typeof source !== 'object' || (source.constructor && source.constructor.name === 'URL')){
             let url = resolveUrl(String(source))
             let entry = this.$images.get(url)
             if(!entry){
@@ -221,14 +208,16 @@ class Canvas extends Item {
             let url = source.$url
             return url ? this.$imageSource(url) : null
         }
-        if(typeof ImageData !== 'undefined' && source instanceof ImageData && typeof document !== 'undefined'){
-            let scratch = document.createElement('canvas')
-            scratch.width = source.width
-            scratch.height = source.height
-            scratch.getContext('2d').putImageData(source, 0, 0)
-            return scratch
+        if(source instanceof QtObject) return null
+        return this.$imageSource(String(source))
+    }
+
+    // QQuickContext2D::flush: the commands go to the canvas, painted() when there were any (textureChanged)
+    $flush(){
+        if(this.$context && this.$drawn){
+            this.$drawn = false
+            engine.emit(this, Canvas.SIGNAL_painted)
         }
-        return source
     }
 
     // QQuickCanvasItem::requestPaint: the canvas window is dirty
@@ -328,7 +317,10 @@ class Canvas extends Item {
     // QQuickCanvasItem::toDataURL: image/png by default; another image/ type the browser cannot write, or no context: "data:,"
     toDataURL(mimeType){
         let mime = String(mimeType === undefined ? 'image/png' : mimeType).toLowerCase()
-        if(!this.$context || !this.$canvas || !mime.startsWith('image/')) return 'data:,'
+        if(!this.$context || !this.$canvas) return 'data:,'
+        // toImage(): the commands go to the canvas first
+        this.$flush()
+        if(!mime.startsWith('image/')) return 'data:,'
         let ext = mime.slice(6)
         if(ext !== 'png' && ext !== 'jpeg') return 'data:,'
         return this.$canvas.toDataURL(mime)

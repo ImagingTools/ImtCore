@@ -8,7 +8,8 @@
     "build": "node compiler/buildcore.js",
     "test": "node --test tests/unit",
     "stress": "node --expose-gc --test --test-concurrency=1 tests/stress",
-    "bench": "node --expose-gc tests/bench/run.js"
+    "bench": "node --expose-gc tests/bench/run.js",
+    "test:web": "node --test tests/web"
   },
   "dependencies": {
     "uglify-js": "^3.19.3"

@@ -1,0 +1,11 @@
+drawImage canvas ok true 0,255,0,255 0,0,255,255
+drawImage scaled ok 0,255,0,255 0,0,255,255 0,0,0,0
+drawImage source ok 0,0,255,255 0,0,0,0
+drawImage index throws 1 drawImage(), index size error
+drawImage negsrc throws 1 drawImage(), index size error
+drawImage zero throws 1 drawImage(), index size error
+drawImage imagedata ok true 0,255,0,255 0,0,0,0
+drawImage shadow 0,255,0,255 255,0,0,255
+drawImage alpha 0,255,0,126
+END
+DONE

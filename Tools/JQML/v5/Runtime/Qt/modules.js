@@ -8,7 +8,7 @@ const SORT_FILTER = ['SortFilterProxyModel', 'ValueFilter', 'FunctionFilter', 'R
 const MODELS = ['ListModel', 'ListElement', 'Instantiator', 'ItemSelectionModel', 'DelegateChooser', 'DelegateChoice', 'DelegateModel', 'ObjectModel', ...SORT_FILTER]
 const LABS_MODELS = ['TableModel', 'TableModelColumn', 'TreeModel', 'DelegateChooser', 'DelegateChoice']
 const QUICK = [
-    'Item', 'FocusScope', 'Rectangle', 'Gradient', 'GradientStop', 'Text', 'TextInput', 'TextEdit', 'Image', 'Canvas',
+    'Item', 'FocusScope', 'Rectangle', 'Gradient', 'GradientStop', 'Text', 'TextInput', 'TextEdit', 'TextSelection', 'Image', 'Canvas',
     'MouseArea', 'DropArea', 'Flickable', 'Column', 'Row', 'Flow', 'Grid', 'Repeater', 'Loader', 'ListView', 'GridView', 'TableView', 'TreeView', 'Shortcut',
     'IntValidator', 'DoubleValidator', 'RegularExpressionValidator', 'FontLoader',
     'State', 'PropertyChanges', 'StateChangeScript', 'Transition', 'StateGroup',
@@ -20,7 +20,7 @@ const QUICK = [
 ]
 const SHAPES = ['Shape', 'ShapePath', 'ShapeGradient', 'LinearGradient', 'RadialGradient', 'ConicalGradient']
 const IMPL = ['PlaceholderText', 'ColorImage', 'IconImage', 'IconLabel', 'PaddedRectangle', 'Color']
-const QUICK_UNCREATABLE = ['Keys', 'KeyNavigation', 'Animation', 'Easing', 'StandardKey', 'Accessible', 'Screen', 'EnterKey', 'PointerDevice', 'PointerHandler', 'PathElement']
+const QUICK_UNCREATABLE = ['TextDocument', 'Keys', 'KeyNavigation', 'Animation', 'Easing', 'StandardKey', 'Accessible', 'Screen', 'EnterKey', 'PointerDevice', 'PointerHandler', 'PathElement']
 // QtQuick.Controls.Basic (the style QtQuick.Controls imports) and QtQuick.Templates (the controls without a style): the
 // types the runtime has, the names of the Qt 6.12 qmldir / plugins.qmltypes. A Templates class is JQ.types['T.<Name>']
 const TABLE_CONTROLS = ['HorizontalHeaderView', 'VerticalHeaderView', 'TableViewDelegate', 'TreeViewDelegate', 'SelectionRectangle']

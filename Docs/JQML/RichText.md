@@ -36,3 +36,5 @@
 
 `MarkdownText` (показывается как обычный текст), таблицы `<table>` (ячейки идут одной строкой), рисование `<img>`, `elide` и
 `maximumLineCount` для разметки, редактирование разметки в `TextEdit` (он показывает очищенный текст).
+
+В JQML v5 `TextEdit` с RichText и MarkdownText работает с документом Qt (редактирование, таблицы, картинки, Markdown) — см. `TextEditRichText.md`.

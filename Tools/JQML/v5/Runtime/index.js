@@ -422,6 +422,7 @@ const JQ = {
         Item, Anchors, FocusScope, Keys, KeyNavigation, Rectangle, Border, Gradient, GradientStop, Text, Font, TextInput, TextEdit, Image, Canvas,
         MouseArea, MouseDrag, DropArea, Drag, Flickable, Column, Row, Flow, Grid: require('./QtQuick/Grid').Grid, Repeater, Loader, ListView, GridView, TableView, TreeView, HorizontalHeaderView, VerticalHeaderView, HeaderViewDelegate, TableViewDelegate, TreeViewDelegate, SelectionRectangle, DelegateModel, Shortcut, StandardKey,
         DelegateChooser, DelegateChoice, ObjectModel: require('./QtQml/Models/ObjectModel').ObjectModel,
+        TextSelection: require('./QtQuick/TextSelection').TextSelection, TextDocument: require('./QtQuick/TextDocumentType').TextDocument,
         IntValidator, DoubleValidator, RegularExpressionValidator, RegExpValidator, FontLoader,
         State, PropertyChanges, StateChangeScript, Transition, StateGroup,
         Animation, PauseAnimation, PropertyAnimation, NumberAnimation, ColorAnimation, RotationAnimation, SmoothedAnimation,

@@ -1,12 +1,14 @@
 // Run: node --test tests/unit
-// Canvas and Context2D as qquickcanvasitem.cpp and qquickcontext2d.cpp (Qt 6.8), on a stand-in for the DOM canvas
-// that behaves as the browser's: a new size resets the DOM state of its context.
+// Canvas and Context2D as qquickcanvasitem.cpp and qquickcontext2d.cpp (Qt 6.12), the context drawing on a stand-in for
+// the DOM canvas that records what it is told (a new size resets its DOM state, as the browser's).
 // - available once in a window (queued); contextType makes the context; getContext("2d") sets it; another type warns;
-// - canvasSize, tileSize and canvasWindow follow the item until set; requestPaint() marks the canvas window;
-// - paint(region) at polish, painted() only when commands were drawn; requestAnimationFrame callbacks first;
-// - the methods return the context; Qt colors in the styles and the gradient stops; the transform in item
-//   coordinates over the device pixel ratio; fillRule in the state; shear, conical gradients, text(), reset();
-// - the state survives a new canvas size; loadImage through a shared cache; toDataURL.
+// - canvasSize, tileSize and canvasWindow follow the item until set; paint(region), painted() when commands went to the
+//   canvas (once after the context is made: its reset()); requestAnimationFrame callbacks first;
+// - the state as Qt reads and checks it (the values below are Qt 6.12's: qml -platform offscreen), the returns and the
+//   exceptions of the methods, the pixel array of an image data;
+// - what goes to the DOM: the matrix over the device pixel ratio (transform() after the current matrix, as Qt), the
+//   dashes in units of the line width, Qt's compositions, shadows through the matrix, arcs as Qt's curves, the clips
+//   of the states again after a new canvas size; loadImage through a shared cache; toDataURL.
 const test = require('node:test')
 const assert = require('node:assert/strict')
 const { runtimes } = require('./runtimes')
@@ -41,8 +43,9 @@ class FakeContext {
         this.s = Object.assign({}, STATE_DEFAULTS, { transform: [1, 0, 0, 1, 0, 0], dash: [] })
         this.domStack = []
     }
-    save(){ this.domStack.push(JSON.parse(JSON.stringify(this.s))) }
-    restore(){ if(this.domStack.length) this.s = this.domStack.pop() }
+    save(){ this.calls.push(['save']); this.domStack.push(JSON.parse(JSON.stringify(this.s))) }
+    restore(){ this.calls.push(['restore']); if(this.domStack.length) this.s = this.domStack.pop() }
+    measureText(text){ return { width: text.length * 6.4, fontBoundingBoxAscent: 9.2, fontBoundingBoxDescent: 2.4 } }
     setTransform(...args){
         let m = args.length === 1 ? [args[0].a, args[0].b, args[0].c, args[0].d, args[0].e, args[0].f] : args
         this.calls.push(['setTransform', ...m])
@@ -60,12 +63,22 @@ class FakeContext {
     createPattern(...a){ this.calls.push(['createPattern', ...a]); return {} }
     createImageData(w, h){ return { width: w, height: h, data: [] } }
     isPointInPath(...a){ this.calls.push(['isPointInPath', ...a]); return false }
+    get canvas(){ return this.owner }
 }
+
+// Path2D: the segments it is given
+class FakePath2D {
+    constructor(){ this.ops = [] }
+}
+for(let name of ['moveTo', 'lineTo', 'bezierCurveTo', 'closePath']) FakePath2D.prototype[name] = function(...a){ this.ops.push([name, ...a.map((v) => Math.round(v * 1000) / 1000)]) }
+globalThis.Path2D = FakePath2D
 for(let name of ['beginPath', 'moveTo', 'lineTo', 'closePath', 'ellipse', 'roundRect', 'rect', 'arc', 'fill', 'stroke', 'clip',
     'fillRect', 'strokeRect', 'clearRect', 'fillText', 'strokeText', 'drawImage', 'putImageData', 'quadraticCurveTo',
     'bezierCurveTo', 'arcTo', 'rotate']){
     FakeContext.prototype[name] = function(...a){
         this.calls.push([name, ...a])
+        // the state the command was drawn with
+        this.drawn = Object.assign({}, this.s)
         if(name === 'fillText' || name === 'strokeText') this.calls[this.calls.length - 1].push(this.s.textAlign, this.s.textBaseline, this.s.transform.slice())
     }
 }
@@ -80,6 +93,7 @@ for(let name of Object.keys(STATE_DEFAULTS)){
 class FakeCanvas {
     constructor(){
         this.ctx = new FakeContext()
+        this.ctx.owner = this
         this.style = {}
         this.w = 0
         this.h = 0
@@ -183,7 +197,7 @@ function cases(name, runtime){
         assert.equal(canvas.canvasWindow.width, 140)
     })
 
-    test(name + ': paint(region) of the canvas window; painted() only after commands', async () => {
+    test(name + ': paint(region) of the canvas window; painted() when commands went to the canvas', async () => {
         let regions = [], painted = 0
         let canvas = canvasIn(window(), (it) => { it.contextType = '2d' })
         engine.connect(canvas, Canvas.SIGNAL_paint, (region) => regions.push([region.x, region.y, region.width, region.height]))
@@ -191,11 +205,19 @@ function cases(name, runtime){
         await tick()
         engine.flushFrame()
         assert.deepEqual(regions, [[0, 0, 100, 50]])
-        assert.equal(painted, 0)
-        engine.connect(canvas, Canvas.SIGNAL_paint, () => canvas.context.fillRect(0, 0, 10, 10))
+        // the reset() of the new context is a command
+        assert.equal(painted, 1)
         engine.batch(() => canvas.requestPaint())
         engine.flushFrame()
         assert.equal(painted, 1)
+        engine.connect(canvas, Canvas.SIGNAL_paint, () => canvas.context.fillRect(0, 0, 10, 10))
+        engine.batch(() => canvas.requestPaint())
+        engine.flushFrame()
+        assert.equal(painted, 2)
+        // reading the pixels sends the commands at once
+        canvas.context.fillRect(0, 0, 5, 5)
+        canvas.toDataURL()
+        assert.equal(painted, 3)
     })
 
     test(name + ': requestAnimationFrame: one counter, the time as the argument, before paint; not while hidden', async () => {
@@ -217,137 +239,301 @@ function cases(name, runtime){
         assert.deepEqual(seen.slice(2), ['hidden'])
     })
 
-    test(name + ': the methods return the context; Qt colors in the styles and in the gradient stops', async () => {
-        let ctx = (await ready((it) => { it.contextType = '2d' })).context
-        assert.equal(ctx.beginPath().moveTo(0, 0).lineTo(5, 5), ctx)
-        assert.equal(ctx.save().translate(1, 1).restore(), ctx)
-        ctx.fillStyle = '#80ff0000'
-        assert.equal(ctx.fillStyle, 'rgba(255,0,0,' + 0x80 / 255 + ')')
-        ctx.strokeStyle = 'steelblue'
-        assert.equal(ctx.strokeStyle, 'steelblue')
-        let gradient = ctx.createLinearGradient(0, 0, 10, 0)
-        gradient.addColorStop(0, '#ff00ff00')
-        gradient.addColorStop(1, 'red')
-        assert.deepEqual(gradient.stops, [[0, 'rgba(0,255,0,1)'], [1, 'red']])
-        assert.throws(() => gradient.addColorStop(2, 'red'), /out of range/)
-        assert.throws(() => gradient.addColorStop(0.5, 'not a color'), /not a valid color/)
-        assert.equal(ctx.createLinearGradient(0, 0), ctx)
-    })
 
-    test(name + ': setTransform, resetTransform and isPointInPath in item coordinates over the device pixel ratio', async () => {
-        let canvas = canvasIn(window(), (it) => { it.contextType = '2d' })
-        canvas.$ratio = () => 2
-        await tick()
-        let ctx = canvas.context
-        let dom = canvas.$canvas.ctx
-        assert.deepEqual(dom.s.transform, [2, 0, 0, 2, 0, 0])
-        ctx.setTransform(1, 0, 0, 1, 10, 20)
-        assert.deepEqual(dom.s.transform, [2, 0, 0, 2, 20, 40])
-        ctx.resetTransform()
-        assert.deepEqual(dom.s.transform, [2, 0, 0, 2, 0, 0])
-        ctx.isPointInPath(3, 4)
-        assert.deepEqual(dom.calls.filter((c) => c[0] === 'isPointInPath').pop(), ['isPointInPath', 6, 8, 'nonzero'])
-    })
+    const context = async () => (await ready((it) => { it.contextType = '2d' })).context
+    const domOf = (ctx) => ctx.canvas.$canvas.ctx
+    const lastCall = (dom, name) => dom.calls.filter((c) => c[0] === name).pop()
+    // values of the runtime of dist/core.js come from another realm: compared as JSON
+    const same = (a, b, m) => assert.deepEqual(JSON.parse(JSON.stringify(a)), b, m)
+    const errorOf = (f) => { try { f(); return 'none' } catch(e){ return e.code + ' ' + e.message } }
 
-    test(name + ': fillRule: WindingFill by default, part of the state, used by fill and clip', async () => {
-        let ctx = (await ready((it) => { it.contextType = '2d' })).context
-        let dom = ctx.canvas.$canvas.ctx
-        assert.equal(ctx.fillRule, 1)
-        ctx.fill()
-        assert.deepEqual(dom.calls.filter((c) => c[0] === 'fill').pop(), ['fill', 'nonzero'])
-        ctx.save()
-        ctx.fillRule = 0
-        ctx.fill()
-        ctx.clip()
-        assert.deepEqual(dom.calls.filter((c) => c[0] === 'fill').pop(), ['fill', 'evenodd'])
-        assert.deepEqual(dom.calls.filter((c) => c[0] === 'clip').pop(), ['clip', 'evenodd'])
-        ctx.restore()
-        assert.equal(ctx.fillRule, 1)
-        ctx.fillRule = 'OddEvenFill'
-        assert.equal(ctx.fillRule, 0)
-    })
-
-    test(name + ': shear, createConicalGradient (counter-clockwise), roundedRect, ellipse, text, unsupported methods', async () => {
-        let ctx = (await ready((it) => { it.contextType = '2d' })).context
-        let dom = ctx.canvas.$canvas.ctx
-        ctx.shear(0.5, 0.25)
-        assert.deepEqual(dom.calls.filter((c) => c[0] === 'transform').pop(), ['transform', 1, 0.25, 0.5, 1, 0, 0])
-        ctx.resetTransform()
-        let conical = ctx.createConicalGradient(10, 20, Math.PI / 2)
-        assert.deepEqual(dom.calls.filter((c) => c[0] === 'createConicGradient').pop(), ['createConicGradient', -Math.PI / 2, 10, 20])
-        conical.addColorStop(0.25, 'red')
-        assert.deepEqual(conical.stops, [[0.75, 'red']])
-        ctx.roundedRect(0, 0, 20, 10, 30, 3)
-        assert.equal(JSON.stringify(dom.calls.filter((c) => c[0] === 'roundRect').pop()), JSON.stringify(['roundRect', 0, 0, 20, 10, [{ x: 10, y: 3 }]]))
-        ctx.ellipse(0, 0, 20, 10)
-        assert.deepEqual(dom.calls.filter((c) => c[0] === 'ellipse').pop(), ['ellipse', 10, 5, 10, 5, 0, 0, Math.PI * 2])
-        // text(): the glyphs from the left end of the baseline, filled with the path, gone with beginPath
-        ctx.textAlign = 'center'
-        ctx.text('Qt', 5, 6)
-        ctx.fill()
-        let filled = dom.calls.filter((c) => c[0] === 'fillText').pop()
-        assert.deepEqual(filled.slice(0, 6), ['fillText', 'Qt', 5, 6, 'left', 'alphabetic'])
-        assert.equal(ctx.textAlign, 'center')
-        ctx.beginPath()
-        let count = dom.calls.filter((c) => c[0] === 'fillText').length
-        ctx.fill()
-        assert.equal(dom.calls.filter((c) => c[0] === 'fillText').length, count)
-        assert.throws(() => ctx.drawFocusRing(), /not supported/)
-    })
-
-    // QQuickJSContext2DPrototype::method_arc / method_arcTo: a finite negative radius throws THROW_DOM(INDEX_SIZE_ERR,
-    // "Incorrect argument radius"), an Error with the code; arcTo returns the context and reaches the canvas
-    test(name + ': arc and arcTo refuse a negative radius as Qt, arcTo returns the context', async () => {
-        let ctx = (await ready((it) => { it.contextType = '2d' })).context
-        let dom = ctx.canvas.$canvas.ctx
-        assert.equal(ctx.arcTo(10, 10, 20, 10, 5), ctx)
-        assert.deepEqual(dom.calls.filter((c) => c[0] === 'arcTo').pop(), ['arcTo', 10, 10, 20, 10, 5])
-        for(let call of [() => ctx.arcTo(10, 10, 20, 10, -3), () => ctx.arc(10, 10, -1, 0, Math.PI)]){
-            let error = null
-            try { call() } catch(e) { error = e }
-            assert.ok(error)
-            assert.equal(error.name, 'Error')
-            assert.equal(error.message, 'Incorrect argument radius')
-            assert.equal(error.code, 1)
+    test(name + ': the state as Qt reads it: defaults, colors, numbers, names, fill rule, fonts, dashes', async () => {
+        let ctx = await context()
+        let defaults = {}
+        for(let p of ['fillStyle', 'strokeStyle', 'globalAlpha', 'globalCompositeOperation', 'lineWidth', 'lineCap', 'lineJoin', 'miterLimit', 'lineDashOffset',
+            'shadowOffsetX', 'shadowOffsetY', 'shadowBlur', 'shadowColor', 'font', 'textAlign', 'textBaseline', 'fillRule']) defaults[p] = ctx[p]
+        same(defaults, { fillStyle: '#000000', strokeStyle: '#000000', globalAlpha: 1, globalCompositeOperation: 'source-over', lineWidth: 1,
+            lineCap: 'butt', lineJoin: 'miter', miterLimit: 10, lineDashOffset: 0, shadowOffsetX: 0, shadowOffsetY: 0, shadowBlur: 0, shadowColor: '#000000',
+            font: 'sans-serif,-1,10,5,400,0,0,0,0,0,0,0,0,0,0,1,,0,0', textAlign: 'start', textBaseline: 'alphabetic', fillRule: 1 })
+        let colors = []
+        for(let c of ['red', '#80ff0000', '#f00', 'rgba(1, 2, 3, 0.5)', 'rgb(10,20,30)', 'hsl(120, 100%, 50%)', 'transparent', 'foo', '#12345', '']){
+            ctx.fillStyle = '#000000'
+            ctx.fillStyle = c
+            ctx.strokeStyle = c
+            ctx.shadowColor = c
+            colors.push([ctx.fillStyle, ctx.strokeStyle, ctx.shadowColor].join(' '))
         }
-        // not a finite number: no check (qt_is_finite)
-        ctx.arcTo(0, 0, 1, 1, NaN)
-        assert.ok(Number.isNaN(dom.calls.filter((c) => c[0] === 'arcTo').pop()[5]))
-    })
-
-    test(name + ': reset(): a new state, an empty stack, the canvas cleared', async () => {
-        let ctx = (await ready((it) => { it.contextType = '2d' })).context
-        let dom = ctx.canvas.$canvas.ctx
-        ctx.save()
-        ctx.lineWidth = 7
-        ctx.fillRule = 0
-        ctx.translate(5, 5)
+        same(colors, ['#ff0000 #ff0000 #ff0000', 'rgba(255, 0, 0, 0.501961) rgba(255, 0, 0, 0.501961) #ff0000', '#ff0000 #ff0000 #ff0000',
+            'rgba(1, 2, 3, 0.501961) rgba(1, 2, 3, 0.501961) #010203', '#0a141e #0a141e #0a141e', '#01ff01 #01ff01 #01ff01',
+            'rgba(0, 0, 0, 0.0) rgba(0, 0, 0, 0.0) #000000', '#000000 rgba(0, 0, 0, 0.0) #000000', '#000000 rgba(0, 0, 0, 0.0) #000000',
+            '#000000 rgba(0, 0, 0, 0.0) #000000'])
+        let numbers = {}
+        for(let p of ['lineWidth', 'miterLimit', 'globalAlpha', 'shadowBlur', 'shadowOffsetX', 'lineDashOffset']){
+            let out = []
+            for(let v of [3, 0, -1, NaN, Infinity, 0.5, '2', 2.5]){
+                ctx[p] = v
+                out.push(ctx[p])
+            }
+            numbers[p] = out.join(' ')
+            ctx.reset()
+        }
+        same(numbers, { lineWidth: '3 3 3 3 3 0.5 2 2.5', miterLimit: '3 3 3 3 3 0.5 2 2.5', globalAlpha: '1 0 0 0 0 0.5 0.5 0.5',
+            shadowBlur: '3 3 3 3 3 0.5 2 2.5', shadowOffsetX: '3 0 -1 -1 -1 0.5 2 2.5', lineDashOffset: '3 0 -1 -1 -1 0.5 2 2.5' })
+        let names = {}
+        for(let p of ['lineCap', 'lineJoin', 'textAlign', 'textBaseline', 'globalCompositeOperation']){
+            let out = []
+            for(let v of ['round', 'bevel', 'center', 'middle', 'ideographic', 'qt-multiply', 'multiply', 'qt-lighten', 'bogus']){
+                ctx[p] = v
+                out.push(ctx[p])
+            }
+            names[p] = out.join(' ')
+            ctx.reset()
+        }
+        same(names, { lineCap: 'round round round round round round round round round', lineJoin: 'round bevel bevel bevel bevel bevel bevel bevel bevel',
+            textAlign: 'start start center center center center center center center', textBaseline: 'alphabetic alphabetic alphabetic middle middle middle middle middle middle',
+            globalCompositeOperation: 'source-over source-over source-over source-over source-over qt-multiply qt-multiply lighter lighter' })
+        let rules = []
+        for(let v of [0, 1, 'OddEvenFill', 'WindingFill', 'bogus', 7]){
+            ctx.fillRule = v
+            rules.push(ctx.fillRule)
+        }
+        same(rules, [0, 1, 0, 1, 1, 1])
+        let warn = console.warn
+        console.warn = () => {}
+        try {
+            let fonts = []
+            for(let f of ['bold 20px Arial', 'normal normal 600 16px \'Times New Roman\'', 'oblique bold 9px Arial', 'italic 12pt Arial', '20px', 'bogus', 'bold bold 10px Arial']){
+                ctx.font = '10px Arial'
+                ctx.font = f
+                fonts.push(ctx.font)
+            }
+            same(fonts, ['Arial,-1,20,5,700,0,0,0,0,0,0,0,0,0,0,1,,0,0', 'Times New Roman,-1,16,5,600,0,0,0,0,0,0,0,0,0,0,1,,0,0',
+                'Arial,-1,9,5,700,2,0,0,0,0,0,0,0,0,0,1,,0,0', 'Arial,12,-1,5,400,1,0,0,0,0,0,0,0,0,0,1,,0,0', 'Arial,-1,10,5,400,0,0,0,0,0,0,0,0,0,0,1,,0,0',
+                'Arial,-1,10,5,400,0,0,0,0,0,0,0,0,0,0,1,,0,0', 'Arial,-1,10,5,400,0,0,0,0,0,0,0,0,0,0,1,,0,0'])
+        } finally {
+            console.warn = warn
+        }
+        ctx.setLineDash([5, 3, 2])
+        same(ctx.getLineDash(), [5, 3, 2, 5, 3, 2])
+        ctx.setLineDash([1, -2])
+        ctx.setLineDash([4, NaN])
+        same(ctx.getLineDash(), [5, 3, 2, 5, 3, 2])
+        ctx.setLineDash([])
+        same(ctx.getLineDash(), [])
+        // a gradient reads back as itself, a pattern of a color as the color, a state restored
+        let g = ctx.createLinearGradient(0, 0, 1, 1)
+        ctx.fillStyle = g
+        assert.equal(ctx.fillStyle, g)
+        ctx.fillStyle = ctx.createPattern('#00ff00', 4)
+        assert.equal(ctx.fillStyle, '#00ff00')
         ctx.reset()
-        assert.equal(ctx.lineWidth, 1)
-        assert.equal(ctx.fillRule, 1)
-        assert.deepEqual(dom.s.transform, [1, 0, 0, 1, 0, 0])
-        assert.equal(ctx.$stack.length, 0)
-        assert.deepEqual(dom.calls.filter((c) => c[0] === 'clearRect').pop(), ['clearRect', 0, 0, 100, 50])
+        ctx.fillStyle = 'red'
+        ctx.save()
+        ctx.fillStyle = 'blue'
+        ctx.lineWidth = 7
+        ctx.save()
+        ctx.fillStyle = 'green'
+        ctx.restore()
+        same([ctx.fillStyle, ctx.lineWidth], ['#0000ff', 7])
+        ctx.restore()
+        ctx.restore()
+        same([ctx.fillStyle, ctx.lineWidth], ['#ff0000', 1])
     })
 
-    // QQuickContext2DTexture makes a new image for a new canvas size; the QQuickContext2D state is kept
-    test(name + ': the state and the saved states survive a new canvas size', async () => {
+    test(name + ': what the methods return and throw, as Qt', async () => {
+        let ctx = await context()
+        let rets = []
+        let calls = {
+            save: () => ctx.save(), restore: () => ctx.restore(), beginPath: () => ctx.beginPath(), moveTo: () => ctx.moveTo(1, 1), arc: () => ctx.arc(5, 5, 2, 0, 1),
+            ellipse: () => ctx.ellipse(0, 0, 4, 4), roundedRect: () => ctx.roundedRect(0, 0, 4, 4, 1, 1), text: () => ctx.text('a', 0, 0), fill: () => ctx.fill(),
+            clip: () => ctx.clip(), fillRect: () => ctx.fillRect(0, 0, 0, 0), shear: () => ctx.shear(0, 0), reset: () => ctx.reset(), setLineDash: () => ctx.setLineDash([]),
+            drawImage: () => ctx.drawImage('nothing.png', 0, 0), putImageData: () => ctx.putImageData(ctx.createImageData(1, 1), 0, 0),
+            isPointInPath: () => ctx.isPointInPath(0, 0), lineToNaN: () => ctx.lineTo(NaN, 1), arcFew: () => ctx.arc(0, 0), fillRectFew: () => ctx.fillRect(0, 0),
+            linearFew: () => ctx.createLinearGradient(0, 0), createPatternFew: () => ctx.createPattern('red'), createImageDataFew: () => ctx.createImageData(),
+            getImageDataFew: () => ctx.getImageData(0, 0), measureTextNone: () => ctx.measureText(),
+        }
+        for(let n in calls){
+            let v = calls[n]()
+            rets.push(n + '=' + (v === ctx ? 'ctx' : v === undefined ? 'undefined' : v === null ? 'null' : typeof v === 'object' ? 'object' : String(v)))
+        }
+        same(rets, ['save=ctx', 'restore=ctx', 'beginPath=ctx', 'moveTo=ctx', 'arc=ctx', 'ellipse=ctx', 'roundedRect=ctx', 'text=ctx', 'fill=ctx',
+            'clip=ctx', 'fillRect=ctx', 'shear=ctx', 'reset=ctx', 'setLineDash=undefined', 'drawImage=undefined', 'putImageData=undefined',
+            'isPointInPath=false', 'lineToNaN=undefined', 'arcFew=ctx', 'fillRectFew=ctx', 'linearFew=ctx', 'createPatternFew=undefined',
+            'createImageDataFew=undefined', 'getImageDataFew=null', 'measureTextNone=undefined'])
+        same([
+            errorOf(() => ctx.arc(0, 0, -1, 0, 1)), errorOf(() => ctx.arcTo(0, 0, 1, 1, -1)),
+            errorOf(() => ctx.createLinearGradient(0, 0, 1, 1).addColorStop(2, 'red')), errorOf(() => ctx.createLinearGradient(0, 0, 1, 1).addColorStop(0.5, 'foo')),
+            errorOf(() => ctx.createLinearGradient(0, 0, NaN, 1)), errorOf(() => ctx.createRadialGradient(0, 0, -1, 0, 0, 1)),
+            errorOf(() => ctx.createConicalGradient(NaN, 0, 0)), errorOf(() => ctx.createConicalGradient(0, 0, NaN)),
+            errorOf(() => ctx.createImageData(0, 1)), errorOf(() => ctx.getImageData(0, 0, 0, 1)), errorOf(() => ctx.getImageData(NaN, 0, 1, 1)),
+            errorOf(() => ctx.putImageData(5, 0, 0, 0, 0, 1, 1)), errorOf(() => ctx.putImageData(ctx.createImageData(1, 1), NaN, 0, 0, 0, 1, 1)),
+            errorOf(() => ctx.drawImage(5, 0, 0)), errorOf(() => ctx.drawFocusRing()), errorOf(() => ctx.caretBlinkRate()),
+            errorOf(() => ctx.setCaretSelectionRect()),
+        ], ['1 Incorrect argument radius', '1 Incorrect argument radius', '1 CanvasGradient: parameter offset out of range',
+            '12 CanvasGradient: parameter color is not a valid color string', '9 createLinearGradient(): Incorrect arguments',
+            '1 createRadialGradient(): Incorrect arguments', '9 createConicalGradient(): Incorrect arguments', '1 createConicalGradient(): Incorrect arguments',
+            '1 createImageData(): invalid arguments', '1 getImageData(): Invalid arguments', '9 getImageData(): Invalid arguments',
+            '17 Context2D::putImageData, the image data type mismatch', '9 putImageData() : Invalid arguments', '17 drawImage(), type mismatch',
+            '9 Context2D::drawFocusRing is not supported', '9 Context2D::caretBlinkRate is not supported', '9 Context2D::setCaretSelectionRect is not supported'])
+        same(Object.keys(ctx.measureText('Hello')), ['width'])
+        assert.equal(ctx.measureText('Hello').width, 32)
+    })
+
+    test(name + ': an image data: width, height, a pixel array of integers 0..255', async () => {
+        let ctx = await context()
+        let d = ctx.createImageData(2, 3)
+        same([d.width, d.height, d.data.length, d.data[0], d.data[24] === undefined], [2, 3, 24, 0, true])
+        d.data[0] = 300
+        d.data[1] = -5
+        d.data[2] = 12.7
+        d.data[3] = '40'
+        same([d.data[0], d.data[1], d.data[2], d.data[3]], [0, 0, 12, 40])
+        let copy = ctx.createImageData(d)
+        same([copy.width, copy.height, copy.data[3]], [2, 3, 0])
+        assert.equal(ctx.createImageData(2.6, 1.4).width, 3)
+    })
+
+    test(name + ': the DOM gets the matrix over the device pixel ratio; transform() after the current matrix, as Qt', async () => {
+        let canvas = await ready((it) => { it.contextType = '2d' })
+        canvas.$ratio = () => 2
+        let ctx = canvas.context
+        let dom = domOf(ctx)
+        ctx.scale(2, 2)
+        ctx.transform(1, 0, 0, 1, 10, 0)
+        ctx.fillRect(0, 0, 5, 5)
+        // scale then the translation in the item's coordinates: (2 x, 2 y) + (10, 0), times the ratio
+        same(lastCall(dom, 'setTransform').slice(1), [4, 0, 0, 4, 20, 0])
+        ctx.setTransform(1, 0, 0, 1, 30, 0)
+        ctx.fillRect(0, 0, 5, 5)
+        same(lastCall(dom, 'setTransform').slice(1), [2, 0, 0, 2, 60, 0])
+        // a matrix that cannot be inverted: nothing is drawn until the matrix is set again
+        ctx.scale(0, 1)
+        let before = dom.calls.filter((c) => c[0] === 'fillRect').length
+        ctx.fillRect(0, 0, 5, 5)
+        assert.equal(dom.calls.filter((c) => c[0] === 'fillRect').length, before)
+        ctx.resetTransform()
+        ctx.fillRect(0, 0, 5, 5)
+        assert.equal(dom.calls.filter((c) => c[0] === 'fillRect').length, before + 1)
+        // isPointInPath: the point of the item over the ratio
+        ctx.beginPath()
+        ctx.rect(10, 10, 20, 20)
+        ctx.isPointInPath(15, 15)
+        let call = lastCall(dom, 'isPointInPath')
+        same(call.slice(2, 5), [30, 30, 'nonzero'])
+        same(call[1].ops[0], ['moveTo', 10, 10])
+    })
+
+    test(name + ': the pen: dashes in units of the width; compositions, shadows through the matrix; a gradient as it was set', async () => {
+        let ctx = await context()
+        let dom = domOf(ctx)
+        ctx.lineWidth = 3
+        ctx.setLineDash([2, 1])
+        ctx.lineDashOffset = 1
+        ctx.strokeRect(0, 0, 10, 10)
+        same([dom.drawn.dash, dom.drawn.lineDashOffset, dom.drawn.lineWidth], [[6, 3], 3, 3])
+        ctx.globalCompositeOperation = 'qt-multiply'
+        ctx.fillRect(0, 0, 1, 1)
+        assert.equal(dom.drawn.globalCompositeOperation, 'multiply')
+        ctx.reset()
+        ctx.scale(2, 1)
+        ctx.shadowColor = 'black'
+        ctx.shadowOffsetX = 5
+        ctx.shadowBlur = 4
+        ctx.fillRect(0, 0, 1, 1)
+        same([dom.drawn.shadowOffsetX, dom.drawn.shadowOffsetY, Math.round(dom.drawn.shadowBlur * 1000) / 1000], [10, 0, 5.657])
+        ctx.reset()
+        let g = ctx.createLinearGradient(0, 0, 100, 0)
+        g.addColorStop(0, 'red')
+        ctx.fillStyle = g
+        g.addColorStop(1, 'blue')
+        g.addColorStop(0, '#00ff00')
+        ctx.fillRect(0, 0, 1, 1)
+        same(dom.drawn.fillStyle.stops, [[0, 'rgba(255,0,0,1)']])
+        let c = ctx.createConicalGradient(5, 5, Math.PI / 2)
+        c.addColorStop(0, 'black')
+        c.addColorStop(0.25, 'white')
+        ctx.fillStyle = c
+        ctx.fillRect(0, 0, 1, 1)
+        // QConicalGradient turns counter-clockwise: the DOM's (clockwise) from -angle with the stops mirrored
+        same(lastCall(dom, 'createConicGradient').slice(1), [-Math.PI / 2, 5, 5])
+        same(dom.drawn.fillStyle.stops, [[0.75, 'rgba(255,255,255,1)'], [1, 'rgba(0,0,0,1)']])
+    })
+
+    test(name + ': the path as QPainterPath: arcs and ellipses as Qt\'s curves, closed subpaths, the same point once', async () => {
+        let ctx = await context()
+        let dom = domOf(ctx)
+        ctx.beginPath()
+        ctx.arc(50, 40, 20, 0, Math.PI, false)
+        ctx.fill()
+        let path = lastCall(dom, 'fill')[1]
+        same(path.ops[0], ['moveTo', 70, 40])
+        assert.equal(path.ops.filter((o) => o[0] === 'bezierCurveTo').length, 2)
+        same(path.ops[path.ops.length - 1].slice(-2), [30, 40])
+        ctx.beginPath()
+        ctx.ellipse(10, 10, 40, 20)
+        ctx.fill()
+        path = lastCall(dom, 'fill')[1]
+        same(path.ops.map((o) => o[0]), ['moveTo', 'bezierCurveTo', 'bezierCurveTo', 'bezierCurveTo', 'bezierCurveTo', 'closePath'])
+        same(path.ops[0], ['moveTo', 50, 20])
+        ctx.beginPath()
+        ctx.roundedRect(10, 10, 40, 40, 10, 10)
+        ctx.fill()
+        path = lastCall(dom, 'fill')[1]
+        same(path.ops[0], ['moveTo', 10, 20])
+        assert.equal(path.ops.filter((o) => o[0] === 'bezierCurveTo').length, 4)
+        // a point: no line to it; closePath of a point does nothing; a rectangle of no size is a move
+        ctx.beginPath()
+        ctx.moveTo(1, 1)
+        ctx.lineTo(1, 1)
+        ctx.closePath()
+        ctx.lineTo(5, 1)
+        ctx.rect(20, 20, 0, 0)
+        ctx.stroke()
+        same(lastCall(dom, 'stroke')[1].ops, [['moveTo', 1, 1], ['lineTo', 5, 1], ['moveTo', 20, 20]])
+        // fill and stroke of an empty path draw nothing
+        let fills = dom.calls.filter((c) => c[0] === 'fill').length
+        ctx.beginPath()
+        ctx.fill()
+        assert.equal(dom.calls.filter((c) => c[0] === 'fill').length, fills)
+        // the path stays where it was made across a change of the matrix
+        ctx.beginPath()
+        ctx.save()
+        ctx.translate(10, 10)
+        ctx.moveTo(0, 0)
+        ctx.restore()
+        ctx.lineTo(0, 20)
+        ctx.stroke()
+        same(lastCall(dom, 'stroke')[1].ops, [['moveTo', 10, 10], ['lineTo', 0, 20]])
+        // an SVG path
+        ctx.path = 'M 10 10 L 60 10 L 60 60 Z'
+        assert.equal(ctx.path, 'M 10 10 L 60 10 L 60 60 Z')
+        ctx.fill()
+        same(lastCall(dom, 'fill')[1].ops, [['moveTo', 10, 10], ['lineTo', 60, 10], ['lineTo', 60, 60], ['lineTo', 10, 10], ['closePath']])
+    })
+
+    test(name + ': the clips of the states again after a new canvas size; reset() takes the clip away', async () => {
         let canvas = await ready((it) => { it.contextType = '2d' })
         let ctx = canvas.context
-        ctx.lineWidth = 4
-        ctx.fillStyle = 'red'
-        ctx.translate(10, 0)
+        ctx.beginPath()
+        ctx.rect(0, 0, 10, 10)
+        ctx.clip()
         ctx.save()
         ctx.lineWidth = 9
-        ctx.fillRule = 0
+        ctx.beginPath()
+        ctx.rect(5, 5, 10, 10)
+        ctx.clip()
         engine.batch(() => { canvas.width = 200 })
+        let dom = domOf(ctx)
+        let after = dom.calls.slice(dom.calls.map((c) => c[0]).lastIndexOf('save') - 1)
+        assert.equal(dom.calls.filter((c) => c[0] === 'clip').length >= 4, true)
         assert.equal(ctx.lineWidth, 9)
-        assert.equal(ctx.fillRule, 0)
-        assert.deepEqual(canvas.$canvas.ctx.s.transform, [1, 0, 0, 1, 10, 0])
         ctx.restore()
-        assert.equal(ctx.lineWidth, 4)
-        assert.equal(ctx.fillStyle, 'red')
-        assert.equal(ctx.fillRule, 1)
+        assert.equal(ctx.lineWidth, 1)
+        assert.ok(after.length)
+        let saves = dom.domStack.length
+        ctx.reset()
+        assert.equal(dom.domStack.length, 1)
+        assert.ok(saves >= 1)
     })
 
     test(name + ': loadImage through the pixmap cache; drawImage of a url, of an Image item; toDataURL', async () => {
@@ -367,7 +553,8 @@ function cases(name, runtime){
             assert.equal(loaded, 1)
             assert.equal(first.isImageLoaded('http://host/a.png'), true)
             first.context.drawImage('http://host/a.png', 1, 2)
-            assert.deepEqual(first.$canvas.ctx.calls.filter((c) => c[0] === 'drawImage').pop(), ['drawImage', FakeImage.made[0], 1, 2])
+            // drawImage(image, x, y): the whole image at its size (QQuickContext2DCommandBuffer::drawPixmap)
+            assert.deepEqual(first.$canvas.ctx.calls.filter((c) => c[0] === 'drawImage').pop(), ['drawImage', FakeImage.made[0], 0, 0, 4, 4, 1, 2, 4, 4])
             // another canvas: ready from the cache, no signal, no second load
             let second = canvasIn(first.parent, (it) => { it.contextType = '2d' })
             await tick()
@@ -382,7 +569,7 @@ function cases(name, runtime){
             image = new Item(null)
             image.$url = 'http://host/a.png'
             second.context.drawImage(image, 3, 4)
-            assert.deepEqual(second.$canvas.ctx.calls.filter((c) => c[0] === 'drawImage').pop(), ['drawImage', FakeImage.made[0], 3, 4])
+            assert.deepEqual(second.$canvas.ctx.calls.filter((c) => c[0] === 'drawImage').pop(), ['drawImage', FakeImage.made[0], 0, 0, 4, 4, 3, 4, 4, 4])
             assert.equal(second.toDataURL(), 'data:image/png;base64,AAAA')
             assert.equal(second.toDataURL('image/BMP'), 'data:,')
             assert.equal(second.toDataURL('text/plain'), 'data:,')
