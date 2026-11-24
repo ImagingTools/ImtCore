@@ -118,11 +118,6 @@ public:
 	*/
 	bool Save() const;
 
-	/**
-		Remove the linked object from the storage and reset the link.
-	*/
-	bool Remove();
-
 	bool Serialize(iser::IArchive& archive);
 
 	/**

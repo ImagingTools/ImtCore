@@ -8,12 +8,11 @@ The data model keeps only the link; the way of storing is chosen at run time by 
 | Type | Role |
 |---|---|
 | `TStorageLink<T>` / `CStorageLinkBase` | The link. Serializes only the object ID and the logical storage ID. `->` returns the object, loading it on demand. |
-| `IStorageResolver` | Loads, saves, inserts and removes objects by ID. |
+| `IStorageResolver` | Loads and saves objects by ID. |
 | `IStorageResolverProvider` | Returns a resolver by the logical storage ID. |
 | `CStorageResolverRegistry` | Provider implementation filled by the application. |
 | `CStorageResolverRegistryComp` | Registry component filled by the composition. It is the application-wide provider while it exists. |
 | `CCollectionStorageResolverComp` | Component of `CCollectionStorageResolver` over the collection given by the composition. |
-| `CMemoryStorageResolver` | Objects in memory. Live instances: changes are visible to all links at once. |
 | `CCollectionStorageResolver` | Adapter over `IObjectCollection`. Snapshot semantic: call `Save()` to write changes back. |
 
 ## Late binding
@@ -49,7 +48,8 @@ The component becomes the application-wide provider when it is created, so it mu
 The default provider is one per process: a second registry component replaces the first one and logs a warning, so an application has exactly one.
 The component logs an error if `StorageIds` and `StorageResolvers` differ in count.
 `ImtCorePck/CollectionStorageResolver` is the resolver over the collection given by `ObjectCollection`.
-`InsertObject()` takes the type-ID of the new object from the caller, as `IObjectCollection::InsertNewObject()` does, so one resolver serves a collection of several object types.
+
+A link only loads and saves its object. Objects are created and deleted in the storage itself, for example with `IObjectCollection::InsertNewObject()` and `RemoveElements()`.
 
 ## Links as fields of a data model
 
@@ -85,7 +85,7 @@ So an existing ID field can become a link without changing the stored data. `Ser
 | `value()` | The object; throws `std::bad_optional_access` if it is not available. |
 | `value_or(default)` | A copy of the object or of the default value. Requires `T` to be copy constructible. |
 | `operator*`, `operator->` | Unchecked access (asserts in debug). Use after `has_value()`. |
-| `reset()`, `= std::nullopt` | Clears the link target. The stored object stays in the storage; use `Remove()` to delete it. |
+| `reset()`, `= std::nullopt` | Clears the link target. The stored object stays in the storage. |
 | `IsNull()` | The link has no object ID. Cheap, never loads. |
 
 Differences to `std::optional`: copies of a link refer to the same stored object, and a link with an ID of a missing object is not null but has no value.
@@ -96,7 +96,7 @@ Differences to `std::optional`: copies of a link refer to the same stored object
 - The const access, which loads the object, can be used from several threads at once; changing a link cannot. Copies of a link share the loaded object.
 - Check `GetResolver()` or `GetObject().IsValid()` where the binding is not guaranteed; `operator->` asserts that the object exists.
 - Access through a link may be slow (database, network). Load explicitly with `GetObject()` in loops.
-- Removing an object does not update other links to it: they stay dangling and resolve to nothing.
+- Removing an object from the storage does not update the links to it: they stay dangling and resolve to nothing.
 - A link remembers that its object is missing and does not ask the storage again until it is re-targeted, rebound or unloaded. Call `Unload()` to look again, for example after the object was created under that ID.
 - `Save()` writes only a loaded object and never creates one: it fails if nothing is loaded or the object is gone from the storage.
 
