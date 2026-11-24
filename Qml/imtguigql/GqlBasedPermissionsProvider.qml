@@ -127,7 +127,7 @@ PermissionsProvider {
                         root.lastError = m_errorMessage
                         root.requestFailed(m_errorMessage, root.__pendingOrgTenantId)
                     } else {
-                        root.__storeOrganizationPermissions(m_groups, m_memberPermissions, root.__pendingOrgTenantId)
+                        root.__storeOrganizationPermissions(m_groups, m_memberPermissions, m_administratorPermissions, root.__pendingOrgTenantId)
                     }
                 }
             }
@@ -166,7 +166,7 @@ PermissionsProvider {
         root.userPermissionsReceived()
     }
 
-    function __storeOrganizationPermissions(groupsList, memberPermsList, tenantId) {
+    function __storeOrganizationPermissions(groupsList, memberPermsList, administratorPermsList, tenantId) {
         var parsed = PermissionGroups.toFlatArray(groupsList)
         root.organizationPermissions = parsed
 
@@ -174,6 +174,7 @@ PermissionsProvider {
         root.memberOrganizationPermissions = Array.isArray(memberPermsList)
             ? memberPermsList.filter(function(s) { return s && s.length > 0 })
             : []
+        root.administratorOrganizationPermissions = Array.isArray(administratorPermsList) ? administratorPermsList : []
 
         root.organizationPermissionsReceived()
     }

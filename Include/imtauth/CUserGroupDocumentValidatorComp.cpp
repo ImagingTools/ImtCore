@@ -43,15 +43,17 @@ bool CUserGroupDocumentValidatorComp::ValidateDocumentData(
 	}
 
 	QByteArray tenantId;
+	imtbase::TenantType tenantType = imtbase::TT_ORGANIZATION;
 	if (operationContextPtr != nullptr){
 		tenantId = operationContextPtr->GetTenantId().trimmed();
+		tenantType = operationContextPtr->GetTenantType();
 	}
 
-	if (!CheckGroupNameUnique(*m_userGroupCollectionCompPtr, objectId, name, tenantId, errorMessage)){
+	if (!CheckGroupNameUnique(*m_userGroupCollectionCompPtr, objectId, name, tenantId, tenantType, errorMessage)){
 		return false;
 	}
 
-	return CheckParentGroupsInTenant(*m_userGroupCollectionCompPtr, userGroupInfoPtr->GetParentGroups(), tenantId, errorMessage);
+	return CheckParentGroupsInTenant(*m_userGroupCollectionCompPtr, userGroupInfoPtr->GetParentGroups(), tenantId, tenantType, errorMessage);
 }
 
 
@@ -60,10 +62,12 @@ bool CUserGroupDocumentValidatorComp::CheckGroupNameUnique(
 			const QByteArray& objectId,
 			const QString& name,
 			const QByteArray& tenantId,
+			imtbase::TenantType tenantType,
 			QString& errorMessage)
 {
 	imtauth::CTenantFilterParam tenantFilter;
 	tenantFilter.SetTenantId(tenantId);
+	tenantFilter.SetTenantType(tenantType);
 
 	imtbase::CComplexCollectionFilter::FilterExpression filterExpr;
 	filterExpr.logicalOperation = imtbase::IComplexCollectionFilter::LO_AND;
@@ -93,6 +97,7 @@ bool CUserGroupDocumentValidatorComp::CheckParentGroupsInTenant(
 			const imtbase::IObjectCollection& userGroupCollection,
 			const QByteArrayList& parentGroupIds,
 			const QByteArray& tenantId,
+			imtbase::TenantType tenantType,
 			QString& errorMessage)
 {
 	if (parentGroupIds.isEmpty()){
@@ -101,6 +106,7 @@ bool CUserGroupDocumentValidatorComp::CheckParentGroupsInTenant(
 
 	imtauth::CTenantFilterParam tenantFilter;
 	tenantFilter.SetTenantId(tenantId);
+	tenantFilter.SetTenantType(tenantType);
 
 	imtbase::CComplexCollectionFilter::FilterExpression filterExpr;
 	filterExpr.logicalOperation = imtbase::IComplexCollectionFilter::LO_OR;

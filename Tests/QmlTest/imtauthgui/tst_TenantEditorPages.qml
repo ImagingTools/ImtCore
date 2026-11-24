@@ -170,13 +170,13 @@ TestCase {
 
 		let page = openPageEditor(context, "Members")
 		compare(context.host.headers.length, 2)
-		compare(context.host.headers[0], "section:Members")
+		compare(context.host.headers[0], "section:Members and invitations")
 		compare(context.host.headers[1], "editor:" + page.editorTitle)
 		verify(context.editor.canNavigateBack())
 
 		context.editor.navigateBack()
 		verify(!page.editorOpen)
-		compare(context.host.headers, ["section:Members"])
+		compare(context.host.headers, ["section:Members and invitations"])
 		verify(!context.editor.canNavigateBack())
 	}
 
@@ -207,7 +207,9 @@ TestCase {
 		context.editor.navigateToHeader("tenant-document-id")
 
 		verify(!page.editorOpen)
-		compare(context.pageView.currentIndex, 0)
+		// The first section is the first page of the Organization group
+		compare(context.pageView.currentIndex, context.pageView.getIndexById("General"))
+		verify(context.pageView.getIndexById("General") >= 0)
 	}
 
 	// Leaving the organization closes the editors of all sections, each shown while it is closed

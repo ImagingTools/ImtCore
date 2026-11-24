@@ -197,9 +197,6 @@
         <Element Id="TenantCollectionController" PackageId="ImtUserAdministrationVoce" ComponentId="TenantCollectionController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="InvitationManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TenantMembershipManager/TenantInvitationManager"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

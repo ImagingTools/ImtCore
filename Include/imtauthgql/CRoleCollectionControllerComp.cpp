@@ -669,7 +669,8 @@ bool CRoleCollectionControllerComp::ValidateRoleForTenant(
 			QString& errorMessage) const
 {
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	const QByteArray tenantId = gqlContextPtr != nullptr ? gqlContextPtr->GetTenantId() : QByteArray();
+	imtbase::TenantType tenantType = imtbase::TT_ORGANIZATION;
+	const QByteArray tenantId = gqlContextPtr != nullptr ? imtgql::GetDataTenantId(*gqlContextPtr, tenantType) : QByteArray();
 	const QByteArray languageId = gqlContextPtr != nullptr ? gqlContextPtr->GetLanguageId() : QByteArray();
 	const iqt::ITranslationManager* translationManagerPtr = m_translationManagerCompPtr.GetPtr();
 
@@ -679,13 +680,14 @@ bool CRoleCollectionControllerComp::ValidateRoleForTenant(
 				role.GetRoleId(),
 				role.GetProductId(),
 				tenantId,
+				tenantType,
 				errorMessage,
 				translationManagerPtr,
 				languageId)){
 		return false;
 	}
 
-	if (!imtauth::CRoleDocumentValidatorComp::CheckParentRolesInTenant(*m_objectCollectionCompPtr, role.GetIncludedRoles(), tenantId, errorMessage, translationManagerPtr, languageId)){
+	if (!imtauth::CRoleDocumentValidatorComp::CheckParentRolesInTenant(*m_objectCollectionCompPtr, role.GetIncludedRoles(), tenantId, tenantType, errorMessage, translationManagerPtr, languageId)){
 		return false;
 	}
 

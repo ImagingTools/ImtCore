@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS "TenantEntityBindings"
 (
     "Id"              TEXT PRIMARY KEY,
     "TenantId"        TEXT NOT NULL,
+    "TenantType"      INTEGER NOT NULL DEFAULT 0,
     "EntityType"      TEXT NOT NULL,
     "EntityId"        TEXT NOT NULL,
     "CreatedAt"       TEXT NOT NULL,

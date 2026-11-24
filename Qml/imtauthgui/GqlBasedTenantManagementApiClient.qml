@@ -501,6 +501,7 @@ QtObject {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
 						PopupManager.addErrorMessage(m_errorMessage, true)
+						root.requestFailed(m_errorMessage)
 					} else {
 						root.memberPermissionsUpdated()
 					}
@@ -549,6 +550,7 @@ QtObject {
 
 	property alias organizationPermissions: __userAdminObj.organizationPermissions
 	property alias memberOrganizationPermissions: __userAdminObj.memberOrganizationPermissions
+	property alias administratorOrganizationPermissions: __userAdminObj.administratorOrganizationPermissions
 	signal organizationPermissionsReceived()
 
 	function setRolePermissionsTenantId(tenantId) {
@@ -994,7 +996,10 @@ QtObject {
 					"message": req.m_message || "",
 					"status": req.m_status || ConnectionRequestStatusEnum.s_pending,
 					"createdAt": req.m_createdAt || "",
-					"respondedAt": req.m_respondedAt || ""
+					"respondedAt": req.m_respondedAt || "",
+					"proposedSourceRole": req.m_proposedSourceRole || "",
+					"proposedTargetRole": req.m_proposedTargetRole || "",
+					"proposedScope": req.m_proposedScope || ""
 				})
 			}
 		}
@@ -1006,10 +1011,21 @@ QtObject {
 		root.__getConnectionRequestsSender.send(root.__getConnectionRequestsInput)
 	}
 
-	function createConnectionRequest(sourceTenantId, connectionCode, message) {
+	function createConnectionRequest(sourceTenantId, connectionCode, message, proposedSourceRole, proposedTargetRole, proposedScope) {
 		root.__createConnectionRequestInput.m_sourceTenantId = sourceTenantId || root.tenantId || ""
 		root.__createConnectionRequestInput.m_connectionCode = connectionCode || ""
 		root.__createConnectionRequestInput.m_message = message || ""
+		// A plain request sends no terms: the input is reused, so the ones of an earlier request are dropped
+		if (proposedSourceRole && proposedTargetRole) {
+			root.__createConnectionRequestInput.m_proposedSourceRole = proposedSourceRole
+			root.__createConnectionRequestInput.m_proposedTargetRole = proposedTargetRole
+			root.__createConnectionRequestInput.m_proposedScope = proposedScope || ""
+		}
+		else {
+			root.__createConnectionRequestInput.removeProposedSourceRole()
+			root.__createConnectionRequestInput.removeProposedTargetRole()
+			root.__createConnectionRequestInput.removeProposedScope()
+		}
 		root.__createConnectionRequestSender.send(root.__createConnectionRequestInput)
 	}
 

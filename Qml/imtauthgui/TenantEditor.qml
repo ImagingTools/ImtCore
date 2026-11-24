@@ -201,47 +201,53 @@ DocumentViewBase {
 			container.updateSubHeaders()
 		}
 
+		// Three groups: the organization itself, its people, its links to other organizations
 		function updatePages() {
 			multiPageView.clear()
-			multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
+
 			// The creator picks the permission scope while creating the organization
-			if (stateManager_.isNewTenant)
+			if (stateManager_.isNewTenant) {
+				multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
 				multiPageView.addPage("Permissions", qsTr("Available permissions"), permissionsPageComp, "Icons/Key")
-			if (!stateManager_.isNewTenant) {
-				if (stateManager_.canViewOrganizationMembers)
-					multiPageView.addPage("Members", qsTr("Members"), membersPageComp, "Icons/MultipleUser")
-				if (stateManager_.canViewOrganizationRoles) {
-					multiPageView.addPage("Roles", qsTr("Roles"), rolesPageComp, "Icons/Role")
-				}
-				if (stateManager_.canViewOrganizationGroups) {
-					multiPageView.addPage("Groups", qsTr("Groups"), groupsPageComp, "Icons/Organization")
-				}
-				if (stateManager_.canViewOrganizationPermissions) {
-					multiPageView.addPage("Permissions", qsTr("Available permissions"), permissionsPageComp, "Icons/Key")
-				}
-				if (stateManager_.isCreator) {
-					multiPageView.addPage("CrossOrgGrants", qsTr("Grants"), crossOrgGrantsPageComp, "Icons/Crown")
-					// multiPageView.addPage("Contracts", qsTr("Contracts"), contractsPageComp, "Icons/Assignment")
-				}
-				if (stateManager_.canViewOrganizationConnections || stateManager_.canViewOrganizationConnectionCode || stateManager_.canConnectOrganization) {
-					multiPageView.addPage("Relationships", qsTr("Relationships"), null, "Icons/Participant")
-					if (stateManager_.canViewOrganizationConnectionCode)
-						multiPageView.addSubPage("Relationships", "ConnectionCode", qsTr("Connection Code"), connectionCodePageComp)
-					if (stateManager_.canConnectOrganization || stateManager_.canViewOrganizationConnections)
-						multiPageView.addSubPage("Relationships", "ConnectOrganization", qsTr("Connect Organization"), connectOrganizationPageComp)
-					if (stateManager_.canViewOrganizationConnections)
-						multiPageView.addSubPage("Relationships", "MyRelationships", qsTr("My Relationships"), myConnectionsPageComp)
-					if (stateManager_.canViewOrganizationConnections)
-						multiPageView.addSubPage("Relationships", "RelationshipProposals", qsTr("Proposals"), relationshipProposalsPageComp)
-					// multiPageView.addPage("Messages", qsTr("Messages"), messagesPageComp, "Icons/Message")
-				}
-				// The shares belong to the organization of the session, so only its own editor shows them
-				if (ApplicationInfoProvider.documentSharingEnabled
-							&& (stateManager_.isAdmin || stateManager_.canViewOrganizationConnections)
-							&& container.tenantData && String(container.tenantData.m_id) === AuthorizationController.getTenantId()) {
-					multiPageView.addPage("DocumentShares", qsTr("Shared Documents"), documentSharesPageComp, "Icons/Share")
-				}
+				multiPageView.currentIndex = 0
+				return
 			}
+
+			multiPageView.addPage("OrganizationGroup", qsTr("Organization"), null, "Icons/Settings")
+			multiPageView.addSubPage("OrganizationGroup", "General", qsTr("General"), generalPageComp)
+			if (stateManager_.canViewOrganizationPermissions)
+				multiPageView.addSubPage("OrganizationGroup", "Permissions", qsTr("Available permissions"), permissionsPageComp)
+			multiPageView.toggleExpanded("OrganizationGroup")
+
+			if (stateManager_.canViewOrganizationMembers || stateManager_.canViewOrganizationRoles || stateManager_.canViewOrganizationGroups) {
+				multiPageView.addPage("PeopleGroup", qsTr("People"), null, "Icons/MultipleUser")
+				if (stateManager_.canViewOrganizationMembers)
+					multiPageView.addSubPage("PeopleGroup", "Members", qsTr("Members and invitations"), membersPageComp)
+				if (stateManager_.canViewOrganizationRoles)
+					multiPageView.addSubPage("PeopleGroup", "Roles", qsTr("Roles"), rolesPageComp)
+				if (stateManager_.canViewOrganizationGroups)
+					multiPageView.addSubPage("PeopleGroup", "Groups", qsTr("Groups"), groupsPageComp)
+				multiPageView.toggleExpanded("PeopleGroup")
+			}
+
+			var canSeeConnections = stateManager_.canViewOrganizationConnections || stateManager_.canViewOrganizationConnectionCode || stateManager_.canConnectOrganization
+			// The shares belong to the organization of the session, so only its own editor shows them
+			var canSeeShares = ApplicationInfoProvider.documentSharingEnabled
+						&& (stateManager_.isAdmin || stateManager_.canViewOrganizationConnections)
+						&& container.tenantData && String(container.tenantData.m_id) === AuthorizationController.getTenantId()
+			if (canSeeConnections || stateManager_.isCreator || canSeeShares) {
+				multiPageView.addPage("ExternalGroup", qsTr("External links"), null, "Icons/Participant")
+				if (stateManager_.canConnectOrganization || stateManager_.canViewOrganizationConnections)
+					multiPageView.addSubPage("ExternalGroup", "Partners", qsTr("Partners"), partnersPageComp)
+				if (stateManager_.canViewOrganizationConnectionCode)
+					multiPageView.addSubPage("ExternalGroup", "ConnectionCode", qsTr("Connection Code"), connectionCodePageComp)
+				if (stateManager_.isCreator)
+					multiPageView.addSubPage("ExternalGroup", "CrossOrgGrants", qsTr("Grants"), crossOrgGrantsPageComp)
+				if (canSeeShares)
+					multiPageView.addSubPage("ExternalGroup", "DocumentShares", qsTr("Shared Documents"), documentSharesPageComp)
+				multiPageView.toggleExpanded("ExternalGroup")
+			}
+
 			multiPageView.currentIndex = 0
 		}
 
@@ -494,30 +500,9 @@ DocumentViewBase {
 	}
 
 	Component {
-		id: connectOrganizationPageComp
+		id: partnersPageComp
 
-		TenantConnectOrganizationPage {
-			model: container.tenantData
-			stateManager: stateManager_
-			apiClient: container.apiClient
-		}
-	}
-
-	Component {
-		id: myConnectionsPageComp
-
-		TenantMyConnectionsPage {
-			model: container.tenantData
-			stateManager: stateManager_
-			apiClient: container.apiClient
-			headerHost: container.__headerHost ? container : null
-		}
-	}
-
-	Component {
-		id: relationshipProposalsPageComp
-
-		TenantRelationshipProposalsPage {
+		TenantPartnersPage {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient

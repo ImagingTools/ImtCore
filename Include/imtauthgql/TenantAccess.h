@@ -29,6 +29,7 @@ static const inline QByteArray s_changeOrganizationRolePermission = QByteArrayLi
 static const inline QByteArray s_viewOrganizationGroupsPermission = QByteArrayLiteral("/OrganizationManagement/Groups/View");
 static const inline QByteArray s_changeOrganizationGroupPermission = QByteArrayLiteral("/OrganizationManagement/Groups/Edit/Change");
 static const inline QByteArray s_viewOrganizationPermissionsPermission = QByteArrayLiteral("/OrganizationManagement/Permissions/View");
+static const inline QByteArray s_changeOrganizationPermissionsPermission = QByteArrayLiteral("/OrganizationManagement/Permissions/Change");
 static const inline QByteArray s_viewOrganizationConnectionsPermission = QByteArrayLiteral("/OrganizationManagement/Connections/View");
 static const inline QByteArray s_viewOrganizationConnectionCodePermission = QByteArrayLiteral("/OrganizationManagement/Connections/ViewCode");
 static const inline QByteArray s_connectOrganizationPermission = QByteArrayLiteral("/OrganizationManagement/Connections/Edit/Connect");

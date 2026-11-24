@@ -10,6 +10,7 @@
 #include <imtauth/ITenantManager.h>
 #include <imtdoc/IDocumentValidator.h>
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/TenantType.h>
 
 
 namespace imtauth
@@ -49,6 +50,7 @@ public:
 				const QByteArray& roleId,
 				const QByteArray& productId,
 				const QByteArray& tenantId,
+				imtbase::TenantType tenantType,
 				QString& errorMessage,
 				const iqt::ITranslationManager* translationManagerPtr = nullptr,
 				const QByteArray& languageId = QByteArray());
@@ -60,6 +62,7 @@ public:
 				const imtbase::IObjectCollection& roleCollection,
 				const QByteArrayList& parentRoleIds,
 				const QByteArray& tenantId,
+				imtbase::TenantType tenantType,
 				QString& errorMessage,
 				const iqt::ITranslationManager* translationManagerPtr = nullptr,
 				const QByteArray& languageId = QByteArray());

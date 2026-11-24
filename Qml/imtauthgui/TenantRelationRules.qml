@@ -3,7 +3,7 @@ import QtQuick 2.12
 
 /**
  * What the current user may do with an organization of the list, by the relation the server reports for it:
- * "Owner", "Creator", "Member", "Invited", "Delegated", or none (e.g. the superuser seeing every organization).
+ * "Owner", "Creator", "Member", "Delegated", or none (e.g. the superuser seeing every organization).
  */
 QtObject {
 	id: rules
@@ -13,9 +13,9 @@ QtObject {
 		return scope === "Owner" || scope === "Creator" || scope === "Member"
 	}
 
-	// An organization is entered by a relation: an invitation is to be accepted first
+	// An organization is entered by a relation
 	function canSwitch(scope, isCurrent) {
-		return !isCurrent && scope !== "" && scope !== "Invited"
+		return !isCurrent && scope !== ""
 	}
 
 	function canLeave(scope) {

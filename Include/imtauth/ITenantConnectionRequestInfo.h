@@ -10,6 +10,9 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
 
+// ImtCore includes
+#include <imtauth/ITenantRelationshipInfo.h>
+
 #undef GetMessage
 
 
@@ -67,6 +70,22 @@ public:
 
 	virtual QString GetTargetTenantName() const = 0;
 	virtual void SetTargetTenantName(const QString& targetTenantName) = 0;
+
+	/**
+		Terms of the relationship the request proposes: the approval of the request comes into force as the relationship too.
+		The source role is the one of the requesting organization.
+	*/
+	virtual bool IsRelationshipProposed() const = 0;
+	virtual void SetRelationshipProposed(bool isProposed) = 0;
+
+	virtual ITenantRelationshipInfo::TenantRelationshipRole GetProposedSourceRole() const = 0;
+	virtual void SetProposedSourceRole(ITenantRelationshipInfo::TenantRelationshipRole role) = 0;
+
+	virtual ITenantRelationshipInfo::TenantRelationshipRole GetProposedTargetRole() const = 0;
+	virtual void SetProposedTargetRole(ITenantRelationshipInfo::TenantRelationshipRole role) = 0;
+
+	virtual QString GetProposedScope() const = 0;
+	virtual void SetProposedScope(const QString& scope) = 0;
 };
 
 

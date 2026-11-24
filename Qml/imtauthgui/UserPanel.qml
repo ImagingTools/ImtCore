@@ -79,6 +79,19 @@ Item {
 		function onTenantOwnershipTransferred(tenantId){
 			userPanel.__loadOrganizations();
 		}
+
+		// An open menu shows an accepted or a new invitation at once
+		function onPendingInvitationsChanged(){
+			contextMenuModel.fillModel();
+		}
+	}
+
+	Connections {
+		target: userPanel.profileApiClient;
+
+		function onOrganizationOperationFailed(message){
+			PopupManager.addErrorMessage(message, true);
+		}
 	}
 
 	// The reasons to read the organizations come in bursts (a login selects an organization too): one request serves them all
@@ -90,6 +103,8 @@ Item {
 			if (!AuthorizationController.tenantsEnabled || !AuthorizationController.userTokenProvider.userId)
 				return
 			organizationsRequest.send(userPanel.organizationsInput)
+			// The invitations follow the organizations: a membership change can answer or bring one
+			AuthorizationController.refreshPendingInvitations()
 		}
 	}
 	
@@ -108,6 +123,8 @@ Item {
 		}
 
 		contextMenuModel.fillModel();
+		// A missed notification must not hide an invitation: the open menu takes the answer at once
+		AuthorizationController.refreshPendingInvitations();
 
 		ModalDialogManager.openDialog(popupMenu, {"model": contextMenuModel});
 	}
@@ -126,8 +143,31 @@ Item {
 		}
 	}
 
+	// A page the user has no permission for is not in the rail: a command to it would do nothing
+	function __hasPage(pageId){
+		if (!userPanel.menuPanelRef || !userPanel.menuPanelRef.model)
+			return true
+		var pages = userPanel.menuPanelRef.model
+		for (var i = 0; i < pages.getItemsCount(); i++){
+			if (pages.getData("id", i) === pageId)
+				return true
+		}
+		return false
+	}
+
 	// --- Organizations list for context menu ---
 	property var __organizationsList: []
+
+	// The server names the relation in English: Owner, Creator, Member, Delegated Member
+	function __roleText(role, isDelegated){
+		if (isDelegated)
+			return qsTr("Delegated")
+		if (role === "Owner")
+			return qsTr("Owner")
+		if (role === "Creator")
+			return qsTr("Creator")
+		return qsTr("Member")
+	}
 
 	function __loadOrganizations() {
 		if (!AuthorizationController.tenantsEnabled || !AuthorizationController.userTokenProvider.userId)
@@ -150,17 +190,14 @@ Item {
 						for (var i = 0; i < orgs.count; i++) {
 							var org = orgs.get(i).item
 							if (org && org.m_isActive) {
-								var displayName = org.m_name || org.m_id || ""
 								if (String(org.m_id) === AuthorizationController.currentTenantId && org.m_name) {
 									AuthorizationController.updateCurrentTenantName(String(org.m_name))
 								}
 								var isDelegated = org.m_isDelegated || false
-								if (isDelegated) {
-									displayName = displayName + " " + qsTr("(delegated)")
-								}
 								list.push({
 									id: org.m_id || "",
-									name: displayName,
+									name: org.m_name || org.m_id || "",
+									role: userPanel.__roleText(String(org.m_role || ""), isDelegated),
 									isDelegated: isDelegated,
 									delegatedRoles: org.m_delegatedRoles || []
 								})
@@ -226,7 +263,7 @@ Item {
 		// Pulled back by the amount the avatar overhangs the rail's icon size, so
 		// the login starts on the same line as every page label.
 		anchors.leftMargin: Style.marginM - (accountAvatar.width - Style.menuPanelIconSize) / 2;
-		anchors.right: settingsButton.visible ? settingsButton.left : marker.right;
+		anchors.right: invitationCount.visible ? invitationCount.left : settingsButton.visible ? settingsButton.left : marker.right;
 		anchors.rightMargin: Style.marginXS;
 		anchors.verticalCenter: userPanel.verticalCenter;
 
@@ -254,10 +291,11 @@ Item {
 			color: Style.inactiveTextColor;
 			font.family: Style.fontFamily;
 			font.pixelSize: Style.fontSizeS;
-			text: AuthorizationController.currentTenantName ? AuthorizationController.currentTenantName : "";
+			text: AuthorizationController.currentTenantName ? AuthorizationController.currentTenantName : qsTr("Personal space");
 			elide: Text.ElideRight;
 			visible: AuthorizationController.tenantsEnabled && text !== "";
 		}
+
 	}
 
 	MouseArea {
@@ -309,16 +347,51 @@ Item {
 		}
 	}
 
+	// The pending invitations as the rail shows a badge: the count before the gear, like the one of a page
 	Rectangle {
-		id: invitationBadge
+		id: invitationCount
+		objectName: "InvitationCount"
+
+		anchors.right: settingsButton.visible ? settingsButton.left : marker.right
+		anchors.rightMargin: Style.marginXS
+		anchors.verticalCenter: userPanel.verticalCenter
+
+		height: Style.fontSizeXS + Style.marginXS
+		width: Math.max(height, invitationCountText.width + Style.marginS)
+		radius: height / 2
+		visible: accountText.visible && AuthorizationController.tenantsEnabled && AuthorizationController.pendingInvitationsCount > 0
+		color: Style.imagingToolsAccentColor
+
+		Text {
+			id: invitationCountText
+
+			anchors.centerIn: parent
+
+			text: AuthorizationController.pendingInvitationsCount
+			color: Style.highlightedTextColor
+			font.family: Style.fontFamilyBold
+			font.pixelSize: Style.fontSizeXS
+		}
+	}
+
+	// Folded, the row has no room for the count: a dot on the avatar, ringed to stand out of its color
+	Rectangle {
+		id: invitationDot
+		objectName: "InvitationDot"
+
 		anchors.top: accountAvatar.top
 		anchors.right: accountAvatar.right
-		width: Style.spacingM
+		anchors.topMargin: -Style.marginXXS
+		anchors.rightMargin: -Style.marginXXS
+
+		width: Style.spacingM + 2 * border.width
 		height: width
-		visible: AuthorizationController.pendingInvitationsCount > 0
-		radius: width/2
+		radius: width / 2
+		visible: !accountText.visible && AuthorizationController.tenantsEnabled && AuthorizationController.pendingInvitationsCount > 0
 		color: Style.imagingToolsAccentColor
-		z: parent.z + 1
+		border.width: Style.marginXXS
+		border.color: Style.baseColor
+		z: accountAvatar.z + 1
 	}
 
 	ListModel {
@@ -330,7 +403,7 @@ Item {
 		
 		// Every row carries the same keys - a ListModel takes its roles from the
 		// first item it is given, so a later row cannot introduce one.
-		function appendRow(itemType, id, name, icon, isEnabled, checked, badge){
+		function appendRow(itemType, id, name, icon, isEnabled, checked, badge, detail){
 			contextMenuModel.append({
 				"itemType": itemType,
 				"id": id,
@@ -338,23 +411,34 @@ Item {
 				"icon": icon,
 				"isEnabled": isEnabled,
 				"checked": checked,
-				"badge": badge
+				"badge": badge,
+				"detail": detail
 			});
 		}
 
+		// The one place to switch: the invitations, the personal space and the organizations with the role in each
 		function fillModel(){
 			var currentTenantId = AuthorizationController.currentTenantId || "";
-			var hasInvitations = AuthorizationController.pendingInvitationsCount > 0;
 
 			contextMenuModel.clear();
 
-			contextMenuModel.appendRow("header", "", "", "", false, false, false);
-			contextMenuModel.appendRow("separator", "", "", "", false, false, false);
-			contextMenuModel.appendRow("action", "Profile", qsTr("Profile"), "Icons/Account", true, false, hasInvitations);
-			contextMenuModel.appendRow("separator", "", "", "", false, false, false);
+			contextMenuModel.appendRow("header", "", "", "", false, false, false, "");
+			contextMenuModel.appendRow("separator", "", "", "", false, false, false, "");
 
 			if (AuthorizationController.tenantsEnabled){
-				contextMenuModel.appendRow("caption", "", qsTr("Organization"), "", false, false, false);
+				var invitations = AuthorizationController.pendingInvitations;
+				if (invitations.length > 0){
+					contextMenuModel.appendRow("caption", "", qsTr("Invitations: %1").arg(invitations.length), "", false, false, false, "");
+					for (var j = 0; j < invitations.length; j++){
+						contextMenuModel.appendRow("invitation", invitations[j].id, invitations[j].tenantName || invitations[j].tenantId,
+							"", true, false, false, "");
+					}
+					contextMenuModel.appendRow("separator", "", "", "", false, false, false, "");
+				}
+
+				contextMenuModel.appendRow("caption", "", qsTr("Work in"), "", false, false, false, "");
+				contextMenuModel.appendRow("action", "NoOrganization", qsTr("Personal space"), "Icons/Account",
+					currentTenantId !== "", currentTenantId === "", false, "");
 
 				for (var i = 0; i < userPanel.__organizationsList.length; i++) {
 					var orgData = userPanel.__organizationsList[i];
@@ -364,15 +448,16 @@ Item {
 					var isCurrent = orgData.id === currentTenantId;
 
 					contextMenuModel.appendRow("action", "Organization:" + orgData.id, orgData.name || "",
-						"Icons/Organization", !isCurrent, isCurrent, false);
+						"Icons/Organization", !isCurrent, isCurrent, false, orgData.role);
 				}
 
-				contextMenuModel.appendRow("action", "NoOrganization", qsTr("No organization"), "",
-					currentTenantId !== "", currentTenantId === "", false);
-				contextMenuModel.appendRow("separator", "", "", "", false, false, false);
+				if (userPanel.__hasPage("Tenants"))
+					contextMenuModel.appendRow("action", "AllOrganizations", qsTr("All organizations"), "", true, false, false, "");
+				contextMenuModel.appendRow("separator", "", "", "", false, false, false, "");
 			}
 
-			contextMenuModel.appendRow("action", "Logout", qsTr("Logout"), "Icons/Exit", true, false, false);
+			contextMenuModel.appendRow("action", "Profile", qsTr("Profile"), "Icons/Account", true, false, false, "");
+			contextMenuModel.appendRow("action", "Logout", qsTr("Logout"), "Icons/Exit", true, false, false, "");
 		}
 	}
 
@@ -382,9 +467,9 @@ Item {
 		PopupMenuDialog {
 			id: popupMenuDialog;
 
-			itemWidth: Style.sizeHintXS;
+			itemWidth: AuthorizationController.tenantsEnabled ? Style.sizeHintS : Style.sizeHintXS;
 			itemHeight: Style.controlHeightS + Style.spacingXS;
-			shownItemsCount: 12;
+			shownItemsCount: 14;
 			radius: Style.radiusM;
 			opacity: 0;
 
@@ -460,7 +545,106 @@ Item {
 					height: model.itemType === "header" ? Style.controlHeightL + Style.marginL
 						: model.itemType === "separator" ? Style.marginM
 						: model.itemType === "caption" ? Style.controlHeightS + Style.marginXS
+						: model.itemType === "invitation" ? Style.controlHeightM + Style.marginXS
 						: Style.controlHeightS + Style.spacingXS;
+
+					Item {
+						id: invitationRow;
+
+						anchors.fill: parent;
+
+						visible: model.itemType === "invitation";
+
+						Text {
+							anchors.left: parent.left;
+							anchors.leftMargin: Style.marginM + Style.marginXS;
+							anchors.right: invitationButtons.left;
+							anchors.rightMargin: Style.marginM;
+							anchors.verticalCenter: parent.verticalCenter;
+
+							text: model.name;
+							textFormat: Text.PlainText;
+							color: Style.textColor;
+							font.family: Style.fontFamily;
+							font.pixelSize: Style.fontSizeM;
+							elide: Text.ElideRight;
+						}
+
+						Row {
+							id: invitationButtons;
+
+							anchors.right: parent.right;
+							anchors.rightMargin: Style.marginM;
+							anchors.verticalCenter: parent.verticalCenter;
+
+							spacing: Style.spacingS;
+
+							Rectangle {
+								width: acceptText.contentWidth + 2 * Style.marginM;
+								height: Style.controlHeightS;
+								radius: Style.buttonRadius;
+								color: Style.buttonPrimaryColor;
+								opacity: acceptArea.containsMouse ? 0.85 : 1;
+
+								Text {
+									id: acceptText;
+
+									anchors.centerIn: parent;
+
+									text: qsTr("Accept");
+									color: Style.buttonPrimaryTextColor;
+									font.family: Style.fontFamily;
+									font.pixelSize: Style.fontSizeS;
+								}
+
+								MouseArea {
+									id: acceptArea;
+
+									anchors.fill: parent;
+
+									hoverEnabled: true;
+									cursorShape: Qt.PointingHandCursor;
+
+									onClicked: {
+										userPanel.profileApiClient.acceptInvitation(model.id);
+									}
+								}
+							}
+
+							Rectangle {
+								width: rejectText.contentWidth + 2 * Style.marginM;
+								height: Style.controlHeightS;
+								radius: Style.buttonRadius;
+								color: rejectArea.containsMouse ? Style.menuPanelItemHoverColor : "transparent";
+								border.width: 1;
+								border.color: Style.borderColor;
+
+								Text {
+									id: rejectText;
+
+									anchors.centerIn: parent;
+
+									text: qsTr("Reject");
+									color: Style.textColor;
+									font.family: Style.fontFamily;
+									font.pixelSize: Style.fontSizeS;
+								}
+
+								MouseArea {
+									id: rejectArea;
+
+									anchors.fill: parent;
+
+									hoverEnabled: true;
+									cursorShape: Qt.PointingHandCursor;
+
+									onClicked: {
+										userPanel.profileApiClient.rejectInvitation(model.id);
+									}
+								}
+							}
+						}
+					}
 
 					Item {
 						id: headerRow;
@@ -513,7 +697,7 @@ Item {
 							Text {
 								width: parent.width;
 
-								text: AuthorizationController.currentTenantName ? AuthorizationController.currentTenantName : qsTr("No organization");
+								text: AuthorizationController.currentTenantName ? AuthorizationController.currentTenantName : qsTr("Personal space");
 								textFormat: Text.PlainText;
 								color: Style.inactiveTextColor;
 								font.family: Style.fontFamily;
@@ -605,16 +789,34 @@ Item {
 						Text {
 							anchors.left: actionIcon.visible ? actionIcon.right : parent.left;
 							anchors.leftMargin: actionIcon.visible ? Style.marginM : Style.marginM + Style.marginXS;
-							anchors.right: checkIcon.visible ? checkIcon.left : parent.right;
+							anchors.right: detailText.visible ? detailText.left : checkIcon.visible ? checkIcon.left : parent.right;
 							anchors.rightMargin: Style.marginM;
 							anchors.verticalCenter: parent.verticalCenter;
 
 							text: model.name;
+							textFormat: Text.PlainText;
 							color: actionRow.active ? Style.buttonPrimaryTextColor : model.isEnabled ? Style.textColor : Style.inactiveTextColor;
 							font.family: Style.fontFamily;
 							font.pixelSize: Style.fontSizeM;
 							elide: Text.ElideRight;
 							verticalAlignment: Text.AlignVCenter;
+						}
+
+						// The role in the organization, at the right edge
+						Text {
+							id: detailText;
+
+							anchors.right: checkIcon.visible ? checkIcon.left : parent.right;
+							anchors.rightMargin: Style.marginM;
+							anchors.verticalCenter: parent.verticalCenter;
+
+							visible: model.detail !== "";
+
+							text: model.detail;
+							textFormat: Text.PlainText;
+							color: actionRow.active ? Style.buttonPrimaryTextColor : Style.inactiveTextColor;
+							font.family: Style.fontFamily;
+							font.pixelSize: Style.fontSizeS;
 						}
 
 						// The organisation you are already in reads as picked
@@ -668,6 +870,9 @@ Item {
 				}
 				else if (commandId == "Profile"){
 					ModalDialogManager.openDialog(profileViewComp, {});
+				}
+				else if (commandId == "AllOrganizations"){
+					Events.sendEvent("ChangePage", "Tenants");
 				}
 				else if (commandId.indexOf("Organization:") === 0) {
 					var tenantId = commandId.substring("Organization:".length);

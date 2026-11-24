@@ -20,6 +20,9 @@ public:
 		I_ASSIGN(m_bindingFactCompPtr, "BindingFactory", "Factory used for creation of tenant entity binding instances", true, "BindingFactory");
 	I_END_COMPONENT
 
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 	virtual istd::IChangeableUniquePtr CreateObjectFromRecord(
 				const QSqlRecord& record,
