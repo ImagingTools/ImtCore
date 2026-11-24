@@ -20,8 +20,8 @@ FilterDelegateBase {
 	onCollectionFilterChanged: {
 		if (collectionFilter && selectionParam && internal.delaySignal){
 			let optionId = getOptionId(selectionParam.m_selectedIndex)
-			optionSelectionChanged([optionId], [selectionParam.m_selectedIndex])
-			
+			optionSelectionChanged([optionId], [selectionParam.m_selectedIndex], false)
+
 			internal.delaySignal = false
 		}
 	}
