@@ -240,13 +240,21 @@ Dialog {
 		return path ? String(path).replace(/\\/g, "/") : ""
 	}
 
+	// Whether a normalized path is a Windows one (case-insensitive): a drive path
+	// ("C:/...") or a UNC path ("//server/share/..." - "\\server\share" normalized;
+	// Qt reports UNC paths in this form too). A canonical POSIX path never starts
+	// with "//".
+	function isWindowsPath(normalizedPath){
+		return /^[A-Za-z]:/.test(normalizedPath) || /^\/\/[^\/]/.test(normalizedPath)
+	}
+
 	// Path for comparisons: forward slashes, no trailing slash (except a root such
 	// as "/" or "C:/"), lower case for a Windows path (case-insensitive there).
 	function comparablePath(path){
 		var norm = root.normalizePath(path)
 		while (norm.length > 1 && norm.endsWith("/") && !/^[A-Za-z]:\/$/.test(norm))
 			norm = norm.slice(0, -1)
-		if (/^[A-Za-z]:/.test(norm))
+		if (root.isWindowsPath(norm))
 			norm = norm.toLowerCase()
 		return norm
 	}
