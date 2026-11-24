@@ -18,7 +18,6 @@
 namespace iser
 {
 	class IArchive;
-	class CArchiveTag;
 }
 
 
@@ -118,14 +117,13 @@ public:
 	*/
 	bool Save() const;
 
-	bool Serialize(iser::IArchive& archive);
-
 	/**
-		Serialize only the object ID as a single leaf under the given tag.
-		The archive gets the same data as a plain ID field written under this tag, so a data model can replace such a field with a link without changing its stored format.
+		Serialize the object ID as a single leaf with the given tag name.
+		The archive gets the same data as a plain ID field written under this name, so a data model can replace such a field with a link without changing its stored format.
+		The tag description is not part of the stored data.
 		The logical storage ID is not written: it is a property of the data model field and stays as it was set in the constructor.
 	*/
-	bool SerializeObjectId(iser::IArchive& archive, const iser::CArchiveTag& tag);
+	bool SerializeObjectId(iser::IArchive& archive, const QByteArray& tagId);
 
 	bool operator==(const CStorageLinkBase& other) const;
 	bool operator!=(const CStorageLinkBase& other) const;

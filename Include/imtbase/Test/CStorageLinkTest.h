@@ -23,7 +23,6 @@ private slots:
 	void testDefaultProvider();
 	void testUnknownStorageId();
 	void testTypeMismatch();
-	void testSerialization();
 	void testLinksInContainer();
 	void testOptionalInterface();
 	void testStorageIdKept();
