@@ -3389,7 +3389,11 @@ export class Engine {
 				if (current === null || current === undefined) return true;
 				current = current[part];
 			}
-			return !sameValue(current, state.value);
+			if (sameValue(current, state.value)) return false;
+			// A script that wrote the target after us took the binding of the target away (items.js scriptWrite) and wins, as in Qt:
+			// the Binding writes again when its own value changes (the first check above), not when something else changed the target.
+			if (!property.includes('.') && (target.$bindings === null || !target.$bindings.some((entry) => entry.key === property))) return false;
+			return true;
 		} catch {
 			return true;
 		}
