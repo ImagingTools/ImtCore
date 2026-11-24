@@ -22,7 +22,7 @@ OptionManager {
 		dataModelProvider.requestDataModel()
 	}
 
-	GqlBasedDataModelProvider {
+	property GqlBasedDataModelProvider dataModelProviderObject: GqlBasedDataModelProvider {
 		permissionPath: container.permissionPath
 		id: dataModelProvider
 
