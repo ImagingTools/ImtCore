@@ -340,6 +340,19 @@ Dialog {
 		root.selectedPaths = (path === "" ? [] : [path])
 	}
 
+	function clearInvalidSelections(){
+		var validPaths = []
+		for (var i = 0; i < root.selectedPaths.length; i++){
+			var path = root.selectedPaths[i]
+			var entry = root.findEntryByPath(path)
+			if (!entry || root.isSelectableEntry(entry.entryType))
+				validPaths.push(path)
+		}
+		root.selectedPaths = validPaths
+		if (validPaths.indexOf(root.selectedPath) < 0)
+			root.selectedPath = validPaths.length > 0 ? validPaths[validPaths.length - 1] : ""
+	}
+
 	function toggleSelection(path){
 		var arr = root.selectedPaths.slice()
 		var i = arr.indexOf(path)
@@ -677,6 +690,8 @@ Dialog {
 		// Replace the listing only once the response arrives, so a failed
 		// navigation leaves the previous directory visible.
 		if (freshLoad){
+			if (root.__preserveSelection)
+				root.clearInvalidSelections()
 			entriesModel.clear()
 			root.loadedCount = 0
 			root.__anchorIndex = -1
