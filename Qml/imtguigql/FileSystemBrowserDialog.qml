@@ -665,6 +665,14 @@ Dialog {
 	}
 
 	function applyPayload(payload){
+		// browse() checks the requested path only; a link inside the start folder may
+		// still resolve to a location outside it on the server. Such a listing is
+		// refused like a failed load: the previous folder and listing are kept.
+		if (root.restrictToStartFolder && root.startFolderKnown && !root.isPathWithin(payload.m_path, root.startFolder)){
+			root.onLoadFailed(qsTr("This location is outside the start folder"))
+			return
+		}
+
 		root.isLoading = false
 		root.errorText = ""
 		root.__hasLoaded = true
@@ -1648,10 +1656,13 @@ Dialog {
 					readonly property bool nameFilterEmpty: !emptyState.loadFailed
 						&& entriesModel.count === 0 && root.filterText !== "" && root.errorText === ""
 					// Folder has no allowed files (and no navigable dirs to show) under extensionFilter.
+					// Not in folders-only mode: extensions never filter folders, so an empty
+					// listing there means no subfolders, not a file-type mismatch.
 					readonly property bool extensionEmpty: !emptyState.loadFailed
 						&& !emptyState.nameFilterEmpty
 						&& entriesModel.count === 0
 						&& root.hasExtensionFilter
+						&& !root.showOnlyFolders
 						&& root.errorText === ""
 					readonly property bool filterEmpty: emptyState.nameFilterEmpty
 
