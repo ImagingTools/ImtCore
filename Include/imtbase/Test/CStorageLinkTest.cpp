@@ -365,34 +365,6 @@ void CStorageLinkTest::testTypeMismatch()
 }
 
 
-void CStorageLinkTest::testSerialization()
-{
-	CSimStorage storage;
-
-	DataLink source = CreateLink(storage, 7);
-	source.SetLink(source.GetObjectId(), QByteArrayLiteral("images"));
-
-	iser::CMemoryWriteArchive writeArchive;
-	QVERIFY(source.Serialize(writeArchive));
-
-	DataLink restored;
-	iser::CMemoryReadArchive readArchive(writeArchive);
-	QVERIFY(restored.Serialize(readArchive));
-
-	QCOMPARE(restored.GetObjectId(), source.GetObjectId());
-	QCOMPARE(restored.GetStorageId(), QByteArrayLiteral("images"));
-	QVERIFY(restored == source);
-
-	// Resolver binding is runtime state and is not serialized
-	QVERIFY(restored.GetResolver() == nullptr);
-
-	imtbase::CStorageResolverRegistry registry;
-	registry.RegisterResolver(&storage, QByteArrayLiteral("images"));
-	restored.SetResolverProvider(&registry);
-	QCOMPARE(restored->m_value, 7);
-}
-
-
 void CStorageLinkTest::testLinksInContainer()
 {
 	CSimStorage storage;
@@ -511,19 +483,21 @@ void CStorageLinkTest::testSerializeObjectId()
 	CSimStorage storage;
 	const QByteArray objectId = storage.InsertData(7);
 
-	const iser::CArchiveTag tag(QByteArrayLiteral("AddressId"), QByteArrayLiteral("Address Id"), iser::CArchiveTag::TT_LEAF);
+	const QByteArray tagId = QByteArrayLiteral("AddressId");
 
 	DataLink source(objectId, QByteArrayLiteral("images"));
 	iser::CMemoryWriteArchive linkArchive;
-	QVERIFY(source.SerializeObjectId(linkArchive, tag));
+	QVERIFY(source.SerializeObjectId(linkArchive, tagId));
 
+	// A plain ID field of an existing data model, with its own tag description.
+	const iser::CArchiveTag plainTag(tagId, QByteArrayLiteral("Address Id"), iser::CArchiveTag::TT_LEAF);
 	QByteArray plainId = objectId;
 	iser::CMemoryWriteArchive plainArchive;
-	QVERIFY(plainArchive.BeginTag(tag));
+	QVERIFY(plainArchive.BeginTag(plainTag));
 	QVERIFY(plainArchive.Process(plainId));
-	QVERIFY(plainArchive.EndTag(tag));
+	QVERIFY(plainArchive.EndTag(plainTag));
 
-	// The link writes exactly what a plain ID field writes under the same tag
+	// The link writes exactly what a plain ID field writes under the same tag name
 	const QByteArray linkData(static_cast<const char*>(linkArchive.GetBuffer()), linkArchive.GetBufferSize());
 	const QByteArray plainData(static_cast<const char*>(plainArchive.GetBuffer()), plainArchive.GetBufferSize());
 	QCOMPARE(linkData, plainData);
@@ -531,9 +505,12 @@ void CStorageLinkTest::testSerializeObjectId()
 	// Data of a plain ID field is read into a link, which keeps its own storage ID
 	DataLink restored(QByteArray(), QByteArrayLiteral("images"));
 	iser::CMemoryReadArchive readArchive(plainArchive);
-	QVERIFY(restored.SerializeObjectId(readArchive, tag));
+	QVERIFY(restored.SerializeObjectId(readArchive, tagId));
 	QCOMPARE(restored.GetObjectId(), objectId);
 	QCOMPARE(restored.GetStorageId(), QByteArrayLiteral("images"));
+
+	// Resolver binding is runtime state and is not serialized
+	QVERIFY(restored.GetResolver() == nullptr);
 
 	imtbase::CStorageResolverRegistry registry;
 	registry.RegisterResolver(&storage, QByteArrayLiteral("images"));

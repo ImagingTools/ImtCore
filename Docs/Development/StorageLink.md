@@ -7,7 +7,7 @@ The data model keeps only the link; the way of storing is chosen at run time by 
 
 | Type | Role |
 |---|---|
-| `TStorageLink<T>` / `CStorageLinkBase` | The link. Serializes only the object ID and the logical storage ID. `->` returns the object, loading it on demand. |
+| `TStorageLink<T>` / `CStorageLinkBase` | The link. Keeps the object ID and the logical storage ID; a data model serializes the object ID with `SerializeObjectId()`. `->` returns the object, loading it on demand. |
 | `IStorageResolver` | Loads and saves objects by ID. |
 | `IStorageResolverProvider` | Returns a resolver by the logical storage ID. |
 | `CStorageResolverRegistry` | Provider implementation filled by the application. |
@@ -66,14 +66,12 @@ CDevice::CDevice()
 
 bool CDevice::Serialize(iser::IArchive& archive)
 {
-	static iser::CArchiveTag addressIdTag("AddressId", "Address Id", iser::CArchiveTag::TT_LEAF);
-
-	return m_address.SerializeObjectId(archive, addressIdTag);
+	return m_address.SerializeObjectId(archive, QByteArrayLiteral("AddressId"));
 }
 ```
 
-`SerializeObjectId()` writes the object ID as one leaf under the given tag, exactly what a plain ID field writes there, and does not write the storage ID.
-So an existing ID field can become a link without changing the stored data. `Serialize()` writes both IDs and is meant for data whose storage differs from object to object.
+`SerializeObjectId()` writes the object ID as one leaf with the given tag name, exactly what a plain ID field writes under that name, and does not write the storage ID.
+So an existing ID field can become a link without changing the stored data. The tag description is not stored, so it does not have to match the old field.
 
 ## Optional-like interface
 

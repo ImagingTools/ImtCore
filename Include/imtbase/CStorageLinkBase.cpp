@@ -189,30 +189,10 @@ bool CStorageLinkBase::Save() const
 }
 
 
-bool CStorageLinkBase::Serialize(iser::IArchive& archive)
+bool CStorageLinkBase::SerializeObjectId(iser::IArchive& archive, const QByteArray& tagId)
 {
-	bool retVal = true;
+	const iser::CArchiveTag tag(tagId, QByteArrayLiteral("ID of the linked object"), iser::CArchiveTag::TT_LEAF);
 
-	iser::CArchiveTag objectIdTag(QByteArrayLiteral("ObjectId"), QByteArrayLiteral("ID of the linked object"), iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(objectIdTag);
-	retVal = retVal && archive.Process(m_objectId);
-	retVal = retVal && archive.EndTag(objectIdTag);
-
-	iser::CArchiveTag storageIdTag(QByteArrayLiteral("StorageId"), QByteArrayLiteral("Logical ID of the storage"), iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(storageIdTag);
-	retVal = retVal && archive.Process(m_storageId);
-	retVal = retVal && archive.EndTag(storageIdTag);
-
-	if (!archive.IsStoring()){
-		Unload();
-	}
-
-	return retVal;
-}
-
-
-bool CStorageLinkBase::SerializeObjectId(iser::IArchive& archive, const iser::CArchiveTag& tag)
-{
 	bool retVal = archive.BeginTag(tag);
 	retVal = retVal && archive.Process(m_objectId);
 	retVal = retVal && archive.EndTag(tag);
