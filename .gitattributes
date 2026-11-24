@@ -5,3 +5,6 @@
 3rdParty/**/*.dylib filter=lfs diff=lfs merge=lfs -text
 3rdParty/**/*.exe filter=lfs diff=lfs merge=lfs -text
 3rdParty/**/*.a filter=lfs diff=lfs merge=lfs -text
+
+# The serialization tests compare these files byte for byte with the LF output of the archives.
+Include/imtbase/Test/TestData/*.xml text eol=lf
