@@ -53,7 +53,8 @@ DecoratorBase {
 	}
 
 	Connections {
-		target: tabPanelDecorator.baseElement;
+		// baseElement is set after the decorator is created; until then null, else Connections listens to the decorator itself
+		target: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement : null;
 
 		function onStartContentLoading(){
 			tabPanelDecorator.signalLoading = true;
@@ -157,7 +158,10 @@ DecoratorBase {
 			anchors.verticalCenter: parent.verticalCenter;
 			width: visible ? firsElementImage.width : 0;
 			height: parent.height;
-			visible: firsElementImage.status === Image.Ready;
+			// The place is held while the icon loads - on the web it arrives a moment
+			// after the tab, and again on every switch between Normal and Active - so
+			// the tab does not widen under it. Only an icon that failed gives it up.
+			visible: firsElementImage.source != "" && firsElementImage.status !== Image.Error;
 
 			Image {
 				id: firsElementImage;

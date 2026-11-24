@@ -42,7 +42,8 @@ Item {
 	}
 
 	Connections {
-		target: workspaceView.visualStatusProvider ? workspaceView.visualStatusProvider : undefined
+		// null, not undefined: undefined cannot be assigned, and Connections then listens to its parent
+		target: workspaceView.visualStatusProvider
 		
 		function onVisualStatusReceived(objectId, icon, text, description){
 			workspaceView.setDocumentName(objectId, text)

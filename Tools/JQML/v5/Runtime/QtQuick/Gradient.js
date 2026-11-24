@@ -8,13 +8,14 @@ const STYLE = bits.STYLE
 
 // ---- Gradient: "the gradient overrides color"; orientation is Gradient.Vertical by default ----------
 
+// a stop tells the gradient it is in (Gradient, or a ShapeGradient of QtQuick.Shapes)
 class GradientStop extends QtObject {
     $parentChanged(old, parent){
-        if(old instanceof Gradient) old.$changed()
-        if(parent instanceof Gradient) parent.$changed()
+        if(old && old.$changed) old.$changed()
+        if(parent && parent.$changed) parent.$changed()
     }
 }
-const stopChanged = (stop) => { if(stop.$parent instanceof Gradient) stop.$parent.$changed() }
+const stopChanged = (stop) => { if(stop.$parent && stop.$parent.$changed) stop.$parent.$changed() }
 defineType(GradientStop, {
     props: {
         position: { kind: 'real', effect: stopChanged },

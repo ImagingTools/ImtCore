@@ -4,7 +4,7 @@ const { Item } = require('./Item')
 const { ListModel } = require('../QtQml/Models/ListModel')
 const { ModelContext, modelRows, sameModel } = require('../QtQml/Models/ModelContext')
 const { GroupObject } = require('../Core/QtObject')
-const { installFlick, flickDirection, flickState, wheelScroll, fixup, FLICK_PROPS, FLICK_SIGNALS, FLICK_ENUMS } = require('./Flickable')
+const { installFlick, flickDirection, flickState, wheelScroll, externalMove, fixup, FLICK_PROPS, FLICK_SIGNALS, FLICK_ENUMS } = require('./Flickable')
 const { SmoothedAnimation } = require('./SmoothedAnimation')
 const QtEnums = require('../Qt/enums')
 
@@ -46,6 +46,21 @@ defineType(ListViewAttached, {
     signals: ['pooled', 'reused', 'add', 'remove'],
 })
 Object.assign(ListViewAttached.prototype, ENUMS)
+// ListView.view of a delegate while its bindings are first evaluated: the view it is made in (QQuickItemView::initItem
+// sets it before the delegate is complete)
+{
+    let get = Object.getOwnPropertyDescriptor(ListViewAttached.prototype, 'view').get
+    Object.defineProperty(ListViewAttached.prototype, 'view', {
+        get(){
+            let view = get.call(this)
+            if(view) return view
+            let parent = this.$owner && this.$owner.$parent
+            let candidate = parent && parent.$parent
+            return candidate instanceof ListView && candidate.$content === parent ? candidate : null
+        },
+        configurable: true,
+    })
+}
 
 // ListView.section (QQuickViewSection)
 class ViewSection extends GroupObject {}
@@ -438,7 +453,7 @@ class ListView extends Item {
     // QQuickItemViewPrivate::positionViewAtIndex: an index not built goes to its estimated position, where the view
     // starts again (changedVisibleIndex) and fills; then the mode places its item, within the extents
     $positionViewAt(index, mode){
-        if(!(this.$f & engine.COMPLETED) || !this.$v[ListView.DELEGATE]) return
+        if(!(this.$f & engine.COMPLETED) || !this.$hasItems()) return
         this.$moveReason = MOVE_OTHER
         let count = this.$v[ListView.COUNT]
         if(count <= 0 || mode < ListView.Beginning || mode > ListView.SnapPosition) return
@@ -494,7 +509,12 @@ class ListView extends Item {
         }
     }
 
-    forceLayout(){ this.$fill() }
+    // QQuickItemView::forceLayout: layout() now (the visible items one after the other, refill), not at the next polish
+    forceLayout(){
+        if(!(this.$f & engine.COMPLETED)) return
+        this.$forceLayout = true
+        this.$polish()
+    }
 
     $frame(){ this.$fill() }
 
@@ -566,7 +586,7 @@ class ListView extends Item {
 
     $componentComplete(){
         super.$componentComplete()
-        this.$sync()
+        this.$sync('complete')
     }
 
     // ---- header, footer, highlight (QQuickItemViewPrivate::createComponentItem: z 1, the highlight z 0) ----
@@ -806,6 +826,33 @@ class ListView extends Item {
         animation.restart()
     }
 
+    // QQuickListView::viewportMoved with StrictlyEnforceRange: unless the view moves for a new current index, the
+    // highlight stays in the highlight range of the view, and the item at the highlight (snapItemAt) becomes current
+    $strictViewportMoved(){
+        if(this.$inViewportMoved || this.$moveReason === MOVE_SET_INDEX || !(this.$f & engine.COMPLETED)) return
+        let highlight = this.$highlight, range = this.$highlightRange()
+        if(!range.strict || !highlight || !this.$v[ListView.COUNT] || this.$reversed()) return
+        this.$inViewportMoved = true
+        try {
+            let viewPos = this.$position()
+            let pos = this.$flowPosOf(highlight), size = this.$sizeOf(highlight)
+            if(pos > viewPos + range.end - size) pos = viewPos + range.end - size
+            if(pos < viewPos + range.start) pos = viewPos + range.start
+            if(pos !== this.$flowPosOf(highlight)){
+                this.$stopHighlightAnimations()
+                highlight.$write(this.$vertical() ? Item.Y : Item.X, pos)
+            }
+            let index = this.$snapIndexAt(pos)
+            if(index >= 0 && index !== this.$v[ListView.CURRENTINDEX] && this.$entries.get(index)){
+                // updateCurrent: not a SetIndex move
+                this.$viewMovedCurrent = true
+                try { this.$write(ListView.CURRENTINDEX, index) } finally { this.$viewMovedCurrent = false }
+            }
+        } finally {
+            this.$inViewportMoved = false
+        }
+    }
+
     $stopHighlightAnimations(){
         let animations = this.$highlightAnimations
         if(!animations) return
@@ -868,12 +915,13 @@ class ListView extends Item {
 
     // QQuickItemViewPrivate::regenerate: everything released, the viewport for no item, the view at the start, refill,
     // then the current item
-    $sync(){
+    // reason: 'complete' (QQuickItemView::componentComplete), 'model' (setModel), else a regeneration (a new delegate...)
+    $sync(reason){
         let model = this.$v[ListView.MODEL]
         if(model !== this.$model){
-            if(this.$model instanceof ListModel) this.$model.$removeView(this)
+            if(this.$model && this.$model.$removeView) this.$model.$removeView(this)
             this.$model = model
-            if(model instanceof ListModel) model.$addView(this)
+            if(model && model.$addView) model.$addView(this)
         }
         // QQuickItemViewPrivate::clear releases NotReusable
         for(let index of Array.from(this.$entries.keys())) this.$release(index, false)
@@ -887,17 +935,41 @@ class ListView extends Item {
         this.$updateHeaderFooter()
         this.$placeHeaderFooter()
         this.$updateViewport()
-        this.$setPosition(-this.$headerSize())
+        // QQuickItemViewPrivate::contentStartOffset: before the header and the margin at the start of the flow
+        this.$setPosition(-this.$headerSize() - this.$startMargin())
         this.$fill(false)
-        // QQuickItemView::componentComplete: refill(), then updateCurrent(0) unless the index was cleared
-        if(count > 0 && this.$v[ListView.CURRENTINDEX] < 0) this.$write(ListView.CURRENTINDEX, 0)
-        if(this.$v[ListView.CURRENTINDEX] >= count) this.$write(ListView.CURRENTINDEX, count - 1)
-        // QQuickItemView::modelUpdated(reset) / componentComplete: SetIndex for the regeneration, the highlight put at
-        // the current item at once (resetHighlightPosition) and tracked
-        this.$moveReason = MOVE_SET_INDEX
-        this.$ensureCurrentItem()
-        this.$resetHighlightPosition()
-        this.$trackedPositionChanged()
+        // QQuickItemView::componentComplete: refill(), then updateCurrent(0) unless the index was cleared;
+        // QQuickItemView::setModel: setCurrentIndex(count > 0 ? 0 : -1) (a model without a delegate has no rows);
+        // QQuickItemViewPrivate::regenerate: updateCurrent(currentIndex)
+        let index = this.$v[ListView.CURRENTINDEX]
+        let defaultIndex = false
+        if(reason === 'model') index = count > 0 && this.$v[ListView.DELEGATE] ? 0 : -1
+        else if(reason === 'complete' && count > 0 && index < 0 && !this.$currentIndexCleared){
+            index = 0
+            defaultIndex = true
+        }
+        if(index >= count) index = count - 1
+        let range = this.$highlightRange()
+        let strictStart = defaultIndex && range.strict
+        this.$inSync = true
+        // (the first item of a strict view becomes current without a SetIndex move)
+        this.$viewMovedCurrent = strictStart
+        try { if(index !== this.$v[ListView.CURRENTINDEX]) this.$write(ListView.CURRENTINDEX, index) } finally { this.$inSync = false; this.$viewMovedCurrent = false }
+        if(strictStart && this.$visible.length){
+            // a view made with its component and the first item current: the delegates come after componentComplete
+            // (incubated), the view stays at its start and the item at the highlight range becomes current (checked)
+            this.$moveReason = MOVE_OTHER
+            this.$ensureCurrentItem()
+            this.$resetHighlightPosition()
+            this.$strictViewportMoved()
+        } else {
+            // QQuickItemView::modelUpdated(reset) / componentComplete: SetIndex for the regeneration, the highlight put
+            // at the current item at once (resetHighlightPosition) and tracked
+            this.$moveReason = MOVE_SET_INDEX
+            this.$ensureCurrentItem()
+            this.$resetHighlightPosition()
+            this.$trackedPositionChanged()
+        }
         this.$moveReason = MOVE_OTHER
         // QQuickItemView::setModel / componentComplete end with updateViewport, also when refill laid nothing out
         // (a view of no size): lastPosition estimates the rows with averageSize - the size of the current item when it
@@ -910,7 +982,7 @@ class ListView extends Item {
     // is its size
     $ensureCurrentItem(){
         let index = this.$v[ListView.CURRENTINDEX]
-        if(index < 0 || this.$entries.has(index) || !this.$v[ListView.DELEGATE] || !(this.$f & engine.COMPLETED)) return this.$updateCurrentItem()
+        if(index < 0 || this.$entries.has(index) || !this.$hasItems() || !(this.$f & engine.COMPLETED)) return this.$updateCurrentItem()
         let rows = modelRows(this.$model)
         if(index >= rows.count) return this.$updateCurrentItem()
         let entry = this.$create(index, rows)
@@ -946,6 +1018,18 @@ class ListView extends Item {
             if(this.$currentAttached === entry.item && index !== this.$v[ListView.CURRENTINDEX]) this.$currentAttached = null
             let attached = entry.item.$v[Item.LISTVIEW]
             if(attached) engine.emitArgs(attached, ListViewAttached.SIGNAL_reused, [])
+        } else if(rows.object){
+            // an ObjectModel: its item itself (QQmlObjectModel::object), shown in the view and kept when it is released
+            let item = rows.object(index)
+            if(!item) return null
+            let ctx = new ModelContext(null, index, item)
+            ctx.$view = this
+            if(item.$parent !== this.$content) item.$setParent(this.$content)
+            item.$culled = false
+            engine.markDirty(item, VISIBILITY)
+            attachedOf(item).$write(ListViewAttached.VIEW, this)
+            entry = { item, ctx, section: null, index, pos: 0, object: true }
+            this.$entries.set(index, entry)
         } else {
             let delegate = this.$v[ListView.DELEGATE]
             let ctx = new ModelContext(rows.row(index), index, rows.data(index))
@@ -972,6 +1056,12 @@ class ListView extends Item {
             entry.section.$releaseLater()
             entry.section = null
         }
+        // an item of an ObjectModel is the model's: hidden, not deleted (QQmlObjectModel::release)
+        if(entry.object){
+            entry.item.$culled = true
+            engine.markDirty(entry.item, VISIBILITY)
+            return
+        }
         if(reusable && this.$v[ListView.REUSEITEMS]){
             this.$pool.push(entry)
             entry.item.$culled = true
@@ -982,6 +1072,9 @@ class ListView extends Item {
         }
         entry.item.$releaseLater()
     }
+
+    // items to show: a delegate, or the items of an ObjectModel
+    $hasItems(){ return !!this.$v[ListView.DELEGATE] || !!(this.$model && this.$model.$isObjectModel) }
 
     // a visible entry the view lets go of; the current item stays (the view holds it as currentItem)
     $releaseEntry(entry){
@@ -1009,7 +1102,7 @@ class ListView extends Item {
     // A null-size view without entries does not fill at all
     $fill(withBuffer = false){
         if(this.$filling || !(this.$f & engine.COMPLETED)) return
-        if(!this.$v[ListView.DELEGATE]){
+        if(!this.$hasItems()){
             this.$placeHeaderFooter()
             return
         }
@@ -1191,11 +1284,18 @@ class ListView extends Item {
         this.$updateOrigin()
     }
 
-    // QQuickItemView::originX / originY, atXBeginning ... (QQuickFlickable::updateBeginningEnd)
+    // the margin where the flow starts: topMargin, bottomMargin of a flow from the bottom; leftMargin, rightMargin of
+    // a flow from the right
+    $startMargin(){
+        let m = require('./Flickable').margins(this, this.$vertical() ? 'y' : 'x')
+        return this.$reversed() ? m.end : m.start
+    }
+
+    // QQuickItemView::originX / originY (of the content, not the margins), atXBeginning ... (QQuickFlickable::updateBeginningEnd)
     $updateOrigin(){
         let vertical = this.$vertical()
         let axis = vertical ? 'y' : 'x'
-        let b = this.$flickBounds(axis)
+        let b = this.$contentBounds(axis)
         let origin = b.min
         if(this.$reversed() && this.$contentSize() < this.$viewSize()) origin = -this.$lastPosition() - this.$footerSize()
         this.$write(vertical ? ListView.ORIGINY : ListView.ORIGINX, origin)
@@ -1210,6 +1310,7 @@ class ListView extends Item {
             this.$write(axis === 'x' ? ListView.ATXBEGINNING : ListView.ATYBEGINNING, pos <= b.min)
             this.$write(axis === 'x' ? ListView.ATXEND : ListView.ATYEND, pos >= b.max)
         }
+        this.$updateVisibleArea()
     }
 
     // QQuickListView::currentSection: the section of the item at the start of the view
@@ -1285,10 +1386,12 @@ class ListView extends Item {
         let old = this.$v[id]
         if(id === ListView.FLICKABLEDIRECTION && !this.$settingDirection) this.$flickDirectionSet = true
         if(id === ListView.KEYNAVIGATIONENABLED) this.$keyNavigationSet = true
+        // QQuickItemView::setCurrentIndex: currentIndexCleared by -1
+        if(id === ListView.CURRENTINDEX && !this.$inSync && !this.$viewMovedCurrent) this.$currentIndexCleared = value === -1
         super.$write(id, value)
         // QQuickItemView::setCurrentIndex: moveReason SetIndex (not for a change of the model), updateCurrent
         if(id === ListView.CURRENTINDEX && this.$v[id] !== old){
-            if(!this.$modelUpdating && this.$f & engine.COMPLETED) this.$moveReason = MOVE_SET_INDEX
+            if(!this.$modelUpdating && !this.$viewMovedCurrent && this.$f & engine.COMPLETED) this.$moveReason = MOVE_SET_INDEX
             this.$ensureCurrentItem()
         }
         // QQuickListView::geometryChange drains the pool, setReuseItems(false) as well
@@ -1512,7 +1615,7 @@ class ListView extends Item {
     }
 
     $disposeNative(){
-        if(this.$model instanceof ListModel) this.$model.$removeView(this)
+        if(this.$model && this.$model.$removeView) this.$model.$removeView(this)
         if(this.$bufferTimer) clearTimeout(this.$bufferTimer)
         this.$stopHighlightAnimations()
         super.$disposeNative()
@@ -1521,7 +1624,7 @@ class ListView extends Item {
 installFlick(ListView)
 
 const resync = (view) => { if(view.$f & engine.COMPLETED) view.$sync() }
-const modelSet = (view, value, old) => { if(!sameModel(value, old)) resync(view) }
+const modelSet = (view, value, old) => { if(!sameModel(value, old) && view.$f & engine.COMPLETED) view.$sync('model') }
 // QQuickItemViewPrivate::forceLayoutPolish (setSpacing, setCacheBuffer, setHighlightRangeMode ...)
 const refill = (view) => view.$forceLayoutPolish()
 const scrolled = (view) => {
@@ -1529,6 +1632,7 @@ const scrolled = (view) => {
     view.$content.$write(Item.Y, -view.$v[ListView.CONTENTY])
     view.$updateBeginningEnd()
     engine.queuePolish(view)
+    view.$strictViewportMoved()
 }
 // QQuickListView::setOrientation: the flick direction follows the orientation unless it was set
 const orientationChanged = (view) => {
@@ -1552,10 +1656,11 @@ defineType(ListView, {
         orientation: { kind: 'int', initial: VERTICAL, effect: orientationChanged },
         spacing: { kind: 'real', effect: refill },
         cacheBuffer: { kind: 'real', initial: 320, effect: refill },
-        contentX: { kind: 'real', effect: scrolled },
-        contentY: { kind: 'real', effect: scrolled },
-        contentWidth: 'real',
-        contentHeight: 'real',
+        contentX: { kind: 'real', effect: scrolled, set(value){ externalMove(this, 'x'); this.$assign(ListView.CONTENTX, value) } },
+        contentY: { kind: 'real', effect: scrolled, set(value){ externalMove(this, 'y'); this.$assign(ListView.CONTENTY, value) } },
+        // -1 across the flow, as a Flickable's (QQuickItemView sets the size along it)
+        contentWidth: { kind: 'real', initial: -1 },
+        contentHeight: { kind: 'real', initial: -1 },
         keyNavigationEnabled: { kind: 'bool', initial: true },
         keyNavigationWraps: 'bool',
         highlightFollowsCurrentItem: { kind: 'bool', initial: true },

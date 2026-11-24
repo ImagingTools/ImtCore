@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "CTcpServerConnectionTest.h"
+#include "SslTestComponents.h"
+#include "TSimModelComponentPtr.h"
 
 
 // STL includes
 #include <atomic>
 #include <memory>
+#include <thread>
 
 // Qt includes
 #include <QtCore/QElapsedTimer>
@@ -18,6 +21,9 @@
 // ACF includes
 #include <icomp/CComponentBase.h>
 #include <icomp/TSimComponentWrap.h>
+#include <iser/CMemoryReadArchive.h>
+#include <iser/CMemoryWriteArchive.h>
+#include <istd/CChangeNotifier.h>
 
 // ImtCore includes
 #include <imtcom/CServerConnectionInterfaceParamComp.h>
@@ -194,7 +200,10 @@ private:
 typedef icomp::TSimSharedComponentPtr<CHoldingServletComp> Servlet;
 typedef icomp::TSimSharedComponentPtr<CSlowBodyPolicyComp> SlowBodyPolicy;
 typedef icomp::TSimSharedComponentPtr<imtrest::CHttpProtocolEngineComp> Engine;
-typedef icomp::TSimSharedComponentPtr<imtcom::CServerConnectionInterfaceParamComp> Connection;
+// A model, as the package of the component makes it: the server follows the changes of its port
+typedef TSimModelComponentPtr<imtcom::CServerConnectionInterfaceParamComp> Connection;
+typedef TSimModelComponentPtr<CTestSslParamsComp> SslParams;
+typedef icomp::TSimSharedComponentPtr<CTestSslManagerComp> SslManager;
 typedef icomp::TSimComponentWrap<imtrest::CTcpServerComp> TcpServer;
 
 
@@ -215,7 +224,10 @@ int FindFreePort()
 */
 struct SServer
 {
-	explicit SServer(int threadsLimit, bool isSlowBody = false)
+	/**
+		\param hasSslSettings	the server gets the SSL settings (a model) and their manager, the encryption is off.
+	*/
+	explicit SServer(int threadsLimit, bool isSlowBody = false, bool startOnCreate = true, bool hasSslSettings = false)
 	{
 		port = FindFreePort();
 
@@ -231,11 +243,36 @@ struct SServer
 		connection->SetIntAttr("DefaultHttpPort", port);
 		connection->InitComponent();
 
+		if (hasSslSettings){
+			sslParams->InitComponent();
+			sslManager->InitComponent();
+
+			server.SetRef("SslConfiguration", sslParams);
+			server.SetRef("SslConfigurationManager", sslManager);
+		}
+
 		server.SetIntAttr("ThreadsLimit", threadsLimit);
+		server.SetBoolAttr("StartServerOnCreate", startOnCreate);
 		server.SetRef("RequestHandler", servlet);
 		server.SetRef("ProtocolEngine", engine);
 		server.SetRef("ServerInterface", connection);
 		server.InitComponent();
+	}
+
+	/**
+		Change the SSL settings: the encryption is on or off. The server is told about it only if \c isNotified, otherwise it finds it out
+		when it is started again.
+	*/
+	void SetSecure(bool isSecure, bool isNotified = true)
+	{
+		if (isNotified){
+			istd::CChangeNotifier notifier(&*sslParams);
+
+			sslParams->enableParam.SetEnabled(isSecure);
+		}
+		else{
+			sslParams->enableParam.SetEnabled(isSecure);
+		}
 	}
 
 	bool IsListening() const
@@ -243,6 +280,21 @@ struct SServer
 		const imtrest::IServer* serverPtr = &server;
 
 		return (port != 0) && (serverPtr->GetServerStatus() == imtrest::IServer::SS_LISTENING);
+	}
+
+	/**
+		The threads of the connections that still run.
+	*/
+	int GetRunningThreadCount() const
+	{
+		int retVal = 0;
+		for (const QThread* threadPtr : server.findChildren<QThread*>()){
+			if (threadPtr->isRunning()){
+				++retVal;
+			}
+		}
+
+		return retVal;
 	}
 
 	/**
@@ -272,6 +324,8 @@ struct SServer
 	SlowBodyPolicy bodyPolicy;
 	Engine engine;
 	Connection connection;
+	SslParams sslParams;
+	SslManager sslManager;
 	TcpServer server;
 };
 
@@ -676,6 +730,257 @@ void CTcpServerConnectionTest::QueuedConnectionsAreServedTest()
 
 	const QStringList messages = warnings.GetMessages();
 	QVERIFY2(messages.isEmpty(), qPrintable(messages.join(QStringLiteral("; "))));
+}
+
+
+// A new HTTP port of the connection interface moves the running server: the old port is closed, a request on the new one is handled
+// once (the server object is the same, its connection to the handler is not doubled)
+void CTcpServerConnectionTest::PortChangeMovesServerTest()
+{
+	SServer server(2);
+	QVERIFY(server.IsListening());
+	const int firstPort = server.port;
+
+	const int secondPort = FindFreePort();
+	QVERIFY(secondPort != 0 && secondPort != firstPort);
+	server.connection->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, secondPort);
+
+	const imtrest::IServer* serverPtr = &server.server;
+	QCOMPARE(serverPtr->GetServerStatus(), imtrest::IServer::SS_LISTENING);
+
+	CClient oldClient;
+	QVERIFY(!oldClient.Connect(firstPort));
+
+	CClient client;
+	QVERIFY(client.Connect(secondPort));
+	client.SendGet("/moved");
+	QTRY_COMPARE_WITH_TIMEOUT(server.servlet->GetHeld().size(), 1, 5000);
+	QTest::qWait(300);
+	QCOMPARE(server.servlet->GetHeld().size(), 1);
+
+	QCOMPARE(server.RespondToHeld(), 1);
+	QTRY_COMPARE_WITH_TIMEOUT(client.GetResponseCount(), 1, 5000);
+	client.Disconnect();
+}
+
+
+// The settings are loaded again (a file of the settings changed): the loaded port moves the server as a set one does
+void CTcpServerConnectionTest::LoadedPortMovesServerTest()
+{
+	SServer server(2);
+	QVERIFY(server.IsListening());
+
+	const int newPort = FindFreePort();
+	QVERIFY(newPort != 0 && newPort != server.port);
+	imtcom::CServerConnectionInterfaceParam loaded;
+	loaded.RegisterProtocol(imtcom::IServerConnectionInterface::PT_HTTP);
+	loaded.SetPort(imtcom::IServerConnectionInterface::PT_HTTP, newPort);
+
+	iser::CMemoryWriteArchive writeArchive;
+	QVERIFY(loaded.Serialize(writeArchive));
+	iser::CMemoryReadArchive readArchive(writeArchive);
+	QVERIFY(server.connection->Serialize(readArchive));
+
+	CClient client;
+	QVERIFY(client.Connect(newPort));
+	client.SendGet("/loaded");
+	QTRY_COMPARE_WITH_TIMEOUT(server.servlet->GetHeld().size(), 1, 5000);
+	QCOMPARE(server.RespondToHeld(), 1);
+	QTRY_COMPARE_WITH_TIMEOUT(client.GetResponseCount(), 1, 5000);
+	client.Disconnect();
+}
+
+
+// A port that another program listens on cannot be taken: the server stays on its port and goes on working
+void CTcpServerConnectionTest::BusyPortKeepsServerTest()
+{
+	SServer server(2);
+	QVERIFY(server.IsListening());
+
+	QTcpServer otherProgram;
+	QVERIFY(otherProgram.listen(QHostAddress::Any, 0));
+
+	QTest::ignoreMessage(QtDebugMsg, QRegularExpression(QStringLiteral("Tcp server could not be started on port")));
+	server.connection->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, otherProgram.serverPort());
+
+	CClient client;
+	QVERIFY(client.Connect(server.port));
+	client.SendGet("/stays");
+	QTRY_COMPARE_WITH_TIMEOUT(server.servlet->GetHeld().size(), 1, 5000);
+
+	QCOMPARE(server.RespondToHeld(), 1);
+	QTRY_COMPARE_WITH_TIMEOUT(client.GetResponseCount(), 1, 5000);
+	client.Disconnect();
+}
+
+
+// The server stopped by StopServer stays stopped when the port changes
+void CTcpServerConnectionTest::StoppedServerStaysStoppedTest()
+{
+	SServer server(2);
+	imtrest::IServer* serverPtr = &server.server;
+	QVERIFY(serverPtr->StopServer());
+
+	const int newPort = FindFreePort();
+	QVERIFY(newPort != 0 && newPort != server.port);
+	server.connection->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, newPort);
+	QCoreApplication::processEvents();
+
+	QCOMPARE(serverPtr->GetServerStatus(), imtrest::IServer::SS_NOT_STARTED);
+	CClient client;
+	QVERIFY(!client.Connect(newPort));
+}
+
+
+// The server that is not started on creation but by StartServer takes a new port as well
+void CTcpServerConnectionTest::StartedServerMovesTest()
+{
+	SServer server(2, false, false);
+	imtrest::IServer* serverPtr = &server.server;
+	QCOMPARE(serverPtr->GetServerStatus(), imtrest::IServer::SS_NOT_STARTED);
+	QVERIFY(serverPtr->StartServer());
+	QVERIFY(server.IsListening());
+
+	const int newPort = FindFreePort();
+	QVERIFY(newPort != 0 && newPort != server.port);
+	server.connection->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, newPort);
+
+	CClient oldClient;
+	QVERIFY(!oldClient.Connect(server.port));
+
+	CClient client;
+	QVERIFY(client.Connect(newPort));
+	client.SendGet("/started");
+	QTRY_COMPARE_WITH_TIMEOUT(server.servlet->GetHeld().size(), 1, 5000);
+	QCOMPARE(server.RespondToHeld(), 1);
+	QTRY_COMPARE_WITH_TIMEOUT(client.GetResponseCount(), 1, 5000);
+	client.Disconnect();
+}
+
+
+// Only a changed port moves the server. The port of the system (0) would be another one on each notification; a port that could not
+// be listened on is not tried again when another part of the settings changes (or the same settings are loaded again)
+void CTcpServerConnectionTest::OnlyChangedPortMovesServerTest()
+{
+	SServer server(2);
+	QVERIFY(server.IsListening());
+	const int firstPort = server.port;
+
+	server.connection->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, 0);
+	CClient firstClient;
+	QVERIFY(firstClient.Connect(firstPort));
+	firstClient.Disconnect();
+
+	QTcpServer otherProgram;
+	QVERIFY(otherProgram.listen(QHostAddress::Any, 0));
+	const int busyPort = otherProgram.serverPort();
+	QTest::ignoreMessage(QtDebugMsg, QRegularExpression(QStringLiteral("Tcp server could not be started on port")));
+	server.connection->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, busyPort);
+
+	// The port is free now, but it is not set again
+	otherProgram.close();
+	server.connection->SetHost(QStringLiteral("other"));
+
+	CClient client;
+	QVERIFY(client.Connect(firstPort));
+	client.SendGet("/stays");
+	QTRY_COMPARE_WITH_TIMEOUT(server.servlet->GetHeld().size(), 1, 5000);
+	QCOMPARE(server.RespondToHeld(), 1);
+	QTRY_COMPARE_WITH_TIMEOUT(client.GetResponseCount(), 1, 5000);
+	client.Disconnect();
+}
+
+
+// The server that is asked to be secure and cannot be does not listen when it moves to another port: also not on the previous port
+// without the encryption. The SSL settings that are not a model tell nothing about their change before
+void CTcpServerConnectionTest::RefusedEncryptionStopsMovedServerTest()
+{
+	SServer server(2, false, true, true);
+	QVERIFY(server.IsListening());
+
+	server.SetSecure(true, false);
+
+	const int newPort = FindFreePort();
+	QVERIFY(newPort != 0 && newPort != server.port);
+	server.connection->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, newPort);
+
+	const imtrest::IServer* serverPtr = &server.server;
+	QCOMPARE(serverPtr->GetServerStatus(), imtrest::IServer::SS_NOT_STARTED);
+
+	CClient oldPortClient;
+	QVERIFY(!oldPortClient.Connect(server.port));
+
+	CClient newPortClient;
+	QVERIFY(!newPortClient.Connect(newPort));
+}
+
+
+// The server stopped by StopServer stays stopped when the SSL settings change. The server started by StartServer follows them
+void CTcpServerConnectionTest::StoppedServerStaysStoppedOnSslChangeTest()
+{
+	SServer server(2, false, true, true);
+	imtrest::IServer* serverPtr = &server.server;
+	QVERIFY(serverPtr->StopServer());
+
+	server.SetSecure(false);
+	QCoreApplication::processEvents();
+	QCOMPARE(serverPtr->GetServerStatus(), imtrest::IServer::SS_NOT_STARTED);
+
+	SServer startedServer(2, false, false, true);
+	imtrest::IServer* startedServerPtr = &startedServer.server;
+	QVERIFY(startedServerPtr->StartServer());
+
+	startedServer.SetSecure(true);
+	QTRY_COMPARE_WITH_TIMEOUT(startedServerPtr->GetServerStatus(), imtrest::IServer::SS_NOT_STARTED, 5000);
+}
+
+
+// The SSL settings changed in another thread (a request of a client) restart the server in its own thread: the server and its sockets
+// are not touched from the other thread
+void CTcpServerConnectionTest::SslChangeInAnotherThreadIsQueuedTest()
+{
+	SServer server(2, false, true, true);
+	QVERIFY(server.IsListening());
+	server.sslManager->isFailing = false;
+
+	CThreadWarningCatcher catcher;
+
+	std::thread changer([&server](){ server.SetSecure(true); });
+	changer.join();
+
+	// The restart is queued to the thread of the server
+	QCoreApplication::processEvents();
+	QVERIFY(server.IsListening());
+
+	// The server expects the encryption now: a request without it is not served
+	CClient client;
+	QVERIFY(client.Connect(server.port));
+	client.SendGet("/plain");
+	QTest::qWait(300);
+	QCOMPARE(server.servlet->GetHeld().size(), 0);
+
+	QVERIFY2(catcher.GetMessages().isEmpty(), qPrintable(catcher.GetMessages().join(QLatin1Char('\n'))));
+}
+
+
+// The threads of the connections use the references and the attributes of the server: they are stopped when the component is
+// destroyed, while it still has them. Later, in the destructor of the server, the wrapper of the component has removed them already
+void CTcpServerConnectionTest::ConnectionsStopWhenComponentIsDestroyedTest()
+{
+	SServer server(5);
+	QVERIFY(server.IsListening());
+
+	CClient client;
+	QVERIFY(client.Connect(server.port));
+	client.SendGet("/held");
+	QTRY_COMPARE_WITH_TIMEOUT(server.servlet->GetHeld().size(), 1, 5000);
+	QVERIFY(server.GetRunningThreadCount() > 0);
+
+	// As the destructor of the wrapper does it: the component is destroyed and loses its context
+	server.server.SetComponentContext(icomp::IComponentContextSharedPtr(), nullptr, false);
+
+	QCOMPARE(server.GetRunningThreadCount(), 0);
+	QVERIFY(!server.IsListening());
 }
 
 

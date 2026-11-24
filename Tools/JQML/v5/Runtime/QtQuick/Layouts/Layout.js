@@ -83,10 +83,15 @@ function hints(item, horizontal, parentLayout){
     let min = v ? v[horizontal ? P.MINIMUMWIDTH : P.MINIMUMHEIGHT] : 0
     let max = v ? v[horizontal ? P.MAXIMUMWIDTH : P.MAXIMUMHEIGHT] : Infinity
     if(item instanceof Layout && !(v && v[horizontal ? P.MINIMUMWIDTH : P.MINIMUMHEIGHT])) min = item.$minimum(horizontal)
+    // a layout in a layout: no larger than its items let it be (QQuickLayout::sizeHint(Qt::MaximumSize))
+    if(item instanceof Layout && max === Infinity) max = item.$maximum(horizontal)
     let fillExplicit = attached && attached.$explicit & (horizontal ? 16 : 32)
     let fill = fillExplicit ? !!v[horizontal ? P.FILLWIDTH : P.FILLHEIGHT] : (item instanceof Layout || (parentLayout instanceof require('./StackLayout').StackLayout))
     let stretch = v ? v[horizontal ? P.HORIZONTALSTRETCHFACTOR : P.VERTICALSTRETCHFACTOR] : -1
     preferred = Math.max(min, Math.min(max, preferred))
+    // snapped to the pixel grid: the sizes of an item are whole pixels, up (QQuickLayout, QGridLayoutItem::box)
+    preferred = Math.ceil(preferred - 1e-9)
+    min = Math.ceil(min - 1e-9)
     return { preferred: preferred + before + after, min: min + before + after, max: max + before + after, fill, stretch, before, after }
 }
 
@@ -121,6 +126,15 @@ function solve(cells, available){
                 for(let i of growing) sizes[i] += totalWeight > 0 ? extra * weight(i) / totalWeight : extra / growing.length
                 extra = 0
             }
+            // every fill cell at its maximum: the cells take the rest past it (QGridLayoutRowData::calculateGeometries,
+            // a target above the maximum), by stretch factor; their items keep their maximum, aligned in the cell
+            if(extra > 0.0001){
+                let fills = cells.map((cell, i) => i).filter(i => cells[i].fill)
+                let stretchOf = (i) => (cells[i].stretch > 0 ? cells[i].stretch : 1)
+                let totalStretch = fills.reduce((sum, i) => sum + stretchOf(i), 0)
+                for(let i of fills) sizes[i] += extra * stretchOf(i) / totalStretch
+                extra = 0
+            }
         } else if(total > 0){
             for(let i = 0; i < cells.length; i++) sizes[i] += extra * cells[i].preferred / total
         } else if(cells.length){
@@ -141,6 +155,31 @@ function solve(cells, available){
     return sizes
 }
 
+// QGridLayoutRowData::calculateGeometries with snapToPixelGrid: the cells start at whole pixels (the difference goes to
+// the cell before), the last one ends at the size, each at least its minimum. { positions, sizes } of the cells
+function snapCells(sizes, spacing, target, minimums){
+    let n = sizes.length
+    let positions = [], out = sizes.slice()
+    let at = 0
+    for(let i = 0; i < n; i++){
+        positions.push(at)
+        at += sizes[i] + spacing
+    }
+    if(!n) return { positions, sizes: out }
+    for(let i = 0; i < n; i++){
+        let old = positions[i]
+        positions[i] = qround(old)
+        let delta = positions[i] - old
+        out[i] -= delta
+        if(i > 0) out[i - 1] += delta
+    }
+    out[n - 1] = target - positions[n - 1]
+    for(let i = 0; i < n; i++) out[i] = Math.max(minimums[i], qround(out[i]))
+    return { positions, sizes: out }
+}
+// qRound
+const qround = (d) => (d >= 0 ? Math.floor(d + 0.5) : Math.ceil(d - 0.5))
+
 // ---- base -------------------------------------------------------------------------------------
 
 class Layout extends Item {
@@ -156,10 +195,16 @@ class Layout extends Item {
     }
 
     $invalidate(){
-        if(this.$f & engine.COMPLETED && !this.$arranging) engine.queuePolish(this)
+        // a change while the layout arranges (a Text that wraps at its new width: a new implicit height) arranges again
+        if(this.$arranging) this.$again = true
+        else if(this.$f & engine.COMPLETED) engine.queuePolish(this)
     }
 
     $childGeometryChanged(){
+        this.$invalidate()
+    }
+
+    $childImplicitChanged(){
         this.$invalidate()
     }
 
@@ -172,11 +217,15 @@ class Layout extends Item {
     }
 
     $minimum(horizontal){ return 0 }
+    $maximum(horizontal){ return Infinity }
 
     // position first, then size, like QQuickLayout::rearrange applying item geometry
-    $place(item, x, y, width, height){
+    // (not $place: that is Item.$place(id, value), a layout in a layout is placed by it)
+    $placeItem(item, x, y, width, height){
         item.$place(Item.X, x)
         item.$place(Item.Y, y)
+        // QQuickItem::setWidth / setHeight of the layout: the size is valid (a Text wraps at it)
+        item.$explicit |= 3
         item.$write(Item.WIDTH, width)
         item.$write(Item.HEIGHT, height)
     }
@@ -184,9 +233,14 @@ class Layout extends Item {
     $polish(){
         this.$arranging = true
         try {
-            this.$arrange()
+            for(let pass = 0; pass < 3; pass++){
+                this.$again = false
+                this.$arrange()
+                if(!this.$again) break
+            }
         } finally {
             this.$arranging = false
+            this.$again = false
         }
     }
 }
@@ -209,8 +263,13 @@ function align(start, cell, size, flags, horizontal){
 for(let Class of [Layout]){
     let base = Class.prototype.$write
     Class.prototype.$write = function(id, value){
+        let old = id === Item.WIDTH || id === Item.HEIGHT ? this.$v[id] : undefined
         base.call(this, id, value)
-        if((id === Item.WIDTH || id === Item.HEIGHT) && this.$f & engine.COMPLETED && !this.$arranging) engine.queuePolish(this)
+        if(id !== Item.WIDTH && id !== Item.HEIGHT) return
+        // a size that follows the implicit one changes while the layout arranges: it arranges again in the new size
+        if(this.$arranging){
+            if(this.$v[id] !== old) this.$again = true
+        } else if(this.$f & engine.COMPLETED) engine.queuePolish(this)
     }
 }
 
@@ -225,4 +284,4 @@ for(let Class of [Layout]){
     })
 }
 
-module.exports = { LayoutAttached, hints, solve, Layout, align }
+module.exports = { LayoutAttached, hints, solve, snapCells, Layout, align }

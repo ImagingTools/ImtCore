@@ -1,6 +1,7 @@
 const engine = require('../Core/engine')
 const mouse = require('../QtQuick/PointerDelivery')
 const QtEnums = require('../Qt/enums')
+const { domKey: domKeyOf } = require('../QtQuick/KeyEvent')
 const { defineType } = require('../Core/type')
 const { Item } = require('../QtQuick/Item')
 
@@ -67,6 +68,19 @@ class TestCase extends Item {
     }
 
     async $run(){
+        // qmltestrunner shows the root item of the document in a window and waits for it to be active
+        // (qWaitForWindowActive); a page that was not mounted (node) gets that window here
+        let keys = require('../QtQuick/KeyDelivery')
+        let top = this
+        while(top.$parent instanceof Item) top = top.$parent
+        if(!keys.agent.root){
+            keys.agent.root = top
+            top.$isFocusScope = true
+        }
+        if(!mouse.scene.roots.length) mouse.scene.roots.push(top)
+        keys.activateWindow()
+        // qWaitForWindowExposed: the window has shown a frame, its items are polished (positioners laid out)
+        engine.flushFrame()
         this.running = true
         try {
             await this.$call('initTestCase')
@@ -311,35 +325,48 @@ class TestCase extends Item {
 
     $key(type, key, modifiers = 0){
         if(typeof window === 'undefined') return
-        // Qt key enums are DOM key names; letter and digit codes become characters, Backtab is Shift+Tab
-        let domKey = String(key)
+        // a Qt key is the DOM key it stands for: a named key by its name, a letter or digit code its character (lower
+        // case without Shift), another code its character; Backtab is Shift+Tab; a string is a character
+        let domKey = typeof key === 'string' ? key : domKeyOf(key)
         if(typeof key === 'number' && ((key >= 0x30 && key <= 0x39) || (key >= 0x41 && key <= 0x5a))){
             domKey = String.fromCharCode(key)
             if(!(modifiers & QtEnums.ShiftModifier)) domKey = domKey.toLowerCase()
+        } else if(typeof key === 'number' && domKey === null){
+            domKey = key > 0 && key < 0x110000 ? String.fromCodePoint(key) : 'Unidentified'
         }
         if(key === QtEnums.Key_Backtab){
             domKey = 'Tab'
             modifiers |= QtEnums.ShiftModifier
         }
-        let event = new KeyboardEvent(type, {
+        let init = {
             bubbles: true,
             cancelable: true,
             key: domKey,
             code: domKey,
+            location: key === QtEnums.Key_Enter ? 3 : 0,
             shiftKey: !!(modifiers & QtEnums.ShiftModifier),
             ctrlKey: !!(modifiers & (isMac() ? QtEnums.MetaModifier : QtEnums.ControlModifier)),
             altKey: !!(modifiers & QtEnums.AltModifier),
             metaKey: !!(modifiers & (isMac() ? QtEnums.ControlModifier : QtEnums.MetaModifier)),
-        })
+        }
+        // without a document (node): the event goes to the key delivery as the window listener gives it
+        if(typeof document === 'undefined' || typeof KeyboardEvent === 'undefined'){
+            let event = Object.assign({ type, repeat: false, defaultPrevented: false, preventDefault(){ this.defaultPrevented = true } }, init)
+            // the shortcuts first, as the window's listener of the capture phase does in a page
+            if(type === 'keydown') require('../QtQuick/Shortcut').onKeyDown(event)
+            if(event.defaultPrevented) return
+            require('../QtQuick/KeyDelivery').deliverKey(event, type === 'keydown' ? 'pressed' : 'released')
+            return
+        }
         let target = document.activeElement && document.activeElement !== document.body ? document.activeElement : window
-        target.dispatchEvent(event)
+        target.dispatchEvent(new KeyboardEvent(type, init))
     }
 
     keyPress(key, modifiers){ this.$key('keydown', key, modifiers) }
     keyRelease(key, modifiers){ this.$key('keyup', key, modifiers) }
 
     keyClick(key, modifiers){
-        let input = document.activeElement
+        let input = typeof document === 'undefined' ? null : document.activeElement
         if(!modifiers && input && (input.tagName === 'TEXTAREA' || input.tagName === 'INPUT')){
             let ch = typeof key === 'string' && key.length === 1 ? key : key === QtEnums.Key_Return && input.tagName === 'TEXTAREA' ? '\n' : null
             if(ch){
@@ -370,13 +397,13 @@ class TestCase extends Item {
             input.value = current
             input.setSelectionRange(current.length, current.length)
         }
-        this.$key('keydown', ch === '\n' ? QtEnums.Key_Enter : ch)
+        this.$key('keydown', ch === '\n' ? QtEnums.Key_Return : ch)
         let start = input.selectionStart === null ? input.value.length : input.selectionStart
         let end = input.selectionEnd === null ? start : input.selectionEnd
         input.value = input.value.slice(0, start) + ch + input.value.slice(end)
         input.setSelectionRange(start + 1, start + 1)
         input.dispatchEvent(new Event('input', { bubbles: true }))
-        this.$key('keyup', ch === '\n' ? QtEnums.Key_Enter : ch)
+        this.$key('keyup', ch === '\n' ? QtEnums.Key_Return : ch)
     }
 
     keySequence(sequence){

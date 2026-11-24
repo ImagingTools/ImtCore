@@ -330,6 +330,25 @@ function cases(name, runtime){
         assert.equal(own.status, Image.Ready)
     }))
 
+    // the engine counts the pending bindings of an object in $pending: an Image made in a component, with bindings and a
+    // source set while it is created, still takes the end of its load (the TreeViewDelegate indicator stayed Loading)
+    test(name + ': an Image with bindings made in a component takes the end of its load', () => withImages(() => {
+        let image
+        runtime.jq.create(() => {
+            let root = new Item(null)
+            image = new Image(root)
+            image.source = 'icons/pending.svg'
+            image.$bind(Item.X, () => root.width / 2, null)
+            image.$bind(Item.ROTATION, () => 90, null)
+            return root
+        })
+        assert.equal(image.status, Image.Loading)
+        engine.batch(() => FakeImage.made[0].finish(11, 18))
+        assert.equal(image.status, Image.Ready)
+        assert.equal(image.implicitWidth, 11)
+        assert.equal(image.rotation, 90)
+    }))
+
     test(name + ': an image of the page\'s server is fetched once and drawn from its blob', async () => {
         let saved = { fetch: globalThis.fetch, URL: globalThis.URL, location: globalThis.location }
         let fetched = []
@@ -407,6 +426,71 @@ function cases(name, runtime){
         engine.batch(() => { image.sourceSize.width = 8 })
         assert.equal(image.implicitWidth, 8)
         assert.equal(evaluations, 1)
+    }))
+
+    // QtObject::md5: QCryptographicHash::hash(data.toUtf8(), Md5).toHex(); the values printed by Qt 6.12
+    test(name + ': Qt.md5 is the hex MD5 of the UTF-8 bytes', () => {
+        assert.equal(Qt.md5('ab'), '187ef4436122d1cc2f40dc2b92f0eba0')
+        assert.equal(Qt.md5(''), 'd41d8cd98f00b204e9800998ecf8427e')
+        assert.equal(Qt.md5(12), 'c20ad4d76fe97759aa27a0c99bff6710')
+        assert.equal(Qt.md5('\u043f\u0430\u0440\u043e\u043b\u044c'), 'e242f36f4f95f12966da8fa2efd59992')
+    })
+
+    // QQmlInstantiatorPrivate::clear: objectRemoved from the first object to the last
+    test(name + ': Instantiator removes its objects from the first one', () => {
+        const { Instantiator, QtObject } = types
+        let removed = []
+        let inst
+        engine.batch(() => {
+            inst = new Instantiator(null)
+            inst.delegate = new Component(null, () => new QtObject(null))
+            inst.model = 3
+        })
+        engine.batch(() => engine.scheduleComponentComplete(inst))
+        engine.connect(inst, Instantiator.SIGNAL_objectRemoved, (index) => removed.push(index))
+        engine.batch(() => { inst.model = 0 })
+        assert.deepEqual(removed, [0, 1, 2])
+    })
+
+    // QQuickImageBase::sourceSize reads a part not set as the size of the picture (0 without one); writing one part writes
+    // the QSize read first; QQuickImageProviderWithOptions::loadSize: a raster picture is only made smaller, a vector one
+    // takes the size, PreserveAspectFit / Crop cover the box (Qt 6.12, the measurements of pic.png 40x20 and pic.svg)
+    test(name + ': Image.sourceSize reads back and sizes the picture as Qt', () => withImages(() => {
+        let make = (source, set) => {
+            let image
+            engine.batch(() => {
+                image = new Image(null)
+                set(image)
+                image.source = source
+            })
+            return image
+        }
+        let finish = (image) => engine.batch(() => FakeImage.made[FakeImage.made.length - 1].finish(40, 20))
+        let plain = make('pics/a.png', () => {})
+        assert.deepEqual([plain.sourceSize.width, plain.sourceSize.height], [0, 0])
+        finish(plain)
+        assert.deepEqual([plain.sourceSize.width, plain.sourceSize.height], [40, 20])
+        let w10 = make('pics/b.png', (im) => { im.sourceSize.width = 10 })
+        assert.deepEqual([w10.sourceSize.width, w10.sourceSize.height], [10, 0])
+        finish(w10)
+        assert.deepEqual([w10.implicitWidth, w10.implicitHeight], [10, 5])
+        let bigger = make('pics/c.png', (im) => { im.sourceSize.width = 80; im.sourceSize.height = 60 })
+        finish(bigger)
+        assert.deepEqual([bigger.implicitWidth, bigger.implicitHeight], [40, 20])
+        let fit = make('pics/d.png', (im) => { im.sourceSize.width = 30; im.sourceSize.height = 30; im.fillMode = Image.PreserveAspectFit })
+        finish(fit)
+        assert.deepEqual([fit.implicitWidth, fit.implicitHeight], [60, 30])
+        let svg = make('pics/e.svg', (im) => { im.sourceSize.width = 80; im.sourceSize.height = 40 })
+        finish(svg)
+        assert.deepEqual([svg.implicitWidth, svg.implicitHeight], [80, 40])
+        let svgW = make('pics/f.svg', (im) => { im.sourceSize.width = 30; im.sourceSize.height = 30 })
+        finish(svgW)
+        assert.deepEqual([svgW.implicitWidth, svgW.implicitHeight], [30, 30])
+        let changes = 0
+        engine.connect(plain, Image.SIGNAL_sourceSizeChanged, () => changes++)
+        engine.batch(() => { plain.sourceSize.width = 20 })
+        assert.ok(changes > 0)
+        assert.deepEqual([plain.sourceSize.width, plain.sourceSize.height, plain.implicitWidth, plain.implicitHeight], [20, 20, 20, 10])
     }))
 
     test(name + ': a locale name the browser does not know is the C locale, as QLocale', () => {

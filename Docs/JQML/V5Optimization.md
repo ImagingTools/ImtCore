@@ -29,7 +29,7 @@ qtdeclarative 6.8, поведение проверено на Qt 6.12). Кажд
 Все прочие метрики (привязки, сигналы, кадры Column / anchors / анимаций, создание и уничтожение делегатов,
 документы Lisa и Puma) — в пределах шума. Ни одна метрика не ухудшилась сверх шума, кроме размера `core.js`.
 
-Кроме цифр: найдено и исправлено 13 багов (два — зависание и утечка памяти), добавлены бенчмарк, стресс-тесты,
+Кроме цифр: найдено и исправлено 17 багов (два — зависание и утечка памяти), добавлены бенчмарк, стресс-тесты,
 дифференциальные тесты против Qt 6.
 
 ## 2. Применено
@@ -68,6 +68,10 @@ qtdeclarative 6.8, поведение проверено на Qt 6.12). Кажд
 | B11 | средняя (потеря состояния) | Runtime/QtQuick/ListView.js (`$modelMoved`), Runtime/QtQml/Models/ListModel.js (`move`) | `ListModel.move` давал представлениям `reset`: все делегаты пересоздавались и теряли состояние; теперь как QQmlChangeSet move — делегаты перемещённых строк те же объекты, текущая строка следует за своей без прокрутки (при вставке и удалении тоже: moveReason не SetIndex). Repeater, GridView, Instantiator по-прежнему пересобираются | Views.test.js «ListModel.move moves the delegates»; tests/diff/cases/listview_move.qml совпадает с Qt 6.12 (те же объекты делегатов и их число) | c97843f42f | в шуме |
 | B12 | средняя (поведение) | Runtime/QtQuick/ListView.js, GridView.js (`$trackedPositionChanged`) | вид прыгал к новой текущей строке сразу; в Qt у вида всегда есть подсветка (без компонента — пустой Item), она едет к текущему элементу (SmoothedAnimation: ListView 400 px/с, GridView 150 мс), вид следует за ней только после нового currentIndex (moveReason SetIndex); после удаления текущей строки текущий элемент создаётся сразу | Views.test.js «the view follows the highlight», «GridView arrows»; diff: listview_follows_current, listview_model, gridview_model совпадают с Qt | d131b3e9b2 | в шуме |
 | B13 | средняя (потеря состояния) | Runtime/QtQuick/GridView.js, Repeater.js, Instantiator.js | GridView пересоздавал все делегаты при любой вставке, удалении, перемещении; Repeater и Instantiator — при перемещении; теперь как Qt: объекты остаются, сигналы added/removed для перемещений не испускаются | diff: gridview_model, repeater_instantiator_move совпадают с Qt | 455ac09bd8, d131b3e9b2 | в шуме |
+| B14 | средняя | Runtime/Qt/md5.js, Qt.js | `Qt.md5` не было (диалоги смены пароля IotPlatform; в v4 добавлен в #1171) | QtCompat.test.js; diff qt_md5_key_asterisk | d62c82a4d3 | в шуме |
+| B15 | низкая | Runtime/QtQml/Models/Instantiator.js (`$clear`) | `objectRemoved` шёл с последнего объекта; в Qt с первого | QtCompat.test.js; diff instantiator_objects | 32e307bc44 | в шуме |
+| B16 | средняя | Runtime/QtQuick/Image.js (`SourceSize`, `loadSize`) | `sourceSize` читался как -1 вместо размера картинки, не было `sourceSizeChanged`, svg не увеличивался до запрошенного размера, `PreserveAspectFit/Crop` не покрывали область — как в `QQuickImageProviderWithOptions::loadSize` | QtCompat.test.js; diff image_source_size; 30 замеров из #1171 в Chromium совпадают с Qt | 02e94cfed2 | в шуме |
+| B17 | низкая | Runtime/QtQuick/Context2D.js | `arc`/`arcTo` с отрицательным радиусом: ошибка браузера вместо Qt («Incorrect argument radius», Error с кодом) | Canvas.test.js; Canvas_007 из #1171 в Chromium совпадает с Qt | a636045676 | в шуме |
 | B10 | высокая (Firefox) | Runtime/Qt/Locale.js:4 | неизвестное имя локали бросало исключение (Firefox под автоматизацией: `navigator.language === "undefined"`) — ProLife висел на «Connecting» | QtCompat.test.js «C locale» | 165db2f3a7 | в шуме |
 
 Цена исправлений: `core.js` +7 КБ (+2,1% raw, +2,3% gzip) — сверх порога 2%; бандлы приложений +0,07% (в шуме).

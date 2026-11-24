@@ -204,7 +204,8 @@ QByteArray CWebSocketClientComp::Sign(const QByteArray& message, const QByteArra
 
 void CWebSocketClientComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	ProcessSettingsChanged();
+	// The connection is changed in the thread of the component: the settings can be loaded in another thread
+	QMetaObject::invokeMethod(this, [this](){ ProcessSettingsChanged(); }, Qt::AutoConnection);
 }
 
 
@@ -619,9 +620,34 @@ void CWebSocketClientComp::SetState(State state)
 }
 
 
+CWebSocketClientComp::SConnectionSettings CWebSocketClientComp::GetConnectionSettings() const
+{
+	SConnectionSettings retVal;
+
+	if (m_serverConnectionCompPtr.IsValid()){
+		m_serverConnectionCompPtr->GetUrl(imtcom::IServerConnectionInterface::PT_WEBSOCKET, retVal.url);
+	}
+
+	if (m_sslConfigurationCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid()){
+		iprm::TParamsPtr<iprm::IEnableableParam> sslEnableParamPtr(
+					m_sslConfigurationCompPtr.GetPtr(),
+					imtcom::ISslConfigurationManager::ParamKeys::s_enableSslModeParamKey);
+
+		retVal.isSecure = sslEnableParamPtr.IsValid() && sslEnableParamPtr->IsEnabled();
+		if (retVal.isSecure){
+			m_sslConfigurationManagerCompPtr->CreateSslConfiguration(*m_sslConfigurationCompPtr, retVal.sslConfiguration);
+		}
+	}
+
+	return retVal;
+}
+
+
 void CWebSocketClientComp::OpenConnection()
 {
 	SetState(ST_CONNECTING);
+
+	m_connectionSettings = GetConnectionSettings();
 
 	EnsureWebSocketConnection();
 
@@ -700,6 +726,10 @@ void CWebSocketClientComp::ProcessDisconnectRequest()
 void CWebSocketClientComp::ProcessSettingsChanged()
 {
 	Q_ASSERT(QThread::currentThread() == thread());
+
+	if (GetConnectionSettings() == m_connectionSettings){
+		return;
+	}
 
 	// A new server deserves its own first attempt in the log
 	m_isRetrying = false;

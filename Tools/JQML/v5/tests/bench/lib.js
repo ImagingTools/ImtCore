@@ -93,6 +93,8 @@ function load(application, options = {}){
         frames = []
         for(let fn of due) fn(time)
     }
+    // globals of the page (navigator...) the runtime reads
+    if(options.globals) Object.assign(context, options.globals)
     vm.createContext(context)
     // BENCH_CORE=sources: the sources of Runtime/ bundled (readable names in a profile); BENCH_CORE=<file>: that runtime
     let core = options.core || process.env.BENCH_CORE || CORE
@@ -117,6 +119,8 @@ function load(application, options = {}){
     // the bootstrap without mounting into a document
     // (a minified bundle has its own name for content)
     vm.runInContext(application.replace(/[\w$]+\.\$mount\(document\.body\)/, '0'), context, { filename: 'app.js' })
+    // the runtime is loaded, the application not built yet (settings of the platform: Qt.styleHints...)
+    if(options.beforeMount && context.JQ) options.beforeMount(context.JQ, context)
     if(options.mount !== false && loads[0]) loads[0]()
     let dispose = () => {
         if(context.JQ) context.JQ.engine.stop()

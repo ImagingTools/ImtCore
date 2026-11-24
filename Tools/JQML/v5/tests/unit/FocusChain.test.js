@@ -58,14 +58,14 @@ function cases(name, runtime){
         engine.batch(() => a.forceActiveFocus())
         assert.equal(a.activeFocus, true)
         let result
-        engine.batch(() => { result = keys.deliverTo(a, { key: 'Tab', modifiers: 0, text: '' }, 'pressed') })
+        engine.batch(() => { result = keys.deliverTo(a, { key: 0x01000001, modifiers: 0, text: '' }, 'pressed') })
         assert.equal(result, keys.ACCEPTED)
         assert.equal(b.activeFocus, true)
-        engine.batch(() => keys.deliverTo(b, { key: 'Tab', modifiers: 0, text: '' }, 'pressed'))
+        engine.batch(() => keys.deliverTo(b, { key: 0x01000001, modifiers: 0, text: '' }, 'pressed'))
         assert.equal(button.activeFocus, true)
         engine.batch(() => keys.deliverTo(button, { key: 0x01000002, modifiers: ShiftModifier, text: '' }, 'pressed'))
         assert.equal(b.activeFocus, true)
-        engine.batch(() => { result = keys.deliverTo(b, { key: 'Tab', modifiers: ControlModifier, text: '' }, 'pressed') })
+        engine.batch(() => { result = keys.deliverTo(b, { key: 0x01000001, modifiers: ControlModifier, text: '' }, 'pressed') })
         assert.equal(result, 0)
         assert.equal(b.activeFocus, true)
     })
@@ -73,8 +73,8 @@ function cases(name, runtime){
     test(name + ': an item without activeFocusOnTab leaves Tab to its parents, the contentItem moves the focus', () => {
         let { root, a, plain } = scene()
         engine.batch(() => plain.forceActiveFocus())
-        assert.equal(keys.deliverTo(plain, { key: 'Tab', modifiers: 0, text: '' }, 'pressed'), 0)
-        engine.batch(() => keys.deliverTo(root, { key: 'Tab', modifiers: 0, text: '' }, 'pressed'))
+        assert.equal(keys.deliverTo(plain, { key: 0x01000001, modifiers: 0, text: '' }, 'pressed'), 0)
+        engine.batch(() => keys.deliverTo(root, { key: 0x01000001, modifiers: 0, text: '' }, 'pressed'))
         assert.equal(a.activeFocus || root.activeFocus, true)
     })
 
@@ -85,10 +85,10 @@ function cases(name, runtime){
             edit.text = 'ab'
             edit.cursorPosition = 1
         })
-        engine.batch(() => edit.$keyEvent({ key: 'Tab', modifiers: 0, text: '' }, 'pressed'))
+        engine.batch(() => edit.$keyEvent({ key: 0x01000001, modifiers: 0, text: '' }, 'pressed'))
         assert.equal(edit.text, 'a\tb')
         engine.batch(() => { edit.readOnly = true })
-        assert.equal(edit.$keyEvent({ key: 'Tab', modifiers: 0, text: '' }, 'pressed'), 0)
+        assert.equal(edit.$keyEvent({ key: 0x01000001, modifiers: 0, text: '' }, 'pressed'), 0)
     })
 }
 

@@ -21,9 +21,14 @@ CGqlQuickObjectComp::CGqlQuickObjectComp()
 
 // reimplemented (CQuickObjectCompBase)
 
-bool CGqlQuickObjectComp::InitializeEngine(QQmlEngine& /*qmlEngine*/) const
+bool CGqlQuickObjectComp::InitializeEngine(QQmlEngine& qmlEngine) const
 {
-	SetBaseUrl();
+	// The item does not exist yet, so SetBaseUrl() cannot reach the engine through it. Requests sent while the
+	// root item is created (Component.onCompleted) would otherwise go to the default base URL - the local folder of the application.
+	const QString baseUrl = CalculateBaseUrl();
+	if (!baseUrl.isEmpty()){
+		qmlEngine.setBaseUrl(baseUrl);
+	}
 
 	return true;
 }
@@ -97,6 +102,12 @@ void CGqlQuickObjectComp::SetBaseUrl() const
 		return;
 	}
 
+	qmlEnginePtr->setBaseUrl(CalculateBaseUrl());
+}
+
+
+QString CGqlQuickObjectComp::CalculateBaseUrl() const
+{
 	QString baseUrl;
 	if (m_serverConnectionParamPtr.IsValid()){
 		QUrl url;
@@ -118,7 +129,7 @@ void CGqlQuickObjectComp::SetBaseUrl() const
 		baseUrl += "/" + suffix;
 	}
 
-	qmlEnginePtr->setBaseUrl(baseUrl);
+	return baseUrl;
 }
 
 

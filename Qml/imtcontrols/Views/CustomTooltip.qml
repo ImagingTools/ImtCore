@@ -197,6 +197,11 @@ ControlBase {
             radius: customTooltip.radius;
 
             property Item root: null;
+            // A tooltip is only looked at, as QQuickToolTip: opened by hovering, it
+            // took the keys from whatever had them - the menu it hovered over, a
+            // field being typed into (DialogManagerView gives a dialog focus unless
+            // it says otherwise).
+            property bool forceFocus: false;
 
             Component.onCompleted: {
                opacityAnimTo.start();

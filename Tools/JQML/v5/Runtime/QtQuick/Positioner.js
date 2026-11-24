@@ -25,8 +25,31 @@ class Positioner extends Item {
         if(this.$f & engine.COMPLETED) this.$polish()
     }
 
-    // A side padding set explicitly wins over padding, like in Qt
+    // laid out from the right (layoutDirection Qt.RightToLeft of Row, Grid, Flow)
+    // effectiveLayoutDirection: layoutDirection, the other one when the item is mirrored (LayoutMirroring)
+    $rightToLeft(){
+        let id = this.constructor.LAYOUTDIRECTION
+        if(id === undefined) return false
+        return (this.$v[id] === 1) !== require('./LayoutMirroring').mirrored(this)
+    }
+
+    $mirrorChanged(){
+        if(this.constructor.SIGNAL_effectiveLayoutDirectionChanged !== undefined) engine.emit(this, this.constructor.SIGNAL_effectiveLayoutDirectionChanged)
+        // QQuickBasePositionerPrivate::mirrorChange: laid out again at once
+        if(this.$f & engine.COMPLETED) this.$polish()
+    }
+
+    // QQuickRow / QQuickGrid / QQuickFlow::doPositioning from the right: the children placed from the left (with the
+    // side paddings swapped) are mirrored in the width, or in the implicit width without one
+    $mirror(children){
+        if(!this.$rightToLeft()) return
+        let end = this.$explicit & 1 ? this.$v[Item.WIDTH] : this.$v[Item.IMPLICITWIDTH]
+        for(let child of children) child.$place(Item.X, end - child.$v[Item.X] - child.$v[Item.WIDTH])
+    }
+
+    // A side padding set explicitly wins over padding, like in Qt; from the right the left and right ones swap
     $padding(name){
+        if(this.$rightToLeft() && (name === 'leftPadding' || name === 'rightPadding')) name = name === 'leftPadding' ? 'rightPadding' : 'leftPadding'
         let type = this.constructor.$type
         let own = this.$v[type.propByName.get(name).id]
         return this.$explicitPadding & PADDING_BITS[name] ? own : this.$v[Positioner.PADDING]
@@ -70,4 +93,17 @@ defineType(Positioner, {
     signals: ['positioningComplete'],
 })
 
-module.exports = { Positioner, relayout }
+// effectiveLayoutDirection of Row, Grid, Flow
+function effectiveDirection(Class){
+    let id = Class.EFFECTIVELAYOUTDIRECTION
+    Object.defineProperty(Class.prototype, 'effectiveLayoutDirection', {
+        get(){
+            engine.track(this, Class.SIGNAL_effectiveLayoutDirectionChanged)
+            return this.$rightToLeft() ? 1 : 0
+        },
+        configurable: true,
+    })
+    return id
+}
+
+module.exports = { Positioner, relayout, effectiveDirection }

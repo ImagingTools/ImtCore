@@ -8,7 +8,20 @@ const { KeyNavigation } = require('./KeyNavigation')
 const { KeyEvent } = require('./KeyEvent')
 const QtEnums = require('../Qt/enums')
 
-const agent = { root: null, activeFocusItem: null, windowFocused: false, windowFocusReason: false }
+// focusReason: the Qt::FocusReason of the focus change in progress (Tab, Backtab, a press of the mouse...); OtherFocusReason
+const agent = { root: null, activeFocusItem: null, windowFocused: false, windowFocusReason: false, focusReason: 7 }
+const MouseFocusReason = 0, TabFocusReason = 1, BacktabFocusReason = 2, ActiveWindowFocusReason = 3, OtherFocusReason = 7
+
+// runs fn with the Qt::FocusReason of the focus changes it makes (QQuickItemPrivate::setFocusInScope(.., reason))
+function withFocusReason(reason, fn){
+    let previous = agent.focusReason
+    agent.focusReason = reason
+    try {
+        return fn()
+    } finally {
+        agent.focusReason = previous
+    }
+}
 
 // setFocusInScope / clearFocusInScope options
 const DONT_CHANGE_FOCUS_PROPERTY = 1
@@ -20,11 +33,9 @@ const CONSUMED = 2
 
 let syncingDom = false
 
+// the effective enabled of an item (Item.enabled holds it)
 function isEnabled(item){
-    for(let it = item; it instanceof Item; it = it.$parent){
-        if(!it.$v[Item.ENABLED]) return false
-    }
-    return true
+    return item instanceof Item ? !!item.$v[Item.ENABLED] : true
 }
 
 // (a test page stands for JQMLHost, which builds an Item root without a window and shows a Window root)
@@ -72,6 +83,8 @@ function notify(changed){
         }
         if(item.$notifiedActiveFocus !== active){
             item.$notifiedActiveFocus = active
+            // QQuickItem::focusInEvent / focusOutEvent with their reason (QQuickControl: focusReason, visualFocus)
+            if(item.$focusEvent) item.$focusEvent(active, agent.windowFocusReason ? ActiveWindowFocusReason : agent.focusReason)
             engine.emit(item, Item.SIGNAL_activeFocusChanged, !active, active)
         }
     }
@@ -123,7 +136,10 @@ function setFocusInScope(scope, item, options = 0){
             }
         }
     }
-    if(oldActive !== agent.activeFocusItem) syncDomFocus()
+    if(oldActive !== agent.activeFocusItem){
+        syncDomFocus()
+        activeFocusItemChanged()
+    }
     notify(changed)
 }
 
@@ -148,8 +164,20 @@ function clearFocusInScope(scope, item, options = 0){
         changed.push(item)
     }
     if(newActive) agent.activeFocusItem = newActive
-    if(oldActive !== agent.activeFocusItem) syncDomFocus()
+    if(oldActive !== agent.activeFocusItem){
+        syncDomFocus()
+        activeFocusItemChanged()
+    }
     notify(changed)
+}
+
+// QQuickWindow::activeFocusItemChanged, before the items are told (QQuickDeliveryAgentPrivate::setFocusInScope)
+function activeFocusItemChanged(){
+    let Window = require('./Window/Window').Window
+    for(let window of Array.from(Window.$all || [])){
+        if(window.$f & engine.DESTROYED) Window.$all.delete(window)
+        else engine.emit(window, Window.SIGNAL_activeFocusItemChanged)
+    }
 }
 
 // The DOM follows the active focus: a text field's input is focused, any other item blurs the input that has it
@@ -294,7 +322,7 @@ function nextPrevItemInTabFocusChain(item, forward, wrap = true){
 function focusNextPrev(item, forward){
     let next = nextPrevItemInTabFocusChain(item, forward, true)
     if(!next || next === item) return false
-    next.forceActiveFocus()
+    withFocusReason(forward ? TabFocusReason : BacktabFocusReason, () => next.forceActiveFocus())
     return true
 }
 
@@ -313,6 +341,12 @@ function filterKey(item, event, kind, post){
 }
 
 // from the item with active focus up the parents until one accepts; a Shortcut that matched has the key already
+// QObject::installEventFilter of an item on the focus object: an object that sees the key before the focus item does
+// (TableView on the focus item of its editor); $filterEditKey(event, kind, target) returns true to take it
+const keyFilters = []
+function addKeyFilter(filter){ if(keyFilters.indexOf(filter) < 0) keyFilters.push(filter) }
+function removeKeyFilter(filter){ let i = keyFilters.indexOf(filter); if(i >= 0) keyFilters.splice(i, 1) }
+
 function deliverKey(e, kind){
     if(engine.isStopped() || e.defaultPrevented) return
     let item = agent.activeFocusItem
@@ -320,7 +354,19 @@ function deliverKey(e, kind){
     let event = new KeyEvent(e)
     let result = 0
     engine.batch(() => {
+        for(let filter of keyFilters.slice()){
+            if(!(filter.$f & engine.DESTROYED) && filter.$filterEditKey(event, kind, item)){
+                result = ACCEPTED
+                return
+            }
+        }
         for(let it = item; it instanceof Item && !result; it = it.$parent) result = deliverTo(it, event, kind)
+        // an Escape nothing took: the topmost popup of the window that closes on it (the Overlay)
+        if(!result && kind === 'pressed' && event.key === QtEnums.Key_Escape){
+            let top = item
+            while(top.$parent instanceof Item) top = top.$parent
+            if(top.$overlay && top.$overlay.$escape && top.$overlay.$escape()) result = ACCEPTED
+        }
     })
     if(result === ACCEPTED) e.preventDefault()
 }
@@ -375,8 +421,9 @@ Item.prototype.$setFocus = function(value){
     notify(changed)
 }
 
-// QQuickItem::forceActiveFocus: the item and every focus scope above it take focus
-Item.prototype.forceActiveFocus = function(){
+// QQuickItem::forceActiveFocus(reason = Qt.OtherFocusReason): the item and every focus scope above it take focus
+Item.prototype.forceActiveFocus = function(reason){
+    if(reason !== undefined && reason !== OtherFocusReason) return withFocusReason(reason, () => this.forceActiveFocus())
     engine.batch(() => {
         this.$setFocus(true)
         for(let parent = this.$parent; parent instanceof Item; parent = parent.$parent){
@@ -435,7 +482,7 @@ function enableChanged(item, scope, enabled){
     if(scope && !enabled && item.$v[Item.ACTIVEFOCUS]) clearFocusInScope(scope, item, options)
     let childScope = item.$isFocusScope && scope ? item : scope
     for(let child of item.$children || []){
-        if(child instanceof Item && child.$v[Item.ENABLED]) enableChanged(child, childScope, enabled)
+        if(child instanceof Item && child.$ownEnabled !== false) enableChanged(child, childScope, enabled)
     }
     if(scope && enabled && item.$v[Item.FOCUS] && inWindow(item)) setFocusInScope(scope, item, options)
 }
@@ -476,4 +523,4 @@ for(let [name, Group] of [['Keys', Keys], ['KeyNavigation', KeyNavigation]]){
     }
 }
 
-module.exports = { agent, deliverTo, nextPrevItemInTabFocusChain, focusNextPrev, isEnabled, setWindowFocused, activateWindow, windowCreated, isSyncingDom: () => syncingDom, ACCEPTED, CONSUMED }
+module.exports = { agent, withFocusReason, MouseFocusReason, TabFocusReason, BacktabFocusReason, OtherFocusReason, addKeyFilter, removeKeyFilter, deliverKey, deliverTo, nextPrevItemInTabFocusChain, focusNextPrev, isEnabled, setWindowFocused, activateWindow, windowCreated, isSyncingDom: () => syncingDom, ACCEPTED, CONSUMED }

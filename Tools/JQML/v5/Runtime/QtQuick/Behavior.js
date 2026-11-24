@@ -13,7 +13,10 @@ class Behavior extends QtObject {
         this.$finalized = false
         this.$animation = null
         engine.scheduleCompleted(this)
+        // QQuickBehavior is a QQmlFinalizerHook: it animates once the creation is finalized, before Component.onCompleted
+        engine.scheduleFinalize(this)
     }
+    $componentFinalized(){ this.$finalized = true }
 
     $animationObject(){
         if(this.$animation) return this.$animation
