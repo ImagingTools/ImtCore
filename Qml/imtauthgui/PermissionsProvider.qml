@@ -38,6 +38,8 @@ QtObject {
     property var organizationPermissions: []
     // Assigned permissions for the last requested member (populated when userId passed to requestOrganizationPermissions)
     property var memberOrganizationPermissions: []
+    // The permissions of the level Administrator, given by the server with the tree
+    property var administratorOrganizationPermissions: []
     signal organizationPermissionsReceived()
 
     signal requestStarted(string tenantId)
@@ -86,6 +88,7 @@ QtObject {
         tenantPermissionsTenantId = ""
         organizationPermissions = []
         memberOrganizationPermissions = []
+        administratorOrganizationPermissions = []
         lastError = ""
     }
 

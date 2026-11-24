@@ -28,14 +28,6 @@ namespace imtauthdb
 {
 
 
-namespace
-{
-
-const int s_invitationStatusPending = 0;
-
-} // namespace
-
-
 // reimplemented (icomp::CComponentBase)
 
 void CTenantDbDelegateComp::OnComponentCreated()
@@ -378,7 +370,6 @@ QString CTenantDbDelegateComp::GetTenantRelationScopeSubquery(const QByteArray& 
 
 	QString grantsTableName = m_crossOrgGrantsTableNameAttrPtr.IsValid() ? *m_crossOrgGrantsTableNameAttrPtr : QString::fromUtf8("CrossOrgGrants");
 	const bool hasMembershipsTable = TableExists(QStringLiteral("TenantMemberships"));
-	const bool hasInvitationsTable = TableExists(QStringLiteral("TenantInvitations"));
 	const bool hasCrossOrgGrantsTable = !grantsTableName.isEmpty() && TableExists(grantsTableName);
 
 	QStringList relationCaseItems;
@@ -391,14 +382,6 @@ QString CTenantDbDelegateComp::GetTenantRelationScopeSubquery(const QByteArray& 
 					"WHEN \"Id\" IN (SELECT \"TenantId\" FROM \"TenantMemberships\" "
 					"WHERE \"UserId\"='%1' AND \"IsActive\"=true) THEN 'Member'")
 					.arg(escapedUserId);
-	}
-
-	if (hasInvitationsTable){
-		relationCaseItems << QString(
-					"WHEN \"Id\" IN (SELECT \"TenantId\" FROM \"TenantInvitations\" "
-					"WHERE \"UserId\"='%1' AND \"Status\"=%2) THEN 'Invited'")
-					.arg(escapedUserId)
-					.arg(s_invitationStatusPending);
 	}
 
 	if (hasCrossOrgGrantsTable && hasMembershipsTable){

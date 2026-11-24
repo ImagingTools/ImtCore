@@ -24,8 +24,6 @@ type TenantItemData {
 	createdAt: String
 	updatedAt: String
 	tenantRelationScope: String
-	invitationId: ID
-	invitedByName: String
 	parentTenantId: ID
 	parentTenantName: String
 	isSystemTenant: Boolean
@@ -34,6 +32,8 @@ type TenantItemData {
 type TenantMemberEntry {
 	id: ID!
 	name: String!
+	# Given only to whom may view the permissions of the members
+	organizationPermissions: [ID]
 }
 
 input TenantMemberEntryInput {
@@ -212,12 +212,20 @@ type ConnectionRequest {
 	status: ConnectionRequestStatus!
 	createdAt: String
 	respondedAt: String
+	# The relationship the request proposes along, absent for a plain connection. The source role is the one of the requesting organization.
+	proposedSourceRole: TenantRelationshipRole
+	proposedTargetRole: TenantRelationshipRole
+	proposedScope: String
 }
 
 input CreateConnectionRequestInput {
 	sourceTenantId: ID!
 	connectionCode: String!
 	message: String
+	# Both roles propose a relationship: the approval brings it into force with the connection.
+	proposedSourceRole: TenantRelationshipRole
+	proposedTargetRole: TenantRelationshipRole
+	proposedScope: String
 }
 
 type CreateConnectionRequestPayload {
@@ -232,6 +240,8 @@ input ApproveConnectionRequestInput {
 
 type ApproveConnectionRequestPayload {
 	connectionId: ID
+	# The relationship of a request that proposes one
+	relationshipId: ID
 	errorMessage: String
 }
 

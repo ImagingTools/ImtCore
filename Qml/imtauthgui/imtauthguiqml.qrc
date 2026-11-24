@@ -37,7 +37,6 @@
         <file alias="imtauthgui/ProfileApiClient.qml">ProfileApiClient.qml</file>
         <file alias="imtauthgui/GqlBasedProfileApiClient.qml">GqlBasedProfileApiClient.qml</file>
         <file alias="imtauthgui/ProfileGeneralPage.qml">ProfileGeneralPage.qml</file>
-        <file alias="imtauthgui/ProfileOrganizationsPage.qml">ProfileOrganizationsPage.qml</file>
         <file alias="imtauthgui/ProfileTokensPage.qml">ProfileTokensPage.qml</file>
         <file alias="imtauthgui/ProfileAccessPage.qml">ProfileAccessPage.qml</file>
         <file alias="imtauthgui/PermissionDetailsPanel.qml">PermissionDetailsPanel.qml</file>
@@ -68,15 +67,13 @@
 	<file alias="imtauthgui/TenantCrossOrgGrantsPage.qml">TenantCrossOrgGrantsPage.qml</file>
 	<file alias="imtauthgui/TenantContractsPage.qml">TenantContractsPage.qml</file>
 	<file alias="imtauthgui/TenantConnectionCodePage.qml">TenantConnectionCodePage.qml</file>
-	<file alias="imtauthgui/TenantConnectOrganizationPage.qml">TenantConnectOrganizationPage.qml</file>
-	<file alias="imtauthgui/TenantMyConnectionsPage.qml">TenantMyConnectionsPage.qml</file>
-        <file alias="imtauthgui/TenantRelationshipProposalsPage.qml">TenantRelationshipProposalsPage.qml</file>
+	<file alias="imtauthgui/TenantPartnersPage.qml">TenantPartnersPage.qml</file>
+	<file alias="imtauthgui/PartnerTermsDialog.qml">PartnerTermsDialog.qml</file>
 	<file alias="imtauthgui/TenantMessagesPage.qml">TenantMessagesPage.qml</file>
 	<file alias="imtauthgui/CrossOrgGrantView.qml">CrossOrgGrantView.qml</file>
 	<file alias="imtauthgui/ShareDocumentDialog.qml">ShareDocumentDialog.qml</file>
 	<file alias="imtauthgui/TenantDocumentSharesPage.qml">TenantDocumentSharesPage.qml</file>
 	<file alias="imtauthgui/ContractView.qml">ContractView.qml</file>
-	<file alias="imtauthgui/RelationshipView.qml">RelationshipView.qml</file>
 	<file alias="imtauthgui/MessageView.qml">MessageView.qml</file>
 	<file alias="imtauthgui/StatusBadge.qml">StatusBadge.qml</file>
 	<file alias="imtauthgui/TenantCollectionListView.qml">TenantCollectionListView.qml</file>

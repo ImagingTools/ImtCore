@@ -807,8 +807,9 @@ imtbase::IOperationContext* CCollectionDocumentServiceControllerComp::CreateOper
 		operationContextPtr->SetOperationOwnerId(objectInfo);
 	}
 
-	QByteArray tenantId = requestContextPtr->GetTenantId();
-	operationContextPtr->SetTenantId(tenantId);
+	imtbase::TenantType tenantType = imtbase::TT_ORGANIZATION;
+	const QByteArray tenantId = imtgql::GetDataTenantId(*requestContextPtr, tenantType);
+	operationContextPtr->SetTenantId(tenantId, tenantType);
 
 	return operationContextPtr.PopPtr();
 }

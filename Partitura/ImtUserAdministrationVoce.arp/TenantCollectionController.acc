@@ -40,7 +40,7 @@
                                 <Value>Name</Value>
                                 <Value>Description</Value>
                                 <Value>Parent</Value>
-                                <Value>Role</Value>
+                                <Value>My role</Value>
                                 <Value>Active</Value>
                                 <Value>Created</Value>
                                 <Value>Updated</Value>
@@ -210,9 +210,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="HeadersProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="CollectionHeadersProvider"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="InvitationManager" Type="Reference" ExportId="InvitationManager">
-                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>

@@ -6,6 +6,8 @@
 #include <QtCore/QTimeZone>
 #include <QtCore/QUuid>
 #include <QtCore/QVariant>
+#include <QtSql/QSqlError>
+#include <QtSql/QSqlQuery>
 
 
 namespace imtdb
@@ -164,6 +166,54 @@ void GetTimeFilterBounds(const imtbase::ITimeFilterParam& timeFilter, const QDat
 		begin = AddTimeUnits(end, unit, -1);
 		break;
 	}
+}
+
+
+bool AddColumnIfMissing(
+			const IDatabaseEngine& databaseEngine,
+			const QString& tableName,
+			const QString& columnName,
+			const QString& columnType,
+			const QString& defaultValue)
+{
+	const QByteArray driverId = databaseEngine.GetDatabaseDriverId();
+	const bool isSqlite = driverId.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
+
+	// DuckDB takes no constraint in ADD COLUMN
+	const bool isDuckDb = driverId.contains("DUCK");
+	QString definition = columnType;
+	if (!defaultValue.isEmpty()){
+		definition += isDuckDb ? QStringLiteral(" DEFAULT %1").arg(defaultValue) : QStringLiteral(" NOT NULL DEFAULT %1").arg(defaultValue);
+	}
+
+	// SQLite has no ADD COLUMN IF NOT EXISTS
+	if (isSqlite){
+		QSqlError columnsError;
+		QSqlQuery columnsQuery = databaseEngine.ExecSqlQuery(QStringLiteral("PRAGMA table_info(%1)").arg(tableName).toUtf8(), &columnsError);
+		if (columnsError.type() != QSqlError::NoError || !columnsQuery.isActive()){
+			return false;
+		}
+
+		bool hasColumn = false;
+		while (columnsQuery.next()){
+			hasColumn = hasColumn || columnsQuery.value(QStringLiteral("name")).toString() == columnName;
+		}
+		columnsQuery.finish();
+
+		if (hasColumn){
+			return true;
+		}
+
+		QSqlError alterError;
+		databaseEngine.ExecSqlQuery(QStringLiteral(R"(ALTER TABLE %1 ADD COLUMN "%2" %3)").arg(tableName, columnName, definition).toUtf8(), &alterError);
+
+		return alterError.type() == QSqlError::NoError;
+	}
+
+	QSqlError alterError;
+	databaseEngine.ExecSqlQuery(QStringLiteral(R"(ALTER TABLE %1 ADD COLUMN IF NOT EXISTS "%2" %3)").arg(tableName, columnName, definition).toUtf8(), &alterError);
+
+	return alterError.type() == QSqlError::NoError;
 }
 
 

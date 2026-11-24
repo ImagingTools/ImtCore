@@ -17,7 +17,6 @@ TestCase {
 			{tag: "creator", scope: "Creator", editable: true, switchable: true, leavable: false},
 			{tag: "member", scope: "Member", editable: true, switchable: true, leavable: true},
 			{tag: "delegated", scope: "Delegated", editable: false, switchable: true, leavable: false},
-			{tag: "invited", scope: "Invited", editable: false, switchable: false, leavable: false},
 			{tag: "no relation (superuser)", scope: "", editable: false, switchable: false, leavable: false}
 		]
 	}

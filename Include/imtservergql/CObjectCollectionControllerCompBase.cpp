@@ -3411,7 +3411,10 @@ imtauth::CTenantFilterParam* CObjectCollectionControllerCompBase::CreateTenantFi
 	}
 
 	imtauth::CTenantFilterParam* tenantFilterPtr = imtauthgql::CreateTenantFilterParam(gqlRequest);
-	if (tenantFilterPtr != nullptr && m_documentShareManagerCompPtr.IsValid() && !tenantFilterPtr->GetTenantId().isEmpty()){
+	if (		tenantFilterPtr != nullptr &&
+				m_documentShareManagerCompPtr.IsValid() &&
+				tenantFilterPtr->GetTenantType() == imtbase::TT_ORGANIZATION &&
+				!tenantFilterPtr->GetTenantId().isEmpty()){
 		tenantFilterPtr->SetShareOwnerTenantIds(m_documentShareManagerCompPtr->GetShareOwnerTenantIds(tenantFilterPtr->GetTenantId()), true);
 		tenantFilterPtr->SetSharesRevision(m_documentShareManagerCompPtr->GetSharesRevision());
 	}

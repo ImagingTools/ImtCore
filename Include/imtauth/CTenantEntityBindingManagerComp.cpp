@@ -171,7 +171,7 @@ QByteArrayList CTenantEntityBindingManagerComp::GetEntityIds(const QByteArray& t
 }
 
 
-bool CTenantEntityBindingManagerComp::HasAnyTenantBinding(const QByteArray& entityType, const QByteArray& entityId, bool* isReadPtr) const
+bool CTenantEntityBindingManagerComp::HasOrganizationBinding(const QByteArray& entityType, const QByteArray& entityId, bool* isReadPtr) const
 {
 	if (entityType.isEmpty() || entityId.isEmpty()){
 		if (isReadPtr != nullptr){
@@ -184,7 +184,7 @@ bool CTenantEntityBindingManagerComp::HasAnyTenantBinding(const QByteArray& enti
 	imtbase::IComplexCollectionFilter::FilterExpression filterExpr;
 	filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter("EntityType", QString::fromUtf8(entityType));
 	filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter("EntityId", QString::fromUtf8(entityId));
-	// Do not restrict by TenantId: any tenant binding means it is tenant-scoped.
+	filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter("TenantType", static_cast<int>(imtbase::TT_ORGANIZATION));
 
 	return !SelectBindingIds(filterExpr, isReadPtr).isEmpty();
 }
