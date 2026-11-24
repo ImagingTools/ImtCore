@@ -224,6 +224,7 @@ void CSelectionTest::CompareSerializeXmlDataWithInputFileDataTest()
 	iser::CXmlStringWriteArchive xmlWritedArchive;
 	bool checkSerializeXml = multiSelection.Serialize(xmlWritedArchive);
 	QByteArray dataFromWriteXml = xmlWritedArchive.GetString();
+	dataFromWriteXml.replace("\r\n", "\n");
 	QString pathToInputFile = qEnvironmentVariable("IMTCOREDIR")+"/Include/imtbase/Test/TestData/xml.xml";
 	QFile xmlFile(pathToInputFile);
 	xmlFile.open(QIODevice::ReadOnly);
