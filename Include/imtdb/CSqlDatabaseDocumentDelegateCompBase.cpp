@@ -1250,7 +1250,7 @@ void CSqlDatabaseDocumentDelegateCompBase::EnsureTenantBindingTableExists() cons
 		return;
 	}
 
-	if (!AddTenantTypeColumn(*m_databaseEngineCompPtr, CreateTenantBindingTableName())){
+	if (!AddColumnIfMissing(*m_databaseEngineCompPtr, CreateTenantBindingTableName(), QStringLiteral("TenantType"), QStringLiteral("INTEGER"), QStringLiteral("0"))){
 		qWarning() << __FILE__ << __LINE__
 					<< "\n\t| TenantType column could not be added to TenantEntityBindings";
 		return;

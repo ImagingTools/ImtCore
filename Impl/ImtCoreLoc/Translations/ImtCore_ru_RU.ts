@@ -284,6 +284,10 @@
 <context>
     <name>Attribute</name>
     <message>
+        <source>My role</source>
+        <translation>Моя роль</translation>
+    </message>
+    <message>
         <source>{actor} invited you to &quot;{subject}&quot;</source>
         <translation>Приглашение в «{subject}» от {actor}</translation>
     </message>
@@ -7391,6 +7395,89 @@
     </message>
 </context>
 <context>
+    <name>PartnerTermsDialog</name>
+    <message>
+        <source>Partner</source>
+        <translation>Партнёр</translation>
+    </message>
+    <message>
+        <source>Supplier</source>
+        <translation>Поставщик</translation>
+    </message>
+    <message>
+        <source>Customer</source>
+        <translation>Заказчик</translation>
+    </message>
+    <message>
+        <source>Affiliate</source>
+        <translation>Аффилированная организация</translation>
+    </message>
+    <message>
+        <source>Parent organization</source>
+        <translation>Материнская организация</translation>
+    </message>
+    <message>
+        <source>Subsidiary</source>
+        <translation>Дочерняя организация</translation>
+    </message>
+    <message>
+        <source>Send request</source>
+        <translation>Отправить запрос</translation>
+    </message>
+    <message>
+        <source>Propose terms</source>
+        <translation>Предложить условия</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Отмена</translation>
+    </message>
+    <message>
+        <source>Organizations do not see each other. You can connect only by the code the partner gave you.</source>
+        <translation>Организации не видят друг друга. Подключиться можно только по коду, который дал партнёр.</translation>
+    </message>
+    <message>
+        <source>Partner&apos;s code</source>
+        <translation>Код партнёра</translation>
+    </message>
+    <message>
+        <source>Enter code...</source>
+        <translation>Введите код...</translation>
+    </message>
+    <message>
+        <source>We are for them</source>
+        <translation>Мы для них</translation>
+    </message>
+    <message>
+        <source>They are for us</source>
+        <translation>Они для нас</translation>
+    </message>
+    <message>
+        <source>Scope</source>
+        <translation>Область</translation>
+    </message>
+    <message>
+        <source>Optional — empty applies to all resources</source>
+        <translation>Необязательно — пусто означает все ресурсы</translation>
+    </message>
+    <message>
+        <source>Message to the partner</source>
+        <translation>Сообщение партнёру</translation>
+    </message>
+    <message>
+        <source>Optional</source>
+        <translation>Необязательно</translation>
+    </message>
+    <message>
+        <source>The partner accepts the request once: the connection and the relationship come into force together. Access to your data is given separately, with grants.</source>
+        <translation>Партнёр принимает запрос один раз: подключение и отношения вступают в силу вместе. Доступ к вашим данным выдаётся отдельно, через права доступа.</translation>
+    </message>
+    <message>
+        <source>The new terms come into force when the partner accepts them.</source>
+        <translation>Новые условия вступят в силу, когда партнёр их примет.</translation>
+    </message>
+</context>
+<context>
     <name>PasswordInput</name>
     <message>
         <location filename="../../../Qml/imtauthgui/PasswordInput.qml" line="+38"/>
@@ -9748,95 +9835,6 @@ Errors: 0</source>
     </message>
 </context>
 <context>
-    <name>RelationshipView</name>
-    <message>
-        <location filename="../../../Qml/imtauthgui/RelationshipView.qml" line="+75"/>
-        <source>Select the partner organization.</source>
-        <translation>Выберите организацию-партнёра.</translation>
-    </message>
-    <message>
-        <location line="+68"/>
-        <source>Partner Organization</source>
-        <translation>Организация-партнёр</translation>
-    </message>
-    <message>
-        <location line="+11"/>
-        <location line="+70"/>
-        <source>Select organization...</source>
-        <translation>Выберите организацию...</translation>
-    </message>
-    <message>
-        <location line="-64"/>
-        <source>Select</source>
-        <translation>Выбрать</translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <source>My Role</source>
-        <translation>Моя роль</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Partner Role</source>
-        <translation>Роль партнёра</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Scope</source>
-        <translation>Область</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Optional — empty applies to all resources</source>
-        <translation>Необязательно — если пусто, применяется ко всем ресурсам</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Description</source>
-        <translation>Описание</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Optional description</source>
-        <translation>Необязательное описание</translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>The changes take effect when the partner organization approves them.</source>
-        <translation>Изменения вступят в силу после их одобрения организацией-партнёром.</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>The relationship comes into force when the partner organization approves it.</source>
-        <translation>Отношения вступят в силу после их одобрения организацией-партнёром.</translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>Sending...</source>
-        <translation>Отправка...</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Propose Changes</source>
-        <translation>Предложить изменения</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Send Proposal</source>
-        <translation>Отправить предложение</translation>
-    </message>
-    <message>
-        <location line="+15"/>
-        <source>No connected organizations. Connect one under Relationships first.</source>
-        <translation>Нет связанных организаций. Сначала добавьте связь в разделе «Связи».</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Choose another organization. Current and partner organizations must be different.</source>
-        <translation>Выберите другую организацию. Текущая организация и организация-партнёр должны различаться.</translation>
-    </message>
-</context>
-<context>
     <name>RemoteCollectionView</name>
     <message>
         <location filename="../../../Qml/imtguigql/RemoteCollectionView.qml" line="+142"/>
@@ -11110,33 +11108,8 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+3"/>
-        <source>Invited</source>
-        <translation>Приглашён</translation>
-    </message>
-    <message>
-        <location line="+3"/>
         <source>Delegated</source>
         <translation>Делегирован</translation>
-    </message>
-    <message>
-        <location line="+59"/>
-        <source>Invited by: %1</source>
-        <translation>Приглашён: %1</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Unknown</source>
-        <translation>Неизвестный</translation>
-    </message>
-    <message>
-        <location line="+18"/>
-        <source>Accept</source>
-        <translation>Принять</translation>
-    </message>
-    <message>
-        <location line="+26"/>
-        <source>Reject</source>
-        <translation>Отклонить</translation>
     </message>
     <message>
         <location line="+67"/>
@@ -11176,11 +11149,6 @@ ID входных данных: </translation>
         <translation>Я участник</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>I am invited</source>
-        <translation>Я приглашён</translation>
-    </message>
-    <message>
         <location line="+115"/>
         <source>Activate organization</source>
         <translation>Активация организации</translation>
@@ -11189,16 +11157,6 @@ ID входных данных: </translation>
         <location line="+1"/>
         <source>&quot;%1&quot; is inactive. Activate it and switch to it?</source>
         <translation>Организация «%1» неактивна. Активировать её и переключиться на неё?</translation>
-    </message>
-    <message>
-        <location line="+22"/>
-        <source>Switch organization</source>
-        <translation>Переключение организации</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>An organization can be edited only while you work in it. Switch to &quot;%1&quot; and open it?</source>
-        <translation>Организацию можно редактировать, только работая в ней. Переключиться на «%1» и открыть её?</translation>
     </message>
     <message>
         <location line="+146"/>
@@ -11234,236 +11192,6 @@ ID входных данных: </translation>
         <location line="+36"/>
         <source>The organization &quot;%1&quot; was created inactive. Activate it to work in it.</source>
         <translation>Организация «%1» создана неактивной. Активируйте её, чтобы работать в ней.</translation>
-    </message>
-</context>
-<context>
-    <name>TenantConnectOrganizationPage</name>
-    <message>
-        <location filename="../../../Qml/imtauthgui/TenantConnectOrganizationPage.qml" line="+98"/>
-        <source>Connection request sent successfully</source>
-        <translation>Запрос на подключение успешно отправлен</translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <location line="+15"/>
-        <source>Approve failed</source>
-        <translation>Не удалось одобрить</translation>
-    </message>
-    <message>
-        <location line="-13"/>
-        <location line="+15"/>
-        <source>Reject failed</source>
-        <translation>Не удалось отклонить</translation>
-    </message>
-    <message>
-        <location line="-13"/>
-        <location line="+15"/>
-        <source>Cancel failed</source>
-        <translation>Не удалось отменить</translation>
-    </message>
-    <message>
-        <location line="+16"/>
-        <source>Approved</source>
-        <translation>Одобрен</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Connection request approved</source>
-        <translation>Запрос на подключение одобрен</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Rejected</source>
-        <translation>Отклонён</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Connection request rejected</source>
-        <translation>Запрос на подключение отклонён</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Canceled</source>
-        <translation>Отменён</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Connection request canceled</source>
-        <translation>Запрос на подключение отменён</translation>
-    </message>
-    <message>
-        <location line="+18"/>
-        <source>Connection removed</source>
-        <translation>Подключение удалено</translation>
-    </message>
-    <message>
-        <location line="+12"/>
-        <location line="+84"/>
-        <source>Unknown Organization</source>
-        <translation>Неизвестная организация</translation>
-    </message>
-    <message>
-        <location line="+27"/>
-        <source>Connect Organization</source>
-        <translation>Подключить организацию</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Enter the Connection Code of the organization you want to connect with.</source>
-        <translation>Введите код подключения организации, с которой хотите связаться.</translation>
-    </message>
-    <message>
-        <location line="+31"/>
-        <source>Connection Code</source>
-        <translation>Код подключения</translation>
-    </message>
-    <message>
-        <location line="+15"/>
-        <source>Enter code...</source>
-        <translation>Введите код...</translation>
-    </message>
-    <message>
-        <location line="+18"/>
-        <source>Message (optional)</source>
-        <translation>Сообщение (необязательно)</translation>
-    </message>
-    <message>
-        <location line="+15"/>
-        <source>Add a message...</source>
-        <translation>Добавьте сообщение...</translation>
-    </message>
-    <message>
-        <location line="+16"/>
-        <source>Sending...</source>
-        <translation>Отправка...</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Send Request</source>
-        <translation>Отправить запрос</translation>
-    </message>
-    <message>
-        <location line="+23"/>
-        <source>Incoming Requests</source>
-        <translation>Входящие запросы</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>No pending incoming requests.</source>
-        <translation>Нет ожидающих входящих запросов.</translation>
-    </message>
-    <message>
-        <location line="+21"/>
-        <source>Sent Requests</source>
-        <translation>Отправленные запросы</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>No pending sent requests.</source>
-        <translation>Нет ожидающих отправленных запросов.</translation>
-    </message>
-    <message>
-        <location line="+21"/>
-        <source>Established Connections</source>
-        <translation>Установленные подключения</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Organizations you are connected with.</source>
-        <translation>Организации, с которыми у вас есть подключение.</translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>No established connections yet.</source>
-        <translation>Установленных подключений пока нет.</translation>
-    </message>
-    <message>
-        <location line="+20"/>
-        <location line="+15"/>
-        <location line="+15"/>
-        <source>Organization</source>
-        <translation>Организация</translation>
-    </message>
-    <message>
-        <location line="-29"/>
-        <location line="+15"/>
-        <source>Message</source>
-        <translation>Сообщение</translation>
-    </message>
-    <message>
-        <location line="-14"/>
-        <source>Received</source>
-        <translation>Получен</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <location line="+15"/>
-        <source>State</source>
-        <translation>Состояние</translation>
-    </message>
-    <message>
-        <location line="-1"/>
-        <source>Sent</source>
-        <translation>Отправлен</translation>
-    </message>
-    <message>
-        <location line="+14"/>
-        <source>Owner</source>
-        <translation>Владелец</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Connected since</source>
-        <translation>Подключено с</translation>
-    </message>
-    <message>
-        <location line="+19"/>
-        <source>Approving...</source>
-        <translation>Одобрение...</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Rejecting...</source>
-        <translation>Отклонение...</translation>
-    </message>
-    <message>
-        <location line="+24"/>
-        <source>Approve</source>
-        <translation>Одобрить</translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <source>Reject</source>
-        <translation>Отклонить</translation>
-    </message>
-    <message>
-        <location line="+27"/>
-        <source>Canceling...</source>
-        <translation>Отмена...</translation>
-    </message>
-    <message>
-        <location line="+20"/>
-        <source>Cancel</source>
-        <translation>Отмена</translation>
-    </message>
-    <message>
-        <location line="+25"/>
-        <source>Remove</source>
-        <translation>Удалить</translation>
-    </message>
-    <message>
-        <location line="+20"/>
-        <source>Remove connection</source>
-        <translation>Удалить подключение</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Are you sure you want to remove the connection with &quot;%1&quot;?
-
-All relationships with this organization will also be removed.</source>
-        <translation>Вы уверены, что хотите удалить подключение к «%1»?
-
-Все связи с этой организацией также будут удалены.</translation>
     </message>
 </context>
 <context>
@@ -11819,6 +11547,26 @@ All relationships with this organization will also be removed.</source>
 </context>
 <context>
     <name>TenantEditor</name>
+    <message>
+        <source>Organization</source>
+        <translation>Организация</translation>
+    </message>
+    <message>
+        <source>People</source>
+        <translation>Люди</translation>
+    </message>
+    <message>
+        <source>Members and invitations</source>
+        <translation>Участники и приглашения</translation>
+    </message>
+    <message>
+        <source>External links</source>
+        <translation>Внешние связи</translation>
+    </message>
+    <message>
+        <source>Partners</source>
+        <translation>Партнёры</translation>
+    </message>
     <message>
         <location filename="../../../Qml/imtauthgui/TenantEditor.qml" line="+209"/>
         <location line="+11"/>
@@ -12253,8 +12001,8 @@ All relationships with this organization will also be removed.</source>
     </message>
     <message>
         <location line="+139"/>
-        <source>Manage Organization Permissions...</source>
-        <translation>Управление правами в организации...</translation>
+        <source>Permissions in Detail...</source>
+        <translation>Подробнее...</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -12391,6 +12139,22 @@ All relationships with this organization will also be removed.</source>
         <source>Type or choose a user to invite</source>
         <translation>Введите или выберите пользователя для приглашения</translation>
     </message>
+    <message>
+        <source>Administrator</source>
+        <translation>Администратор</translation>
+    </message>
+    <message>
+        <source>Special permissions</source>
+        <translation>Особые права</translation>
+    </message>
+    <message>
+        <source>Make Administrator</source>
+        <translation>Сделать администратором</translation>
+    </message>
+    <message>
+        <source>Make Member</source>
+        <translation>Сделать участником</translation>
+    </message>
 </context>
 <context>
     <name>TenantMessagesPage</name>
@@ -12448,56 +12212,162 @@ All relationships with this organization will also be removed.</source>
     </message>
 </context>
 <context>
-    <name>TenantMyConnectionsPage</name>
+    <name>TenantPartnersPage</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/TenantMyConnectionsPage.qml" line="+21"/>
-        <source>Relationship</source>
-        <translation>Связь</translation>
+        <source>The request was sent to the partner</source>
+        <translation>Запрос отправлен партнёру</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Relationships</source>
-        <translation>Отношения</translation>
+        <source>The partnership came into force</source>
+        <translation>Партнёрство вступило в силу</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>My Relationships</source>
-        <translation>Мои отношения</translation>
+        <source>The request was declined</source>
+        <translation>Запрос отклонён</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Business relationships with other organizations. Creating or modifying a relationship requires approval from both parties.</source>
-        <translation>Деловые отношения с другими организациями. Создание или изменение отношений требует согласия обеих сторон.</translation>
+        <source>The request was withdrawn</source>
+        <translation>Запрос отозван</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <source>The new terms were sent to the partner</source>
+        <translation>Новые условия отправлены партнёру</translation>
+    </message>
+    <message>
+        <source>The new terms came into force</source>
+        <translation>Новые условия вступили в силу</translation>
+    </message>
+    <message>
+        <source>The new terms were declined</source>
+        <translation>Новые условия отклонены</translation>
+    </message>
+    <message>
+        <source>The new terms were withdrawn</source>
+        <translation>Новые условия отозваны</translation>
+    </message>
+    <message>
+        <source>The partnership was ended</source>
+        <translation>Партнёрство прекращено</translation>
+    </message>
+    <message>
+        <source>supplier</source>
+        <translation>поставщик</translation>
+    </message>
+    <message>
+        <source>customer</source>
+        <translation>заказчик</translation>
+    </message>
+    <message>
+        <source>affiliate</source>
+        <translation>аффилированная организация</translation>
+    </message>
+    <message>
+        <source>parent organization</source>
+        <translation>материнская организация</translation>
+    </message>
+    <message>
+        <source>subsidiary</source>
+        <translation>дочерняя организация</translation>
+    </message>
+    <message>
+        <source>partner</source>
+        <translation>партнёр</translation>
+    </message>
+    <message>
+        <source>We are %1, they are %2</source>
+        <translation>Мы — %1, они — %2</translation>
+    </message>
+    <message>
+        <source>Unknown organization</source>
+        <translation>Неизвестная организация</translation>
+    </message>
+    <message>
+        <source>Connection without terms</source>
+        <translation>Подключение без условий</translation>
+    </message>
+    <message>
+        <source>Waiting for your answer</source>
+        <translation>Ждёт вашего ответа</translation>
+    </message>
+    <message>
+        <source>Waiting for the partner</source>
+        <translation>Ждёт ответа партнёра</translation>
+    </message>
+    <message>
+        <source>No terms yet</source>
+        <translation>Условий пока нет</translation>
+    </message>
+    <message>
+        <source>Active</source>
+        <translation>Действует</translation>
+    </message>
+    <message>
+        <source>New terms wait for the partner</source>
+        <translation>Новые условия ждут ответа партнёра</translation>
+    </message>
+    <message>
+        <source>New terms wait for your answer</source>
+        <translation>Новые условия ждут вашего ответа</translation>
+    </message>
+    <message>
+        <source>End of the partnership proposed</source>
+        <translation>Предложено прекратить партнёрство</translation>
+    </message>
+    <message>
+        <source>Partners</source>
+        <translation>Партнёры</translation>
+    </message>
+    <message>
+        <source>Organizations you work with. A partnership is in force when both sides agree.</source>
+        <translation>Организации, с которыми вы работаете. Партнёрство действует, когда согласны обе стороны.</translation>
+    </message>
+    <message>
+        <source>Invite partner</source>
+        <translation>Пригласить партнёра</translation>
+    </message>
+    <message>
+        <source>No partners yet. Invite one by the code the partner gave you.</source>
+        <translation>Партнёров пока нет. Пригласите партнёра по коду, который он вам дал.</translation>
+    </message>
+    <message>
         <source>Partner</source>
         <translation>Партнёр</translation>
     </message>
     <message>
-        <location line="+0"/>
-        <source>Partner role</source>
-        <translation>Роль партнёра</translation>
+        <source>Terms</source>
+        <translation>Условия</translation>
     </message>
     <message>
-        <location line="+0"/>
-        <source>Our role</source>
-        <translation>Наша роль</translation>
+        <source>State</source>
+        <translation>Состояние</translation>
     </message>
     <message>
-        <location line="+0"/>
-        <source>Status</source>
-        <translation>Статус</translation>
+        <source>Accept</source>
+        <translation>Принять</translation>
     </message>
     <message>
-        <location line="+0"/>
-        <source>Description</source>
-        <translation>Описание</translation>
+        <source>Decline</source>
+        <translation>Отклонить</translation>
     </message>
     <message>
-        <location line="+49"/>
-        <source>The proposal was sent to the partner organization</source>
-        <translation>Предложение отправлено организации-партнёру</translation>
+        <source>Withdraw</source>
+        <translation>Отозвать</translation>
+    </message>
+    <message>
+        <source>Change terms</source>
+        <translation>Изменить условия</translation>
+    </message>
+    <message>
+        <source>End</source>
+        <translation>Прекратить</translation>
+    </message>
+    <message>
+        <source>End partnership</source>
+        <translation>Прекращение партнёрства</translation>
+    </message>
+    <message>
+        <source>End the partnership with &quot;%1&quot;? The relationship with this organization ends with it.</source>
+        <translation>Прекратить партнёрство с «%1»? Отношения с этой организацией прекратятся вместе с ним.</translation>
     </message>
 </context>
 <context>
@@ -12623,103 +12493,6 @@ All relationships with this organization will also be removed.</source>
     <message>
         <source>Description</source>
         <translation type="vanished">Описание</translation>
-    </message>
-</context>
-<context>
-    <name>TenantRelationshipProposalsPage</name>
-    <message>
-        <location filename="../../../Qml/imtauthgui/TenantRelationshipProposalsPage.qml" line="+82"/>
-        <source>Change of the relationship</source>
-        <translation>Изменение отношений</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>End of the relationship</source>
-        <translation>Прекращение отношений</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>New relationship</source>
-        <translation>Новые отношения</translation>
-    </message>
-    <message>
-        <location line="+69"/>
-        <source>Relationship proposal approved</source>
-        <translation>Предложение об отношениях одобрено</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Relationship proposal rejected</source>
-        <translation>Предложение об отношениях отклонено</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Relationship proposal withdrawn</source>
-        <translation>Предложение об отношениях отозвано</translation>
-    </message>
-    <message>
-        <location line="+35"/>
-        <source>Incoming Proposals</source>
-        <translation>Входящие предложения</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>A relationship comes into force or changes only when both organizations agree.</source>
-        <translation>Отношения вступают в силу или изменяются только с согласия обеих организаций.</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>No proposals are waiting for your answer.</source>
-        <translation>Нет предложений, ожидающих вашего ответа.</translation>
-    </message>
-    <message>
-        <location line="+21"/>
-        <source>Sent Proposals</source>
-        <translation>Отправленные предложения</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>No proposals are waiting for the partner&apos;s answer.</source>
-        <translation>Нет предложений, ожидающих ответа партнёра.</translation>
-    </message>
-    <message>
-        <location line="+20"/>
-        <location line="+14"/>
-        <source>Partner</source>
-        <translation>Партнёр</translation>
-    </message>
-    <message>
-        <location line="-13"/>
-        <location line="+14"/>
-        <source>Proposal</source>
-        <translation>Предложение</translation>
-    </message>
-    <message>
-        <location line="-13"/>
-        <location line="+14"/>
-        <source>Roles</source>
-        <translation>Роли</translation>
-    </message>
-    <message>
-        <location line="-13"/>
-        <location line="+14"/>
-        <source>Description</source>
-        <translation>Описание</translation>
-    </message>
-    <message>
-        <location line="+22"/>
-        <source>Approve</source>
-        <translation>Одобрить</translation>
-    </message>
-    <message>
-        <location line="+10"/>
-        <source>Reject</source>
-        <translation>Отклонить</translation>
-    </message>
-    <message>
-        <location line="+23"/>
-        <source>Withdraw</source>
-        <translation>Отозвать</translation>
     </message>
 </context>
 <context>
@@ -14155,34 +13928,55 @@ All relationships with this organization will also be removed.</source>
 <context>
     <name>UserPanel</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/UserPanel.qml" line="+159"/>
-        <source>(delegated)</source>
-        <translation>(делегировано)</translation>
-    </message>
-    <message>
-        <location line="+138"/>
+        <location filename="../../../Qml/imtauthgui/UserPanel.qml"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location line="+56"/>
-        <location line="+337"/>
         <source>Profile</source>
         <translation>Профиль</translation>
     </message>
     <message>
-        <location line="-333"/>
-        <source>Organization</source>
-        <translation>Организация</translation>
+        <source>Personal space</source>
+        <translation>Личное пространство</translation>
     </message>
     <message>
-        <location line="+13"/>
-        <location line="+146"/>
-        <source>No organization</source>
-        <translation>Нет организации</translation>
+        <source>Work in</source>
+        <translation>Работать в</translation>
     </message>
     <message>
-        <location line="-141"/>
+        <source>Invitations: %1</source>
+        <translation>Приглашения: %1</translation>
+    </message>
+    <message>
+        <source>All organizations</source>
+        <translation>Все организации</translation>
+    </message>
+    <message>
+        <source>Accept</source>
+        <translation>Принять</translation>
+    </message>
+    <message>
+        <source>Reject</source>
+        <translation>Отклонить</translation>
+    </message>
+    <message>
+        <source>Owner</source>
+        <translation>Владелец</translation>
+    </message>
+    <message>
+        <source>Creator</source>
+        <translation>Создатель</translation>
+    </message>
+    <message>
+        <source>Member</source>
+        <translation>Участник</translation>
+    </message>
+    <message>
+        <source>Delegated</source>
+        <translation>Делегирован</translation>
+    </message>
+    <message>
         <source>Logout</source>
         <translation>Выход из системы</translation>
     </message>

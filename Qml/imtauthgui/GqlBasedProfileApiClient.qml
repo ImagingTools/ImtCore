@@ -59,12 +59,8 @@ QtObject {
 	signal profileReceived(var profile)
 	signal profileSaved()
 
-	property var lastOrganizations: []
-	signal organizationsReceived(var list)
-
 	signal invitationAccepted()
 	signal invitationRejected()
-	signal leftTenant(string tenantId)
 
 	signal tokenListReceived(var tokens)
 	signal tokenCreated(string token)
@@ -139,62 +135,6 @@ QtObject {
 	}
 
 	// =========================================================================
-	// Organizations
-	// =========================================================================
-
-	property GetProfileInput __organizationsInput: GetProfileInput {
-		m_id: root.__userId
-		m_productId: root.__productId
-	}
-
-	property GqlSdlRequestSender __organizationsRequest: GqlSdlRequestSender {
-		permissionPath: root.permissionPath
-		requestType: 0
-		gqlCommandId: ImtauthProfileSdlCommandIds.s_getUserOrganizations
-		sdlObjectComp: Component {
-			GetUserOrganizationsPayload {
-				onFinished: {
-					var orgs = m_organizations
-					var list = []
-					if (orgs) {
-						for (var i = 0; i < orgs.count; i++) {
-							var org = orgs.get(i).item
-							if (org && org.m_isActive) {
-								var displayName = org.m_name || org.m_id || ""
-								var isDelegated = org.m_isDelegated || false
-								if (isDelegated)
-									displayName = displayName + " " + qsTr("(delegated)")
-								list.push({
-									id: org.m_id || "",
-									name: displayName,
-									description: org.m_description || "",
-									isDelegated: isDelegated
-								})
-							}
-						}
-					}
-					// Always provide the No Organization entry to allow switching to
-					// the global (non-tenant) context.
-					list.push({
-						id: "",
-						name: qsTr("No organization"),
-						description: "",
-						isDelegated: false
-					})
-					root.lastOrganizations = list
-					root.organizationsReceived(list)
-				}
-			}
-		}
-	}
-
-	function getOrganizations() {
-		if (!root.__userId)
-			return
-		__organizationsRequest.send(root.__organizationsInput)
-	}
-
-	// =========================================================================
 	// Invitations
 	// =========================================================================
 
@@ -250,66 +190,6 @@ QtObject {
 	function rejectInvitation(invitationId) {
 		root.__rejectInvitationInput.m_invitationId = invitationId || ""
 		root.__rejectInvitationSender.send(root.__rejectInvitationInput)
-	}
-
-	// =========================================================================
-	// Leave organization (find membership -> remove membership)
-	// =========================================================================
-
-	property string __leaveTenantId: ""
-
-	property FindMembershipInput __findMembershipForLeaveInput: FindMembershipInput {}
-	property GqlSdlRequestSender __findMembershipForLeaveSender: GqlSdlRequestSender {
-		permissionPath: root.permissionPath
-		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_findMembership
-		sdlObjectComp: Component {
-			FindMembershipPayload {
-				onFinished: {
-					if (m_membership && m_membership.m_id && m_membership.m_id !== "") {
-						root.__removeMembershipForLeaveInput.m_membershipId = m_membership.m_id
-						root.__removeMembershipForLeaveSender.send(root.__removeMembershipForLeaveInput)
-					} else if (m_errorMessage && m_errorMessage !== "") {
-						root.organizationOperationFailed(m_errorMessage)
-					}
-				}
-			}
-		}
-		function onError(message, type) {
-			root.organizationOperationFailed(message)
-		}
-	}
-
-	property RemoveMembershipInput __removeMembershipForLeaveInput: RemoveMembershipInput {}
-	property GqlSdlRequestSender __removeMembershipForLeaveSender: GqlSdlRequestSender {
-		permissionPath: root.permissionPath
-		requestType: 1
-		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_removeMembership
-		sdlObjectComp: Component {
-			RemoveMembershipPayload {
-				onFinished: {
-					if (m_success) {
-						if (root.__leaveTenantId === AuthorizationController.currentTenantId) {
-							AuthorizationController.selectTenant("")
-						}
-						root.leftTenant(root.__leaveTenantId)
-					} else if (m_errorMessage && m_errorMessage !== "") {
-						root.organizationOperationFailed(m_errorMessage)
-					}
-				}
-			}
-		}
-		function onError(message, type) {
-			root.organizationOperationFailed(message)
-		}
-	}
-
-	function leaveTenant(tenantId) {
-		if (!tenantId)
-			return
-		root.__leaveTenantId = tenantId
-		root.__findMembershipForLeaveInput.m_userId = root.__userId
-		root.__findMembershipForLeaveInput.m_tenantId = tenantId
-		root.__findMembershipForLeaveSender.send(root.__findMembershipForLeaveInput)
 	}
 
 	// =========================================================================

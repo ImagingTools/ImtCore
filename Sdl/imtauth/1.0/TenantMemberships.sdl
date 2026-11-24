@@ -127,6 +127,8 @@ input GetOrganizationPermissionsInput {
 type GetOrganizationPermissionsPayload {
 	groups: [PermissionGroup]
 	memberPermissions: [ID]
+	# The level Administrator: every leaf but the change of the permissions
+	administratorPermissions: [ID]
 	errorMessage: String
 }
 

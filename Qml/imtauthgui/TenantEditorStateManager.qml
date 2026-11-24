@@ -193,7 +193,7 @@ QtObject {
 					members.push({
 						id: userId,
 						name: m.m_name || userId,
-						organizationPermissions: []
+						organizationPermissions: m.m_organizationPermissions || []
 					})
 				}
 			}
@@ -239,6 +239,18 @@ QtObject {
 		stateManager.__membersModifiedLocally = true
 	}
 
+	// The organization permissions of a member changed on the server
+	function setMemberOrganizationPermissions(userId, permissions) {
+		var arr = stateManager.pendingMembers.slice()
+		for (var i = 0; i < arr.length; i++) {
+			if (arr[i].id === userId) {
+				arr[i] = {id: arr[i].id, name: arr[i].name, organizationPermissions: permissions}
+				break
+			}
+		}
+		stateManager.pendingMembers = arr
+	}
+
 	function removePendingInvitation(invitationId) {
 		var invitations = []
 		for (var i = 0; i < stateManager.pendingInvitations.length; i++) {
@@ -278,6 +290,8 @@ QtObject {
 			if (memberEntry) {
 				memberEntry.m_id = pendingMembers[i].id
 				memberEntry.m_name = pendingMembers[i].name || pendingMembers[i].id
+				if (pendingMembers[i].organizationPermissions && pendingMembers[i].organizationPermissions.length > 0)
+					memberEntry.m_organizationPermissions = pendingMembers[i].organizationPermissions
 				stateManager.tenantData.m_members.addElement(memberEntry)
 			}
 		}
