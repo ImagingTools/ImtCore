@@ -2257,7 +2257,46 @@ export class Engine {
 			for (const key of Object.keys(props)) this.guard(() => this.assign(item, key.split('.'), props[key]), `property '${key}'`, 0);
 		}
 		this.runCompletedFrom(mark);
+		// Qt (measured): the change handlers of the new object run for the values of its bindings while it is created, before the script
+		// that called createObject goes on (it may point a Binding at the object: that Binding then comes last, over what the handlers wrote).
+		if (item !== null) this.settleNewObject(item);
 		return item;
+	}
+
+	// The bindings of a new object and of what it holds are evaluated until they agree (a binding that read an item that was made after
+	// it reads it again), then its change handlers run for those values (see instantiateComponent).
+	settleNewObject(item) {
+		const items = [];
+		const collect = (node) => {
+			items.push(node);
+			for (const child of node.$children) collect(child);
+			if (node.$owned !== undefined) for (const owned of node.$owned) collect(owned);
+		};
+		collect(item);
+		for (let round = 0; round < 3; round++) {
+			for (const node of items) {
+				if (node.$bindings === null || node.$bindings === undefined) continue;
+				for (const binding of [...node.$bindings]) {
+					if (binding.failed || binding.evaluating) continue;
+					this.evaluateOne(binding, false);
+				}
+			}
+		}
+		this.runNewObjectHandlers(item);
+	}
+
+	// The change handlers of an object and of what it holds, polled once now (see instantiateComponent).
+	runNewObjectHandlers(item) {
+		if (item.$chg !== undefined) {
+			for (const list of [...item.$chg.values()]) {
+				for (const handler of [...list]) {
+					if (handler.failed || handler.immediate === true) continue;
+					this.runChangeHandler(handler);
+				}
+			}
+		}
+		for (const child of item.$children) this.runNewObjectHandlers(child);
+		if (item.$owned !== undefined) for (const owned of item.$owned) this.runNewObjectHandlers(owned);
 	}
 
 	assign(item, path, value) {
