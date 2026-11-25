@@ -9,6 +9,6 @@ ButtonDecorator{
     color: baseElement && baseElement.hovered  ? Style.toolButtonHoverColor : "transparent";
     border.width: 0;
 
-	icon.width: icon.visible ? Style.iconSizeM : 0;
+	icon.width: icon.visible ? Style.iconSizeS : 0;
 }
 
