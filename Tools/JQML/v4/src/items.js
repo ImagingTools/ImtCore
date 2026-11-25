@@ -4079,6 +4079,8 @@ export class ListView extends Item {
 		this.$extentCount = 0; // rows with a measured extent
 		this.$oddExtents = 0; // measured rows whose extent differs from $rowHeight; 0 means uniform rows
 		this.$arranging = false; // re-entrancy guard: binding refresh during reuse must not nest $arrange
+		this.$dragFrom = null;
+		this.$initFlick();
 		this.createDelegate = null; // (index) => Item | null
 		this.releaseDelegate = null; // (item) => void
 		this.rebindDelegate = null; // (item, index) => void: points a pooled delegate at another row
@@ -4228,6 +4230,65 @@ export class ListView extends Item {
 
 	get $acceptsWheel() {
 		return true;
+	}
+
+	// A list is dragged along its own axis only.
+	$flickRange() {
+		return this.$horizontal ? [this.$maxContentX, 0] : [0, this.$maxContentY];
+	}
+
+	get $isFlickView() {
+		return true;
+	}
+
+	get $acceptsMouse() {
+		if (!this.$interactive || !itemEnabled(this)) return false;
+		const range = this.$flickRange();
+		return range[0] > 0 || range[1] > 0;
+	}
+
+	// The place of a row along the main axis: { pos, size }.
+	$indexSpan(index) {
+		const spacing = Math.max(0, this.$spacing);
+		if (this.$oddExtents === 0) {
+			const base = this.$rowHeight > 0 ? this.$rowHeight : 40;
+			return { pos: index * (base + spacing), size: base };
+		}
+		let pos = 0;
+		for (let i = 0; i < index; i++) pos += this.$extentAt(i) + spacing;
+		return { pos, size: this.$extentAt(index) };
+	}
+
+	// ListView.Beginning, Center, End, Visible, Contain (Qt, measured): the view moves so that the row is there; Visible and Contain
+	// move it as little as possible (Visible only when no part of the row shows); the position stays inside the content.
+	positionViewAtIndex(index, mode) {
+		index = toFloat(index);
+		if (!(index >= 0 && index < this.$rowCount)) return;
+		const { pos, size } = this.$indexSpan(Math.floor(index));
+		const horizontal = this.$horizontal;
+		const view = horizontal ? this.$aw : this.$ah;
+		const current = horizontal ? this.$contentX : this.$contentY;
+		const max = horizontal ? this.$maxContentX : this.$maxContentY;
+		let target = current;
+		if (mode === 0) target = pos;
+		else if (mode === 1) target = pos + size / 2 - view / 2;
+		else if (mode === 2) target = pos + size - view;
+		else if (mode === 3 && (pos + size <= current || pos >= current + view)) target = pos < current ? pos : pos + size - view;
+		else if (mode === 4) target = pos < current ? pos : pos + size > current + view ? pos + size - view : current;
+		this.$scrollTo(clamp(target, 0, max));
+	}
+
+	positionViewAtBeginning() {
+		this.$scrollTo(0);
+	}
+
+	positionViewAtEnd() {
+		this.$scrollTo(this.$horizontal ? this.$maxContentX : this.$maxContentY);
+	}
+
+	$scrollTo(value) {
+		if (this.$horizontal) this.contentX = value;
+		else this.contentY = value;
 	}
 
 	// A list scrolls along its own axis only: a vertical wheel does not move a horizontal list (Qt).
@@ -4681,9 +4742,6 @@ defineReadOnly(ListView.prototype, 'originX', function () {
 defineReadOnly(ListView.prototype, 'originY', function () {
 	return 0;
 });
-for (const name of ['positionViewAtIndex', 'positionViewAtBeginning', 'positionViewAtEnd']) {
-	ListView.prototype[name] = function () {};
-}
 ListView.prototype.forceLayout = function () {
 	this.$arrange();
 };
@@ -4884,8 +4942,9 @@ export class GridView extends ListView {
 		}
 	}
 
-	positionViewAtBeginning() {
-		this.contentY = 0;
+	// A grid places a cell by the row that holds it.
+	$indexSpan(index) {
+		return { pos: Math.floor(index / this.$columns()) * this.$cellHeight, size: this.$cellHeight };
 	}
 }
 
@@ -5366,8 +5425,16 @@ export class Flickable extends Item {
 		this.$contentY = 0;
 		this.$contentW = 0;
 		this.$contentH = 0;
-		this.$interactive = true;
 		this.$dragFrom = null;
+		this.$initFlick();
+		// As in Qt the visual children live in contentItem, which is the only entry of `children`.
+		this.$content = new FlickableContentItem(this);
+		super.$adopt(this.$content);
+	}
+
+	// The state of the drag and the flick; a Flickable and the views (ListView, GridView) share it.
+	$initFlick() {
+		this.$interactive = true;
 		this.$flickDeceleration = 1500;
 		this.$maximumFlickVelocity = 2500;
 		// the press that may become a drag: { x, y, cx, cy, ax, ay, samples, exceeded: [x, y], started: [x, y] }
@@ -5382,9 +5449,16 @@ export class Flickable extends Item {
 		this.$declareSignal('flickEnded', []);
 		this.$declareSignal('dragStarted', []);
 		this.$declareSignal('dragEnded', []);
-		// As in Qt the visual children live in contentItem, which is the only entry of `children`.
-		this.$content = new FlickableContentItem(this);
-		super.$adopt(this.$content);
+	}
+
+	// The scroll range of the axes that the user can drag: [x, y].
+	$flickRange() {
+		return [this.$maxContentX, this.$maxContentY];
+	}
+
+	// The scroll views below the pointer that may take its drag (see Scene.pointerDown).
+	get $isFlickView() {
+		return true;
 	}
 
 	// Sets moving, dragging or flicking and tells those who wait for it.
@@ -5494,7 +5568,7 @@ export class Flickable extends Item {
 		const now = performance.now() / 1000;
 		press.samples.push({ t: now, x: sceneX, y: sceneY });
 		if (press.samples.length > 12) press.samples.shift();
-		const range = [this.$maxContentX, this.$maxContentY];
+		const range = this.$flickRange();
 		const pointer = [sceneX, sceneY];
 		const origin = [press.x, press.y];
 		for (let axis = 0; axis < 2; axis++) {
@@ -5516,8 +5590,8 @@ export class Flickable extends Item {
 				press.exceeded[axis] = true;
 			}
 		}
-		if (press.started[0]) this.contentX = clamp(press.cx - (sceneX - press.ax), 0, this.$maxContentX);
-		if (press.started[1]) this.contentY = clamp(press.cy - (sceneY - press.ay), 0, this.$maxContentY);
+		if (press.started[0]) this.contentX = clamp(press.cx - (sceneX - press.ax), 0, range[0]);
+		if (press.started[1]) this.contentY = clamp(press.cy - (sceneY - press.ay), 0, range[1]);
 	}
 
 	$pressChanged(pressed) {
@@ -5554,7 +5628,7 @@ export class Flickable extends Item {
 	$startFlick(vx, vy) {
 		const velocity = [vx, vy];
 		const position = [this.$contentX, this.$contentY];
-		const range = [this.$maxContentX, this.$maxContentY];
+		const range = this.$flickRange();
 		const start = hooks.now();
 		let any = false;
 		for (let axis = 0; axis < 2; axis++) {
@@ -5591,7 +5665,7 @@ export class Flickable extends Item {
 			const sign = state.v > 0 ? 1 : -1;
 			const decel = state.bound ? speed / state.dur : this.$flickDeceleration;
 			const travelled = speed * t - (decel * t * t) / 2;
-			const target = clamp(state.from + sign * travelled, 0, axis === 0 ? this.$maxContentX : this.$maxContentY);
+			const target = clamp(state.from + sign * travelled, 0, this.$flickRange()[axis]);
 			if (axis === 0) this.contentX = target;
 			else this.contentY = target;
 			if (t >= state.dur) {
@@ -5632,23 +5706,29 @@ export class Flickable extends Item {
 	}
 }
 
-defineReadOnly(Flickable.prototype, 'moving', function () {
-	return this.$flags.moving;
-});
-defineReadOnly(Flickable.prototype, 'dragging', function () {
-	return this.$flags.dragging;
-});
-defineReadOnly(Flickable.prototype, 'flicking', function () {
-	return this.$flags.flicking;
-});
-defineReadOnly(Flickable.prototype, 'horizontalVelocity', function () {
-	return this.$velocity[0];
-});
-defineReadOnly(Flickable.prototype, 'verticalVelocity', function () {
-	return this.$velocity[1];
-});
-defineField(Flickable.prototype, 'flickDeceleration', '$flickDeceleration', toFloat);
-defineField(Flickable.prototype, 'maximumFlickVelocity', '$maximumFlickVelocity', toFloat);
+// The drag and the flick of the views are those of a Flickable (Qt: a ListView and a GridView are Flickables).
+for (const proto of [Flickable.prototype, ListView.prototype]) {
+	defineReadOnly(proto, 'moving', function () {
+		return this.$flags.moving;
+	});
+	defineReadOnly(proto, 'dragging', function () {
+		return this.$flags.dragging;
+	});
+	defineReadOnly(proto, 'flicking', function () {
+		return this.$flags.flicking;
+	});
+	defineReadOnly(proto, 'horizontalVelocity', function () {
+		return this.$velocity[0];
+	});
+	defineReadOnly(proto, 'verticalVelocity', function () {
+		return this.$velocity[1];
+	});
+	defineField(proto, 'flickDeceleration', '$flickDeceleration', toFloat);
+	defineField(proto, 'maximumFlickVelocity', '$maximumFlickVelocity', toFloat);
+}
+for (const name of ['$initFlick', '$setFlag', '$beginMovement', '$endMovement', '$setVelocity', '$mousePressAt', '$mouseMoveAt', '$pressChanged', '$startFlick', '$flickTick', '$finishFlick', 'flick', 'cancelFlick']) {
+	Object.defineProperty(ListView.prototype, name, Object.getOwnPropertyDescriptor(Flickable.prototype, name));
+}
 
 function defineContent(name, field, sizeField = null) {
 	defineProp(
@@ -5675,6 +5755,7 @@ defineContent('contentY', '$contentY');
 defineContent('contentWidth', '$contentW', '$w');
 defineContent('contentHeight', '$contentH', '$h');
 defineField(Flickable.prototype, 'interactive', '$interactive', toBool);
+defineField(ListView.prototype, 'interactive', '$interactive', toBool);
 // The origin of the content: 0 for a Flickable whose content starts at its top left corner. A scroll bar places its thumb with
 // `(contentY - originY) * ...`: without the property the thumb was NaN and did not follow the content.
 defineReadOnly(Flickable.prototype, 'originX', function () {
