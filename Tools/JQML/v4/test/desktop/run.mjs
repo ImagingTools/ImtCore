@@ -340,6 +340,7 @@ async function main() {
 	const { writeFile } = await import('node:fs/promises');
 	await writeFile(reportPath, '');
 	let passed = 0;
+	let withoutReference = 0;
 
 	for (const { name, dir } of list) {
 		const mainFile = join(dir, 'Main.qml');
@@ -349,12 +350,23 @@ async function main() {
 		let webError = '';
 		let webErrors = [];
 		const importDirs = await readImportDirs(dir);
+		// "desktop": false and a "reason" in test.json: desktop Qt cannot load the case (it relies on what the engine is more lenient about, such
+		// as a type from the qmldir of a module that the file did not import), so there is nothing to compare with; the engine must still load it.
+		let noReference = '';
 		try {
-			const result = await runDesktop(qml, mainFile, importDirs);
-			desktop = result.lines;
-			desktopError = result.error;
-		} catch (error) {
-			desktopError = error.message;
+			const config = JSON.parse((await new DirFS(dir).readText('test.json')) || '{}');
+			if (config.desktop === false) noReference = String(config.reason || 'no reason given');
+		} catch {
+			noReference = '';
+		}
+		if (noReference === '') {
+			try {
+				const result = await runDesktop(qml, mainFile, importDirs);
+				desktop = result.lines;
+				desktopError = result.error;
+			} catch (error) {
+				desktopError = error.message;
+			}
 		}
 		try {
 			const result = await runWeb(dir, importDirs);
@@ -364,14 +376,15 @@ async function main() {
 		} catch (error) {
 			webError = error.message;
 		}
-		const ok = !desktopError && !webError && sameLines(desktop, web);
+		const ok = noReference !== '' ? !webError && webErrors.length === 0 : !desktopError && !webError && sameLines(desktop, web);
+		if (noReference !== '') withoutReference++;
 		if (ok) passed++;
-		const mark = ok ? `${color.green}[+]${color.reset}` : `${color.red}[-]${color.reset}`;
-		console.log(`${mark} ${name}`);
+		const mark = ok ? (noReference !== '' ? `${color.cyan}[~]${color.reset}` : `${color.green}[+]${color.reset}`) : `${color.red}[-]${color.reset}`;
+		console.log(`${mark} ${name}${noReference !== '' ? ` ${color.gray}(no desktop reference: ${noReference})${color.reset}` : ''}`);
 		await appendFile(reportPath, `${JSON.stringify({ name, ok, desktop, web, desktopError, webError, webErrors })}\n`);
 	}
 
-	console.log(`${color.yellow}[i] ${passed}/${list.length}${color.reset}`);
+	console.log(`${color.yellow}[i] ${passed}/${list.length}${withoutReference > 0 ? ` (${withoutReference} loaded without a desktop reference)` : ''}${color.reset}`);
 	process.exit(passed === list.length && list.length > 0 ? 0 : 1);
 }
 

@@ -481,7 +481,7 @@ async function main() {
 	}
 
 	let count = 0;
-	for (const sample of (await readdir(join(root, 'qml'))).filter((name) => name.endsWith('.qml') && !/error/.test(name)).sort()) {
+	for (const sample of (existsSync(join(root, 'qml')) ? await readdir(join(root, 'qml')) : []).filter((name) => name.endsWith('.qml') && !/error/.test(name)).sort()) {
 		if (selected.length > 0 && !selected.includes(sample)) continue;
 		count++;
 		const full = await runViewer(root, `qml/${sample}`, [], false, false);
