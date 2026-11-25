@@ -140,6 +140,19 @@ export function getFocusItem() {
 	return activeLeaf !== null ? activeLeaf : chainLeaf;
 }
 
+// Non-zero while the pointer press or click of the user is handled: forceActiveFocus() there is what the user asked for (a click on a row
+// of a list that is not active gives the row the active focus, so the keys go to it).
+let userGesture = 0;
+
+export function userGestureScope(fn) {
+	userGesture++;
+	try {
+		return fn();
+	} finally {
+		userGesture--;
+	}
+}
+
 export function resetFocus() {
 	activeLeaf = null;
 	chainLeaf = null;
@@ -1422,6 +1435,7 @@ export class Item {
 		// still-inactive view — that would activate the row when the dialog/popup takes focus.
 		const list = enclosingListView(this);
 		const scopedListCurrent =
+			userGesture === 0 &&
 			list !== null && list.$scopeFocus === this && !list.$focus && (activeLeaf === null || !focusHostOwnsList(list, activeLeaf));
 		if (!scopedListCurrent) {
 			let parent = this.$parent;
