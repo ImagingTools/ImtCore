@@ -4047,6 +4047,8 @@ function sizeUnresolved(item) {
 	return false;
 }
 
+const POSITION_MODES = ['Beginning', 'Center', 'End', 'Visible', 'Contain'];
+
 export class ListView extends Item {
 	// The delegates are the children of the view itself.
 	get contentItem() {
@@ -4262,6 +4264,8 @@ export class ListView extends Item {
 	// ListView.Beginning, Center, End, Visible, Contain (Qt, measured): the view moves so that the row is there; Visible and Contain
 	// move it as little as possible (Visible only when no part of the row shows); the position stays inside the content.
 	positionViewAtIndex(index, mode) {
+		// the enum of the engine is the name of the value (ListView.Contain is 'Contain'), Qt's is its number
+		if (typeof mode === 'string') mode = POSITION_MODES.indexOf(mode);
 		index = toFloat(index);
 		if (!(index >= 0 && index < this.$rowCount)) return;
 		const { pos, size } = this.$indexSpan(Math.floor(index));
