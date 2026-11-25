@@ -1,6 +1,6 @@
 // The scene: the root item, the frame (layout, bindings, painting) and the mouse input.
 
-import { DragHandler, flushLazyViews, updateDrags, getFocusItem, Item, setDestroyObserver, setFocusItem, setFrameLoop, WheelHandler } from './items.js';
+import { DragHandler, flushLazyViews, updateDrags, getFocusItem, userGestureScope, Item, setDestroyObserver, setFocusItem, setFrameLoop, WheelHandler } from './items.js';
 
 const MAX_PASSES = 10;
 
@@ -207,7 +207,7 @@ export class Scene {
 		if (target !== null) {
 			target.$pressButton = button;
 			target.$pressChanged(true);
-			target.$mousePressAt(x, y);
+			userGestureScope(() => target.$mousePressAt(x, y));
 		}
 		this.syncCursor();
 	}
@@ -219,7 +219,7 @@ export class Scene {
 		this.pressed = null;
 		if (target !== null) {
 			target.$pressChanged(false);
-			if (this.root.$itemAt(x, y, false, this.pressedButton) === target) target.$mouseClicked();
+			if (this.root.$itemAt(x, y, false, this.pressedButton) === target) userGestureScope(() => target.$mouseClicked());
 		}
 		this.syncCursor();
 	}
