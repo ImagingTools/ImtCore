@@ -181,15 +181,17 @@ DecoratorBase {
 								  (commonButtonDecorator.baseElement.icon && commonButtonDecorator.baseElement.icon.width !== 0) ?
 								  commonButtonDecorator.baseElement.icon.width : Style.iconSizeS
 
+			// Without an explicit height the icon stays square: follow the actual width,
+			// which a derived decorator may override through icon.width.
 			property real _iconH: (isEmpty || !commonButtonDecorator.baseElement) ? 0 :
 								  (commonButtonDecorator.baseElement.icon && commonButtonDecorator.baseElement.icon.height !== 0) ?
-								  commonButtonDecorator.baseElement.icon.height : Style.iconSizeS
+								  commonButtonDecorator.baseElement.icon.height : iconObj.width
 
 			width: _iconW
 			height: _iconH
 
-			sourceSize.width: _iconW
-			sourceSize.height: _iconH
+			sourceSize.width: iconObj.width
+			sourceSize.height: iconObj.height
 			source: !commonButtonDecorator.baseElement ? "" :
 														(commonButtonDecorator.baseElement.icon && commonButtonDecorator.baseElement.icon.source !== "") ?
 															 commonButtonDecorator.baseElement.icon.source :
