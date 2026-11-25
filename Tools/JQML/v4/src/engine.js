@@ -3726,14 +3726,6 @@ export class Engine {
 	releaseItem(item, dead) {
 		if (item.$released) return;
 		item.$released = true;
-		if (item.$destruction !== undefined) {
-			const list = item.$destruction;
-			item.$destruction = undefined;
-			for (const entry of list) this.guard(() => entry.fn.call(item), `handler 'Component.onDestruction' (${entry.file})`, entry.line);
-		}
-		if (item.$component !== undefined) {
-			this.guard(() => item.$component.$emit('destruction'), 'signal \'Component.destruction\'', 0);
-		}
 		if (item.$links !== undefined) {
 			const links = item.$links;
 			item.$links = undefined;
@@ -3791,12 +3783,22 @@ export class Engine {
 			item.$running = false;
 			this.animations.delete(item);
 		}
-		for (const child of item.$children) this.releaseItem(child, dead);
+		// Qt (measured): Component.onDestruction of an item runs after those of what it owns: the objects of its properties (the last
+		// declared first), then its children (each of them after its own), the item itself last.
 		if (item.$owned !== undefined) {
-			for (const owned of item.$owned) this.releaseItem(owned, dead);
+			for (const owned of [...item.$owned].reverse()) this.releaseItem(owned, dead);
 		}
+		for (const child of item.$children) this.releaseItem(child, dead);
 		if (item instanceof ListView) {
 			for (const pooled of item.$pool) this.releaseItem(pooled, dead);
+		}
+		if (item.$destruction !== undefined) {
+			const list = item.$destruction;
+			item.$destruction = undefined;
+			for (const entry of list) this.guard(() => entry.fn.call(item), `handler 'Component.onDestruction' (${entry.file})`, entry.line);
+		}
+		if (item.$component !== undefined) {
+			this.guard(() => item.$component.$emit('destruction'), 'signal \'Component.destruction\'', 0);
 		}
 	}
 

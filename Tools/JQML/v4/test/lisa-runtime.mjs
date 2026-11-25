@@ -259,9 +259,16 @@ const checks = {
 			settle();
 			assert.equal(root.icon.$img, requests[1].picture);
 
+			// an address that was loaded is not requested again: the picture of the cache is used at once
 			root.selected = false;
 			settle();
 			root.selected = true;
+			settle();
+			assert.equal(requests.length, 2);
+			assert.equal(root.icon.$img, requests[1].picture);
+			root.icon.source = 'third.png';
+			settle();
+			root.icon.source = 'fourth.png';
 			settle();
 			requests[2].picture.onload();
 			requests[2].picture.onerror();
@@ -641,11 +648,14 @@ const checks = {
 			fetches[0].resolve({ ok: true, text: async () => svg });
 			fetches[1].resolve({ ok: true, text: async () => svg });
 			await new Promise((resolve) => setTimeout(resolve, 0));
-			assert.equal(requests.length, 1);
+			// each address is requested once (the picture of the old one is kept for the next item that asks), the current one is the last
+			assert.equal(requests.length, 2);
 			assert.equal(fetches[1].source, 'https://assets.example.test/admin.svg?version=1');
-			assert.equal(requests[0].cors, 'anonymous');
-			assert.equal(decodeURIComponent(requests[0].source.split(',')[1]), svg);
+			assert.equal(requests[1].cors, 'anonymous');
+			assert.equal(decodeURIComponent(requests[1].source.split(',')[1]), svg);
 			requests[0].picture.onload();
+			assert.notEqual(image.status, 1, 'the picture of the old source is ignored');
+			requests[1].picture.onload();
 			assert.equal(image.status, 1);
 			image.source = 'missing.svg';
 			fetches[2].resolve({ ok: false, status: 404 });
