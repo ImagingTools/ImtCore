@@ -18,6 +18,7 @@ Item {
 	property alias list: list
 	property alias rows: rows
 	property alias grid: grid
+	function contain(index) { list.positionViewAtIndex(index, ListView.Contain) }
 	ListView {
 		id: list
 		x: 0; y: 0; width: 200; height: 200
@@ -113,6 +114,9 @@ check('End 10', place(10, End), 350);
 check('Visible 1 (not shown)', place(1, Visible), 50);
 check('Visible 19 (not shown), kept inside the content', place(19, Visible), 800);
 check('Beginning 19 is kept inside the content', place(19, Beginning), 800);
+list.contentY = 0;
+root.contain(12);
+check('ListView.Contain written in QML (an enum of the engine is a name)', list.contentY, 450);
 list.positionViewAtBeginning();
 check('positionViewAtBeginning', list.contentY, 0);
 list.positionViewAtEnd();
