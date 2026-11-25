@@ -83,7 +83,11 @@ Area-specific actions are leaves alongside `View` (`/SensorManagement/Bind`, `/S
 ├─ Roles/{View, Edit → Roles/View /{Add, Change, Remove}}
 ├─ Groups/{View, Edit → Groups/View /{Add, Change, Remove}}
 ├─ Permissions/{View, Change → Permissions/View}
-└─ Connections/{View, ViewCode, Edit → Connections/View /{Connect, Remove}}
+├─ Connections/{View, ViewCode, Edit → Connections/View /{Connect, Remove}}
+├─ Contracts/{View, Edit, Approve, Sign, Suspend, Distribute} → Contracts/View
+├─ PartyRoles/Edit
+├─ ContractTypes/Edit
+└─ Directory/Edit
 ```
 
 Permissions in this tree, like product permissions, are stored and checked only as full paths (section 4).
@@ -113,10 +117,20 @@ Internal organization commands are declared with product permission `/Organizati
 | `GetTenantPermissions` | `Permissions/View` or `Roles/View` |
 | Read another user's membership permissions (`GetOrganizationPermissions`) | `Permissions/View` |
 | Change a member's permissions (`UpdateMembershipPermissions`) | Any `Members/Edit/*` leaf (13.23) |
-| Read connections, requests, offers, contracts, grants, messages, and applications | `Connections/View` |
+| Read the address book, requests, messages, and applications | `Connections/View` |
 | Connection code | `Connections/ViewCode` |
-| Create, accept, reject, or cancel; edit contracts, grants, messages, or applications; change the connection code | `Connections/Edit/Connect` |
-| Remove a connection | `Connections/Edit/Remove` |
+| Request an address book entry (by code or from the directory), accept, reject, or cancel; edit messages or applications; change the connection code | `Connections/Edit/Connect` |
+| Read contracts, their attachments, journal, and related organizations | `Contracts/View` |
+| Draft, change the terms, send, withdraw the offer, ask for changes, attachments, internal data | `Contracts/Edit` |
+| Approve | `Contracts/Approve` |
+| Sign, decline, give notice, stop the renewal, terminate by agreement | `Contracts/Sign` |
+| Suspend the permissions given by a contract | `Contracts/Suspend` |
+| Give the permissions received by a contract to groups | `Contracts/Distribute` |
+| Read the catalogs of roles and types | `Contracts/View`, `Contracts/Edit`, `PartyRoles/Edit`, or `ContractTypes/Edit` |
+| Own roles / own contract types | `PartyRoles/Edit` / `ContractTypes/Edit` |
+| Search the directory of organizations | `Connections/Edit/Connect` or `Contracts/Edit` |
+| Profile of the organization in the directory | `Directory/Edit` |
+| Remove an address book entry | `Connections/Edit/Remove` |
 | Shares: restrict to groups, status, removal (`SetDocumentShareGroups`, `SetDocumentSharesStatus`, `RemoveOrganizationDocumentShares`) | product `/OrganizationManagement/Shares/Edit` (ProLife, attribute `EditCommandPermissions` of the `DocumentShareController` composite); reading (`GetOrganizationDocumentShares`) is `View` |
 
 ## 4. Identifier format and comparison rule

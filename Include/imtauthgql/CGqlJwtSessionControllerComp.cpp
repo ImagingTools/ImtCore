@@ -110,8 +110,7 @@ imtauth::ISessionAuthorizationProvider::SessionAuthorization CGqlJwtSessionContr
 		m_roleCollectionCompPtr.GetPtr(),
 		m_userGroupCollectionCompPtr.GetPtr(),
 		m_bindingManagerCompPtr.GetPtr(),
-		m_delegatedAccessCompPtr.GetPtr(),
-		m_membershipManagerCompPtr.GetPtr()
+		m_delegatedAccessCompPtr.GetPtr()
 	};
 	istd::IChangeableUniquePtr userPtr;
 	switch (ComputeTenantUser(sources, claims.userId, claims.tenantId, productId, userPtr, message)){
@@ -726,23 +725,9 @@ bool CGqlJwtSessionControllerComp::CanUseTenant(
 		return true;
 	}
 
-	// Check delegated access via cross-org grants
-	if (m_delegatedAccessCompPtr.IsValid()){
-		// Resolve user's home tenants from direct memberships
-		const imtauth::ITenantMembershipManager::MembershipIds membershipIds = m_membershipManagerCompPtr->GetMembershipsByUser(userId);
-		for (const QByteArray& membershipId : membershipIds){
-			imtauth::ITenantMembershipUniquePtr homeMembershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
-			if (!homeMembershipPtr.IsValid() || !homeMembershipPtr->IsActive()){
-				continue;
-			}
-			QByteArray homeTenantId = homeMembershipPtr->GetTenantId();
-			if (homeTenantId.isEmpty()){
-				continue;
-			}
-			if (m_delegatedAccessCompPtr->IsDelegatedAccess(userId, homeTenantId, tenantId)){
-				return true;
-			}
-		}
+	// Permissions given to the user by the contracts of the organization
+	if (m_delegatedAccessCompPtr.IsValid() && m_delegatedAccessCompPtr->HasDelegatedAccess(userId, tenantId)){
+		return true;
 	}
 
 	errorMessage = QStringLiteral("You are not an active member of this organization");

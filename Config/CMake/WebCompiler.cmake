@@ -726,8 +726,6 @@ macro(getImtAuthQmlWebDirs webdirs buildwebdir)
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthGroupsSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthGroupsSdl)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthRelationshipCollectionDocumentServiceSdl)
-	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthRelationshipCollectionDocumentServiceSdl)
 
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthRolesSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthRolesSdl)
@@ -779,9 +777,16 @@ macro(getImtAuthQmlWebDirs webdirs buildwebdir)
 
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthTenantMembershipsSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthTenantMembershipsSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthContractsSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthContractsSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthContractCatalogsSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthContractCatalogsSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthTenantDirectorySdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthTenantDirectorySdl)
 	
-	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthCrossOrgGrantCollectionDocumentServiceSdl)
-	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthCrossOrgGrantCollectionDocumentServiceSdl)
 endmacro(getImtAuthQmlWebDirs)
 
 macro(getImtGeoQmlWebDirs webdirs buildwebdir)

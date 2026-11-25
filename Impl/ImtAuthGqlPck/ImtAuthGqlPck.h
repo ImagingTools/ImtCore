@@ -48,6 +48,7 @@
 #include <imtauthgql/CRemoteServerTokenIssuerComp.h>
 #include <imtauthgql/CPublishedPermissionsProviderComp.h>
 #include <imtauthgql/CConnectedProductCollectionControllerComp.h>
+#include <imtauthgql/CTenantDirectoryCollectionControllerComp.h>
 #include <imtauthgql/CConnectedProductCollectionDocumentServiceComp.h>
 #include <imtauthgql/CClientRequestPersonalAccessTokenManagerComp.h>
 #include <imtauthgql/CExternalLoginCallbackServletComp.h>
@@ -66,15 +67,17 @@
 #include <imtauthgql/CCrossTenantMessageNotificationPublisherComp.h>
 #include <imtauthgql/CConnectionCodesNotificationPublisherComp.h>
 #include <imtauthgql/CTenantConnectionsSelectControllerComp.h>
-#include <imtauthgql/CTenantRelationshipsSelectControllerComp.h>
 #include <imtauthgql/CRemoteTenantCollectionDocumentServiceControllerComp.h>
 #include <imtauthgql/CRoleCollectionDocumentServiceComp.h>
-#include <imtauthgql/CRelationshipCollectionDocumentServiceComp.h>
 #include <imtauthgql/CGroupCollectionDocumentServiceComp.h>
 #include <imtauthgql/CUserCollectionDocumentServiceComp.h>
-#include <imtauthgql/CCrossOrgGrantCollectionDocumentServiceComp.h>
-#include <imtauthgql/CCrossOrgGrantItemInfoProviderComp.h>
-#include <imtauthgql/CTenantRelationshipItemInfoProviderComp.h>
+#include <imtauthgql/CContractControllerComp.h>
+#include <imtauthgql/CContractCatalogControllerComp.h>
+#include <imtauthgql/CTenantDirectoryControllerComp.h>
+#include <imtauthgql/CContractNotificationPublisherComp.h>
+#include <imtauthgql/CRemoteContractControllerComp.h>
+#include <imtauthgql/CRemoteContractCatalogControllerComp.h>
+#include <imtauthgql/CRemoteTenantDirectoryControllerComp.h>
 
 
 /**
@@ -125,6 +128,7 @@ typedef imtauthgql::CAuthorizationServerProductInfoComp AuthorizationServerProdu
 typedef imtauthgql::CRemoteServerTokenIssuerComp RemoteServerTokenIssuer;
 typedef imtauthgql::CPublishedPermissionsProviderComp PublishedPermissionsProvider;
 typedef imtauthgql::CConnectedProductCollectionControllerComp ConnectedProductCollectionController;
+typedef imtauthgql::CTenantDirectoryCollectionControllerComp TenantDirectoryCollectionController;
 typedef imtauthgql::CConnectedProductCollectionDocumentServiceComp ConnectedProductCollectionDocumentService;
 typedef icomp::TModelCompWrap<imtauthgql::CClientRequestPersonalAccessTokenManagerComp> ClientRequestPersonalAccessTokenManager;
 typedef imtauthgql::CExternalLoginCallbackServletComp ExternalLoginCallbackServlet;
@@ -143,15 +147,17 @@ typedef imtauthgql::CTenantNotificationPublisherComp TenantNotificationPublisher
 typedef imtauthgql::CCrossTenantMessageNotificationPublisherComp CrossTenantMessageNotificationPublisher;
 typedef imtauthgql::CConnectionCodesNotificationPublisherComp ConnectionCodesNotificationPublisher;
 typedef imtauthgql::CTenantConnectionsSelectControllerComp TenantConnectionsSelectController;
-typedef imtauthgql::CTenantRelationshipsSelectControllerComp TenantRelationshipsSelectController;
 typedef imtauthgql::CRemoteTenantCollectionDocumentServiceControllerComp RemoteTenantCollectionDocumentService;
 typedef imtauthgql::CRoleCollectionDocumentServiceComp RoleCollectionDocumentService;
-typedef imtauthgql::CRelationshipCollectionDocumentServiceComp RelationshipCollectionDocumentService;
 typedef imtauthgql::CGroupCollectionDocumentServiceComp GroupCollectionDocumentService;
 typedef imtauthgql::CUserCollectionDocumentServiceComp UserCollectionDocumentService;
-typedef imtauthgql::CCrossOrgGrantCollectionDocumentServiceComp CrossOrgGrantCollectionDocumentService;
-typedef imtauthgql::CCrossOrgGrantItemInfoProviderComp CrossOrgGrantItemInfoProvider;
-typedef imtauthgql::CTenantRelationshipItemInfoProviderComp TenantRelationshipItemInfoProvider;
+typedef imtauthgql::CContractControllerComp ContractController;
+typedef imtauthgql::CContractCatalogControllerComp ContractCatalogController;
+typedef imtauthgql::CTenantDirectoryControllerComp TenantDirectoryController;
+typedef imtauthgql::CContractNotificationPublisherComp ContractNotificationPublisher;
+typedef imtauthgql::CRemoteContractControllerComp RemoteContractController;
+typedef imtauthgql::CRemoteContractCatalogControllerComp RemoteContractCatalogController;
+typedef imtauthgql::CRemoteTenantDirectoryControllerComp RemoteTenantDirectoryController;
 
 
 } // namespace ImtAuthGqlPck

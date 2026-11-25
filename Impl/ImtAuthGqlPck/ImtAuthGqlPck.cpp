@@ -191,6 +191,11 @@ I_EXPORT_COMPONENT(
 			"Connected Product Collection Controller");
 
 I_EXPORT_COMPONENT(
+			TenantDirectoryCollectionController,
+			"Collection controller of the directory of the organizations, searched by a text",
+			"Tenant Directory Collection Controller");
+
+I_EXPORT_COMPONENT(
 			ConnectedProductCollectionDocumentService,
 			"Document service of the catalog of connected products",
 			"Connected Product Collection Document Service");
@@ -307,11 +312,6 @@ I_EXPORT_COMPONENT(
 			"Tenant Connections Select Controller");
 
 I_EXPORT_COMPONENT(
-			TenantRelationshipsSelectController,
-			"Tenant relationships select controller",
-			"Tenant Relationships Select Controller");
-
-I_EXPORT_COMPONENT(
 			RemoteTenantCollectionDocumentService,
 			"Remote tenant collection document service with product permissions enrichment",
 			"Remote Tenant Collection Document Service");
@@ -320,11 +320,6 @@ I_EXPORT_COMPONENT(
 			RoleCollectionDocumentService,
 			"Role collection document service: GetRoleRepresentation / UpdateRoleFromRepresentation",
 			"Role Collection Document Service");
-
-I_EXPORT_COMPONENT(
-			RelationshipCollectionDocumentService,
-			"Relationship collection document service: GetRelationshipRepresentation / UpdateRelationshipFromRepresentation",
-			"Relationship Collection Document Service");
 
 I_EXPORT_COMPONENT(
 			GroupCollectionDocumentService,
@@ -337,19 +332,39 @@ I_EXPORT_COMPONENT(
 			"User Collection Document Service");
 
 I_EXPORT_COMPONENT(
-			CrossOrgGrantCollectionDocumentService,
-			"Cross Org Grant collection document service",
-			"Cross Org Grant Collection Document Service");
+			ContractController,
+			"Contracts of the organizations: parties, links, signatures, allocations of permissions",
+			"Contract Controller Organization Tenant");
 
 I_EXPORT_COMPONENT(
-			CrossOrgGrantItemInfoProvider,
-			"Cross org grant item info provider",
-			"Cross Org Grant Item Info Provider");
+			ContractCatalogController,
+			"Roles of the parties and types of contracts of the organizations",
+			"Contract Catalog Party Role Type Controller");
 
 I_EXPORT_COMPONENT(
-			TenantRelationshipItemInfoProvider,
-			"Tenant relationship item info provider",
-			"Tenant Relationship Item Info Provider");
+			TenantDirectoryController,
+			"Directory of the organizations: profiles and search",
+			"Tenant Directory Controller Organization");
+
+I_EXPORT_COMPONENT(
+			ContractNotificationPublisher,
+			"Publisher of the contract events to the parties and to the notification center",
+			"Contract Notification Publisher");
+
+I_EXPORT_COMPONENT(
+			RemoteContractController,
+			"Contracts on the server of a product, kept by the authorization server",
+			"Remote Contract Controller");
+
+I_EXPORT_COMPONENT(
+			RemoteContractCatalogController,
+			"Roles of the parties and types of contracts on the server of a product",
+			"Remote Contract Catalog Controller");
+
+I_EXPORT_COMPONENT(
+			RemoteTenantDirectoryController,
+			"Directory of the organizations on the server of a product",
+			"Remote Tenant Directory Controller");
 
 I_EXPORT_COMPONENT(
 			PermissionsProvider,

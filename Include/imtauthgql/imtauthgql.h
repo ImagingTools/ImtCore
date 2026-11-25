@@ -5,12 +5,8 @@
 // ImtCore includes
 #include <imtauth/CTenantFilterParam.h>
 #include <imtauth/CUserInfo.h>
-#include <imtauth/ITenantRelationshipInfo.h>
-#include <imtauth/ITenantRelationshipProposalInfo.h>
 #include <imtauth/ITenantConnectionRequestInfo.h>
 #include <imtauth/ITenantConnectionInfo.h>
-#include <imtauth/ICrossOrgGrant.h>
-#include <imtauth/IContract.h>
 #include <imtauth/ITenantEntityBindingManager.h>
 #include <imtauth/IDelegatedAccess.h>
 #include <imtauth/ITenantMembershipManager.h>
@@ -1067,16 +1063,15 @@ inline void RemovePasswordData(imtauth::IUserInfo& userInfo)
 
 /**
 	Adapts (filters) the roles, groups and permissions of a user according to the
-	current tenant context, and enriches with delegated roles when appropriate.
+	current tenant context, and enriches with the permissions delegated by contracts.
 
 	This is the shared logic for tenant-aware UserInfo transformation.
 
 	- For empty tenantId (No Organization): keeps only entities that have no
 	  tenant bindings at all (global items).
 	- For non-empty tenantId: keeps only entities explicitly bound to that tenant.
-	- Additionally, if the user does not have direct membership in the current
-	  tenant, adds roles granted via cross-org delegation from the user's home
-	  tenants.
+	- Additionally adds the permissions the organizations of the user receive in
+	  the tenant by the allocations of their contracts.
 
 	The function returns a (possibly cloned) adapted object, or the original
 	base adapted if no changes were needed.
@@ -1177,9 +1172,10 @@ inline imtauth::IPrincipal::RoleIds GetTenantUserRoles(
 
 
 /**
-	The user as it is seen in the tenant: only its roles and groups visible there, with the roles delegated to it.
+	The user as it is seen in the tenant: only its roles and groups visible there, with the permissions delegated to it
+	by the contracts of its organizations as local permissions of the product.
 	An invalid result means the user needs no adaptation.
-	\param isCompletePtr [optional] Cleared when a binding, a membership or a grant could not be read; never set.
+	\param isCompletePtr [optional] Cleared when a binding or a contract could not be read; never set.
 */
 inline istd::IChangeableUniquePtr AdaptUserForTenant(
 				const QByteArray& objectId,
@@ -1187,9 +1183,7 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 				const QByteArray& tenantId,
 				const QByteArray& productId,
 				imtauth::ITenantEntityBindingManager* bindingManager,
-				imtauth::IDelegatedAccess* delegatedAccess,
-				imtauth::ITenantMembershipManager* membershipManager,
-				imtauth::IRoleInfoProvider* roleInfoProvider,
+				const imtauth::IDelegatedAccess* delegatedAccess,
 				bool* isCompletePtr = nullptr)
 {
 	// Operate on the original object for reading current assignments.
@@ -1236,64 +1230,17 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 		}
 	}
 
-	// Delegated roles enrichment (only when not direct member in current tenant)
-	QSet<QByteArray> delegatedRoleIdSet;
-	if (!tenantId.isEmpty() && !productId.isEmpty() && delegatedAccess != nullptr && membershipManager != nullptr){
-		bool hasDirectMembership = false;
-		QByteArrayList homeTenantIds;
+	// Permissions the contracts allocate to the groups of the user
+	QByteArrayList delegatedPermissions;
+	if (!tenantId.isEmpty() && !productId.isEmpty() && delegatedAccess != nullptr){
 		bool isRead = true;
-		const imtauth::ITenantMembershipManager::MembershipIds membershipIds =
-			membershipManager->GetMembershipsByUser(objectId, &isRead);
-		for (int i = 0; i < membershipIds.size(); ++i){
-			const QByteArray membershipId = membershipIds.at(i);
-			imtauth::ITenantMembershipUniquePtr membershipPtr = membershipManager->GetMembership(membershipId);
-			if (!membershipPtr.IsValid()){
-				// Listed, so it is there: it could not be read
-				isRead = false;
-				continue;
-			}
-			if (!membershipPtr->IsActive()){
-				continue;
-			}
-			QByteArray tId = membershipPtr->GetTenantId();
-			if (tId == tenantId){
-				hasDirectMembership = true;
-				break;
-			}
-			if (!tId.isEmpty()){
-				homeTenantIds.append(tId);
-			}
-		}
-
-		if (!hasDirectMembership){
-			for (int i = 0; i < homeTenantIds.size(); ++i){
-				const QByteArray homeTenantId = homeTenantIds.at(i);
-				bool isGrantRead = true;
-				QByteArrayList roleIds = delegatedAccess->GetDelegatedRoles(homeTenantId, tenantId, &isGrantRead);
-				isRead = isRead && isGrantRead;
-				for (int j = 0; j < roleIds.size(); ++j){
-					const QByteArray roleId = roleIds.at(j);
-					if (!roleId.isEmpty()){
-						// Only keep roles that belong to the current product context (if provider available).
-						if (roleInfoProvider != nullptr){
-							imtauth::IRoleUniquePtr roleInfoPtr = roleInfoProvider->GetRole(roleId);
-							if (!roleInfoPtr.IsValid() || roleInfoPtr->GetProductId() != productId){
-								continue;
-							}
-						}
-						delegatedRoleIdSet.insert(roleId);
-					}
-				}
-			}
-		}
-
+		delegatedPermissions = delegatedAccess->GetDelegatedPermissions(objectId, tenantId, productId, &isRead);
 		if (!isRead && isCompletePtr != nullptr){
 			*isCompletePtr = false;
 		}
 	}
 
-	bool hasDelegatedChanges = !delegatedRoleIdSet.isEmpty();
-	if (!anyFilterChange && !hasDelegatedChanges){
+	if (!anyFilterChange && delegatedPermissions.isEmpty()){
 		return istd::IChangeableUniquePtr();
 	}
 
@@ -1322,16 +1269,15 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 		}
 	}
 
-	if (hasDelegatedChanges){
-		QByteArrayList currRoles = adaptedUserInfoPtr->GetRoles(productId);
-		QSet<QByteArray>::const_iterator it = delegatedRoleIdSet.constBegin();
-		for (; it != delegatedRoleIdSet.constEnd(); ++it){
-			const QByteArray r = *it;
-			if (!currRoles.contains(r)){
-				currRoles.append(r);
+	if (!delegatedPermissions.isEmpty()){
+		QByteArrayList localPermissions = adaptedUserInfoPtr->GetLocalPermissions(productId);
+		for (const QByteArray& permissionId : std::as_const(delegatedPermissions)){
+			if (!localPermissions.contains(permissionId)){
+				localPermissions.append(permissionId);
 			}
 		}
-		adaptedUserInfoPtr->SetRoles(productId, currRoles);
+
+		adaptedUserInfoPtr->SetLocalPermissions(productId, localPermissions);
 	}
 
 	return adaptedObjectPtr;
@@ -1404,8 +1350,7 @@ struct TenantUserSources
 	const imtbase::IObjectCollection* roleCollectionPtr = nullptr;
 	const imtbase::IObjectCollection* groupCollectionPtr = nullptr;
 	imtauth::ITenantEntityBindingManager* bindingManagerPtr = nullptr;
-	imtauth::IDelegatedAccess* delegatedAccessPtr = nullptr;
-	imtauth::ITenantMembershipManager* membershipManagerPtr = nullptr;
+	const imtauth::IDelegatedAccess* delegatedAccessPtr = nullptr;
 };
 
 
@@ -1439,8 +1384,6 @@ inline imtservergql::CAuthorizationSnapshot::ReadStatus ComputeTenantUser(
 				productId,
 				sources.bindingManagerPtr,
 				sources.delegatedAccessPtr,
-				sources.membershipManagerPtr,
-				&snapshot,
 				&isComplete);
 	if (!adaptedPtr.IsValid()){
 		adaptedPtr = std::move(readUserPtr);
@@ -1477,9 +1420,7 @@ inline const imtauth::IUserInfo& GetTenantAdaptedUser(
 				const QByteArray& tenantId,
 				const QByteArray& productId,
 				imtauth::ITenantEntityBindingManager* bindingManager,
-				imtauth::IDelegatedAccess* delegatedAccess,
-				imtauth::ITenantMembershipManager* membershipManager,
-				imtauth::IRoleInfoProvider* roleInfoProvider,
+				const imtauth::IDelegatedAccess* delegatedAccess,
 				istd::IChangeableUniquePtr& adaptedPtr)
 {
 	adaptedPtr = AdaptUserForTenant(
@@ -1488,9 +1429,7 @@ inline const imtauth::IUserInfo& GetTenantAdaptedUser(
 				tenantId,
 				productId,
 				bindingManager,
-				delegatedAccess,
-				membershipManager,
-				roleInfoProvider);
+				delegatedAccess);
 
 	const imtauth::IUserInfo* adaptedUserPtr = dynamic_cast<const imtauth::IUserInfo*>(adaptedPtr.GetPtr());
 
@@ -1504,8 +1443,8 @@ inline const imtauth::IUserInfo& GetTenantAdaptedUser(
 
 	This applies the same tenant-based adaptation as GetProfile
 	(AdaptUserForTenant): only roles/groups/permissions visible in the
-	current tenant - or true globals for "No Organization" - plus delegated
-	role enrichment are considered. Use this instead of a raw
+	current tenant - or true globals for "No Organization" - plus the permissions
+	delegated by contracts are considered. Use this instead of a raw
 	IPrincipal::GetPermissions() call whenever the result must reflect
 	what the user actually possesses in the caller's current context (e.g.
 	for building the personal-access-token scope tree or for validating
@@ -1517,13 +1456,12 @@ inline imtauth::IPrincipal::FeatureIds GetEffectiveUserPermissions(
 				const QByteArray& tenantId,
 				const QByteArray& productId,
 				imtauth::ITenantEntityBindingManager* bindingManager,
-				imtauth::IDelegatedAccess* delegatedAccess,
-				imtauth::ITenantMembershipManager* membershipManager,
+				const imtauth::IDelegatedAccess* delegatedAccess,
 				imtauth::IRoleInfoProvider* roleInfoProvider)
 {
 	istd::IChangeableUniquePtr adaptedPtr;
 	const imtauth::IUserInfo& effectiveUser = GetTenantAdaptedUser(
-				userId, userInfo, tenantId, productId, bindingManager, delegatedAccess, membershipManager, roleInfoProvider, adaptedPtr);
+				userId, userInfo, tenantId, productId, bindingManager, delegatedAccess, adaptedPtr);
 
 	return GetTenantUserPermissions(effectiveUser, tenantId, productId, bindingManager, roleInfoProvider);
 }
@@ -1531,7 +1469,7 @@ inline imtauth::IPrincipal::FeatureIds GetEffectiveUserPermissions(
 
 /**
 	Get the effective roles of a user for the given tenant and product context,
-	adapted the same way as GetEffectiveUserPermissions(), delegated roles included.
+	adapted the same way as GetEffectiveUserPermissions(). Contracts delegate permissions, not roles.
 */
 inline imtauth::IPrincipal::RoleIds GetEffectiveUserRoles(
 				const QByteArray& userId,
@@ -1539,13 +1477,11 @@ inline imtauth::IPrincipal::RoleIds GetEffectiveUserRoles(
 				const QByteArray& tenantId,
 				const QByteArray& productId,
 				imtauth::ITenantEntityBindingManager* bindingManager,
-				imtauth::IDelegatedAccess* delegatedAccess,
-				imtauth::ITenantMembershipManager* membershipManager,
-				imtauth::IRoleInfoProvider* roleInfoProvider)
+				const imtauth::IDelegatedAccess* delegatedAccess)
 {
 	istd::IChangeableUniquePtr adaptedPtr;
 	const imtauth::IUserInfo& effectiveUser = GetTenantAdaptedUser(
-				userId, userInfo, tenantId, productId, bindingManager, delegatedAccess, membershipManager, roleInfoProvider, adaptedPtr);
+				userId, userInfo, tenantId, productId, bindingManager, delegatedAccess, adaptedPtr);
 
 	return GetTenantUserRoles(effectiveUser, tenantId, productId, bindingManager);
 }
@@ -1598,61 +1534,6 @@ inline bool RestrictUserPermissions(imtgql::IGqlContext& gqlContext, const QByte
 
 // --- SDL ↔ C++ Enum Converters ---
 
-// Relationship Role
-
-inline imtauth::ITenantRelationshipInfo::TenantRelationshipRole FromSdlRelationshipRole(sdl::V1_0::imtauth::TenantRelationshipRole role)
-{
-	switch (role){
-	case sdl::V1_0::imtauth::TenantRelationshipRole::Parent:
-		return imtauth::ITenantRelationshipInfo::TRR_PARENT;
-	case sdl::V1_0::imtauth::TenantRelationshipRole::Child:
-		return imtauth::ITenantRelationshipInfo::TRR_CHILD;
-	case sdl::V1_0::imtauth::TenantRelationshipRole::Supplier:
-		return imtauth::ITenantRelationshipInfo::TRR_SUPPLIER;
-	case sdl::V1_0::imtauth::TenantRelationshipRole::Customer:
-		return imtauth::ITenantRelationshipInfo::TRR_CUSTOMER;
-	case sdl::V1_0::imtauth::TenantRelationshipRole::Affiliate:
-		return imtauth::ITenantRelationshipInfo::TRR_AFFILIATE;
-	default:
-		return imtauth::ITenantRelationshipInfo::TRR_PARTNER;
-	}
-}
-
-
-inline sdl::V1_0::imtauth::TenantRelationshipRole ToSdlRelationshipRole(imtauth::ITenantRelationshipInfo::TenantRelationshipRole role)
-{
-	switch (role){
-	case imtauth::ITenantRelationshipInfo::TRR_PARENT:
-		return sdl::V1_0::imtauth::TenantRelationshipRole::Parent;
-	case imtauth::ITenantRelationshipInfo::TRR_CHILD:
-		return sdl::V1_0::imtauth::TenantRelationshipRole::Child;
-	case imtauth::ITenantRelationshipInfo::TRR_SUPPLIER:
-		return sdl::V1_0::imtauth::TenantRelationshipRole::Supplier;
-	case imtauth::ITenantRelationshipInfo::TRR_CUSTOMER:
-		return sdl::V1_0::imtauth::TenantRelationshipRole::Customer;
-	case imtauth::ITenantRelationshipInfo::TRR_AFFILIATE:
-		return sdl::V1_0::imtauth::TenantRelationshipRole::Affiliate;
-	default:
-		return sdl::V1_0::imtauth::TenantRelationshipRole::Partner;
-	}
-}
-
-
-// Relationship Status
-
-inline sdl::V1_0::imtauth::RelationshipStatus ToSdlRelationshipStatus(imtauth::ITenantRelationshipInfo::TenantRelationshipStatus status)
-{
-	switch (status){
-	case imtauth::ITenantRelationshipInfo::TRS_ARCHIVED:
-		return sdl::V1_0::imtauth::RelationshipStatus::Archived;
-	case imtauth::ITenantRelationshipInfo::TRS_PENDING_APPROVED:
-		return sdl::V1_0::imtauth::RelationshipStatus::PendingApproval;
-	default:
-		return sdl::V1_0::imtauth::RelationshipStatus::Active;
-	}
-}
-
-
 // Connection Request Status
 
 inline sdl::V1_0::imtauth::ConnectionRequestStatus ToSdlConnectionRequestStatus(imtauth::ITenantConnectionRequestInfo::ConnectionRequestStatus status)
@@ -1681,93 +1562,6 @@ inline sdl::V1_0::imtauth::ConnectionStatus ToSdlConnectionStatus(imtauth::ITena
 		return sdl::V1_0::imtauth::ConnectionStatus::Suspended;
 	default:
 		return sdl::V1_0::imtauth::ConnectionStatus::Active;
-	}
-}
-
-
-// Relationship Proposal Type
-
-inline sdl::V1_0::imtauth::RelationshipProposalType ToSdlProposalType(imtauth::ITenantRelationshipProposalInfo::RelationshipProposalType type)
-{
-	switch (type){
-	case imtauth::ITenantRelationshipProposalInfo::RPT_UPDATE:
-		return sdl::V1_0::imtauth::RelationshipProposalType::Update;
-	case imtauth::ITenantRelationshipProposalInfo::RPT_DELETE:
-		return sdl::V1_0::imtauth::RelationshipProposalType::Delete;
-	default:
-		return sdl::V1_0::imtauth::RelationshipProposalType::Create;
-	}
-}
-
-
-inline imtauth::ITenantRelationshipProposalInfo::RelationshipProposalType FromSdlProposalType(sdl::V1_0::imtauth::RelationshipProposalType type)
-{
-	switch (type){
-	case sdl::V1_0::imtauth::RelationshipProposalType::Update:
-		return imtauth::ITenantRelationshipProposalInfo::RPT_UPDATE;
-	case sdl::V1_0::imtauth::RelationshipProposalType::Delete:
-		return imtauth::ITenantRelationshipProposalInfo::RPT_DELETE;
-	default:
-		return imtauth::ITenantRelationshipProposalInfo::RPT_CREATE;
-	}
-}
-
-
-// Relationship Proposal Status
-
-inline sdl::V1_0::imtauth::RelationshipProposalStatus ToSdlProposalStatus(imtauth::ITenantRelationshipProposalInfo::RelationshipProposalStatus status)
-{
-	switch (status){
-	case imtauth::ITenantRelationshipProposalInfo::RPS_APPROVED_BY_INITIATOR:
-		return sdl::V1_0::imtauth::RelationshipProposalStatus::ApprovedByInitiator;
-	case imtauth::ITenantRelationshipProposalInfo::RPS_APPROVED_BY_COUNTERPARTY:
-		return sdl::V1_0::imtauth::RelationshipProposalStatus::ApprovedByCounterparty;
-	case imtauth::ITenantRelationshipProposalInfo::RPS_REJECTED:
-		return sdl::V1_0::imtauth::RelationshipProposalStatus::Rejected;
-	case imtauth::ITenantRelationshipProposalInfo::RPS_CANCELED:
-		return sdl::V1_0::imtauth::RelationshipProposalStatus::Canceled;
-	case imtauth::ITenantRelationshipProposalInfo::RPS_EXPIRED:
-		return sdl::V1_0::imtauth::RelationshipProposalStatus::Expired;
-	case imtauth::ITenantRelationshipProposalInfo::RPS_APPLIED:
-		return sdl::V1_0::imtauth::RelationshipProposalStatus::Applied;
-	default:
-		return sdl::V1_0::imtauth::RelationshipProposalStatus::Pending;
-	}
-}
-
-
-// Contract Status
-
-inline imtauth::ContractStatus FromSdlContractStatus(sdl::V1_0::imtauth::ContractStatus status)
-{
-	switch (status){
-	case sdl::V1_0::imtauth::ContractStatus::Active:
-		return imtauth::CTS_ACTIVE;
-	case sdl::V1_0::imtauth::ContractStatus::Expired:
-		return imtauth::CTS_EXPIRED;
-	case sdl::V1_0::imtauth::ContractStatus::Terminated:
-		return imtauth::CTS_TERMINATED;
-	case sdl::V1_0::imtauth::ContractStatus::Renewed:
-		return imtauth::CTS_RENEWED;
-	default:
-		return imtauth::CTS_DRAFT;
-	}
-}
-
-
-inline sdl::V1_0::imtauth::ContractStatus ToSdlContractStatus(imtauth::ContractStatus status)
-{
-	switch (status){
-	case imtauth::CTS_ACTIVE:
-		return sdl::V1_0::imtauth::ContractStatus::Active;
-	case imtauth::CTS_EXPIRED:
-		return sdl::V1_0::imtauth::ContractStatus::Expired;
-	case imtauth::CTS_TERMINATED:
-		return sdl::V1_0::imtauth::ContractStatus::Terminated;
-	case imtauth::CTS_RENEWED:
-		return sdl::V1_0::imtauth::ContractStatus::Renewed;
-	default:
-		return sdl::V1_0::imtauth::ContractStatus::Draft;
 	}
 }
 

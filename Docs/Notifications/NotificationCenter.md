@@ -47,7 +47,8 @@ There is **one** notification center: on the authorization server (Puma). A prod
 | Producer | Notifications | Inbox |
 |---|---|---|
 | `imtauthgql::CTenantNotificationPublisherComp` | invitation received / accepted / declined / withdrawn, ownership, permissions changed, membership ended, member left | invitation and end of membership: personal; others: the tenant in every product (no product is set) |
-| `imtauthgql::CConnectionCodesNotificationPublisherComp` | connection requests and relationship proposals received / approved / rejected, connection and relationship removed | the tenant of the owner |
+| `imtauthgql::CConnectionCodesNotificationPublisherComp` | address book requests received / approved / rejected, address book entry removed | the tenant of the owner |
+| `imtauthgql::CContractNotificationPublisherComp` | contract invitation, changed terms, changes requested, turn to sign, signed, declined, concluded, offer withdrawn, notice given, party left, termination proposed / agreed, permissions stopped / resumed / received, superseded, reminders of `imtauth::CContractReminderComp` (signing deadline, end, renewal notice) | the tenant of the owner and the user responsible for the contract in the party |
 | `imtauthgql::CCrossTenantMessageNotificationPublisherComp` | new message from another tenant | the target tenant |
 | `imtdeskgql::CTicketNotificationProducerComp` | new message of a ticket (reporter and assignees but the sender), assigned to a ticket; a removed assignee loses both (the reporter keeps the messages) | personal in the product |
 
@@ -69,7 +70,7 @@ Created ──► Delivered ──► Read ──► removed by the user or by r
 - **Delivered** means a session has received it (push or sync). Undelivered notifications pop up at the next login.
 - **Read** implies delivered.
 - A second `Send` with the same **dedup key** in the same inbox is ignored, also after the first one was grouped, read or removed by the user. Withdrawing a group forgets the dedup keys equal to its group key, so the event can be told again.
-- The **actor** never receives a notification about the own action. The organization, connection and relationship notifications take the user of the request as their actor (`TenantNotification::RequestUserLink`), so an owner who removes a member, hands the organization over or ends a relationship is not told about it, a member who leaves is not told that the membership ended, and the other party sees who did it.
+- The **actor** never receives a notification about the own action. The organization, address book and contract notifications take the user of the request as their actor (`TenantNotification::RequestUserLink`), so an owner who removes a member, hands the organization over or removes a partner is not told about it, a member who leaves is not told that the membership ended, and the other party sees who did it.
 
 ## Sending
 

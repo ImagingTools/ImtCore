@@ -34,6 +34,8 @@ FilterableSelectDataProvider {
 	 * Ids that must never be offered, on top of the already selected ones.
 	 */
 	property var extraExcludeIds: []
+	// False keeps the selected items in the list, ticked there: for a selection known by its ids only
+	property bool excludeSelected: true
 
 	/**
 	 * Host-supplied GroupFilter objects sent in viewParams.filterModel with every
@@ -157,7 +159,7 @@ FilterableSelectDataProvider {
 
 		// Pass selected IDs as excludeIds for server-side filtering, plus anything the host
 		// declared unselectable (a role must not be offered as its own parent).
-		var excludeIds = root.getSelectedIds().slice()
+		var excludeIds = root.excludeSelected ? root.getSelectedIds().slice() : []
 		for (var i = 0; i < root.extraExcludeIds.length; i++){
 			var extraId = root.extraExcludeIds[i]
 			if (extraId && excludeIds.indexOf(extraId) < 0){

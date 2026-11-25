@@ -70,8 +70,8 @@ istd::IChangeableUniquePtr CCrossTenantMessageDbDelegateComp::CreateObjectFromRe
 	if (record.contains("TargetTenantId")){
 		info.targetTenantId = imtdb::VariantToByteArray(record.value("TargetTenantId"));
 	}
-	if (record.contains("RelationshipId")){
-		info.relationshipId = imtdb::VariantToByteArray(record.value("RelationshipId"));
+	if (record.contains("LinkId")){
+		info.linkId = imtdb::VariantToByteArray(record.value("LinkId"));
 	}
 	if (record.contains("ContractId")){
 		info.contractId = imtdb::VariantToByteArray(record.value("ContractId"));
@@ -127,7 +127,7 @@ CCrossTenantMessageDbDelegateComp::NewObjectQuery CCrossTenantMessageDbDelegateC
 	QString id = imtdb::EscapeSql(QString::fromUtf8(!proposedObjectId.isEmpty() ? proposedObjectId : info.messageId));
 	QString sourceTenantId = imtdb::EscapeSql(QString::fromUtf8(info.sourceTenantId));
 	QString targetTenantId = imtdb::EscapeSql(QString::fromUtf8(info.targetTenantId));
-	QString relationshipId = imtdb::EscapeSql(QString::fromUtf8(info.relationshipId));
+	QString linkId = imtdb::EscapeSql(QString::fromUtf8(info.linkId));
 	QString contractId = NullableSqlText(QString::fromUtf8(info.contractId));
 	QString sourceObjectId = NullableSqlText(QString::fromUtf8(info.sourceObjectId));
 	QString targetObjectId = NullableSqlText(QString::fromUtf8(info.targetObjectId));
@@ -141,13 +141,13 @@ CCrossTenantMessageDbDelegateComp::NewObjectQuery CCrossTenantMessageDbDelegateC
 	QString expiresAt = NullableSqlDateTime(info.expiresAt);
 
 	result.query = QString(
-		"INSERT INTO \"%1\" (\"Id\", \"SourceTenantId\", \"TargetTenantId\", \"RelationshipId\", \"ContractId\", \"SourceObjectId\", \"TargetObjectId\", \"MessageType\", \"CustomType\", \"Payload\", \"Status\", \"ErrorMessage\", \"CreatedAt\", \"UpdatedAt\", \"ExpiresAt\") "
+		"INSERT INTO \"%1\" (\"Id\", \"SourceTenantId\", \"TargetTenantId\", \"LinkId\", \"ContractId\", \"SourceObjectId\", \"TargetObjectId\", \"MessageType\", \"CustomType\", \"Payload\", \"Status\", \"ErrorMessage\", \"CreatedAt\", \"UpdatedAt\", \"ExpiresAt\") "
 		"VALUES ('%2', '%3', '%4', '%5', %6, %7, %8, %9, %10, %11, %12, %13, '%14', '%15', %16);")
 		.arg(*m_tableNameAttrPtr)
 		.arg(id)
 		.arg(sourceTenantId)
 		.arg(targetTenantId)
-		.arg(relationshipId)
+		.arg(linkId)
 		.arg(contractId)
 		.arg(sourceObjectId)
 		.arg(targetObjectId)

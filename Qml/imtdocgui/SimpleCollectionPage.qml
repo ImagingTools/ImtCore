@@ -59,6 +59,8 @@ ViewBase {
 	property var columnDelegateComponents: []
 	property Component headerButtonsComponent: null
 	property Component customEditorComponent: null
+	// A dialog creates and edits the items instead of an editor page; it is opened with {"itemId": id}, "" for a new item
+	property Component editorDialogComponent: null
 	property bool showCreateButton: true
 	property var managePermissionIds: []
 	property var createPermissionIds: []
@@ -303,6 +305,10 @@ ViewBase {
 	}
 
 	function openCreate() {
+		if (root.editorDialogComponent) {
+			ModalDialogManager.openDialog(root.editorDialogComponent, {"itemId": ""})
+			return
+		}
 		__clearExtraPages()
 		root.__isCreating = true
 		root.editorTitle = qsTr("Create New %1").arg(root.entityName)
@@ -313,7 +319,7 @@ ViewBase {
 	// A double-clicked row of the table; pages with rows that are not documents override it
 	function openItem(itemId) {
 		var item = root.__findItemById(itemId)
-		if (item && root.canEdit && (root.documentManager || root.customEditorComponent))
+		if (item && root.canEdit && (root.documentManager || root.customEditorComponent || root.editorDialogComponent))
 			root.__openEdit(itemId, item.title || item.id || "", item.description || "")
 	}
 
@@ -322,6 +328,10 @@ ViewBase {
 	}
 
 	function __openEdit(itemId, itemName, itemDescription) {
+		if (root.editorDialogComponent) {
+			ModalDialogManager.openDialog(root.editorDialogComponent, {"itemId": itemId})
+			return
+		}
 		root.__editItemId = itemId
 		root.__isCreating = false
 		__clearExtraPages()

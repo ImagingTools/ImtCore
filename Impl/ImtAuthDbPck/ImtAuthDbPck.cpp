@@ -111,10 +111,6 @@ I_EXPORT_COMPONENT(
 			"SQL delegate for tenant invitations (hydration, INSERT/UPDATE/DELETE)",
 			"Tenant Invitation Database Delegate");
 
-I_EXPORT_COMPONENT(
-			CrossOrgGrantDatabaseDelegate,
-			"SQL delegate for cross-org grants (hydration, INSERT/UPDATE/DELETE)",
-			"Cross Org Grant Database Delegate");
 
 I_EXPORT_COMPONENT(
 			DocumentShareDatabaseDelegate,
@@ -123,8 +119,33 @@ I_EXPORT_COMPONENT(
 
 I_EXPORT_COMPONENT(
 			ContractDatabaseDelegate,
-			"SQL delegate for cooperation contracts (hydration, INSERT/UPDATE/DELETE)",
+			"SQL delegate of the contracts and the index of their parties",
 			"Contract Database Delegate");
+
+I_EXPORT_COMPONENT(
+			ContractPartyPrivateDatabaseDelegate,
+			"SQL delegate of the records the parties of the contracts keep for themselves",
+			"Contract Party Private Database Delegate");
+
+I_EXPORT_COMPONENT(
+			ContractEventDatabaseDelegate,
+			"SQL delegate of the journals of the contracts",
+			"Contract Event Database Delegate");
+
+I_EXPORT_COMPONENT(
+			PartyRoleDatabaseDelegate,
+			"SQL delegate of the roles of the parties of the organizations",
+			"Party Role Database Delegate");
+
+I_EXPORT_COMPONENT(
+			ContractTypeDatabaseDelegate,
+			"SQL delegate of the types of contracts of the organizations",
+			"Contract Type Database Delegate");
+
+I_EXPORT_COMPONENT(
+			TenantDirectoryProfileDatabaseDelegate,
+			"SQL delegate of the profiles of the organizations in the directory",
+			"Tenant Directory Profile Database Delegate");
 
 I_EXPORT_COMPONENT(
 			TenantConnectionRequestDatabaseDelegate,
@@ -141,15 +162,6 @@ I_EXPORT_COMPONENT(
 			"SQL delegate for tenant connections (hydration, INSERT/UPDATE/DELETE)",
 			"Tenant Connection Database Delegate");
 
-I_EXPORT_COMPONENT(
-			TenantRelationshipProposalDatabaseDelegate,
-			"SQL delegate for relationship proposals (hydration, INSERT/UPDATE/DELETE)",
-			"Tenant Relationship Proposal Database Delegate");
-
-I_EXPORT_COMPONENT(
-			TenantRelationshipDatabaseDelegate,
-			"SQL delegate for tenant relationships (hydration, INSERT/UPDATE/DELETE)",
-			"Tenant Relationship Database Delegate");
 
 I_EXPORT_COMPONENT(
 			CrossTenantMessageDatabaseDelegate,

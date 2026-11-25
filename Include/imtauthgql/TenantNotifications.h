@@ -39,10 +39,22 @@ static const inline QByteArray s_connectionRequestReceived = QByteArrayLiteral("
 static const inline QByteArray s_connectionRequestApproved = QByteArrayLiteral("imtauth.ConnectionRequestApproved");
 static const inline QByteArray s_connectionRequestRejected = QByteArrayLiteral("imtauth.ConnectionRequestRejected");
 static const inline QByteArray s_connectionRemoved = QByteArrayLiteral("imtauth.ConnectionRemoved");
-static const inline QByteArray s_relationshipProposalReceived = QByteArrayLiteral("imtauth.RelationshipProposalReceived");
-static const inline QByteArray s_relationshipProposalApproved = QByteArrayLiteral("imtauth.RelationshipProposalApproved");
-static const inline QByteArray s_relationshipProposalRejected = QByteArrayLiteral("imtauth.RelationshipProposalRejected");
-static const inline QByteArray s_relationshipRemoved = QByteArrayLiteral("imtauth.RelationshipRemoved");
+static const inline QByteArray s_contractInvitationReceived = QByteArrayLiteral("imtauth.ContractInvitationReceived");
+static const inline QByteArray s_contractTurnToSign = QByteArrayLiteral("imtauth.ContractTurnToSign");
+static const inline QByteArray s_contractChangesRequested = QByteArrayLiteral("imtauth.ContractChangesRequested");
+static const inline QByteArray s_contractSigned = QByteArrayLiteral("imtauth.ContractSigned");
+static const inline QByteArray s_contractDeclined = QByteArrayLiteral("imtauth.ContractDeclined");
+static const inline QByteArray s_contractConcluded = QByteArrayLiteral("imtauth.ContractConcluded");
+static const inline QByteArray s_contractCancelled = QByteArrayLiteral("imtauth.ContractCancelled");
+static const inline QByteArray s_contractNoticeGiven = QByteArrayLiteral("imtauth.ContractNoticeGiven");
+static const inline QByteArray s_contractWithdrawn = QByteArrayLiteral("imtauth.ContractWithdrawn");
+static const inline QByteArray s_contractTerminationProposed = QByteArrayLiteral("imtauth.ContractTerminationProposed");
+static const inline QByteArray s_contractTerminationAgreed = QByteArrayLiteral("imtauth.ContractTerminationAgreed");
+static const inline QByteArray s_contractAllocationsSuspended = QByteArrayLiteral("imtauth.ContractAllocationsSuspended");
+static const inline QByteArray s_contractAllocationsResumed = QByteArrayLiteral("imtauth.ContractAllocationsResumed");
+static const inline QByteArray s_contractPermissionsReceived = QByteArrayLiteral("imtauth.ContractPermissionsReceived");
+static const inline QByteArray s_contractSuperseded = QByteArrayLiteral("imtauth.ContractSuperseded");
+static const inline QByteArray s_contractReminder = QByteArrayLiteral("imtauth.ContractReminder");
 
 
 /**

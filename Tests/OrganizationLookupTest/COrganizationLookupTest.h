@@ -34,10 +34,7 @@ private slots:
 	void testFindTenantIdsByName_SemicolonAndBackslashStayOutOfTheSelection();
 	void testChildTenantIds_ReportsAFailedRead();
 	void testOwnedOrCreated_ReportsAFailedRead();
-	void testGetRelatedTenants_RelationshipReplacedDuringTheRead();
 	void testRemoveMembership_RefusedWhenItCannotBeRead();
-	void testGetGrantsBySourceTenant_ReportsAFailedRead();
-	void testGetRelatedSince_ReportsAFailedHistoryRead();
 	void testRemoveVerificationData_UnreadableCodeIsRemovedAnyway();
 	void testConsumeVerification_OnlyOneConcurrentCallerSucceeds();
 	void testRevokeInvitationsSentBy_ReportsAnUnreadInvitation();
@@ -45,12 +42,6 @@ private slots:
 	void testShareDocument_RefusesAnUnreadShareOfTheDocument();
 	void testShareDocument_RefusesWhenTheEarlierShareStays();
 	void testGetShareOwnerTenantIds_UnreadShareTrustsNoPartner();
-	void testRemoveConnection_KeepsTheConnectionWhenARelationshipStays();
-	void testApproveProposal_IsNotAppliedTwice();
-	void testApproveProposal_AfterTheConnectionWasRemovedCreatesNoRelationship();
-	void testApproveProposal_ConcurrentApprovalsCreateOneRelationship();
-	void testRemoveConnection_RefusedWhenAProposalCannotBeCanceled();
-	void testCancelProposal_DuringAnApprovalLeavesOneOutcome();
 
 	// Invitations
 	void testRevokeInvitationsSentBy_RevokesOnlyPendingInvitationsOfTheInviter();
@@ -65,35 +56,13 @@ private slots:
 	void testGetShareOwnerTenantIds_DropsTheSharesOfAnEarlierRelationship();
 	void testShareDocument_ReplacesTheShareOfAnEarlierRelationship();
 	void testRemoveUnrelatedShares_KeepsTheSharesOfARelationshipOutsideItsValidity();
-	void testShareDocument_RefusesARelationshipOutsideItsValidity();
+	void testShareDocument_RefusesAPartnerWithoutAContractInForce();
 	void testRemoveUnrelatedShares_ReadsTheRelationshipsOncePerCachePeriod();
 
-	// Connections and relationships
+	// Connections
 	void testGetConnectionIds_LoadsOnlyTheTenants();
-	void testGetTenantRelationshipIds_LoadsOnlyTheTenants();
-	void testRemoveConnection_ArchivesOnlyItsRelationships();
 	void testConnectionLookups_NonUuidIds_MatchNothing();
-	void testGetTenantRelationship_UnknownIdIsNoRelationship();
-	void testGetTenantRelationshipIds_ReportsAFailedRead();
-	void testGetRelatedTenants_PartialReadIsNotRead();
-	void testRemoveTenantRelationship_RepeatedRemovalKeepsTheEnd();
-	void testUpdateProposal_RefusesAnEndedRelationship();
-	void testValidateRelationship_RefusesAnEndedRelationship();
-
-	// The period of relationships of two organizations
-	void testGetUninterruptedStart_FollowsTheRelationshipsThatOverlap();
-	void testGetUninterruptedStart_StopsAtAGap();
-	void testGetUninterruptedStart_UnknownOrNoActiveRelationship();
-	void testGetRelatedSince_KeepsTheStartWhenARelationshipIsReplaced();
-	void testGetRelatedSince_StartsAnewAfterAGap();
-
-	// Removal events
-	void testRemoveTenantRelationship_PublishesTheRemoval();
-	void testDeleteProposal_PublishesTheRemoval();
-	void testRemoveConnection_PublishesOnlyTheConnectionRemoval();
-
-	// Cross-organization grants
-	void testGetGrantsBySourceTenant_LoadsOnlyTheTenants();
+	void testRemoveConnection_PublishesTheConnectionRemoval();
 
 	// Personal access tokens
 	void testValidateToken_LoadsOnlyTheToken();

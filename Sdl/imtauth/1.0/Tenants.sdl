@@ -212,20 +212,14 @@ type ConnectionRequest {
 	status: ConnectionRequestStatus!
 	createdAt: String
 	respondedAt: String
-	# The relationship the request proposes along, absent for a plain connection. The source role is the one of the requesting organization.
-	proposedSourceRole: TenantRelationshipRole
-	proposedTargetRole: TenantRelationshipRole
-	proposedScope: String
 }
 
 input CreateConnectionRequestInput {
 	sourceTenantId: ID!
-	connectionCode: String!
+	# The code of the organization, or an organization listed in the directory
+	connectionCode: String
+	targetTenantId: ID
 	message: String
-	# Both roles propose a relationship: the approval brings it into force with the connection.
-	proposedSourceRole: TenantRelationshipRole
-	proposedTargetRole: TenantRelationshipRole
-	proposedScope: String
 }
 
 type CreateConnectionRequestPayload {
@@ -240,8 +234,6 @@ input ApproveConnectionRequestInput {
 
 type ApproveConnectionRequestPayload {
 	connectionId: ID
-	# The relationship of a request that proposes one
-	relationshipId: ID
 	errorMessage: String
 }
 
@@ -314,279 +306,11 @@ type RemoveConnectionPayload {
 	errorMessage: String
 }
 
-# --- Tenant Relationships ---
-
-enum TenantRelationshipRole {
-	Parent
-	Child
-	Partner
-	Supplier
-	Customer
-	Affiliate
-}
-
-enum RelationshipStatus {
-	Active
-	Archived
-	PendingApproval
-}
-
-type TenantRelationship {
-	id: ID!
-	connectionId: ID!
-	sourceTenantId: ID!
-	targetTenantId: ID!
-	sourceTenantName: String
-	targetTenantName: String
-	sourceRole: TenantRelationshipRole!
-	targetRole: TenantRelationshipRole!
-	scope: String
-	validFrom: String
-	validUntil: String
-	status: RelationshipStatus!
-	description: String
-	createdAt: String
-	updatedAt: String
-	relatedSince: String
-}
-
-input GetTenantRelationshipsInput {
-	tenantId: ID!
-}
-
-type GetTenantRelationshipsPayload {
-	relationships: [TenantRelationship]
-	errorMessage: String
-}
-
-input RemoveTenantRelationshipInput {
-	tenantId: ID!
-	relationshipId: ID!
-}
-
-type RemoveTenantRelationshipPayload {
-	success: Boolean
-	errorMessage: String
-}
-
-# --- Relationship Proposal ---
-
-enum RelationshipProposalType {
-	Create
-	Update
-	Delete
-}
-
-enum RelationshipProposalStatus {
-	Pending
-	ApprovedByInitiator
-	ApprovedByCounterparty
-	Rejected
-	Canceled
-	Expired
-	Applied
-}
-
-type RelationshipProposal {
-	id: ID!
-	connectionId: ID!
-	existingRelationshipId: ID
-	proposalType: RelationshipProposalType!
-	initiatorTenantId: ID!
-	counterpartyTenantId: ID!
-	proposedSourceRole: TenantRelationshipRole!
-	proposedTargetRole: TenantRelationshipRole!
-	proposedScope: String
-	proposedDescription: String
-	proposedValidFrom: String
-	proposedValidUntil: String
-	status: RelationshipProposalStatus!
-	message: String
-	createdAt: String
-	updatedAt: String
-}
-
-input CreateRelationshipProposalInput {
-	proposal: RelationshipProposal!
-}
-
-type CreateRelationshipProposalPayload {
-	proposalId: ID
-	errorMessage: String
-}
-
-input ApproveRelationshipProposalInput {
-	proposalId: ID!
-	tenantId: ID!
-}
-
-type ApproveRelationshipProposalPayload {
-	success: Boolean
-	relationshipId: ID
-	errorMessage: String
-}
-
-input RejectRelationshipProposalInput {
-	proposalId: ID!
-	tenantId: ID!
-}
-
-type RejectRelationshipProposalPayload {
-	success: Boolean
-	errorMessage: String
-}
-
-input CancelRelationshipProposalInput {
-	proposalId: ID!
-	tenantId: ID!
-}
-
-type CancelRelationshipProposalPayload {
-	success: Boolean
-	errorMessage: String
-}
-
-input GetRelationshipProposalsInput {
-	tenantId: ID!
-}
-
-type GetRelationshipProposalsPayload {
-	proposals: [RelationshipProposal]
-	errorMessage: String
-}
-
-# --- Cross-Org Grants ---
-
-type CrossOrgGrant {
-	id: ID!
-	sourceTenantId: ID!
-	sourceTenantName: String
-	targetTenantId: ID!
-	targetTenantName: String
-	name: String
-	roleIds: [ID]
-	roleNames: [String]
-	description: String
-	createdAt: String
-	expiresAt: String
-	isActive: Boolean
-	isReadOnly: Boolean
-}
-
-input CreateCrossOrgGrantInput {
-	sourceTenantId: ID!
-	targetTenantId: ID!
-	roleIds: [ID]
-	description: String
-	expiresAt: String
-}
-
-type CreateCrossOrgGrantPayload {
-	grantId: ID
-	errorMessage: String
-}
-
-input RevokeCrossOrgGrantInput {
-	grantId: ID!
-}
-
-type RevokeCrossOrgGrantPayload {
-	success: Boolean
-	errorMessage: String
-}
-
-input RemoveCrossOrgGrantsInput {
-	grantIds: [ID]!
-}
-
-type RemoveCrossOrgGrantsPayload {
-	success: Boolean
-	errorMessage: String
-}
-
-input GetCrossOrgGrantsInput {
-	tenantId: ID!
-}
-
-type GetCrossOrgGrantsPayload {
-	grants: [CrossOrgGrant]
-	errorMessage: String
-}
-
-# --- Cooperation Contracts ---
-
-enum ContractStatus {
-	Draft
-	Active
-	Expired
-	Terminated
-	Renewed
-}
-
-type Contract {
-	id: ID!
-	relationshipId: ID!
-	sourceTenantId: ID!
-	targetTenantId: ID!
-	status: ContractStatus!
-	scope: String
-	validFrom: String
-	validUntil: String
-	description: String
-	terms: String
-	createdAt: String
-	updatedAt: String
-}
-
-input CreateContractInput {
-	relationshipId: ID!
-	sourceTenantId: ID!
-	targetTenantId: ID!
-	scope: String
-	validFrom: String
-	validUntil: String
-	description: String
-	terms: String
-}
-
-type CreateContractPayload {
-	contractId: ID
-	errorMessage: String
-}
-
-input UpdateContractStatusInput {
-	contractId: ID!
-	status: ContractStatus!
-}
-
-type UpdateContractStatusPayload {
-	success: Boolean
-	errorMessage: String
-}
-
-input TerminateContractInput {
-	contractId: ID!
-}
-
-type TerminateContractPayload {
-	success: Boolean
-	errorMessage: String
-}
-
-input GetContractsInput {
-	tenantId: ID!
-}
+# --- System Tenant ---
 
 input EnsureSystemTenantInput {
 	tenantId: ID
 }
-
-type GetContractsPayload {
-	contracts: [Contract]
-	errorMessage: String
-}
-
-# --- System Tenant ---
 
 type EnsureSystemTenantPayload {
 	success: Boolean
@@ -627,8 +351,8 @@ type CrossTenantMessage {
 	id: ID!
 	sourceTenantId: ID!
 	targetTenantId: ID!
-	relationshipId: ID!
-	contractId: ID
+	contractId: ID!
+	linkId: ID!
 	sourceObjectId: ID
 	targetObjectId: ID
 	messageType: CrossTenantMessageType!
@@ -644,8 +368,8 @@ type CrossTenantMessage {
 input SendCrossTenantMessageInput {
 	sourceTenantId: ID!
 	targetTenantId: ID!
-	relationshipId: ID!
-	contractId: ID
+	contractId: ID!
+	linkId: ID!
 	messageType: CrossTenantMessageType!
 	payload: String
 	sourceObjectId: ID
@@ -704,8 +428,8 @@ type OrderRequest {
 	messageId: ID
 	sourceTenantId: ID!
 	targetTenantId: ID!
-	relationshipId: ID
 	contractId: ID
+	linkId: ID
 	sourceOrderId: ID
 	articleNumber: String
 	quantity: Int
@@ -777,7 +501,7 @@ type CrossTenantMessageNotification {
 	messageId: ID!
 	sourceTenantId: ID!
 	targetTenantId: ID!
-	relationshipId: ID
+	contractId: ID
 	messageType: CrossTenantMessageType!
 	status: CrossTenantMessageStatus!
 	tenantName: String
@@ -794,10 +518,6 @@ enum EConnectionNotificationType {
 	ConnectionRequestApproved
 	ConnectionRequestRejected
 	ConnectionRemoved
-	RelationshipProposalReceived
-	RelationshipProposalApproved
-	RelationshipProposalRejected
-	RelationshipRemoved
 }
 
 type ConnectionNotification {
@@ -805,8 +525,6 @@ type ConnectionNotification {
 	tenantId: ID!
 	connectionId: ID
 	requestId: ID
-	proposalId: ID
-	relationshipId: ID
 }
 
 input ConnectionNotificationSubscriptionInput {
@@ -821,10 +539,6 @@ type Query {
 	GetConnectionCode (input: GetConnectionCodeInput): GetConnectionCodePayload!
 	GetConnectionRequests (input: GetConnectionRequestsInput): GetConnectionRequestsPayload!
 	GetConnections (input: GetConnectionsInput): GetConnectionsPayload!
-	GetTenantRelationships (input: GetTenantRelationshipsInput): GetTenantRelationshipsPayload!
-	GetRelationshipProposals (input: GetRelationshipProposalsInput): GetRelationshipProposalsPayload!
-	GetCrossOrgGrants (input: GetCrossOrgGrantsInput): GetCrossOrgGrantsPayload!
-	GetContracts (input: GetContractsInput): GetContractsPayload!
 	GetCrossTenantMessage (input: GetCrossTenantMessageInput): GetCrossTenantMessagePayload!
 	GetCrossTenantMessages (input: GetCrossTenantMessagesInput): GetCrossTenantMessagesPayload!
 	GetOrderRequest (input: GetOrderRequestInput): GetOrderRequestPayload!
@@ -843,17 +557,6 @@ type Mutation {
 	RejectConnectionRequest (input: RejectConnectionRequestInput): RejectConnectionRequestPayload!
 	CancelConnectionRequest (input: CancelConnectionRequestInput): CancelConnectionRequestPayload!
 	RemoveConnection (input: RemoveConnectionInput): RemoveConnectionPayload!
-	CreateRelationshipProposal (input: CreateRelationshipProposalInput): CreateRelationshipProposalPayload!
-	ApproveRelationshipProposal (input: ApproveRelationshipProposalInput): ApproveRelationshipProposalPayload!
-	RejectRelationshipProposal (input: RejectRelationshipProposalInput): RejectRelationshipProposalPayload!
-	CancelRelationshipProposal (input: CancelRelationshipProposalInput): CancelRelationshipProposalPayload!
-	RemoveTenantRelationship (input: RemoveTenantRelationshipInput): RemoveTenantRelationshipPayload!
-	CreateCrossOrgGrant (input: CreateCrossOrgGrantInput): CreateCrossOrgGrantPayload!
-	RevokeCrossOrgGrant (input: RevokeCrossOrgGrantInput): RevokeCrossOrgGrantPayload!
-	RemoveCrossOrgGrants (input: RemoveCrossOrgGrantsInput): RemoveCrossOrgGrantsPayload!
-	CreateContract (input: CreateContractInput): CreateContractPayload!
-	UpdateContractStatus (input: UpdateContractStatusInput): UpdateContractStatusPayload!
-	TerminateContract (input: TerminateContractInput): TerminateContractPayload!
 	EnsureSystemTenant (input: EnsureSystemTenantInput): EnsureSystemTenantPayload!
 	SendCrossTenantMessage (input: SendCrossTenantMessageInput): SendCrossTenantMessagePayload!
 	UpdateCrossTenantMessageStatus (input: UpdateCrossTenantMessageStatusInput): UpdateCrossTenantMessageStatusPayload!

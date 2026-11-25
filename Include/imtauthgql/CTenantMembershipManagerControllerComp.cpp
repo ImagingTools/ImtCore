@@ -1123,7 +1123,6 @@ bool CTenantMembershipManagerControllerComp::CanViewOrganizationData(
 				*m_membershipManagerCompPtr.GetPtr(),
 				m_delegatedAccessCompPtr.IsValid() ? m_delegatedAccessCompPtr.GetPtr() : nullptr,
 				userId,
-				ContextTenantId(gqlRequest),
 				tenantId)
 				&& HoldsOrganizationPermission(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), userId, tenantId, permission);
 }

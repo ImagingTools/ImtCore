@@ -200,6 +200,54 @@ void COrganizationsPermissionsProviderComp::CreateOrganizationFeatures()
 				QT_TRANSLATE_NOOP("Feature", "Remove Connection"),
 				QT_TRANSLATE_NOOP("Feature", "Allows removing a connection to another organization."));
 
+	imtlic::CFeatureInfo* contractsPtr = AddPermission(*organizationPtr, "Contracts",
+				QT_TRANSLATE_NOOP("Feature", "Contracts"),
+				QT_TRANSLATE_NOOP("Feature", "Provides access to the contracts with other organizations."));
+	AddPermission(*contractsPtr, "View",
+				QT_TRANSLATE_NOOP("Feature", "View Contracts"),
+				QT_TRANSLATE_NOOP("Feature", "Allows viewing the contracts, their attachments and journals."));
+	AddPermission(*contractsPtr, "Edit",
+				QT_TRANSLATE_NOOP("Feature", "Edit Contracts"),
+				QT_TRANSLATE_NOOP("Feature", "Allows drafting and sending contracts, asking for changes and adding attachments."),
+				{QByteArrayLiteral("/OrganizationManagement/Contracts/View")});
+	AddPermission(*contractsPtr, "Approve",
+				QT_TRANSLATE_NOOP("Feature", "Approve Contracts"),
+				QT_TRANSLATE_NOOP("Feature", "Allows approving the terms of a contract inside the organization."),
+				{QByteArrayLiteral("/OrganizationManagement/Contracts/View")});
+	AddPermission(*contractsPtr, "Sign",
+				QT_TRANSLATE_NOOP("Feature", "Sign Contracts"),
+				QT_TRANSLATE_NOOP("Feature", "Allows signing and declining contracts, leaving and terminating them."),
+				{QByteArrayLiteral("/OrganizationManagement/Contracts/View")});
+	AddPermission(*contractsPtr, "Suspend",
+				QT_TRANSLATE_NOOP("Feature", "Suspend Permissions"),
+				QT_TRANSLATE_NOOP("Feature", "Allows stopping and resuming the permissions the organization gives by a contract."),
+				{QByteArrayLiteral("/OrganizationManagement/Contracts/View")});
+	AddPermission(*contractsPtr, "Distribute",
+				QT_TRANSLATE_NOOP("Feature", "Distribute Received Permissions"),
+				QT_TRANSLATE_NOOP("Feature", "Allows giving the permissions received by a contract to the groups of the organization."),
+				{QByteArrayLiteral("/OrganizationManagement/Contracts/View")});
+
+	imtlic::CFeatureInfo* partyRolesPtr = AddPermission(*organizationPtr, "PartyRoles",
+				QT_TRANSLATE_NOOP("Feature", "Roles of Parties"),
+				QT_TRANSLATE_NOOP("Feature", "Provides access to the roles the organization plays in contracts."));
+	AddPermission(*partyRolesPtr, "Edit",
+				QT_TRANSLATE_NOOP("Feature", "Edit Roles of Parties"),
+				QT_TRANSLATE_NOOP("Feature", "Allows creating, changing and archiving the roles of parties of the organization."));
+
+	imtlic::CFeatureInfo* contractTypesPtr = AddPermission(*organizationPtr, "ContractTypes",
+				QT_TRANSLATE_NOOP("Feature", "Types of Contracts"),
+				QT_TRANSLATE_NOOP("Feature", "Provides access to the templates of contracts of the organization."));
+	AddPermission(*contractTypesPtr, "Edit",
+				QT_TRANSLATE_NOOP("Feature", "Edit Types of Contracts"),
+				QT_TRANSLATE_NOOP("Feature", "Allows creating, changing and archiving the types of contracts of the organization."));
+
+	imtlic::CFeatureInfo* directoryPtr = AddPermission(*organizationPtr, "Directory",
+				QT_TRANSLATE_NOOP("Feature", "Directory"),
+				QT_TRANSLATE_NOOP("Feature", "Provides access to the profile of the organization in the directory."));
+	AddPermission(*directoryPtr, "Edit",
+				QT_TRANSLATE_NOOP("Feature", "Edit Profile in Directory"),
+				QT_TRANSLATE_NOOP("Feature", "Allows publishing the organization in the directory and changing its profile."));
+
 	m_featureCollection.InsertNewObject("FeatureInfo", "", "", organizationPtr.GetPtr());
 }
 

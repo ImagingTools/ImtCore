@@ -9,8 +9,9 @@ import imtauthgui 1.0
 /**
  * TenantConnectionCodePage
  *
- * Displays the tenant's public Connection Code and the setting to
- * allow/disallow other organizations to connect by code.
+ * How other organizations find this one: its connection code with the switch of connecting by it,
+ * and its profile in the directory of the organizations (TenantDirectoryProfileSection).
+ * The switch applies at once; the profile is saved by its own command.
  */
 ViewBase {
 	id: connectionCodePage
@@ -22,12 +23,17 @@ ViewBase {
 	readonly property var tenantData: connectionCodePage.model
 	property var stateManager: null
 	property var apiClient: null
+	// ContractsApiClient: the directory profile; without it the section is not shown
+	property var contractsApiClient: null
 	readonly property bool __canViewConnectionCode: connectionCodePage.stateManager ? connectionCodePage.stateManager.canViewOrganizationConnectionCode : false
+	readonly property bool __canEditDirectoryProfile: !!connectionCodePage.contractsApiClient
+		&& (connectionCodePage.stateManager ? connectionCodePage.stateManager.canEditDirectoryProfile : false)
 	readonly property bool __canManageConnections: connectionCodePage.stateManager ? connectionCodePage.stateManager.canManageOrganizationConnections : false
 
 	property string connectionCode: ""
 	property bool allowConnectionsByCode: true
 	property bool loading: false
+	// The switch shows the received state before it sends changes
 	property bool __ready: false
 
 	function updateGui() {
@@ -42,18 +48,37 @@ ViewBase {
 		connectionCodePage.updateGui()
 	}
 
+	function copyCode() {
+		clipboardHelper.selectAll()
+		clipboardHelper.copy()
+		PopupManager.addSuccessMessage(qsTr("The code was copied"), true)
+	}
+
+	function regenerateCode() {
+		ModalDialogManager.showConfirmationDialog(
+			qsTr("Change the connection code"),
+			qsTr("The organizations that have the old code cannot use it any more. Change the code?"),
+			function(result) {
+				if (result === Enums.yes && connectionCodePage.apiClient && connectionCodePage.tenantData)
+					connectionCodePage.apiClient.regenerateConnectionCode(connectionCodePage.tenantData.m_id)
+			})
+	}
+
 	Connections {
 		target: connectionCodePage.apiClient
 
 		function onConnectionCodeReceived(code, allowByCode) {
+			connectionCodePage.__ready = false
 			connectionCodePage.connectionCode = code
 			connectionCodePage.allowConnectionsByCode = allowByCode
+			allowSwitch.checked = allowByCode
 			connectionCodePage.loading = false
 			connectionCodePage.__ready = true
 		}
 
 		function onConnectionCodeRegenerated(newCode) {
 			connectionCodePage.connectionCode = newCode
+			PopupManager.addSuccessMessage(qsTr("The code was changed. Give the new one to the organizations that should connect."), true)
 		}
 
 		function onAllowConnectionsByCodeChanged(allow) {
@@ -67,200 +92,117 @@ ViewBase {
 		text: connectionCodePage.connectionCode
 	}
 
-	Column {
-		anchors.top: parent.top
+	CustomScrollbar {
+		z: pageFlickable.z + 1
+		anchors.right: parent.right
+		anchors.top: pageFlickable.top
+		anchors.bottom: pageFlickable.bottom
+		secondSize: Style.marginM
+		targetItem: pageFlickable
+	}
+
+	Flickable {
+		id: pageFlickable
+
+		anchors.fill: parent
 		anchors.topMargin: Style.marginXL
-		anchors.horizontalCenter: parent.horizontalCenter
-		width: Math.min(parent.width - Style.marginXL * 2, Style.contentWidthMax)
-		spacing: Style.marginM
+		contentHeight: pageColumn.height + Style.marginXL
+		boundsBehavior: Flickable.StopAtBounds
+		clip: true
 
-		GroupHeaderView {
-			width: parent.width
-			title: qsTr("Connection Code")
-		}
+		Column {
+			id: pageColumn
 
-		Text {
-			text: qsTr("Share this code with other organizations so they can send you a connection request.")
-			font.pixelSize: Style.fontSizeS
-			color: Style.inactiveTextColor
-			wrapMode: Text.WordWrap
-			width: parent.width
-		}
+			anchors.horizontalCenter: parent.horizontalCenter
+			width: Math.min(pageFlickable.width - Style.marginXL * 2, Style.contentWidthMax)
+			spacing: Style.marginL
 
-		Rectangle {
-			width: parent.width
-			height: Style.controlHeightL + 2 * Style.marginL
-			color: Style.baseColor
-			radius: Style.radiusM
-			border.width: 1
-			border.color: Style.borderColor
-
-			Row {
-				anchors.left: parent.left
-				anchors.leftMargin: Style.marginL
-				anchors.verticalCenter: parent.verticalCenter
-				spacing: Style.marginL
-
-				TextInput {
-					anchors.verticalCenter: parent.verticalCenter
-					width: contentWidth
-					height: contentHeight
-					text: connectionCodePage.connectionCode ? connectionCodePage.connectionCode : qsTr("Loading...")
-					font.pixelSize: Style.fontSizeXL
-					font.family: Style.fontFamilyBold
-					font.bold: true
-					color: Style.textColor
-					readOnly: true
-					selectByMouse: true
-					selectionColor: Style.selectedColor
-				}
-
-				ToolButton {
-					id: copyButton
-					anchors.verticalCenter: parent.verticalCenter
-					width: Style.buttonWidthL
-					height: Style.buttonWidthL
-					iconSource: copyButton.__copied
-						? "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal)
-						: "../../../" + Style.getIconPath("Icons/Copy", Icon.State.On, Icon.Mode.Normal)
-					enabled: !copyButton.__copied && connectionCodePage.connectionCode !== "" && connectionCodePage.__canViewConnectionCode
-
-					property bool __copied: false
-
-					onClicked: {
-						clipboardHelper.selectAll()
-						clipboardHelper.copy()
-						copyButton.__copied = true
-						copiedPopup.open()
-						copyResetTimer.restart()
-					}
-
-					Timer {
-						id: copyResetTimer
-						interval: 2000
-						onTriggered: {
-							copyButton.__copied = false
-							copiedPopup.close()
-						}
-					}
-
-					Popup {
-						id: copiedPopup
-						x: -copiedPopup.width / 2 + copyButton.width / 2
-						y: copyButton.height + Style.marginS
-						width: copiedPopupLabel.contentWidth + Style.marginL * 2
-						height: copiedPopupLabel.contentHeight + Style.marginM * 2
-						closePolicy: Enums.popupCloseOnEscape | Enums.popupCloseOnPressOutside
-
-						background: Rectangle {
-							color: Style.baseColor
-							border.color: Style.borderColor
-							border.width: 1
-							radius: Style.radiusM
-						}
-
-						Text {
-							id: copiedPopupLabel
-							anchors.centerIn: parent
-							text: qsTr("Copied!")
-							font.pixelSize: Style.fontSizeS
-							color: Style.textColor
-						}
-					}
-				}
-			}
-
-			Button {
-				anchors.right: parent.right
-				anchors.rightMargin: Style.marginL
-				anchors.verticalCenter: parent.verticalCenter
-				text: qsTr("Regenerate Code")
-				enabled: connectionCodePage.__canManageConnections
-				onClicked: {
-					ModalDialogManager.showConfirmationDialog(
-						qsTr("Regenerate Connection Code"),
-						qsTr("Are you sure you want to regenerate the connection code? The old code will stop working."),
-						function(result) {
-							if (result === Enums.yes && connectionCodePage.apiClient && connectionCodePage.tenantData) {
-								connectionCodePage.apiClient.regenerateConnectionCode(
-									connectionCodePage.tenantData.m_id)
-							}
-						}
-					)
-				}
-			}
-		}
-
-		Item {
-			width: parent.width
-			height: Style.marginM
-		}
-
-		GroupHeaderView {
-			width: parent.width
-			title: qsTr("Access")
-		}
-
-		Rectangle {
-			width: parent.width
-			height: allowColumn.height + 2 * Style.marginL
-			color: Style.baseColor
-			radius: Style.radiusM
-			border.width: 1
-			border.color: Style.borderColor
-
+			// --- Connection code ---
 			Column {
-				id: allowColumn
-				anchors.left: parent.left
-				anchors.leftMargin: Style.marginL
-				anchors.right: parent.right
-				anchors.rightMargin: Style.marginL
-				anchors.verticalCenter: parent.verticalCenter
-				spacing: Style.marginXS
+				width: parent.width
+				visible: connectionCodePage.__canViewConnectionCode
+				spacing: Style.marginM
 
-				Item {
+				GroupHeaderView {
 					width: parent.width
-					height: Style.controlHeightM
-
-					Text {
-						anchors.left: parent.left
-						anchors.right: allowSwitch.left
-						anchors.rightMargin: Style.marginL
-						anchors.verticalCenter: parent.verticalCenter
-						text: qsTr("Allow other organizations to connect by code")
-						font.family: Style.fontFamilyBold
-						font.pixelSize: Style.fontSizeM
-						font.bold: true
-						color: Style.textColor
-						elide: Text.ElideRight
-					}
-
-					SwitchCustom {
-						id: allowSwitch
-						anchors.right: parent.right
-						anchors.verticalCenter: parent.verticalCenter
-						enabled: connectionCodePage.__canManageConnections
-						checked: connectionCodePage.allowConnectionsByCode
-						onCheckedChanged: {
-							if (!connectionCodePage.__ready) {
-								return
-							}
-							if (connectionCodePage.apiClient && connectionCodePage.tenantData) {
-								connectionCodePage.apiClient.setAllowConnectionsByCode(
-									connectionCodePage.tenantData.m_id, allowSwitch.checked)
-							}
-						}
-					}
+					title: qsTr("Connection code")
 				}
 
-				Text {
-					visible: !connectionCodePage.allowConnectionsByCode
-					text: qsTr("When disabled, other organizations cannot send you connection requests using your code.")
+				BaseText {
+					width: parent.width
+					wrapMode: Text.WordWrap
+					text: qsTr("Give the code to an organization you know: with it, it sends your organization a request to join the address book.")
 					font.pixelSize: Style.fontSizeS
 					color: Style.inactiveTextColor
-					wrapMode: Text.WordWrap
-					width: parent.width
 				}
+
+				GroupElementView {
+					width: parent.width
+
+					ElementView {
+						name: qsTr("Your code")
+						controlComp: Component {
+							Row {
+								spacing: Style.marginM
+
+								BaseText {
+									anchors.verticalCenter: parent.verticalCenter
+									text: connectionCodePage.connectionCode !== "" ? connectionCodePage.connectionCode : qsTr("Loading...")
+									font.pixelSize: Style.fontSizeL
+									font.bold: true
+									color: Style.textColor
+								}
+
+								ToolButton {
+									anchors.verticalCenter: parent.verticalCenter
+									width: Style.buttonWidthL
+									height: Style.buttonWidthL
+									enabled: connectionCodePage.connectionCode !== ""
+									tooltipText: qsTr("Copy the code")
+									iconSource: "../../../" + Style.getIconPath("Icons/Copy", Icon.State.On, Icon.Mode.Normal)
+									onClicked: {
+										connectionCodePage.copyCode()
+									}
+								}
+
+								Button {
+									anchors.verticalCenter: parent.verticalCenter
+									visible: connectionCodePage.__canManageConnections
+									text: qsTr("Change code")
+									onClicked: {
+										connectionCodePage.regenerateCode()
+									}
+								}
+							}
+						}
+					}
+
+					SwitchElementView {
+						id: allowSwitch
+						name: qsTr("Connecting by code")
+						description: allowSwitch.checked
+									 ? qsTr("Organizations can send a request by this code")
+									 : qsTr("Nobody can send a request by the code now")
+						readOnly: !connectionCodePage.__canManageConnections || !connectionCodePage.__ready
+						onCheckedChanged: {
+							if (!connectionCodePage.__ready || allowSwitch.checked === connectionCodePage.allowConnectionsByCode)
+								return
+							if (connectionCodePage.apiClient && connectionCodePage.tenantData)
+								connectionCodePage.apiClient.setAllowConnectionsByCode(connectionCodePage.tenantData.m_id, allowSwitch.checked)
+						}
+					}
+				}
+			}
+
+			// --- Directory of the organizations ---
+			TenantDirectoryProfileSection {
+				id: directorySection
+
+				width: parent.width
+				visible: connectionCodePage.__canEditDirectoryProfile
+				tenantId: connectionCodePage.tenantData && connectionCodePage.tenantData.m_id ? String(connectionCodePage.tenantData.m_id) : ""
+				contractsApiClient: connectionCodePage.__canEditDirectoryProfile ? connectionCodePage.contractsApiClient : null
+				canEdit: connectionCodePage.__canEditDirectoryProfile
 			}
 		}
 	}

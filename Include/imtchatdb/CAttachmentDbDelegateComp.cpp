@@ -101,15 +101,17 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAttachmentDbDelegateComp::Create
 
 	NewObjectQuery retVal;
 	retVal.query = QString(
-		"INSERT INTO \"Attachments\" "
+		"INSERT INTO \"%1\" "
 		"(\"Id\", \"FileName\", \"MimeType\", \"Data\", \"FileSize\", \"CreatedAt\") "
-		"VALUES('%1', '%2', '%3', E'\\\\x%4', %5, '%6');")
-		.arg(attachId)
-		.arg(escapedFileName)
-		.arg(escapedMimeType)
-		.arg(hexData)
-		.arg(attachPtr->GetFileSize())
-		.arg(nowUtc)
+		"VALUES('%2', '%3', '%4', E'\\\\x%5', %6, '%7');")
+		.arg(
+			QString::fromUtf8(GetTableName()),
+			QString::fromUtf8(attachId),
+			escapedFileName,
+			escapedMimeType,
+			QString::fromLatin1(hexData),
+			QString::number(attachPtr->GetFileSize()),
+			nowUtc)
 		.toUtf8();
 
 	return retVal;
@@ -145,8 +147,8 @@ QByteArray CAttachmentDbDelegateComp::CreateDeleteObjectsQuery(
 		idsStr += QStringLiteral("'%1'").arg(escaped);
 	}
 
-	return QStringLiteral(R"(DELETE FROM "Attachments" WHERE "Id" IN (%1);)")
-		.arg(idsStr)
+	return QStringLiteral(R"(DELETE FROM "%1" WHERE "Id" IN (%2);)")
+		.arg(QString::fromUtf8(GetTableName()), idsStr)
 		.toUtf8();
 }
 
@@ -189,7 +191,7 @@ void CAttachmentDbDelegateComp::OnComponentCreated()
 	}
 
 	const QString tableName = GetTableName();
-	if (TableExists(tableName)){
+	if (!(*m_referencingTableNameAttrPtr).isEmpty() && TableExists(tableName)){
 		CleanupOrphanedAttachments();
 	}
 }
@@ -225,10 +227,10 @@ void CAttachmentDbDelegateComp::CleanupOrphanedAttachments()
 	QString cutoffTime = QDateTime::currentDateTimeUtc().addSecs(-24 * 3600).toString(Qt::ISODateWithMs);
 
 	QByteArray query = QString(
-		"DELETE FROM \"Attachments\" "
-		"WHERE \"Id\" NOT IN (SELECT \"AttachmentId\" FROM \"MessageAttachments\") "
-		"AND \"CreatedAt\" < '%1';")
-		.arg(cutoffTime)
+		"DELETE FROM \"%1\" "
+		"WHERE \"Id\" NOT IN (SELECT \"AttachmentId\" FROM \"%2\") "
+		"AND \"CreatedAt\" < '%3';")
+		.arg(QString::fromUtf8(GetTableName()), QString::fromUtf8(*m_referencingTableNameAttrPtr), cutoffTime)
 		.toUtf8();
 
 	QSqlError sqlError;

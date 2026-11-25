@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS "DocumentShares"
     "TargetTenantId"  TEXT NOT NULL,
     "TargetTenantName" TEXT,
     "TargetGroupIds"  TEXT NOT NULL DEFAULT '',
+    "ContractId"      TEXT,
     "AccessLevel"     INTEGER NOT NULL,
     "Status"          INTEGER NOT NULL,
     "ValidUntil"      TEXT,

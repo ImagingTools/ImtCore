@@ -16,39 +16,25 @@ namespace imtauth
 
 
 /**
-	Check whether an active relationship is valid at the current time. Empty bounds are open.
+	An organization linked to another one by a concluded contract.
 */
-inline bool IsTenantRelationshipValidNow(const QString& validFrom, const QString& validUntil)
-{
-	const QDateTime now = QDateTime::currentDateTimeUtc();
-
-	const QDateTime fromTime = QDateTime::fromString(validFrom, Qt::ISODateWithMs);
-	if (fromTime.isValid() && fromTime > now){
-		return false;
-	}
-
-	const QDateTime untilTime = QDateTime::fromString(validUntil, Qt::ISODateWithMs);
-	if (untilTime.isValid() && untilTime <= now){
-		return false;
-	}
-
-	return true;
-}
-
-
 struct RelatedTenantInfo
 {
 	QByteArray tenantId;
 	QString tenantName;
-	// Whether a relationship with the tenant is within its validity period now; outside it the relationship grants nothing but still exists
+	// A link of the two is in force now; a contract that comes into force later or a link out of its period gives nothing
 	bool isEffective = true;
-	// Start of the uninterrupted period of active relationships with the tenant; invalid when unknown
+	// The concluded contracts linking the two that did not end
+	QByteArrayList relatedContractIds;
+	// The contracts whose link of the two is in force and allows to share documents
+	QByteArrayList sharingContractIds;
+	// Start of the uninterrupted period of links of the two; invalid when unknown
 	QDateTime relatedSince;
 };
 
 
 /**
-	One relationship of two tenants: the end is invalid while the relationship is active.
+	One link of two tenants in a contract: the end is invalid while it holds.
 */
 struct RelationshipPeriod
 {
@@ -114,14 +100,14 @@ typedef QList<RelatedTenantInfo> RelatedTenantInfos;
 
 
 /**
-	Read access to the tenant relationships, independent of where they are stored.
+	The organizations related to an organization: linked to it by a concluded contract that did not end yet.
 	\ingroup Tenant
 */
 class ITenantRelationshipProvider: virtual public istd::IPolymorphic
 {
 public:
 	/**
-		Get the tenants having an active relationship with \a tenantId, in either direction; \c isEffective tells whether one is valid now.
+		Get the tenants linked to \a tenantId by a concluded contract; \c isEffective tells whether a link is in force now.
 		\param tenantNamePtr Receives the name of \a tenantId itself, if known.
 		\param isReadPtr Receives false if the relationships could not be read, e.g. for lack of permissions.
 	*/

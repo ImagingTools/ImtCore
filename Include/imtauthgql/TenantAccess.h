@@ -34,6 +34,15 @@ static const inline QByteArray s_viewOrganizationConnectionsPermission = QByteAr
 static const inline QByteArray s_viewOrganizationConnectionCodePermission = QByteArrayLiteral("/OrganizationManagement/Connections/ViewCode");
 static const inline QByteArray s_connectOrganizationPermission = QByteArrayLiteral("/OrganizationManagement/Connections/Edit/Connect");
 static const inline QByteArray s_removeOrganizationConnectionPermission = QByteArrayLiteral("/OrganizationManagement/Connections/Edit/Remove");
+static const inline QByteArray s_viewContractsPermission = QByteArrayLiteral("/OrganizationManagement/Contracts/View");
+static const inline QByteArray s_editContractsPermission = QByteArrayLiteral("/OrganizationManagement/Contracts/Edit");
+static const inline QByteArray s_approveContractsPermission = QByteArrayLiteral("/OrganizationManagement/Contracts/Approve");
+static const inline QByteArray s_signContractsPermission = QByteArrayLiteral("/OrganizationManagement/Contracts/Sign");
+static const inline QByteArray s_suspendContractPermissionsPermission = QByteArrayLiteral("/OrganizationManagement/Contracts/Suspend");
+static const inline QByteArray s_distributeContractPermissionsPermission = QByteArrayLiteral("/OrganizationManagement/Contracts/Distribute");
+static const inline QByteArray s_editPartyRolesPermission = QByteArrayLiteral("/OrganizationManagement/PartyRoles/Edit");
+static const inline QByteArray s_editContractTypesPermission = QByteArrayLiteral("/OrganizationManagement/ContractTypes/Edit");
+static const inline QByteArray s_editDirectoryProfilePermission = QByteArrayLiteral("/OrganizationManagement/Directory/Edit");
 /**
 	Every leaf that edits the organization itself, or its members.
 */

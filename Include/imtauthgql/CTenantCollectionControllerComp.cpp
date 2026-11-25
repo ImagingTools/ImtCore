@@ -9,6 +9,7 @@
 #include <iprm/CParamsSet.h>
 #include <iprm/CIdParam.h>
 #include <iprm/CEnableableParam.h>
+#include <iprm/CTextParam.h>
 
 // ImtCore includes
 #include <imtauth/ITenantInfo.h>
@@ -147,6 +148,16 @@ void CTenantCollectionControllerComp::SetAdditionalFilters(
 	iprm::CIdParam* userIdParamPtr = new iprm::CIdParam();
 	userIdParamPtr->SetId(userId);
 	filterParamsPtr->SetEditableParameter("UserId", userIdParamPtr, true);
+
+	// The organizations giving the user permissions by their contracts are related to it as delegated
+	if (m_delegatedAccessCompPtr.IsValid() && userId != s_noUserId){
+		const QByteArrayList delegatingTenantIds = m_delegatedAccessCompPtr->GetDelegatingTenantIds(userId);
+		if (!delegatingTenantIds.isEmpty()){
+			iprm::CTextParam* tenantIdsParamPtr = new iprm::CTextParam();
+			tenantIdsParamPtr->SetText(QString::fromUtf8(delegatingTenantIds.join(',')));
+			filterParamsPtr->SetEditableParameter("DelegatingTenantIds", tenantIdsParamPtr, true);
+		}
+	}
 
 	// System administrators get a global view, the others see only the tenants they are related to.
 	if (userInfoPtr == nullptr || !userInfoPtr->IsAdmin()){

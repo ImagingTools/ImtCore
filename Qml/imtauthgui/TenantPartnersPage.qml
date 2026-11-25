@@ -9,10 +9,9 @@ import imtauthgui 1.0
 /**
  * TenantPartnersPage
  *
- * The partners of the organization in one table: the requests waiting for an answer,
- * the connected organizations with the terms of the relationship, and the new terms
- * waiting for an answer. A partner is invited by its code; the request carries the
- * terms, so the partner accepts once.
+ * The address book of the organization in one table: the requests waiting for an answer
+ * and the connected organizations. A partner is invited by its code or found in the directory.
+ * The roles and the terms of the cooperation are agreed in contracts, not here.
  */
 ViewBase {
 	id: partnersPage
@@ -24,6 +23,10 @@ ViewBase {
 	readonly property var tenantData: partnersPage.model
 	property var stateManager: null
 	property var apiClient: null
+	// The directory of the organizations can be searched: the page offers to find a partner there
+	property bool canFindInDirectory: false
+
+	signal findInDirectoryRequested()
 
 	readonly property string __tenantId: partnersPage.tenantData && partnersPage.tenantData.m_id ? String(partnersPage.tenantData.m_id) : ""
 	readonly property bool __canConnect: partnersPage.stateManager ? partnersPage.stateManager.canConnectOrganization : false
@@ -37,8 +40,6 @@ ViewBase {
 			return
 		partnersPage.apiClient.fetchConnectionRequests(partnersPage.__tenantId)
 		partnersPage.apiClient.fetchConnections(partnersPage.__tenantId)
-		partnersPage.apiClient.fetchTenantRelationships(partnersPage.__tenantId)
-		partnersPage.apiClient.fetchRelationshipProposals(partnersPage.__tenantId)
 	}
 
 	Component.onCompleted: {
@@ -91,21 +92,15 @@ ViewBase {
 
 		function onConnectionRequestsReceived() { rebuildTimer.restart() }
 		function onConnectionsReceived() { rebuildTimer.restart() }
-		function onTenantRelationshipsReceived() { rebuildTimer.restart() }
-		function onRelationshipProposalsReceived() { rebuildTimer.restart() }
 
 		function onConnectionRequestCreated(requestId) { partnersPage.__done(qsTr("The request was sent to the partner")) }
-		function onConnectionRequestApproved(connectionId) { partnersPage.__done(qsTr("The partnership came into force")) }
+		function onConnectionRequestApproved(connectionId) { partnersPage.__done(qsTr("The partner was added to the address book")) }
 		function onConnectionRequestRejected() { partnersPage.__done(qsTr("The request was declined")) }
 		function onConnectionRequestCanceled() { partnersPage.__done(qsTr("The request was withdrawn")) }
-		function onRelationshipProposalCreated() { partnersPage.__done(qsTr("The new terms were sent to the partner")) }
-		function onRelationshipProposalApproved(relationshipId) { partnersPage.__done(qsTr("The new terms came into force")) }
-		function onRelationshipProposalRejected() { partnersPage.__done(qsTr("The new terms were declined")) }
-		function onRelationshipProposalCanceled() { partnersPage.__done(qsTr("The new terms were withdrawn")) }
 
 		function onConnectionRemoved(connectionId) {
 			// Keyed by the connection, as the notification of the same removal: one message for both
-			PopupManager.addSuccessMessage(qsTr("The partnership was ended"), true, "connection-removed-" + connectionId)
+			PopupManager.addSuccessMessage(qsTr("The partner was removed from the address book"), true, "connection-removed-" + connectionId)
 			partnersPage.__done("")
 		}
 
@@ -125,95 +120,28 @@ ViewBase {
 		function onSubscriptionsResumed() { partnersPage.__updateWhenVisible() }
 	}
 
-	function roleName(role) {
-		if (role === "Supplier")
-			return qsTr("supplier")
-		if (role === "Customer")
-			return qsTr("customer")
-		if (role === "Affiliate")
-			return qsTr("affiliate")
-		if (role === "Parent")
-			return qsTr("parent organization")
-		if (role === "Child")
-			return qsTr("subsidiary")
-		return qsTr("partner")
-	}
-
-	// The terms seen from this organization
-	function termsText(myRole, partnerRole, scope) {
-		var text = qsTr("We are %1, they are %2").arg(partnersPage.roleName(myRole)).arg(partnersPage.roleName(partnerRole))
-		if (scope && scope !== "")
-			text = text + " · " + scope
-		return text
-	}
-
-	function __findActiveRelationship(relationships, connectionId) {
-		for (var i = 0; i < relationships.count; ++i) {
-			var rel = relationships.get(i)
-			if (rel.connectionId === connectionId && rel.status === "Active")
-				return rel
-		}
-		return null
-	}
-
-	// A proposal waits while only its initiator agreed
-	function __findOpenProposal(proposals, connectionId) {
-		for (var i = 0; i < proposals.count; ++i) {
-			var proposal = proposals.get(i)
-			if (proposal.connectionId === connectionId && proposal.status === "ApprovedByInitiator")
-				return proposal
-		}
-		return null
-	}
-
 	function __requestRow(request, isIncoming) {
 		var row = {}
 		row.id = "request:" + request.id
 		row.requestId = request.id
 		row.kind = isIncoming ? "incomingRequest" : "outgoingRequest"
 		row.partner = (isIncoming ? request.sourceTenantName : request.targetTenantName) || qsTr("Unknown organization")
-		// The source role is the one of the requesting organization
-		if (request.proposedSourceRole !== "") {
-			row.terms = isIncoming
-				? partnersPage.termsText(request.proposedTargetRole, request.proposedSourceRole, request.proposedScope)
-				: partnersPage.termsText(request.proposedSourceRole, request.proposedTargetRole, request.proposedScope)
-		}
-		else {
-			row.terms = qsTr("Connection without terms")
-		}
+		row.since = request.createdAt || ""
 		row.state = isIncoming ? qsTr("Waiting for your answer") : qsTr("Waiting for the partner")
 		row.message = request.message || ""
 		return row
 	}
 
-	function __partnerRow(connection, relationship, proposal) {
+	function __partnerRow(connection) {
 		var row = {}
 		row.id = "connection:" + connection.id
 		row.connectionId = connection.id
 		row.partnerId = connection.partnerId
 		row.partner = connection.partnerName || qsTr("Unknown organization")
-		row.relationshipId = relationship ? relationship.id : ""
-		var isSource = relationship ? relationship.sourceTenantId === partnersPage.__tenantId : true
-		row.myRole = relationship ? (isSource ? relationship.sourceRole : relationship.targetRole) : "Partner"
-		row.partnerRole = relationship ? (isSource ? relationship.targetRole : relationship.sourceRole) : "Partner"
-		row.scope = relationship ? relationship.scope : ""
-		row.terms = relationship ? partnersPage.termsText(row.myRole, row.partnerRole, row.scope) : qsTr("No terms yet")
+		row.since = connection.createdAt || ""
 		row.message = ""
 		row.kind = "partner"
-		row.state = qsTr("Active")
-		if (proposal) {
-			row.proposalId = proposal.id
-			var isInitiator = proposal.initiatorTenantId === partnersPage.__tenantId
-			row.kind = isInitiator ? "outgoingProposal" : "incomingProposal"
-			row.state = isInitiator ? qsTr("New terms wait for the partner") : qsTr("New terms wait for your answer")
-			// The roles of a proposal are the ones of the source and the target of its relationship, the initiator for a new one
-			var proposalIsSource = relationship ? isSource : isInitiator
-			row.terms = proposal.proposalType === "Delete"
-				? qsTr("End of the partnership proposed")
-				: partnersPage.termsText(proposalIsSource ? proposal.proposedSourceRole : proposal.proposedTargetRole,
-										proposalIsSource ? proposal.proposedTargetRole : proposal.proposedSourceRole,
-										proposal.proposedScope)
-		}
+		row.state = qsTr("In the address book")
 		return row
 	}
 
@@ -225,8 +153,6 @@ ViewBase {
 
 		var requests = partnersPage.apiClient.connectionRequestsModel
 		var connections = partnersPage.apiClient.connectionsModel
-		var relationships = partnersPage.apiClient.tenantRelationshipsModel
-		var proposals = partnersPage.apiClient.relationshipProposalsModel
 		var waiting = []
 		var others = []
 
@@ -242,18 +168,12 @@ ViewBase {
 			}
 		}
 
-		if (connections && relationships && proposals) {
+		if (connections) {
 			for (var j = 0; j < connections.count; ++j) {
 				var connection = connections.get(j)
 				if (connection.status !== "Active")
 					continue
-				var row = partnersPage.__partnerRow(connection,
-												partnersPage.__findActiveRelationship(relationships, connection.id),
-												partnersPage.__findOpenProposal(proposals, connection.id))
-				if (row.kind === "incomingProposal")
-					waiting.push(row)
-				else
-					others.push(row)
+				others.push(partnersPage.__partnerRow(connection))
 			}
 		}
 
@@ -275,51 +195,44 @@ ViewBase {
 		ModalDialogManager.openDialog(inviteDialogComp, {})
 	}
 
-	function proposeTerms(rowId) {
-		var row = partnersPage.__rowById(rowId)
-		if (!row)
-			return
-		ModalDialogManager.openDialog(termsDialogComp, {"rowId": rowId, "initialMyRole": row.myRole, "initialPartnerRole": row.partnerRole, "initialScope": row.scope})
-	}
-
 	function answer(rowId, accept) {
 		var row = partnersPage.__rowById(rowId)
-		if (!row || !partnersPage.apiClient)
+		if (!row || !partnersPage.apiClient || row.kind !== "incomingRequest")
 			return
 		partnersPage.busyRowId = rowId
-		if (row.kind === "incomingRequest") {
-			if (accept)
-				partnersPage.apiClient.approveConnectionRequest(row.requestId, partnersPage.__tenantId)
-			else
-				partnersPage.apiClient.rejectConnectionRequest(row.requestId, partnersPage.__tenantId)
-		}
-		else if (row.kind === "incomingProposal") {
-			if (accept)
-				partnersPage.apiClient.approveRelationshipProposal(row.proposalId, partnersPage.__tenantId)
-			else
-				partnersPage.apiClient.rejectRelationshipProposal(row.proposalId, partnersPage.__tenantId)
-		}
+		if (accept)
+			partnersPage.apiClient.approveConnectionRequest(row.requestId, partnersPage.__tenantId)
+		else
+			partnersPage.apiClient.rejectConnectionRequest(row.requestId, partnersPage.__tenantId)
 	}
 
 	function withdraw(rowId) {
 		var row = partnersPage.__rowById(rowId)
-		if (!row || !partnersPage.apiClient)
+		if (!row || !partnersPage.apiClient || row.kind !== "outgoingRequest")
 			return
 		partnersPage.busyRowId = rowId
-		if (row.kind === "outgoingRequest")
-			partnersPage.apiClient.cancelConnectionRequest(row.requestId, partnersPage.__tenantId)
-		else if (row.kind === "outgoingProposal")
-			partnersPage.apiClient.cancelRelationshipProposal(row.proposalId, partnersPage.__tenantId)
+		partnersPage.apiClient.cancelConnectionRequest(row.requestId, partnersPage.__tenantId)
 	}
 
-	function endPartnership(rowId) {
+	function removePartner(rowId) {
 		var row = partnersPage.__rowById(rowId)
 		if (!row)
 			return
-		ModalDialogManager.openDialog(endDialogComp, {"rowId": rowId, "partnerName": row.partner})
+		ModalDialogManager.openDialog(removeDialogComp, {"rowId": rowId, "partnerName": row.partner})
+	}
+
+	CustomScrollbar {
+		z: pageFlickable.z + 1
+		anchors.right: parent.right
+		anchors.top: pageFlickable.top
+		anchors.bottom: pageFlickable.bottom
+		secondSize: Style.marginM
+		targetItem: pageFlickable
 	}
 
 	Flickable {
+		id: pageFlickable
+
 		anchors.fill: parent
 		anchors.topMargin: Style.marginXL
 		contentHeight: mainColumn.height + Style.marginXL
@@ -333,45 +246,58 @@ ViewBase {
 
 			Item {
 				width: parent.width
-				height: Math.max(titleColumn.height, inviteButton.height)
+				height: Math.max(titleColumn.height, headerButtons.height)
 
 				Column {
 					id: titleColumn
 					anchors.left: parent.left
-					anchors.right: inviteButton.left
+					anchors.right: headerButtons.left
 					anchors.rightMargin: Style.marginL
 					spacing: Style.marginXS
 
 					GroupHeaderView {
 						width: parent.width
-						title: qsTr("Partners")
+						title: qsTr("Address book")
 					}
 
 					Text {
 						width: parent.width
-						text: qsTr("Organizations you work with. A partnership is in force when both sides agree.")
+						text: qsTr("The address book of the organization. The terms of the cooperation with a partner are agreed in a contract.")
 						font.pixelSize: Style.fontSizeS
 						color: Style.inactiveTextColor
 						wrapMode: Text.WordWrap
 					}
 				}
 
-				Button {
-					id: inviteButton
+				Row {
+					id: headerButtons
 					anchors.right: parent.right
 					anchors.verticalCenter: parent.verticalCenter
-					variant: "primary"
-					text: qsTr("Invite partner")
-					visible: partnersPage.__canConnect
-					onClicked: {
-						partnersPage.invitePartner()
+					spacing: Style.marginS
+
+					Button {
+						text: qsTr("Find in the directory")
+						visible: partnersPage.__canConnect && partnersPage.canFindInDirectory
+						onClicked: {
+							partnersPage.findInDirectoryRequested()
+						}
+					}
+
+					Button {
+						id: inviteButton
+						variant: "primary"
+						text: qsTr("Invite partner")
+						visible: partnersPage.__canConnect
+						onClicked: {
+							partnersPage.invitePartner()
+						}
 					}
 				}
 			}
 
 			Text {
 				visible: partnersTable.elementsCount === 0
-				text: qsTr("No partners yet. Invite one by the code the partner gave you.")
+				text: qsTr("No partners yet. Invite one by the code the partner gave you or find one in the directory.")
 				font.pixelSize: Style.fontSizeS
 				color: Style.inactiveTextColor
 			}
@@ -392,7 +318,7 @@ ViewBase {
 
 		Component.onCompleted: {
 			addHeader("partner", qsTr("Partner"), false, false)
-			addHeader("terms", qsTr("Terms"), false, false)
+			addHeader("message", qsTr("Message"), false, false)
 			addHeader("state", qsTr("State"), false, false)
 			addHeader("actions", "", false, false)
 			partnersTable.headers = partnersHeaders
@@ -419,7 +345,7 @@ ViewBase {
 				Button {
 					variant: "primary"
 					text: qsTr("Accept")
-					visible: actionsCell.kind === "incomingRequest" || actionsCell.kind === "incomingProposal"
+					visible: actionsCell.kind === "incomingRequest"
 					enabled: actionsCell.free && partnersPage.__canManage
 					onClicked: {
 						partnersPage.answer(actionsCell.rowId, true)
@@ -428,7 +354,7 @@ ViewBase {
 
 				Button {
 					text: qsTr("Decline")
-					visible: actionsCell.kind === "incomingRequest" || actionsCell.kind === "incomingProposal"
+					visible: actionsCell.kind === "incomingRequest"
 					enabled: actionsCell.free && partnersPage.__canManage
 					onClicked: {
 						partnersPage.answer(actionsCell.rowId, false)
@@ -437,7 +363,7 @@ ViewBase {
 
 				Button {
 					text: qsTr("Withdraw")
-					visible: actionsCell.kind === "outgoingRequest" || actionsCell.kind === "outgoingProposal"
+					visible: actionsCell.kind === "outgoingRequest"
 					enabled: actionsCell.free && partnersPage.__canConnect
 					onClicked: {
 						partnersPage.withdraw(actionsCell.rowId)
@@ -445,20 +371,11 @@ ViewBase {
 				}
 
 				Button {
-					text: qsTr("Change terms")
-					visible: actionsCell.kind === "partner"
-					enabled: actionsCell.free && partnersPage.__canConnect
-					onClicked: {
-						partnersPage.proposeTerms(actionsCell.rowId)
-					}
-				}
-
-				Button {
-					text: qsTr("End")
+					text: qsTr("Remove")
 					visible: actionsCell.kind === "partner"
 					enabled: actionsCell.free && partnersPage.__canManage
 					onClicked: {
-						partnersPage.endPartnership(actionsCell.rowId)
+						partnersPage.removePartner(actionsCell.rowId)
 					}
 				}
 			}
@@ -468,65 +385,32 @@ ViewBase {
 	Component {
 		id: inviteDialogComp
 
-		PartnerTermsDialog {
+		PartnerInviteDialog {
 			id: inviteDialog
 			title: qsTr("Invite partner")
-			showCode: true
 			onFinished: {
 				if (buttonId == Enums.ok && partnersPage.apiClient && inviteDialog.contentItem) {
 					partnersPage.busyRowId = "invite"
-					partnersPage.apiClient.createConnectionRequest(partnersPage.__tenantId, inviteDialog.contentItem.code, inviteDialog.contentItem.message,
-																	inviteDialog.contentItem.myRole, inviteDialog.contentItem.partnerRole, inviteDialog.contentItem.scope)
+					partnersPage.apiClient.createConnectionRequest(partnersPage.__tenantId, inviteDialog.contentItem.code, inviteDialog.contentItem.message, "")
 				}
 			}
 		}
 	}
 
 	Component {
-		id: termsDialogComp
-
-		PartnerTermsDialog {
-			id: termsDialog
-			property string rowId: ""
-			title: qsTr("Change terms")
-			showCode: false
-			onFinished: {
-				var row = partnersPage.__rowById(termsDialog.rowId)
-				var content = termsDialog.contentItem
-				if (buttonId != Enums.ok || !row || !content || !partnersPage.apiClient)
-					return
-				// The roles go to the source and the target of the relationship; a new one has this organization as its source
-				var relationships = partnersPage.apiClient.tenantRelationshipsModel
-				var relationship = row.relationshipId !== "" ? partnersPage.__findActiveRelationship(relationships, row.connectionId) : null
-				var isSource = relationship ? relationship.sourceTenantId === partnersPage.__tenantId : true
-				partnersPage.busyRowId = termsDialog.rowId
-				partnersPage.apiClient.createRelationshipProposal(
-							partnersPage.__tenantId,
-							row.partnerId,
-							relationship ? "Update" : "Create",
-							row.relationshipId,
-							isSource ? content.myRole : content.partnerRole,
-							isSource ? content.partnerRole : content.myRole,
-							content.scope,
-							content.message)
-			}
-		}
-	}
-
-	Component {
-		id: endDialogComp
+		id: removeDialogComp
 
 		MessageDialog {
-			id: endDialog
+			id: removeDialog
 			property string rowId: ""
 			property string partnerName: ""
 			width: Style.sizeHintM
-			title: qsTr("End partnership")
-			message: qsTr("End the partnership with \"%1\"? The relationship with this organization ends with it.").arg(endDialog.partnerName)
+			title: qsTr("Remove partner")
+			message: qsTr("Remove \"%1\" from the address book? The contracts with this organization stay in force.").arg(removeDialog.partnerName)
 			onFinished: {
-				var row = partnersPage.__rowById(endDialog.rowId)
+				var row = partnersPage.__rowById(removeDialog.rowId)
 				if (buttonId == Enums.yes && row && partnersPage.apiClient) {
-					partnersPage.busyRowId = endDialog.rowId
+					partnersPage.busyRowId = removeDialog.rowId
 					partnersPage.apiClient.removeConnection(row.connectionId, partnersPage.__tenantId)
 				}
 			}

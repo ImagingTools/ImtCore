@@ -3,6 +3,7 @@
 
 
 // ImtCore includes
+#include <imtauth/IDelegatedAccess.h>
 #include <imtauth/ITenantMembershipManager.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants_fwd.h>
 
@@ -19,6 +20,7 @@ public:
 	I_BEGIN_COMPONENT(CTenantCollectionControllerComp);
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager for member count", false, "MembershipManager");
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Collection of users", true, "UserCollection");
+		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Organizations giving the user permissions by their contracts", false, "ContractDelegatedAccess");
 	I_END_COMPONENT;
 
 protected:
@@ -44,6 +46,7 @@ protected:
 private:
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
+	I_REF(imtauth::IDelegatedAccess, m_delegatedAccessCompPtr);
 };
 
 

@@ -29,7 +29,7 @@ public:
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager providing CRUD operations", true, "TenantMembershipManager");
 		I_ASSIGN(m_invitationManagerCompPtr, "InvitationManager", "Tenant invitation manager providing invitation lifecycle operations", true, "TenantInvitationManager");
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager for resolving tenant names", false, "TenantManager");
-		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Optional delegated access resolver for cross-org grant read access", false, "DelegatedAccessResolver");
+		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Permissions given to the users by the contracts of the organizations: read access to the members", false, "ContractDelegatedAccess");
 		I_ASSIGN(m_organizationsProviderCompPtr, "OrganizationsProvider", "Provider of organization-only permission features", false, "OrganizationsPermissionsProvider");
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 	I_END_COMPONENT;

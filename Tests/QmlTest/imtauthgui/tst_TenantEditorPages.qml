@@ -216,11 +216,11 @@ TestCase {
 	function test_leaveClosesTheEditorsOfAllSections(){
 		let context = openHostedEditor()
 		let members = openPageEditor(context, "Members")
-		let grants = openPageEditor(context, "CrossOrgGrants")
+		let roles = openPageEditor(context, "Roles")
 		context.pageView.activatePage(0)
 		let shown = []
 		members.editorOpenChanged.connect(function(){ shown.push("Members:" + context.pageView.currentIndex) })
-		grants.editorOpenChanged.connect(function(){ shown.push("CrossOrgGrants:" + context.pageView.currentIndex) })
+		roles.editorOpenChanged.connect(function(){ shown.push("Roles:" + context.pageView.currentIndex) })
 		let answers = []
 
 		context.editor.requestLeave(function(left){
@@ -229,8 +229,8 @@ TestCase {
 
 		compare(answers, [true])
 		verify(!members.editorOpen)
-		verify(!grants.editorOpen)
-		compare(shown, ["Members:" + context.pageView.getIndexById("Members"), "CrossOrgGrants:" + context.pageView.getIndexById("CrossOrgGrants")])
+		verify(!roles.editorOpen)
+		compare(shown, ["Members:" + context.pageView.getIndexById("Members"), "Roles:" + context.pageView.getIndexById("Roles")])
 	}
 
 	// The pages are not rebuilt under an open editor: that would drop its changes

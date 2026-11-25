@@ -6,7 +6,6 @@
 #include <imtauth/IPersonalAccessTokenManager.h>
 #include <imtauth/ITenantEntityBindingManager.h>
 #include <imtauth/IDelegatedAccess.h>
-#include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/IRoleInfoProvider.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/PersonalAccessTokens_fwd.h>
 
@@ -25,8 +24,7 @@ public:
 		I_ASSIGN(m_tokenManagerCompPtr, "PersonalAccessTokenManager", "Personal access token manager", true, "PersonalAccessTokenManager");
 		I_ASSIGN(m_tokenFactoryCompPtr, "TokenFactory", "Factory for creating token instances", true, "PersonalAccessTokenFactory");
 		I_ASSIGN(m_bindingManagerCompPtr, "BindingManager", "Tenant entity binding manager for tenant-scoped adaptation of user roles/groups/permissions", false, "TenantEntityBindingManager");
-		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Delegated access resolver for cross-org grants", false, "DelegatedAccessResolver");
-		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager", false, "TenantMembershipManager");
+		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Permissions given to the users by the contracts of the organizations", false, "ContractDelegatedAccess");
 		I_ASSIGN(m_roleInfoProviderCompPtr, "RoleInfoProvider", "Role info provider (used for delegated role product validation)", false, "RoleInfoProvider");
 	I_END_COMPONENT;
 
@@ -106,7 +104,6 @@ private:
 	I_FACT(imtauth::IPersonalAccessToken, m_tokenFactoryCompPtr);
 	I_REF(imtauth::ITenantEntityBindingManager, m_bindingManagerCompPtr);
 	I_REF(imtauth::IDelegatedAccess, m_delegatedAccessCompPtr);
-	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 	I_REF(imtauth::IRoleInfoProvider, m_roleInfoProviderCompPtr);
 };
 

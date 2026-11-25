@@ -1,0 +1,205 @@
+import QtQuick 2.12
+import QtTest 1.12
+import imtauthgui 1.0
+
+TestCase {
+	id: testCase
+
+	name: "ContractView"
+	when: windowShown
+
+	// Records what the card sends; the answers are given by the test
+	Component {
+		id: contractsClientComp
+
+		QtObject {
+			property var contracts: []
+			property var contract: null
+			property var privateInfo: null
+			property var events: []
+			property var partyCandidates: []
+			property var partyRoles: [{"roleId": "supplier", "name": "Supplier", "isPartyRole": true, "isLinkRole": true},
+				{"roleId": "customer", "name": "Customer", "isPartyRole": true, "isLinkRole": true}]
+			property var contractTypes: [{"typeId": "star", "name": "Star", "linkScheme": "Star", "starRoleId": "supplier", "requiredSignatures": 2}]
+			property Component contractCommandsControllerComp: null
+			property var lastDraft: null
+			property string lastCommand: ""
+			property int contractReads: 0
+
+			signal contractsReceived()
+			signal contractReceived(string contractId)
+			signal eventsReceived(string contractId)
+			signal partyCandidatesReceived()
+			signal commandSucceeded(string command, string contractId, int revision)
+			signal commandFailed(string command, string errorMessage)
+			signal attachmentReceived(string attachmentId, string fileName, string mimeType, string data)
+			signal contractNotified(string contractId, string tenantId)
+			signal partyRolesReceived()
+			signal contractTypesReceived()
+
+			function fetchPartyRoles(tenantId, includeArchived){}
+			function fetchContractTypes(tenantId, includeArchived){}
+			function fetchPartyCandidates(tenantId){}
+			function fetchContract(tenantId, contractId){ contractReads++ }
+			function fetchEvents(tenantId, contractId){}
+			function createContract(tenantId, draft){ lastCommand = "CreateContract"; lastDraft = draft }
+			function updateContract(tenantId, contractId, revision, draft){ lastCommand = "UpdateContract"; lastDraft = draft }
+			function runCommand(command, tenantId, contractId, revision, comment){ lastCommand = command }
+		}
+	}
+
+	Component {
+		id: stateManagerComp
+
+		QtObject {
+			property bool canEditContracts: true
+			property bool canApproveContracts: true
+			property bool canSignContracts: true
+			property bool canSuspendContractPermissions: true
+			property bool canDistributeContractPermissions: true
+		}
+	}
+
+	Component {
+		id: viewComp
+
+		ContractView {
+			width: 900
+			height: 700
+		}
+	}
+
+	function init(){
+		failOnWarning(/ReferenceError|TypeError/)
+	}
+
+	function createView(client, contractId){
+		let view = createTemporaryObject(viewComp, testCase.parent, {"tenantId": "me", "tenantName": "Me", "contractId": contractId,
+			"contractsApiClient": client, "stateManager": createTemporaryObject(stateManagerComp, testCase)})
+		verify(view !== null, "The card is created")
+		return view
+	}
+
+	// A new draft has the organization as its party, and every added party is linked with every other one
+	function test_aNewDraftLinksEveryPair(){
+		let client = createTemporaryObject(contractsClientComp, testCase)
+		let view = createView(client, "")
+
+		verify(view.isNew)
+		verify(view.isEditable)
+		compare(view.parties.length, 1)
+		compare(view.parties[0].tenantId, "me")
+
+		view.addParty("a", "A", "customer", "Customer", 1)
+		view.addParty("b", "B", "", "", 1)
+		compare(view.links.length, 3, "Three parties have three pairs")
+
+		view.removeParty("b")
+		compare(view.links.length, 1)
+		compare(view.links[0].tenantBId, "a")
+	}
+
+	// A type with a star links its center with every other party only, and asks for its number of signatures
+	function test_aStarTypeLinksTheCenter(){
+		let client = createTemporaryObject(contractsClientComp, testCase)
+		let view = createView(client, "")
+
+		view.addParty("a", "A", "supplier", "Supplier", 1)
+		view.addParty("b", "B", "customer", "Customer", 1)
+		view.applyType("star")
+
+		compare(view.links.length, 2)
+		for (let i = 0; i < view.links.length; i++)
+			verify(view.links[i].tenantAId === "a" || view.links[i].tenantBId === "a", "Every link has the center")
+		compare(view.parties[0].requiredSignatures, 2)
+	}
+
+	// A pair keeps its saved link, so the permissions given within it stay
+	function test_aSavedLinkIsKept(){
+		let client = createTemporaryObject(contractsClientComp, testCase)
+		let view = createView(client, "")
+
+		view.addParty("a", "A", "", "", 1)
+		view.links = [{"linkId": "link-1", "tenantAId": "me", "tenantBId": "a", "isMessagingAllowed": false, "isSharingAllowed": true}]
+		view.addParty("b", "B", "", "", 1)
+
+		let kept = view.__findLink("me", "a")
+		compare(kept.linkId, "link-1")
+		compare(kept.isMessagingAllowed, false)
+	}
+
+	// The draft sent has the order of the parties as their order of signing and the typed days as times
+	function test_saveSendsTheDraft(){
+		let client = createTemporaryObject(contractsClientComp, testCase)
+		let view = createView(client, "")
+
+		view.addParty("a", "A", "customer", "Customer", 1)
+		view.save()
+		compare(client.lastCommand, "", "A contract without a name is not sent")
+
+		let draft = view.__buildDraft()
+		compare(draft.parties.length, 2)
+		compare(draft.parties[1].signOrder, 2)
+		compare(draft.links.length, 1)
+		compare(draft.signOrder, "Parallel")
+	}
+
+	// A party other than the initiator reads the terms; its steps follow its state
+	function test_anInvitedPartyDoesNotEditTheTerms(){
+		let client = createTemporaryObject(contractsClientComp, testCase)
+		let view = createView(client, "c1")
+		compare(client.contractReads, 1)
+
+		client.contract = {"id": "c1", "name": "Supply", "initiatorTenantId": "other", "state": "Negotiation", "revision": 3,
+			"submittedAt": "2027-01-01T00:00:00Z",
+			"parties": [{"tenantId": "other", "tenantName": "Other", "state": "Reviewing"},
+				{"tenantId": "me", "tenantName": "Me", "state": "Reviewing"}],
+			"links": [{"linkId": "l1", "tenantAId": "other", "tenantBId": "me", "isInForce": false}]}
+		client.contractReceived("c1")
+
+		verify(!view.isNew)
+		verify(!view.isInitiator)
+		verify(!view.isEditable)
+		verify(view.isNegotiated)
+		compare(view.myPartyState, "Reviewing")
+		compare(view.links.length, 1)
+
+		view.run("ApproveContract", "")
+		compare(client.lastCommand, "ApproveContract")
+	}
+
+	// The answer of another card does not touch this one
+	function test_anotherContractIsIgnored(){
+		let client = createTemporaryObject(contractsClientComp, testCase)
+		let view = createView(client, "c1")
+
+		client.contract = {"id": "c2", "name": "Other", "initiatorTenantId": "me", "state": "Draft", "parties": []}
+		client.contractReceived("c2")
+
+		verify(view.contract === null)
+	}
+
+	function test_theComponentsCompile_data(){
+		return [
+			{"tag": "ContractPartyDialog"}, {"tag": "ContractReasonDialog"}, {"tag": "ContractSignDialog"},
+			{"tag": "ContractAllocationDialog"}, {"tag": "ContractReferenceDialog"}, {"tag": "ContractRoleSlotDialog"},
+			{"tag": "PartnerInviteDialog"}, {"tag": "TenantContractsPage"}, {"tag": "ChoiceModel"},
+			{"tag": "ContractTermsPage"}, {"tag": "ContractPeriodPage"}, {"tag": "ContractPartiesPage"},
+			{"tag": "ContractLinksPage"}, {"tag": "ContractPermissionsPage"}, {"tag": "ContractReferencesPage"},
+			{"tag": "ContractDocumentsPage"}, {"tag": "ContractInternalPage"}, {"tag": "ContractJournalPage"},
+			{"tag": "TenantPartyRolesPage"}, {"tag": "PartyRoleView"}, {"tag": "TenantContractTypesPage"},
+			{"tag": "ContractTypeView"}, {"tag": "TenantDirectoryProfileSection"}, {"tag": "TenantConnectionCodePage"}, {"tag": "TenantPartnersPage"}, {"tag": "DirectoryProfileDialog"}, {"tag": "DirectoryProfileEditDialog"}, {"tag": "PartyRoleDialog"}, {"tag": "ContractTypeDialog"}, {"tag": "ContractDialog"}, {"tag": "TenantDirectorySearchPage"},
+			{"tag": "ContractsApiClient"}
+		]
+	}
+
+	function test_theComponentsCompile(data){
+		let component = Qt.createComponent("qrc:/qml/imtauthgui/" + data.tag + ".qml")
+		compare(component.status, Component.Ready, component.errorString())
+	}
+
+	function test_theGqlClientCompiles(){
+		let component = Qt.createComponent("qrc:/qml/imtguigql/GqlBasedContractsApiClient.qml")
+		compare(component.status, Component.Ready, component.errorString())
+	}
+}

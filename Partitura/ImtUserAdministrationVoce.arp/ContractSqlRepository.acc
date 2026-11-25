@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6390" Description="ACF"/>
-            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -69,7 +69,7 @@
                         <Data IsEnabled="true" Value="ObjectCollection"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectDelegate" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ContractDatabaseDelegate"/>
+                        <Data IsEnabled="true" Value="DatabaseDelegate"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
@@ -77,14 +77,17 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ContractDatabaseDelegate" PackageId="ImtAuthDbPck" ComponentId="ContractDatabaseDelegate">
+        <Element Id="DatabaseDelegate" PackageId="ImtAuthDbPck" ComponentId="ContractDatabaseDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="AutoCreateTable" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ContractFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="ContractInfo"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CreateTableScriptPath" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value=":/SQL/Postgres/CreateContractsTable.sql"/>
+                        <Data IsEnabled="true" Value="CreateTenantContractsTable.sql"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>
@@ -92,14 +95,11 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ContractFactory" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="ContractInfo"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="ObjectTypes" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Types"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TableName" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Contracts"/>
+                        <Data IsEnabled="true" Value="TenantContracts"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
@@ -139,11 +139,10 @@
         <Interface InterfaceId="imtbase::ICollectionInfo" ComponentId="Repository"/>
         <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="Repository"/>
         <Interface InterfaceId="imtdb::ISqlDatabaseObjectCollection" ComponentId="Repository"/>
-        <Interface InterfaceId="imtdb::ISqlDatabaseObjectDelegate" ComponentId="ContractDatabaseDelegate"/>
+        <Interface InterfaceId="imtdb::ISqlDatabaseObjectDelegate" ComponentId="DatabaseDelegate"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="Repository"/>
     </ExportedInterfaces>
     <ExportedComponents>
-        <Component ExportedId="ContractDatabaseDelegate" ComponentId="ContractDatabaseDelegate"/>
         <Component ExportedId="ContractRepository" ComponentId="Repository"/>
     </ExportedComponents>
 </Acf>

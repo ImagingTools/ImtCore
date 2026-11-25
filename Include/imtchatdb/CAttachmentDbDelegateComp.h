@@ -17,6 +17,7 @@ public:
 
 	I_BEGIN_COMPONENT(CAttachmentDbDelegateComp)
 		I_ASSIGN(m_attachmentFactCompPtr, "AttachmentFactory", "Factory used for creation of new attachment instances", true, "AttachmentFactory");
+		I_ASSIGN(m_referencingTableNameAttrPtr, "ReferencingTableName", "Table referencing the attachments by \"AttachmentId\"; the others older than a day are removed. Empty: none is removed", true, "MessageAttachments");
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
@@ -65,6 +66,7 @@ protected:
 
 private:
 	I_FACT(imtchat::IAttachment, m_attachmentFactCompPtr);
+	I_ATTR(QByteArray, m_referencingTableNameAttrPtr);
 
 	void CleanupOrphanedAttachments();
 };

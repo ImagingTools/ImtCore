@@ -678,7 +678,6 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 					productId,
 					m_bindingManagerCompPtr.IsValid() ? m_bindingManagerCompPtr.GetPtr() : nullptr,
 					m_delegatedAccessCompPtr.IsValid() ? m_delegatedAccessCompPtr.GetPtr() : nullptr,
-					m_tenantMembershipManagerCompPtr.IsValid() ? m_tenantMembershipManagerCompPtr.GetPtr() : nullptr,
 					m_roleInfoProviderCompPtr.IsValid() ? m_roleInfoProviderCompPtr.GetPtr() : nullptr);
 
 	const imtauth::IUserInfo::FeatureIds organizationAccessPermissions = (!isPat && gqlContextPtr != nullptr)

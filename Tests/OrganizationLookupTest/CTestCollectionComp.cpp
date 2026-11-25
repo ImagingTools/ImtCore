@@ -9,15 +9,12 @@
 
 // ImtCore includes
 #include <imtbase/imtbase.h>
-#include <imtauth/CCrossOrgGrant.h>
 #include <imtauth/CDocumentShareInfo.h>
 #include <imtauth/CPersonalAccessToken.h>
 #include <imtauth/CTenantConnection.h>
 #include <imtauth/CTenantInfo.h>
 #include <imtauth/CTenantInvitation.h>
 #include <imtauth/CTenantMembership.h>
-#include <imtauth/CTenantRelationshipInfo.h>
-#include <imtauth/CTenantRelationshipProposal.h>
 #include <imtauth/CUserVerification.h>
 
 
@@ -228,15 +225,6 @@ istd::IChangeableUniquePtr CTestCollectionComp::CreateObjectInstance(const QByte
 	if (typeId == "TenantConnection"){
 		return new imtauth::CIdentifiableTenantConnection;
 	}
-	if (typeId == "TenantRelationship"){
-		return new imtauth::CIdentifiableTenantRelationshipInfo;
-	}
-	if (typeId == "TenantRelationshipProposal"){
-		return new imtauth::CIdentifiableTenantRelationshipProposal;
-	}
-	if (typeId == "CrossOrgGrant"){
-		return new imtauth::CIdentifiableCrossOrgGrant;
-	}
 	if (typeId == "PersonalAccessToken"){
 		return new imtauth::CPersonalAccessToken;
 	}
@@ -367,24 +355,6 @@ bool CTestCollectionComp::GetFieldValue(const istd::IChangeable& object, const Q
 					: fieldId == "TenantBId" ? connectionPtr->GetTenantBId()
 					: connectionPtr->GetConnectionId();
 	}
-	else if (const imtauth::ITenantRelationshipInfo* relationshipPtr = dynamic_cast<const imtauth::ITenantRelationshipInfo*>(&object)){
-		isKnown = fieldId == "SourceTenantId" || fieldId == "TargetTenantId" || fieldId == "ConnectionId" || fieldId == "Id";
-		rawValue = fieldId == "SourceTenantId" ? relationshipPtr->GetSourceTenantId()
-					: fieldId == "TargetTenantId" ? relationshipPtr->GetTargetTenantId()
-					: fieldId == "ConnectionId" ? relationshipPtr->GetConnectionId()
-					: relationshipPtr->GetRelationshipId();
-	}
-	else if (const imtauth::ITenantRelationshipProposalInfo* proposalPtr = dynamic_cast<const imtauth::ITenantRelationshipProposalInfo*>(&object)){
-		isKnown = fieldId == "InitiatorTenantId" || fieldId == "CounterpartyTenantId" || fieldId == "ConnectionId";
-		rawValue = fieldId == "InitiatorTenantId" ? proposalPtr->GetInitiatorTenantId()
-					: fieldId == "CounterpartyTenantId" ? proposalPtr->GetCounterpartyTenantId()
-					: proposalPtr->GetConnectionId();
-	}
-	else if (const imtauth::ICrossOrgGrantData* grantPtr = dynamic_cast<const imtauth::ICrossOrgGrantData*>(&object)){
-		const imtauth::CrossOrgGrantInfo grantInfo = grantPtr->GetGrantInfo();
-		isKnown = fieldId == "SourceTenantId" || fieldId == "TargetTenantId";
-		rawValue = fieldId == "SourceTenantId" ? grantInfo.sourceTenantId : grantInfo.targetTenantId;
-	}
 	else if (const imtauth::IPersonalAccessToken* tokenPtr = dynamic_cast<const imtauth::IPersonalAccessToken*>(&object)){
 		isKnown = fieldId == "UserId" || fieldId == "TokenHash";
 		rawValue = fieldId == "UserId" ? tokenPtr->GetUserId() : tokenPtr->GetTokenHash();
@@ -450,8 +420,14 @@ imtauth::RelatedTenantInfos CTestRelationshipProviderComp::GetRelatedTenants(con
 			continue;
 		}
 
+		// One contract of the two, whose link allows to share while it is in force
+		const QByteArray contractId = QByteArrayLiteral("contract-") + relationship.tenantId + relationship.otherTenantId;
 		relatedTenant.relatedSince = relationship.relatedSince;
 		relatedTenant.isEffective = relationship.isEffective;
+		relatedTenant.relatedContractIds = {contractId};
+		if (relationship.isEffective){
+			relatedTenant.sharingContractIds = {contractId};
+		}
 		retVal.append(relatedTenant);
 	}
 

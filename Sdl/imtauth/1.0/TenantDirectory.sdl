@@ -1,0 +1,96 @@
+schema {
+	query: Query
+	mutation: Mutation
+	namespace: imtauth
+	version: 1.0
+}
+
+import {
+	"../../imtbase/1.0/ImtCollection.sdl"
+}
+
+# --- Directory of the organizations ---
+
+type DirectoryProfile {
+	tenantId: ID!
+	tenantName: String
+	isListed: Boolean
+	acceptsInvitationsFromUnknown: Boolean
+	description: String
+	offeredRoleIds: [ID]
+	industry: String
+	country: String
+	website: String
+	updatedAt: String
+}
+
+input DirectoryProfileInput {
+	isListed: Boolean
+	acceptsInvitationsFromUnknown: Boolean
+	description: String
+	offeredRoleIds: [ID]
+	industry: String
+	country: String
+	website: String
+}
+
+input GetDirectoryProfileInput {
+	tenantId: ID!
+}
+
+type GetDirectoryProfilePayload {
+	profile: DirectoryProfile
+	errorMessage: String
+}
+
+input SetDirectoryProfileInput {
+	tenantId: ID!
+	profile: DirectoryProfileInput!
+}
+
+type SetDirectoryProfilePayload {
+	success: Boolean
+	errorMessage: String
+}
+
+# The listed organizations as the collection "DirectoryProfiles": found only by a text, never browsed whole.
+# The searching organization is the one of the session.
+input DirectoryProfilesListInput {
+	viewParams: CollectionViewParams
+}
+
+type DirectoryProfileItemData {
+	id: ID!
+	typeId: ID
+	tenantName: String
+	industry: String
+	country: String
+	offeredRoles: String
+	description: String
+	website: String
+	acceptsInvitationsFromUnknown: Boolean
+}
+
+type DirectoryProfilesListPayload {
+	items: [DirectoryProfileItemData]
+	notification: NotificationItem
+}
+
+type Query {
+	GetDirectoryProfile (input: GetDirectoryProfileInput): GetDirectoryProfilePayload!
+	DirectoryProfilesList (input: DirectoryProfilesListInput): DirectoryProfilesListPayload!
+}
+
+type Mutation {
+	SetDirectoryProfile (input: SetDirectoryProfileInput): SetDirectoryProfilePayload!
+}
+
+
+collectionSchema {
+	type DirectoryProfileEntry {
+		ref: DirectoryProfileItemData
+		operations {
+			list: DirectoryProfilesList
+		}
+	}
+}

@@ -53,8 +53,8 @@ bool COrderRequestHandlerComp::HandleMessage(
 	info.messageId = messageInfo.messageId;
 	info.sourceTenantId = messageInfo.sourceTenantId;
 	info.targetTenantId = messageInfo.targetTenantId;
-	info.relationshipId = messageInfo.relationshipId;
 	info.contractId = messageInfo.contractId;
+	info.linkId = messageInfo.linkId;
 	info.sourceOrderId = messageInfo.sourceObjectId;
 	info.articleNumber = payloadObject.value("articleNumber").toString();
 	info.quantity = payloadObject.value("quantity").toInt();
@@ -134,10 +134,10 @@ OrderRequests COrderRequestHandlerComp::GetOrderRequests(const QByteArray& targe
 }
 
 
-OrderRequests COrderRequestHandlerComp::GetOrderRequestsByRelationship(const QByteArray& relationshipId) const
+OrderRequests COrderRequestHandlerComp::GetOrderRequestsByContract(const QByteArray& contractId) const
 {
-	return CollectOrderRequests("RelationshipId", relationshipId, [&relationshipId](const OrderRequestInfo& info){
-		return info.relationshipId == relationshipId;
+	return CollectOrderRequests("ContractId", contractId, [&contractId](const OrderRequestInfo& info){
+		return info.contractId == contractId;
 	});
 }
 
@@ -176,7 +176,7 @@ bool COrderRequestHandlerComp::ApplyStatusFeedback(
 		return false;
 	}
 
-	if (m_brokerCompPtr.IsValid() && !info.sourceTenantId.isEmpty() && !info.relationshipId.isEmpty()){
+	if (m_brokerCompPtr.IsValid() && !info.sourceTenantId.isEmpty() && !info.contractId.isEmpty() && !info.linkId.isEmpty()){
 		QJsonObject feedbackObject;
 		feedbackObject.insert("orderRequestId", QString::fromUtf8(info.orderRequestId));
 		feedbackObject.insert("sourceOrderId", QString::fromUtf8(info.sourceOrderId));
@@ -189,16 +189,21 @@ bool COrderRequestHandlerComp::ApplyStatusFeedback(
 		// target) becomes the source and the original source tenant becomes the
 		// target. The order request ID is carried as the source object ID so the
 		// source tenant can correlate the feedback to its own order.
-		m_brokerCompPtr->SendMessage(
+		// The same link of the same contract carries it, while the link is in force
+		QString errorMessage;
+		if (m_brokerCompPtr->SendMessage(
 					info.targetTenantId,
 					info.sourceTenantId,
-					info.relationshipId,
+					info.contractId,
+					info.linkId,
 					feedbackType,
 					feedbackPayload,
 					info.orderRequestId,
-					QString() /*customType*/,
-					QString() /*expiresAt*/,
-					info.contractId);
+					QString(),
+					QString(),
+					&errorMessage).isEmpty()){
+			SendWarningMessage(0, QStringLiteral("The status of the order request '%1' was not reported back: %2").arg(QString::fromUtf8(info.orderRequestId), errorMessage), "COrderRequestHandlerComp");
+		}
 	}
 
 	return true;

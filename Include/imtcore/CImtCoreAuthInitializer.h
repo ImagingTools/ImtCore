@@ -25,8 +25,9 @@ Q_ALWAYS_INLINE static void ImtCoreInitTenantQmlResources()
 	Q_INIT_RESOURCE(imtauthTenantsSdl);
 	Q_INIT_RESOURCE(imtauthTenantMembershipsSdl);
 	Q_INIT_RESOURCE(imtauthTenantCollectionDocumentServiceSdl);
-	Q_INIT_RESOURCE(imtauthRelationshipCollectionDocumentServiceSdl);
-	Q_INIT_RESOURCE(imtauthCrossOrgGrantCollectionDocumentServiceSdl);
+	Q_INIT_RESOURCE(imtauthContractsSdl);
+	Q_INIT_RESOURCE(imtauthContractCatalogsSdl);
+	Q_INIT_RESOURCE(imtauthTenantDirectorySdl);
 }
 
 

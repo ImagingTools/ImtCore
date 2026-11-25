@@ -49,25 +49,29 @@ QByteArray CDocumentShareManagerComp::ShareDocument(const IDocumentShareInfo& sh
 		bool isRelationshipRead = false;
 		const RelatedTenantInfos relatedTenants = m_relationshipProviderCompPtr->GetRelatedTenants(ownerTenantId, &ownerTenantName, &isRelationshipRead);
 		bool isRelated = false;
-		bool isEffective = false;
+		QByteArrayList sharingContractIds;
 		for (const RelatedTenantInfo& relatedTenant : relatedTenants){
 			if (relatedTenant.tenantId == targetTenantId){
 				targetTenantName = relatedTenant.tenantName;
 				relatedSince = relatedTenant.relatedSince;
 				isRelated = true;
-				isEffective = relatedTenant.isEffective;
+				sharingContractIds = relatedTenant.sharingContractIds;
 				break;
 			}
 		}
 
+		const QByteArray contractId = shareInfo.GetContractId();
 		if (!isRelationshipRead){
-			errorMessage = QStringLiteral("The relationships of the organization could not be read. Try again.");
+			errorMessage = QStringLiteral("The contracts of the organization could not be read. Try again.");
 		}
 		else if (!isRelated){
-			errorMessage = QStringLiteral("The organizations have no active relationship");
+			errorMessage = QStringLiteral("The organizations have no concluded contract");
 		}
-		else if (!isEffective){
-			errorMessage = QStringLiteral("The relationship of the organizations is not valid at this time");
+		else if (sharingContractIds.isEmpty()){
+			errorMessage = QStringLiteral("No contract in force allows the organizations to share documents");
+		}
+		else if (!contractId.isEmpty() && !sharingContractIds.contains(contractId)){
+			errorMessage = QStringLiteral("The contract is not in force or does not allow to share documents");
 		}
 	}
 
@@ -147,6 +151,7 @@ QByteArray CDocumentShareManagerComp::ShareDocument(const IDocumentShareInfo& sh
 		storedPtr->SetAccessLevel(accessLevel);
 		storedPtr->SetValidUntil(shareInfo.GetValidUntil());
 		storedPtr->SetMessage(shareInfo.GetMessage());
+		storedPtr->SetContractId(shareInfo.GetContractId());
 		if (storedPtr->GetStatus() == IDocumentShareInfo::DSS_DECLINED){
 			storedPtr->SetStatus(initialStatus);
 		}
@@ -342,7 +347,7 @@ int CDocumentShareManagerComp::ReadRelatedTenants(const QByteArray& tenantId, QB
 	RelatedTenantsCacheItem cacheItem;
 	cacheItem.expiresAt = now + qint64(qMax(0, *m_relationshipCacheTimeoutAttrPtr)) * 1000;
 	for (const RelatedTenantInfo& relatedTenant : relatedTenants){
-		if (relatedTenant.isEffective){
+		if (!relatedTenant.sharingContractIds.isEmpty()){
 			cacheItem.tenantIds << relatedTenant.tenantId;
 		}
 	}
@@ -369,10 +374,10 @@ QByteArrayList CDocumentShareManagerComp::FindSharesOfEndedRelationships(
 			const RelatedTenantInfos& relatedTenants,
 			const DocumentShares& shares) const
 {
-	// A relationship outside its validity period still exists: its shares grant nothing until it is valid again
-	QHash<QByteArray, QDateTime> relatedSinceByTenant;
+	// A link outside its period still exists: its shares grant nothing until it is in force again
+	QHash<QByteArray, RelatedTenantInfo> relatedByTenant;
 	for (const RelatedTenantInfo& relatedTenant : relatedTenants){
-		relatedSinceByTenant.insert(relatedTenant.tenantId, relatedTenant.relatedSince);
+		relatedByTenant.insert(relatedTenant.tenantId, relatedTenant);
 	}
 
 	QByteArrayList retVal;
@@ -382,9 +387,12 @@ QByteArrayList CDocumentShareManagerComp::FindSharesOfEndedRelationships(
 			continue;
 		}
 
+		// A share made under a contract ends with it
 		const QByteArray partnerTenantId = isOwner ? sharePtr->GetTargetTenantId() : sharePtr->GetOwnerTenantId();
-		const auto relatedIter = relatedSinceByTenant.constFind(partnerTenantId);
-		const bool isEnded = relatedIter == relatedSinceByTenant.constEnd() || IsOfEarlierRelationship(*sharePtr, relatedIter.value());
+		const auto relatedIter = relatedByTenant.constFind(partnerTenantId);
+		const bool isEnded = relatedIter == relatedByTenant.constEnd()
+					|| IsOfEarlierRelationship(*sharePtr, relatedIter->relatedSince)
+					|| (!sharePtr->GetContractId().isEmpty() && !relatedIter->relatedContractIds.contains(sharePtr->GetContractId()));
 		if (isEnded && !retVal.contains(sharePtr->GetShareId())){
 			retVal.append(sharePtr->GetShareId());
 		}

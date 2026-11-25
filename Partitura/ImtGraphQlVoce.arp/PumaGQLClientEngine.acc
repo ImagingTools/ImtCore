@@ -198,8 +198,6 @@
                                 <Value>Users</Value>
                                 <Value>Groups</Value>
                                 <Value>Tenants</Value>
-                                <Value>TenantRelationships</Value>
-                                <Value>CrossOrgGrants</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -851,5 +849,6 @@
         <Component ExportedId="UserRemoteRepository" ComponentId="RemoteRepositories/UserRemoteRepository"/>
         <Component ExportedId="UserSessionRemoteRepository" ComponentId="RemoteRepositories/UserSessionRemoteRepository"/>
         <Component ExportedId="NotificationSender" ComponentId="RemoteNotificationCenter/NotificationSender"/>
+        <Component ExportedId="RemoteContractController" ComponentId="RemoteTenantController/RemoteContractController"/>
     </ExportedComponents>
 </Acf>

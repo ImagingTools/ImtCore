@@ -198,8 +198,7 @@ Item {
 									id: org.m_id || "",
 									name: org.m_name || org.m_id || "",
 									role: userPanel.__roleText(String(org.m_role || ""), isDelegated),
-									isDelegated: isDelegated,
-									delegatedRoles: org.m_delegatedRoles || []
+									isDelegated: isDelegated
 								})
 							}
 						}

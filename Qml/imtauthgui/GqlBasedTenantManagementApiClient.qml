@@ -10,7 +10,6 @@ import imtauthTenantMembershipsSdl 1.0
 import imtauthTenantsSdl 1.0
 import imtbaseImtCollectionSdl 1.0
 import imtbaseCollectionDocumentServiceSdl 1.0
-import imtauthCrossOrgGrantCollectionDocumentServiceSdl 1.0
 import imtauthgui 1.0
 
 /**
@@ -43,14 +42,11 @@ QtObject {
 	property alias roleObjectTypeId: __userAdminObj.roleObjectTypeId
 	property alias groupObjectTypeId: __userAdminObj.groupObjectTypeId
 	property alias userObjectTypeId: __userAdminObj.userObjectTypeId
-	property string crossOrgGrantObjectTypeId: "CrossOrgGrant"
-	property string contractObjectTypeId: "Contract"
 	property string crossTenantMessageObjectTypeId: "CrossTenantMessage"
 
 	readonly property alias roleDocumentManager: __userAdminObj.roleDocumentManager
 	readonly property alias groupDocumentManager: __userAdminObj.groupDocumentManager
 	readonly property alias userDocumentManager: __userAdminObj.userDocumentManager
-	readonly property var crossOrgGrantDocumentManager: __crossOrgGrantDocumentService
 	readonly property alias permissionsProvider: __userAdminObj.permissionsProvider
 
 	signal invitationCreated()
@@ -62,7 +58,6 @@ QtObject {
 
 	signal roleCreated()
 	signal rolesRemoved()
-	signal crossOrgGrantsRemoved()
 	signal roleUpdated(string roleId)
 	signal roleDataReceived(var data)
 
@@ -76,10 +71,6 @@ QtObject {
 	signal userUpdated(string userId)
 	signal userDataReceived(var data)
 
-	signal contractCreated(string contractId)
-	signal contractStatusUpdated(string contractId)
-	signal contractTerminated(string contractId)
-	signal contractsReceived(var contracts)
 
 	signal requestFailed(string message)
 
@@ -195,7 +186,7 @@ QtObject {
 				"messageId": data.containsKey("messageId") ? data.getData("messageId") : "",
 				"sourceTenantId": data.containsKey("sourceTenantId") ? data.getData("sourceTenantId") : "",
 				"targetTenantId": data.containsKey("targetTenantId") ? data.getData("targetTenantId") : "",
-				"relationshipId": data.containsKey("relationshipId") ? data.getData("relationshipId") : "",
+				"contractId": data.containsKey("contractId") ? data.getData("contractId") : "",
 				"messageType": data.containsKey("messageType") ? data.getData("messageType") : "",
 				"status": data.containsKey("status") ? data.getData("status") : "",
 				"tenantName": data.containsKey("tenantName") ? data.getData("tenantName") : ""
@@ -225,8 +216,7 @@ QtObject {
 				"notificationType": data.containsKey("notificationType") ? data.getData("notificationType") : "",
 				"tenantId": data.containsKey("tenantId") ? data.getData("tenantId") : "",
 				"requestId": data.containsKey("requestId") ? data.getData("requestId") : "",
-				"connectionId": data.containsKey("connectionId") ? data.getData("connectionId") : "",
-				"relationshipId": data.containsKey("relationshipId") ? data.getData("relationshipId") : ""
+				"connectionId": data.containsKey("connectionId") ? data.getData("connectionId") : ""
 			}
 
 			// The notification center tells the owners; here only the state of the views follows
@@ -574,218 +564,7 @@ QtObject {
 	}
 
 	// =========================================================================
-	// Cross-org grants
-	//
-	// Creation and editing go through the document service
-	// (crossOrgGrantDocumentManager); the list is provided by
-	// crossOrgGrantsListDataProvider. Only revoke is still handled here via the
-	// RevokeCrossOrgGrant mutation (Tenants.sdl).
-	// =========================================================================
-
-	property RevokeCrossOrgGrantInput __revokeCrossOrgGrantInput: RevokeCrossOrgGrantInput {}
-	property GqlSdlRequestSender __revokeCrossOrgGrantSender: GqlSdlRequestSender {
-		permissionPath: root.permissionPath
-		requestType: 1
-		gqlCommandId: ImtauthTenantsSdlCommandIds.s_revokeCrossOrgGrant
-
-		sdlObjectComp: Component {
-			RevokeCrossOrgGrantPayload {
-				onFinished: {
-					if (m_errorMessage && m_errorMessage !== "") {
-						PopupManager.addErrorMessage(m_errorMessage, true)
-						root.requestFailed(m_errorMessage)
-					} else {
-						root.crossOrgGrantsRemoved()
-					}
-				}
-			}
-		}
-	}
-
-	property RemoveCrossOrgGrantsInput __removeCrossOrgGrantsInput: RemoveCrossOrgGrantsInput {}
-	property GqlSdlRequestSender __removeCrossOrgGrantsSender: GqlSdlRequestSender {
-		permissionPath: root.permissionPath
-		requestType: 1
-		gqlCommandId: ImtauthTenantsSdlCommandIds.s_removeCrossOrgGrants
-
-		sdlObjectComp: Component {
-			RemoveCrossOrgGrantsPayload {
-				onFinished: {
-					if (m_errorMessage && m_errorMessage !== "") {
-						PopupManager.addErrorMessage(m_errorMessage, true)
-						root.requestFailed(m_errorMessage)
-					} else {
-						root.crossOrgGrantsRemoved()
-					}
-				}
-			}
-		}
-	}
-
-	function revokeCrossOrgGrant(grantId) {
-		root.__revokeCrossOrgGrantInput.m_grantId = grantId || ""
-		root.__revokeCrossOrgGrantSender.send(root.__revokeCrossOrgGrantInput)
-	}
-
-	function removeCrossOrgGrants(grantIds) {
-		var ids = []
-		if (Array.isArray(grantIds)) {
-			ids = grantIds
-		} else if (grantIds && grantIds !== "") {
-			ids = [grantIds]
-		}
-		root.__removeCrossOrgGrantsInput.m_grantIds = ids
-		root.__removeCrossOrgGrantsSender.send(root.__removeCrossOrgGrantsInput)
-	}
-
-	// =========================================================================
-	// Cooperation contracts (Tenants.sdl: CreateContract / UpdateContractStatus
-	// / TerminateContract / GetContracts)
-	// =========================================================================
-
-	property ListModel contractsModel: ListModel {}
-
-	property CreateContractInput __createContractInput: CreateContractInput {}
-	property GqlSdlRequestSender __createContractSender: GqlSdlRequestSender {
-		permissionPath: root.permissionPath
-		requestType: 1
-		gqlCommandId: ImtauthTenantsSdlCommandIds.s_createContract
-
-		sdlObjectComp: Component {
-			CreateContractPayload {
-				onFinished: {
-					if (m_errorMessage && m_errorMessage !== "") {
-						PopupManager.addErrorMessage(m_errorMessage, true)
-						root.requestFailed(m_errorMessage)
-					} else {
-						root.contractCreated(m_contractId || "")
-					}
-				}
-			}
-		}
-	}
-
-	property UpdateContractStatusInput __updateContractStatusInput: UpdateContractStatusInput {}
-	property string __pendingUpdateContractId: ""
-	property GqlSdlRequestSender __updateContractStatusSender: GqlSdlRequestSender {
-		permissionPath: root.permissionPath
-		requestType: 1
-		gqlCommandId: ImtauthTenantsSdlCommandIds.s_updateContractStatus
-
-		sdlObjectComp: Component {
-			UpdateContractStatusPayload {
-				onFinished: {
-					if (m_errorMessage && m_errorMessage !== "") {
-						PopupManager.addErrorMessage(m_errorMessage, true)
-						root.requestFailed(m_errorMessage)
-					} else {
-						root.contractStatusUpdated(root.__pendingUpdateContractId)
-					}
-				}
-			}
-		}
-	}
-
-	property TerminateContractInput __terminateContractInput: TerminateContractInput {}
-	property string __pendingTerminateContractId: ""
-	property GqlSdlRequestSender __terminateContractSender: GqlSdlRequestSender {
-		permissionPath: root.permissionPath
-		requestType: 1
-		gqlCommandId: ImtauthTenantsSdlCommandIds.s_terminateContract
-
-		sdlObjectComp: Component {
-			TerminateContractPayload {
-				onFinished: {
-					if (m_errorMessage && m_errorMessage !== "") {
-						PopupManager.addErrorMessage(m_errorMessage, true)
-						root.requestFailed(m_errorMessage)
-					} else {
-						root.contractTerminated(root.__pendingTerminateContractId)
-					}
-				}
-			}
-		}
-	}
-
-	property GetContractsInput __getContractsInput: GetContractsInput {}
-	property GqlSdlRequestSender __getContractsSender: GqlSdlRequestSender {
-		permissionPath: root.permissionPath
-		gqlCommandId: ImtauthTenantsSdlCommandIds.s_getContracts
-
-		sdlObjectComp: Component {
-			GetContractsPayload {
-				onFinished: {
-					if (m_errorMessage && m_errorMessage !== "") {
-						PopupManager.addErrorMessage(m_errorMessage, true)
-						root.requestFailed(m_errorMessage)
-					} else {
-						root.__populateContractsModel(m_contracts)
-					}
-				}
-			}
-		}
-	}
-
-	function __populateContractsModel(contracts) {
-		root.contractsModel.clear()
-		if (contracts) {
-			for (var i = 0; i < contracts.count; ++i) {
-				var contract = contracts.get(i).item
-				if (!contract)
-					continue
-				root.contractsModel.append({
-					"id": contract.m_id || "",
-					"contractId": contract.m_id || "",
-					"relationshipId": contract.m_relationshipId || "",
-					"sourceTenantId": contract.m_sourceTenantId || "",
-					"targetTenantId": contract.m_targetTenantId || "",
-					"status": contract.m_status || ContractStatusEnum.s_draft,
-					"scope": contract.m_scope || "",
-					"validFrom": contract.m_validFrom || "",
-					"validUntil": contract.m_validUntil || "",
-					"description": contract.m_description || "",
-					"terms": contract.m_terms || "",
-					"createdAt": contract.m_createdAt || "",
-					"updatedAt": contract.m_updatedAt || ""
-				})
-			}
-		}
-		root.contractsReceived(contracts || [])
-	}
-
-	function fetchContracts(tenantId) {
-		root.__getContractsInput.m_tenantId = tenantId || root.tenantId || ""
-		root.__getContractsSender.send(root.__getContractsInput)
-	}
-
-	function createContract(relationshipId, sourceTenantId, targetTenantId, scope, validFrom, validUntil, description, terms) {
-		root.__createContractInput.m_relationshipId = relationshipId || ""
-		root.__createContractInput.m_sourceTenantId = sourceTenantId || ""
-		root.__createContractInput.m_targetTenantId = targetTenantId || ""
-		root.__createContractInput.m_scope = scope || ""
-		root.__createContractInput.m_validFrom = validFrom || ""
-		root.__createContractInput.m_validUntil = validUntil || ""
-		root.__createContractInput.m_description = description || ""
-		root.__createContractInput.m_terms = terms || ""
-		root.__createContractSender.send(root.__createContractInput)
-	}
-
-	function updateContractStatus(contractId, status) {
-		root.__pendingUpdateContractId = contractId || ""
-		root.__updateContractStatusInput.m_contractId = contractId || ""
-		root.__updateContractStatusInput.m_status = status || ContractStatusEnum.s_active
-		root.__updateContractStatusSender.send(root.__updateContractStatusInput)
-	}
-
-	function terminateContract(contractId) {
-		root.__pendingTerminateContractId = contractId || ""
-		root.__terminateContractInput.m_contractId = contractId || ""
-		root.__terminateContractSender.send(root.__terminateContractInput)
-	}
-
-	// =========================================================================
-	// Connection Code, Connection Requests, Connections, Relationships,
-	// Relationship Proposals (new corporate model)
+	// Connection Code, Connection Requests, Connections: the address book
 	// =========================================================================
 
 	// --- Signals ---
@@ -800,19 +579,10 @@ QtObject {
 	signal connectionRequestsReceived()
 	signal connectionsReceived()
 	signal connectionRemoved(string connectionId)
-	signal tenantRelationshipRemoved()
-	signal tenantRelationshipsReceived()
-	signal relationshipProposalCreated()
-	signal relationshipProposalApproved(string relationshipId)
-	signal relationshipProposalRejected()
-	signal relationshipProposalCanceled()
-	signal relationshipProposalsReceived()
 
 	// --- Models ---
-	property ListModel tenantRelationshipsModel: ListModel {}
 	property ListModel connectionRequestsModel: ListModel {}
 	property ListModel connectionsModel: ListModel {}
-	property ListModel relationshipProposalsModel: ListModel {}
 
 	// --- Connection Code ---
 	property GetConnectionCodeInput __getConnectionCodeInput: GetConnectionCodeInput {}
@@ -996,10 +766,7 @@ QtObject {
 					"message": req.m_message || "",
 					"status": req.m_status || ConnectionRequestStatusEnum.s_pending,
 					"createdAt": req.m_createdAt || "",
-					"respondedAt": req.m_respondedAt || "",
-					"proposedSourceRole": req.m_proposedSourceRole || "",
-					"proposedTargetRole": req.m_proposedTargetRole || "",
-					"proposedScope": req.m_proposedScope || ""
+					"respondedAt": req.m_respondedAt || ""
 				})
 			}
 		}
@@ -1011,20 +778,18 @@ QtObject {
 		root.__getConnectionRequestsSender.send(root.__getConnectionRequestsInput)
 	}
 
-	function createConnectionRequest(sourceTenantId, connectionCode, message, proposedSourceRole, proposedTargetRole, proposedScope) {
+	// By the connection code of the organization, or to an organization found in the directory
+	function createConnectionRequest(sourceTenantId, connectionCode, message, targetTenantId) {
 		root.__createConnectionRequestInput.m_sourceTenantId = sourceTenantId || root.tenantId || ""
-		root.__createConnectionRequestInput.m_connectionCode = connectionCode || ""
 		root.__createConnectionRequestInput.m_message = message || ""
-		// A plain request sends no terms: the input is reused, so the ones of an earlier request are dropped
-		if (proposedSourceRole && proposedTargetRole) {
-			root.__createConnectionRequestInput.m_proposedSourceRole = proposedSourceRole
-			root.__createConnectionRequestInput.m_proposedTargetRole = proposedTargetRole
-			root.__createConnectionRequestInput.m_proposedScope = proposedScope || ""
+		// The input is reused: the way of an earlier request is dropped
+		if (targetTenantId && targetTenantId !== "") {
+			root.__createConnectionRequestInput.m_targetTenantId = targetTenantId
+			root.__createConnectionRequestInput.removeConnectionCode()
 		}
 		else {
-			root.__createConnectionRequestInput.removeProposedSourceRole()
-			root.__createConnectionRequestInput.removeProposedTargetRole()
-			root.__createConnectionRequestInput.removeProposedScope()
+			root.__createConnectionRequestInput.m_connectionCode = connectionCode || ""
+			root.__createConnectionRequestInput.removeTargetTenantId()
 		}
 		root.__createConnectionRequestSender.send(root.__createConnectionRequestInput)
 	}
@@ -1122,240 +887,6 @@ QtObject {
 		root.__removeConnectionSender.send(root.__removeConnectionInput)
 	}
 
-	// --- Tenant Relationships ---
-	property GetTenantRelationshipsInput __getTenantRelationshipsInput: GetTenantRelationshipsInput {}
-	property GqlSdlRequestSender __getTenantRelationshipsSender: GqlSdlRequestSender {
-		permissionPath: root.permissionPath
-		gqlCommandId: ImtauthTenantsSdlCommandIds.s_getTenantRelationships
-		sdlObjectComp: Component {
-			GetTenantRelationshipsPayload {
-				onFinished: {
-					if (m_errorMessage && m_errorMessage !== "") {
-						root.requestFailed(m_errorMessage)
-					} else {
-						root.__populateTenantRelationshipsModel(m_relationships)
-					}
-				}
-			}
-		}
-	}
-
-	property RemoveTenantRelationshipInput __removeTenantRelationshipInput: RemoveTenantRelationshipInput {}
-	property GqlSdlRequestSender __removeTenantRelationshipSender: GqlSdlRequestSender {
-		permissionPath: root.permissionPath
-		requestType: 1
-		gqlCommandId: ImtauthTenantsSdlCommandIds.s_removeTenantRelationship
-		sdlObjectComp: Component {
-			RemoveTenantRelationshipPayload {
-				onFinished: {
-					if (m_errorMessage && m_errorMessage !== "") {
-						root.requestFailed(m_errorMessage)
-					} else {
-						root.tenantRelationshipRemoved()
-					}
-				}
-			}
-		}
-	}
-
-	function __populateTenantRelationshipsModel(relationships) {
-		root.tenantRelationshipsModel.clear()
-		if (relationships) {
-			for (var i = 0; i < relationships.count; ++i) {
-				var rel = relationships.get(i).item
-				if (!rel) {
-					continue
-				}
-				root.tenantRelationshipsModel.append({
-					"id": rel.m_id || "",
-					"connectionId": rel.m_connectionId || "",
-					"sourceTenantId": rel.m_sourceTenantId || "",
-					"targetTenantId": rel.m_targetTenantId || "",
-					"sourceRole": rel.m_sourceRole || TenantRelationshipRoleEnum.s_partner,
-					"targetRole": rel.m_targetRole || TenantRelationshipRoleEnum.s_partner,
-					"scope": rel.m_scope || "",
-					"validFrom": rel.m_validFrom || "",
-					"validUntil": rel.m_validUntil || "",
-					"status": rel.m_status || RelationshipStatusEnum.s_active,
-					"description": rel.m_description || "",
-					"createdAt": rel.m_createdAt || "",
-					"updatedAt": rel.m_updatedAt || ""
-				})
-			}
-		}
-		root.tenantRelationshipsReceived()
-	}
-
-	function fetchTenantRelationships(tenantId) {
-		root.__getTenantRelationshipsInput.m_tenantId = tenantId || root.tenantId || ""
-		root.__getTenantRelationshipsSender.send(root.__getTenantRelationshipsInput)
-	}
-
-	function removeTenantRelationship(tenantId, relationshipId) {
-		root.__removeTenantRelationshipInput.m_tenantId = tenantId || root.tenantId || ""
-		root.__removeTenantRelationshipInput.m_relationshipId = relationshipId || ""
-		root.__removeTenantRelationshipSender.send(root.__removeTenantRelationshipInput)
-	}
-
-	// --- Relationship Proposals ---
-	property GetRelationshipProposalsInput __getRelationshipProposalsInput: GetRelationshipProposalsInput {}
-	property GqlSdlRequestSender __getRelationshipProposalsSender: GqlSdlRequestSender {
-		permissionPath: root.permissionPath
-		gqlCommandId: ImtauthTenantsSdlCommandIds.s_getRelationshipProposals
-		sdlObjectComp: Component {
-			GetRelationshipProposalsPayload {
-				onFinished: {
-					if (m_errorMessage && m_errorMessage !== "") {
-						root.requestFailed(m_errorMessage)
-					} else {
-						root.__populateRelationshipProposalsModel(m_proposals)
-					}
-				}
-			}
-		}
-	}
-
-	property CreateRelationshipProposalInput __createRelationshipProposalInput: CreateRelationshipProposalInput {}
-	property RelationshipProposal __createRelationshipProposalData: RelationshipProposal {}
-	property GqlSdlRequestSender __createRelationshipProposalSender: GqlSdlRequestSender {
-		permissionPath: root.permissionPath
-		requestType: 1
-		gqlCommandId: ImtauthTenantsSdlCommandIds.s_createRelationshipProposal
-		sdlObjectComp: Component {
-			CreateRelationshipProposalPayload {
-				onFinished: {
-					if (m_errorMessage && m_errorMessage !== "") {
-						root.requestFailed(m_errorMessage)
-					} else {
-						root.relationshipProposalCreated()
-					}
-				}
-			}
-		}
-	}
-
-	property ApproveRelationshipProposalInput __approveRelationshipProposalInput: ApproveRelationshipProposalInput {}
-	property GqlSdlRequestSender __approveRelationshipProposalSender: GqlSdlRequestSender {
-		permissionPath: root.permissionPath
-		requestType: 1
-		gqlCommandId: ImtauthTenantsSdlCommandIds.s_approveRelationshipProposal
-		sdlObjectComp: Component {
-			ApproveRelationshipProposalPayload {
-				onFinished: {
-					if (m_errorMessage && m_errorMessage !== "") {
-						root.requestFailed(m_errorMessage)
-					} else {
-						root.relationshipProposalApproved(m_relationshipId || "")
-					}
-				}
-			}
-		}
-	}
-
-	property RejectRelationshipProposalInput __rejectRelationshipProposalInput: RejectRelationshipProposalInput {}
-	property GqlSdlRequestSender __rejectRelationshipProposalSender: GqlSdlRequestSender {
-		permissionPath: root.permissionPath
-		requestType: 1
-		gqlCommandId: ImtauthTenantsSdlCommandIds.s_rejectRelationshipProposal
-		sdlObjectComp: Component {
-			RejectRelationshipProposalPayload {
-				onFinished: {
-					if (m_errorMessage && m_errorMessage !== "") {
-						root.requestFailed(m_errorMessage)
-					} else {
-						root.relationshipProposalRejected()
-					}
-				}
-			}
-		}
-	}
-
-	property CancelRelationshipProposalInput __cancelRelationshipProposalInput: CancelRelationshipProposalInput {}
-	property GqlSdlRequestSender __cancelRelationshipProposalSender: GqlSdlRequestSender {
-		permissionPath: root.permissionPath
-		requestType: 1
-		gqlCommandId: ImtauthTenantsSdlCommandIds.s_cancelRelationshipProposal
-		sdlObjectComp: Component {
-			CancelRelationshipProposalPayload {
-				onFinished: {
-					if (m_errorMessage && m_errorMessage !== "") {
-						root.requestFailed(m_errorMessage)
-					} else {
-						root.relationshipProposalCanceled()
-					}
-				}
-			}
-		}
-	}
-
-	function __populateRelationshipProposalsModel(proposals) {
-		root.relationshipProposalsModel.clear()
-		if (proposals) {
-			for (var i = 0; i < proposals.count; ++i) {
-				var p = proposals.get(i).item
-				if (!p) {
-					continue
-				}
-				root.relationshipProposalsModel.append({
-					"id": p.m_id || "",
-					"connectionId": p.m_connectionId || "",
-					"existingRelationshipId": p.m_existingRelationshipId || "",
-					"proposalType": p.m_proposalType || RelationshipProposalTypeEnum.s_create,
-					"initiatorTenantId": p.m_initiatorTenantId || "",
-					"counterpartyTenantId": p.m_counterpartyTenantId || "",
-					"proposedSourceRole": p.m_proposedSourceRole || TenantRelationshipRoleEnum.s_partner,
-					"proposedTargetRole": p.m_proposedTargetRole || TenantRelationshipRoleEnum.s_partner,
-					"proposedScope": p.m_proposedScope || "",
-					"proposedDescription": p.m_proposedDescription || "",
-					"message": p.m_message || "",
-					"status": p.m_status || RelationshipProposalStatusEnum.s_pending,
-					"createdAt": p.m_createdAt || "",
-					"updatedAt": p.m_updatedAt || ""
-				})
-			}
-		}
-		root.relationshipProposalsReceived()
-	}
-
-	function fetchRelationshipProposals(tenantId) {
-		root.__getRelationshipProposalsInput.m_tenantId = tenantId || root.tenantId || ""
-		root.__getRelationshipProposalsSender.send(root.__getRelationshipProposalsInput)
-	}
-
-	// The server finds the connection between the two organizations.
-	function createRelationshipProposal(initiatorTenantId, counterpartyTenantId, proposalType, existingRelationshipId, proposedSourceRole, proposedTargetRole, proposedScope, proposedDescription) {
-		root.__createRelationshipProposalData.m_connectionId = ""
-		root.__createRelationshipProposalData.m_initiatorTenantId = initiatorTenantId || root.tenantId || ""
-		root.__createRelationshipProposalData.m_counterpartyTenantId = counterpartyTenantId || ""
-		root.__createRelationshipProposalData.m_proposalType = proposalType || RelationshipProposalTypeEnum.s_create
-		root.__createRelationshipProposalData.m_existingRelationshipId = existingRelationshipId || ""
-		root.__createRelationshipProposalData.m_proposedSourceRole = proposedSourceRole || TenantRelationshipRoleEnum.s_partner
-		root.__createRelationshipProposalData.m_proposedTargetRole = proposedTargetRole || TenantRelationshipRoleEnum.s_partner
-		root.__createRelationshipProposalData.m_proposedScope = proposedScope || ""
-		root.__createRelationshipProposalData.m_proposedDescription = proposedDescription || ""
-		root.__createRelationshipProposalData.m_status = RelationshipProposalStatusEnum.s_pending
-		root.__createRelationshipProposalInput.m_proposal = root.__createRelationshipProposalData
-		root.__createRelationshipProposalSender.send(root.__createRelationshipProposalInput)
-	}
-
-	function approveRelationshipProposal(proposalId, tenantId) {
-		root.__approveRelationshipProposalInput.m_proposalId = proposalId || ""
-		root.__approveRelationshipProposalInput.m_tenantId = tenantId || root.tenantId || ""
-		root.__approveRelationshipProposalSender.send(root.__approveRelationshipProposalInput)
-	}
-
-	function rejectRelationshipProposal(proposalId, tenantId) {
-		root.__rejectRelationshipProposalInput.m_proposalId = proposalId || ""
-		root.__rejectRelationshipProposalInput.m_tenantId = tenantId || root.tenantId || ""
-		root.__rejectRelationshipProposalSender.send(root.__rejectRelationshipProposalInput)
-	}
-
-	function cancelRelationshipProposal(proposalId, tenantId) {
-		root.__cancelRelationshipProposalInput.m_proposalId = proposalId || ""
-		root.__cancelRelationshipProposalInput.m_tenantId = tenantId || root.tenantId || ""
-		root.__cancelRelationshipProposalSender.send(root.__cancelRelationshipProposalInput)
-	}
-
 	// =========================================================================
 	// Cross-tenant messages (phase 2)
 	// =========================================================================
@@ -1436,8 +967,8 @@ QtObject {
 					"messageId": msg.m_id || "",
 					"sourceTenantId": msg.m_sourceTenantId || "",
 					"targetTenantId": msg.m_targetTenantId || "",
-					"relationshipId": msg.m_relationshipId || "",
 					"contractId": msg.m_contractId || "",
+					"linkId": msg.m_linkId || "",
 					"sourceObjectId": msg.m_sourceObjectId || "",
 					"targetObjectId": msg.m_targetObjectId || "",
 					"messageType": msg.m_messageType || CrossTenantMessageTypeEnum.s_custom,
@@ -1461,10 +992,12 @@ QtObject {
 		root.__getMessagesSender.send(root.__getMessagesInput)
 	}
 
-	function sendCrossTenantMessage(sourceTenantId, targetTenantId, relationshipId, messageType, payload, sourceObjectId, customType, expiresAt) {
+	// The link of the two organizations in the contract authorizes the message
+	function sendCrossTenantMessage(sourceTenantId, targetTenantId, contractId, linkId, messageType, payload, sourceObjectId, customType, expiresAt) {
 		root.__sendMessageInput.m_sourceTenantId = sourceTenantId || root.tenantId || ""
 		root.__sendMessageInput.m_targetTenantId = targetTenantId || ""
-		root.__sendMessageInput.m_relationshipId = relationshipId || ""
+		root.__sendMessageInput.m_contractId = contractId || ""
+		root.__sendMessageInput.m_linkId = linkId || ""
 		root.__sendMessageInput.m_messageType = messageType || CrossTenantMessageTypeEnum.s_custom
 		root.__sendMessageInput.m_payload = payload || ""
 		root.__sendMessageInput.m_sourceObjectId = sourceObjectId || ""
@@ -1581,8 +1114,8 @@ QtObject {
 					"messageId": ord.m_messageId || "",
 					"sourceTenantId": ord.m_sourceTenantId || "",
 					"targetTenantId": ord.m_targetTenantId || "",
-					"relationshipId": ord.m_relationshipId || "",
 					"contractId": ord.m_contractId || "",
+					"linkId": ord.m_linkId || "",
 					"sourceOrderId": ord.m_sourceOrderId || "",
 					"articleNumber": ord.m_articleNumber || "",
 					"quantity": ord.m_quantity || 0,
@@ -1625,7 +1158,7 @@ QtObject {
 	}
 
 	// =========================================================================
-	// List data providers (Roles / Groups / invitable Users / Tenants / TenantRelationships)
+	// List data providers (Roles / Groups / invitable Users / Tenants)
 	// =========================================================================
 
 	property FilterableSelectGqlDataProvider roleListDataProvider: FilterableSelectGqlDataProvider {
@@ -1672,6 +1205,15 @@ QtObject {
 		}
 	}
 
+	// The groups of the organization, several chosen at once
+	property FilterableSelectGqlDataProvider groupsMultiSelectDataProvider: FilterableSelectGqlDataProvider {
+		collectionId: "Groups"
+		followsCollectionChanges: true
+		pageSize: 50
+		multiSelect: true
+		excludeSelected: false
+	}
+
 	property FilterableSelectGqlDataProvider invitableUsersListDataProvider: FilterableSelectGqlDataProvider {
 		collectionId: "UsersForInvitation"
 		multiSelect: true
@@ -1698,146 +1240,8 @@ QtObject {
 		pageSize: 50
 	}
 
-	property FilterableSelectGqlDataProvider tenantRelationshipsListDataProvider: FilterableSelectGqlDataProvider {
-		collectionId: "TenantRelationships"
-		followsCollectionChanges: true
-		pageSize: 50
-	}
-
-	property RemoteCollectionChangeListener __tenantRelationshipsCollectionChangeListener: RemoteCollectionChangeListener {
-		collectionId: "TenantRelationships"
-		currentUserId: AuthorizationController.getUserId()
-
-		function getHeaders() {
-			if (root.tenantRelationshipsListDataProvider && root.tenantRelationshipsListDataProvider.getHeaders)
-				return root.tenantRelationshipsListDataProvider.getHeaders()
-			return {}
-		}
-
-		onChanged: {
-			if (changeInfo && changeInfo.valid)
-				root.__refreshDataProvider(root.tenantRelationshipsListDataProvider)
-		}
-	}
-
-	property GqlBasedCollectionDocumentService __crossOrgGrantDocumentService: GqlBasedCollectionDocumentService {
-		collectionId: "CrossOrgGrants"
-	}
-
-	property FilterableSelectGqlDataProvider crossOrgGrantsListDataProvider: FilterableSelectGqlDataProvider {
-		collectionId: "CrossOrgGrants"
-		followsCollectionChanges: true
-	}
-
-	property RemoteCollectionChangeListener __crossOrgGrantsCollectionChangeListener: RemoteCollectionChangeListener {
-		collectionId: "CrossOrgGrants"
-		currentUserId: AuthorizationController.getUserId()
-
-		function getHeaders() {
-			if (root.crossOrgGrantsListDataProvider && root.crossOrgGrantsListDataProvider.getHeaders)
-				return root.crossOrgGrantsListDataProvider.getHeaders()
-			return {}
-		}
-
-		onChanged: {
-			if (changeInfo && changeInfo.valid)
-				root.__refreshDataProvider(root.crossOrgGrantsListDataProvider)
-		}
-	}
-
 	property FilterableSelectGqlDataProvider connectionsDataProvider: FilterableSelectGqlDataProvider{
 		collectionId: "TenantConnections"
 		multiSelect: false
 	}
-
-	// --- CrossOrgGrant editor + representation controller ---
-	property Component __crossOrgGrantEditorComp: Component {
-		CrossOrgGrantView {
-			apiClient: root
-			commandsControllerComp: Component {
-				GqlBasedCommandsController {
-					typeId: root.crossOrgGrantObjectTypeId
-				}
-			}
-		}
-	}
-
-	property Component __crossOrgGrantControllerComp: Component {
-		DocumentRepresentationController {
-			id: crossOrgGrantReprController
-
-			// A new grant shows the defaults of the server (active, the grantor), not empty SDL values
-			requestRepresentationOnCreate: true
-
-			representationModel: CrossOrgGrant {
-				m_id: UuidGenerator.generateUUID()
-			}
-
-			function updateRepresentationFromDocument(){
-				startUpdateRepresentation(documentId, representationModel)
-
-				getCrossOrgGrantInput.m_id = documentId
-				getCrossOrgGrantInput.m_collectionId = "CrossOrgGrants"
-				getCrossOrgGrantInputRequest.send(getCrossOrgGrantInput)
-			}
-
-			function updateDocumentFromRepresentation(){
-				startUpdateDocument(documentId)
-
-				updateCrossOrgGrantInputInput.m_documentId = documentId
-				updateCrossOrgGrantInputInput.m_grant = representationModel
-				return updateCrossOrgGrantRequest.send(updateCrossOrgGrantInputInput)
-			}
-
-			property DocumentId getCrossOrgGrantInput: DocumentId {}
-			property UpdateGrantFromRepresentationInput updateCrossOrgGrantInputInput: UpdateGrantFromRepresentationInput {}
-
-			property GqlSdlRequestSender getCrossOrgGrantInputRequest: GqlSdlRequestSender {
-				permissionPath: root.permissionPath
-				gqlCommandId: ImtauthCrossOrgGrantCollectionDocumentServiceSdlCommandIds.s_getGrantRepresentation
-				sdlObjectComp: Component {
-					CrossOrgGrant {
-						onFinished: {
-							crossOrgGrantReprController.representationModel.copyFrom(this)
-							crossOrgGrantReprController.representationUpdated(
-								crossOrgGrantReprController.documentId,
-								crossOrgGrantReprController.representationModel)
-						}
-					}
-				}
-
-				function onError(message, type){
-					crossOrgGrantReprController.updateRepresentationFailed(crossOrgGrantReprController.documentId, message)
-				}
-			}
-
-			property GqlSdlRequestSender updateCrossOrgGrantRequest: GqlSdlRequestSender {
-				permissionPath: root.permissionPath
-				gqlCommandId: ImtauthCrossOrgGrantCollectionDocumentServiceSdlCommandIds.s_updateGrantFromRepresentation
-				requestType: 1
-				sdlObjectComp: Component {
-					DocumentOperationStatus {
-						onFinished: {
-							if (m_status === "Success"){
-								crossOrgGrantReprController.documentUpdated(crossOrgGrantReprController.documentId)
-							}
-							else{
-								crossOrgGrantReprController.updateDocumentFailed(crossOrgGrantReprController.documentId, m_message !== "" ? m_message : qsTr("The changes could not be saved"))
-							}
-						}
-					}
-				}
-
-				function onError(message, type){
-					crossOrgGrantReprController.updateDocumentFailed(crossOrgGrantReprController.documentId, message)
-				}
-			}
-		}
-	}
-
-	Component.onCompleted: {
-		root.__crossOrgGrantDocumentService.registerDocumentViewData(
-			root.crossOrgGrantObjectTypeId, "Editor", root.__crossOrgGrantEditorComp, root.__crossOrgGrantControllerComp)
-	}
 }
-

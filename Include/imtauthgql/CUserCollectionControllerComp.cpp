@@ -741,8 +741,6 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 	// Delegate to the shared tenant adaptation logic (also used by profile).
 	imtauth::ITenantEntityBindingManager* bindingPtr = m_bindingManagerCompPtr.IsValid() ? m_bindingManagerCompPtr.GetPtr() : nullptr;
 	imtauth::IDelegatedAccess* delegatedPtr = m_delegatedAccessCompPtr.IsValid() ? m_delegatedAccessCompPtr.GetPtr() : nullptr;
-	imtauth::ITenantMembershipManager* membershipPtr = m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr;
-	imtauth::IRoleInfoProvider* roleProviderPtr = m_roleInfoProviderCompPtr.IsValid() ? m_roleInfoProviderCompPtr.GetPtr() : nullptr;
 
 	istd::IChangeableUniquePtr userPtr;
 	if (currentProductId.isEmpty()){
@@ -753,9 +751,7 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 					currentTenantId,
 					currentProductId,
 					bindingPtr,
-					delegatedPtr,
-					membershipPtr,
-					roleProviderPtr);
+					delegatedPtr);
 	}
 	else{
 		// A product server trusts the permissions handed out with the user: only a complete read gives them
@@ -764,8 +760,7 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 			m_roleCollectionCompPtr.GetPtr(),
 			m_userGroupCollectionCompPtr.GetPtr(),
 			bindingPtr,
-			delegatedPtr,
-			membershipPtr
+			delegatedPtr
 		};
 
 		if (ComputeTenantUser(sources, objectId, currentTenantId, currentProductId, userPtr, errorMessage) == imtservergql::CAuthorizationSnapshot::RS_ABSENT){

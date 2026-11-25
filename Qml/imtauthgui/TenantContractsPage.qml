@@ -5,212 +5,141 @@ import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 import imtdocgui 1.0
-import imtguigql 1.0
 import imtauthgui 1.0
 
 /**
  * TenantContractsPage
  *
- * Cooperation Contracts tab of the TenantEditor.
- *
- * Displays contracts via SimpleCollectionPage. Create opens a separate
- * ContractView editor (ViewBase) with GqlBasedCommandsController.
- * Status changes (Activate / Terminate) are per-item in the list delegate.
+ * The contracts the organization takes part in. A row opens the card of the contract in ContractDialog,
+ * the create command opens an empty one. The contracts that wait for an answer of the organization come first.
  */
 SimpleCollectionPage {
 	id: contractsPage
-	
+
 	entityName: qsTr("Contract")
-	entityNamePlural: qsTr("Cooperation Contracts")
-	descriptionText: qsTr("Manage bilateral cooperation agreements with partner tenants.")
-	
-	listModel: apiClient ? apiClient.contractsModel : null
-	
-	customEditorComponent: createContractComp
-	
-	headerButtonsComponent: headerBtnsComp
-	
-	readonly property bool __canManageContracts: contractsPage.stateManager
-												 ? contractsPage.stateManager.canManageOrganizationConnections
-												 : false
-	
+	entityNamePlural: qsTr("Contracts")
+	createButtonText: qsTr("+ New contract")
+	descriptionText: qsTr("The agreements of the organization with other organizations: the parties, their roles, the permissions they give each other and the documents.")
+	emptyText: qsTr("No contracts yet. Press \"+ New contract\", add a partner as a party, agree on the terms and sign. A partner is added on the page Address book.")
+
+	// The transport of the contracts (ContractsApiClient)
+	property var contractsApiClient: null
+
+	readonly property string __tenantId: contractsPage.model && contractsPage.model.m_id ? String(contractsPage.model.m_id) : ""
+
+	createPermissionIds: ["/OrganizationManagement/Contracts/Edit"]
+	editPermissionIds: ["/OrganizationManagement/Contracts/View"]
+	deletePermissionIds: ["/OrganizationManagement/Contracts/Edit"]
+
+	columnIds: ["number", "name", "partyNames", "stateText", "period"]
+	columnNames: [qsTr("Number"), qsTr("Name"), qsTr("Parties"), qsTr("State"), qsTr("Period")]
+
+	listModel: contractsPage.__rows
+
+	property var __rows: []
+
 	function updateGui() {
-		if (contractsPage.apiClient && contractsPage.model && contractsPage.model.m_id) {
-			contractsPage.apiClient.fetchContracts(contractsPage.model.m_id)
-		}
+		contractsPage.refresh()
 	}
-	
+
+	function refresh() {
+		if (contractsPage.contractsApiClient && contractsPage.__tenantId !== "")
+			contractsPage.contractsApiClient.fetchContracts(contractsPage.__tenantId)
+	}
+
 	Component.onCompleted: {
-		if (contractsPage.apiClient && contractsPage.model && contractsPage.model.m_id) {
-			contractsPage.apiClient.fetchContracts(contractsPage.model.m_id)
-		}
+		contractsPage.refresh()
 	}
-	
-	onVisibleChanged: {
-		if (contractsPage.visible && contractsPage.apiClient && contractsPage.model && contractsPage.model.m_id) {
-			contractsPage.apiClient.fetchContracts(contractsPage.model.m_id)
-		}
+
+	// A draft never sent is removed, the other contracts stay in the history of the parties
+	property bool __isRemoving: false
+
+	function removeItems(ids) {
+		if (!contractsPage.contractsApiClient)
+			return
+		contractsPage.__isRemoving = true
+		for (var i = 0; i < ids.length; i++)
+			contractsPage.contractsApiClient.runCommand("RemoveContract", contractsPage.__tenantId, ids[i], 0, "")
 	}
-	
+
+	function openItem(itemId) {
+		var item = contractsPage.__findItemById(itemId)
+		if (item && contractsPage.canEdit)
+			contractsPage.openEdit(itemId, item.title, "")
+	}
+
+	function __rowOf(contract) {
+		var row = {}
+		row.id = contract.id
+		row.number = contract.number || qsTr("Draft")
+		row.name = contract.name || ""
+		row.title = contract.number ? contract.number + " " + (contract.name || "") : (contract.name || qsTr("Draft"))
+		row.partyNames = (contract.partyNames || []).join(", ")
+		row.stateText = ContractTexts.contractStateText(contract.state)
+		if (contract.isMyTurnToSign)
+			row.stateText = row.stateText + " · " + qsTr("your signature is awaited")
+		else if (contract.partyState === "Reviewing" && contract.initiatorTenantId !== contractsPage.__tenantId
+				 && (contract.state === "Negotiation" || contract.state === "Signing"))
+			row.stateText = row.stateText + " · " + qsTr("your answer is awaited")
+		if (contract.isTerminating)
+			row.stateText = row.stateText + " · " + qsTr("terminating")
+		else if (contract.isExpiring)
+			row.stateText = row.stateText + " · " + qsTr("expiring")
+		// A closed contract shows the day it ended
+		row.period = ContractTexts.periodText(contract.effectiveStart, contract.effectiveStart ? (contract.endedAt || contract.periodEnd) : contract.periodEnd)
+		row.isWaiting = contract.isMyTurnToSign === true || contract.isChangesRequested === true
+		return row
+	}
+
 	Connections {
-		target: contractsPage.apiClient
-		
-		function onContractCreated(contractId) {
-			PopupManager.addSuccessMessage(qsTr("Contract created successfully"), true)
-			contractsPage.popEditor()
-			if (contractsPage.apiClient && contractsPage.model && contractsPage.model.m_id) {
-				contractsPage.apiClient.fetchContracts(contractsPage.model.m_id)
+		target: contractsPage.contractsApiClient
+
+		function onContractsReceived() {
+			var contracts = contractsPage.contractsApiClient.contracts || []
+			var waiting = []
+			var others = []
+			for (var i = 0; i < contracts.length; i++) {
+				var row = contractsPage.__rowOf(contracts[i])
+				if (row.isWaiting)
+					waiting.push(row)
+				else
+					others.push(row)
+			}
+			contractsPage.__rows = waiting.concat(others)
+		}
+
+		function onCommandSucceeded(command, contractId, revision) {
+			if (command === "RemoveContract")
+				contractsPage.__isRemoving = false
+			contractsPage.refresh()
+		}
+
+		// The card shows its own errors, the page those of removing from the list
+		function onCommandFailed(command, errorMessage) {
+			if (command === "RemoveContract" && contractsPage.__isRemoving) {
+				contractsPage.__isRemoving = false
+				PopupManager.addErrorMessage(errorMessage, true)
 			}
 		}
-		
-		function onContractStatusUpdated(contractId) {
-			PopupManager.addSuccessMessage(qsTr("Contract status updated"), true)
-			if (contractsPage.apiClient && contractsPage.model && contractsPage.model.m_id) {
-				contractsPage.apiClient.fetchContracts(contractsPage.model.m_id)
-			}
-		}
-		
-		function onContractTerminated(contractId) {
-			PopupManager.addSuccessMessage(qsTr("Contract terminated"), true)
-			if (contractsPage.apiClient && contractsPage.model && contractsPage.model.m_id) {
-				contractsPage.apiClient.fetchContracts(contractsPage.model.m_id)
-			}
-		}
-	}
-	
-	// --- Custom header ---
-	Component {
-		id: headerBtnsComp
-		
-		Text {
-			text: qsTr("+ Create Contract")
-			font.pixelSize: Style.fontSizeM
-			font.bold: true
-			color: contractsPage.__canManageContracts ? Style.linkColor : Style.inactiveTextColor
-			
-			MouseArea {
-				anchors.fill: parent
-				hoverEnabled: true
-				cursorShape: contractsPage.__canManageContracts ? Qt.PointingHandCursor : Qt.ArrowCursor
-				enabled: contractsPage.__canManageContracts
-				onClicked: {
-					contractsPage.openCreate()
-				}
-			}
+
+		function onContractNotified(contractId, tenantId) {
+			if (contractsPage.visible)
+				contractsPage.refresh()
 		}
 	}
-	
-	// --- Custom list delegate ---
-	delegateComponent: Component {
-		Rectangle {
-			id: contractDelegate
-			width: contractDelegate.parent ? contractDelegate.parent.width : 0
-			height: contractDelegateContent.height + 2 * Style.marginM
-			color: Style.alternateBaseColor
-			radius: Style.radiusS
-			border.color: Style.borderColor
-			border.width: 1
-			
-			// contractsModel is a role-based ListModel, so rows arrive as `model` and
-			// `modelData` is undefined - resolve both, as the shared delegate base does.
-			readonly property var __contract: (typeof modelData !== "undefined" && modelData !== null) ? modelData : model
-			readonly property bool __canManage: contractsPage.stateManager
-												&& contractsPage.__canManageContracts
-			
-			Column {
-				id: contractDelegateContent
-				anchors.left: contractDelegate.left
-				anchors.right: contractDelegate.right
-				anchors.top: contractDelegate.top
-				anchors.margins: Style.marginM
-				spacing: Style.marginXS
-				
-				BaseText {
-					width: contractDelegateContent.width
-					elide: Text.ElideRight
-					text: qsTr("Target: %1").arg(contractDelegate.__contract.targetTenantId || "")
-					font.pixelSize: Style.fontSizeM
-					color: Style.textColor
-				}
-				
-				BaseText {
-					width: contractDelegateContent.width
-					elide: Text.ElideRight
-					text: qsTr("Status: %1   Scope: %2")
-					.arg(contractDelegate.__contract.status || qsTr("Draft"))
-					.arg((contractDelegate.__contract.scope && contractDelegate.__contract.scope !== "") ? contractDelegate.__contract.scope : qsTr("All"))
-					font.pixelSize: Style.fontSizeS
-					color: Style.inactiveTextColor
-				}
-				
-				BaseText {
-					width: contractDelegateContent.width
-					visible: (contractDelegate.__contract.validFrom && contractDelegate.__contract.validFrom !== "")
-							 || (contractDelegate.__contract.validUntil && contractDelegate.__contract.validUntil !== "")
-					elide: Text.ElideRight
-					text: qsTr("Valid: %1 – %2")
-					.arg((contractDelegate.__contract.validFrom && contractDelegate.__contract.validFrom !== "") ? contractDelegate.__contract.validFrom : qsTr("now"))
-					.arg((contractDelegate.__contract.validUntil && contractDelegate.__contract.validUntil !== "") ? contractDelegate.__contract.validUntil : qsTr("open"))
-					font.pixelSize: Style.fontSizeS
-					color: Style.inactiveTextColor
-				}
-				
-				BaseText {
-					width: contractDelegateContent.width
-					visible: contractDelegate.__contract.description && contractDelegate.__contract.description !== ""
-					elide: Text.ElideRight
-					text: contractDelegate.__contract.description || ""
-					font.pixelSize: Style.fontSizeS
-					color: Style.inactiveTextColor
-				}
-				
-				// --- Action buttons ---
-				Row {
-					spacing: Style.marginM
-					visible: contractDelegate.__canManage
-					
-					Button {
-						visible: contractDelegate.__contract.status === "Draft"
-						text: qsTr("Activate")
-						onClicked: {
-							if (contractsPage.apiClient) {
-								contractsPage.apiClient.updateContractStatus(contractDelegate.__contract.contractId || "", "Active")
-							}
-						}
-					}
-					
-					Button {
-						visible: contractDelegate.__contract.status !== "Terminated"
-						text: qsTr("Terminate")
-						onClicked: {
-							if (contractsPage.apiClient) {
-								contractsPage.apiClient.terminateContract(contractDelegate.__contract.contractId || "")
-							}
-						}
-					}
-				}
-			}
-		}
+
+	onVisibleChanged: {
+		if (contractsPage.visible)
+			contractsPage.refresh()
 	}
-	
-	// --- Create contract editor (ViewBase with GqlBasedCommandsController) ---
-	Component {
-		id: createContractComp
-		
-		ContractView {
-			apiClient: contractsPage.apiClient
-			tenantData: contractsPage.model
-			commandsControllerComp: Component {
-				GqlBasedCommandsController {
-					typeId: contractsPage.apiClient ? contractsPage.apiClient.contractObjectTypeId : ""
-				}
-			}
-			
-			onCommandActivated: {
-				if (commandId === "save" || commandId === "create") {
-					submitContract()
-				}
-			}
+
+	editorDialogComponent: Component {
+		ContractDialog {
+			tenantId: contractsPage.__tenantId
+			tenantName: contractsPage.model && contractsPage.model.m_name ? String(contractsPage.model.m_name) : ""
+			contractsApiClient: contractsPage.contractsApiClient
+			tenantApiClient: contractsPage.apiClient
+			stateManager: contractsPage.stateManager
 		}
 	}
 }

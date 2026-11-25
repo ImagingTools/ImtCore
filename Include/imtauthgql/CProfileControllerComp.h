@@ -12,7 +12,6 @@
 #include <imtauth/ITenantMembership.h>
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/ITenantManager.h>
-#include <imtauth/ICrossOrgGrant.h>
 #include <imtauth/IDelegatedAccess.h>
 #include <imtauth/IUserInfo.h>
 #include <imtauth/ITenantEntityBindingManager.h>
@@ -36,8 +35,7 @@ public:
 		I_ASSIGN(m_groupCollectionCompPtr, "GroupCollection", "Group collection", false, "GroupCollection");
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager", false, "TenantManager");
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager", false, "TenantMembershipManager");
-		I_ASSIGN(m_crossOrgGrantCompPtr, "CrossOrgGrantManager", "Cross-org grant manager for delegated access", false, "CrossOrgGrantManager");
-		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Delegated access resolver for cross-org grants", false, "DelegatedAccessResolver");
+		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Permissions given to the users by the contracts of the organizations", false, "ContractDelegatedAccess");
 		I_ASSIGN(m_bindingManagerCompPtr, "BindingManager", "Tenant entity binding manager for tenant-scoped adaptation of user roles/groups/permissions", false, "TenantEntityBindingManager");
 		I_ASSIGN(m_roleInfoProviderCompPtr, "RoleInfoProvider", "Role info provider (used for delegated role product validation)", false, "RoleInfoProvider");
 		I_ASSIGN(m_userChangeGeneratorCompPtr, "UserChangeGenerator", "Generates the change description of a profile update", false, "UserChangeGenerator");
@@ -67,7 +65,6 @@ protected:
 	I_REF(imtbase::IObjectCollection, m_groupCollectionCompPtr);
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
-	I_REF(imtauth::ICrossOrgGrant, m_crossOrgGrantCompPtr);
 	I_REF(imtauth::IDelegatedAccess, m_delegatedAccessCompPtr);
 	I_REF(imtauth::ITenantEntityBindingManager, m_bindingManagerCompPtr);
 	I_REF(imtauth::IRoleInfoProvider, m_roleInfoProviderCompPtr);

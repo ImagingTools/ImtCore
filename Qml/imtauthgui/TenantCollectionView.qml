@@ -75,6 +75,7 @@ RemoteCollectionView {
 
 	// --- Notifications that change the organizations of the user (handled by tenantManagementApiClient) ---
 	property GqlBasedTenantManagementApiClient tenantManagementApiClient: GqlBasedTenantManagementApiClient {}
+	property GqlBasedContractsApiClient contractsApiClient: GqlBasedContractsApiClient {}
 
 	Connections {
 		target: container.tenantManagementApiClient
@@ -648,6 +649,7 @@ RemoteCollectionView {
 				TenantEditor {
 					id: tenantEditor
 					apiClient: container.tenantManagementApiClient
+			contractsApiClient: container.contractsApiClient
 					commandsControllerComp: Component {
 						GqlBasedCommandsController {
 							typeId: "Tenant"

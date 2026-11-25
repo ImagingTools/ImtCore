@@ -163,6 +163,18 @@ void CDocumentShareInfo::SetTargetGroupIds(const QByteArrayList& groupIds)
 }
 
 
+QByteArray CDocumentShareInfo::GetContractId() const
+{
+	return m_contractId;
+}
+
+
+void CDocumentShareInfo::SetContractId(const QByteArray& contractId)
+{
+	SetValue(*this, m_contractId, contractId);
+}
+
+
 IDocumentShareInfo::AccessLevel CDocumentShareInfo::GetAccessLevel() const
 {
 	return m_accessLevel;
@@ -270,6 +282,7 @@ bool CDocumentShareInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && SerializeLeaf(archive, "TargetTenantId", m_targetTenantId);
 	retVal = retVal && SerializeLeaf(archive, "TargetTenantName", m_targetTenantName);
 	retVal = retVal && SerializeLeaf(archive, "TargetGroupIds", targetGroupIds);
+	retVal = retVal && SerializeLeaf(archive, "ContractId", m_contractId);
 	retVal = retVal && SerializeLeaf(archive, "AccessLevel", accessLevel);
 	retVal = retVal && SerializeLeaf(archive, "Status", status);
 	retVal = retVal && SerializeLeaf(archive, "ValidUntil", validUntil);
@@ -312,6 +325,7 @@ bool CDocumentShareInfo::CopyFrom(const IChangeable& object, CompatibilityMode /
 	m_targetTenantId = sourcePtr->GetTargetTenantId();
 	m_targetTenantName = sourcePtr->GetTargetTenantName();
 	m_targetGroupIds = sourcePtr->GetTargetGroupIds();
+	m_contractId = sourcePtr->GetContractId();
 	m_accessLevel = sourcePtr->GetAccessLevel();
 	m_status = sourcePtr->GetStatus();
 	m_validUntil = sourcePtr->GetValidUntil();
@@ -340,6 +354,7 @@ bool CDocumentShareInfo::IsEqual(const IChangeable& object) const
 				&& m_targetTenantId == otherPtr->GetTargetTenantId()
 				&& m_targetTenantName == otherPtr->GetTargetTenantName()
 				&& m_targetGroupIds == otherPtr->GetTargetGroupIds()
+				&& m_contractId == otherPtr->GetContractId()
 				&& m_accessLevel == otherPtr->GetAccessLevel()
 				&& m_status == otherPtr->GetStatus()
 				&& m_validUntil == otherPtr->GetValidUntil()
@@ -374,6 +389,7 @@ bool CDocumentShareInfo::ResetData(CompatibilityMode /*mode*/)
 	m_targetTenantId.clear();
 	m_targetTenantName.clear();
 	m_targetGroupIds.clear();
+	m_contractId.clear();
 	m_accessLevel = DAL_VIEW;
 	m_status = DSS_PENDING;
 	m_validUntil = QDateTime();

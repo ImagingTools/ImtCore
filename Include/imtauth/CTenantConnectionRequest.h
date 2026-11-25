@@ -37,14 +37,6 @@ public:
 	virtual void SetSourceTenantName(const QString& sourceTenantName) override;
 	virtual QString GetTargetTenantName() const override;
 	virtual void SetTargetTenantName(const QString& targetTenantName) override;
-	virtual bool IsRelationshipProposed() const override;
-	virtual void SetRelationshipProposed(bool isProposed) override;
-	virtual ITenantRelationshipInfo::TenantRelationshipRole GetProposedSourceRole() const override;
-	virtual void SetProposedSourceRole(ITenantRelationshipInfo::TenantRelationshipRole role) override;
-	virtual ITenantRelationshipInfo::TenantRelationshipRole GetProposedTargetRole() const override;
-	virtual void SetProposedTargetRole(ITenantRelationshipInfo::TenantRelationshipRole role) override;
-	virtual QString GetProposedScope() const override;
-	virtual void SetProposedScope(const QString& scope) override;
 
 	// ISerializable
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -63,10 +55,6 @@ protected:
 	QString m_respondedAt;
 	QString m_sourceTenantName;
 	QString m_targetTenantName;
-	bool m_isRelationshipProposed;
-	ITenantRelationshipInfo::TenantRelationshipRole m_proposedSourceRole;
-	ITenantRelationshipInfo::TenantRelationshipRole m_proposedTargetRole;
-	QString m_proposedScope;
 };
 
 

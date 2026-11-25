@@ -13,7 +13,7 @@
 #include <imtauth/ICrossTenantMessageData.h>
 #include <imtauth/ICrossTenantMessageProjection.h>
 #include <imtauth/ICrossTenantMessageHandler.h>
-#include <imtauth/ITenantManager.h>
+#include <imtauth/IContractProvider.h>
 #include <imtbase/IObjectCollection.h>
 
 
@@ -26,9 +26,8 @@ namespace imtauth
 
 	Implements ICrossTenantMessage on top of an IObjectCollection. On SendMessage
 	the broker:
-	- validates that an active relationship identified by the supplied
-	  relationship ID exists between source and target tenant (when a tenant
-	  manager is wired);
+	- validates that the link of the contract connects the source and the target
+	  tenant, is in force and allows messages;
 	- applies the configured projection to the payload (when a projection is
 	  wired);
 	- stores the message; and
@@ -49,7 +48,7 @@ public:
 		I_REGISTER_INTERFACE(imtauth::ICrossTenantMessage);
 		I_ASSIGN(m_messageCollectionCompPtr, "MessageCollection", "Cross-tenant message collection", false, "MessageCollection");
 		I_ASSIGN(m_messageFactoryCompPtr, "MessageFactory", "Cross-tenant message factory", false, "CrossTenantMessageInfo");
-		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager used for relationship validation", false, "TenantManager");
+		I_ASSIGN(m_contractProviderCompPtr, "ContractProvider", "Contracts whose links authorize the messages", true, "ContractProvider");
 		I_ASSIGN(m_projectionCompPtr, "Projection", "Projection applied to outgoing payloads", false, "Projection");
 		I_ASSIGN_MULTI_0(m_handlersCompPtr, "Handlers", "Domain handlers dispatched for delivered messages", false);
 	I_END_COMPONENT;
@@ -57,17 +56,18 @@ public:
 	virtual QByteArray SendMessage(
 				const QByteArray& sourceTenantId,
 				const QByteArray& targetTenantId,
-				const QByteArray& relationshipId,
+				const QByteArray& contractId,
+				const QByteArray& linkId,
 				CrossTenantMessageType messageType,
 				const QByteArray& payload,
 				const QByteArray& sourceObjectId = QByteArray(),
 				const QString& customType = QString(),
 				const QString& expiresAt = QString(),
-				const QByteArray& contractId = QByteArray()) override;
+				QString* errorMessagePtr = nullptr) override;
 	virtual CrossTenantMessageInfo GetMessage(const QByteArray& messageId) const override;
 	virtual CrossTenantMessages GetIncomingMessages(const QByteArray& targetTenantId) const override;
 	virtual CrossTenantMessages GetOutgoingMessages(const QByteArray& sourceTenantId) const override;
-	virtual CrossTenantMessages GetMessagesByRelationship(const QByteArray& relationshipId) const override;
+	virtual CrossTenantMessages GetMessagesByContract(const QByteArray& contractId) const override;
 	virtual bool UpdateMessageStatus(
 				const QByteArray& messageId,
 				CrossTenantMessageStatus status,
@@ -77,16 +77,17 @@ public:
 private:
 	CrossTenantMessages CollectMessages(const QByteArray& columnId, const QByteArray& value, const std::function<bool(const CrossTenantMessageInfo&)>& predicate) const;
 	bool StoreMessageInfo(const QByteArray& messageId, const CrossTenantMessageInfo& info);
-	bool ValidateRelationship(
+	bool ValidateLink(
 				const QByteArray& sourceTenantId,
 				const QByteArray& targetTenantId,
-				const QByteArray& relationshipId) const;
+				const QByteArray& contractId,
+				const QByteArray& linkId) const;
 	void DispatchToHandlers(CrossTenantMessageInfo& info);
 
 private:
 	I_REF(imtbase::IObjectCollection, m_messageCollectionCompPtr);
 	I_FACT(imtauth::ICrossTenantMessageData, m_messageFactoryCompPtr);
-	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
+	I_REF(imtauth::IContractProvider, m_contractProviderCompPtr);
 	I_REF(imtauth::ICrossTenantMessageProjection, m_projectionCompPtr);
 	I_MULTIREF(imtauth::ICrossTenantMessageHandler, m_handlersCompPtr);
 };

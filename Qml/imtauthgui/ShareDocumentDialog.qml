@@ -6,7 +6,7 @@ import imtcontrols 1.0
 import imtguigql 1.0
 import imtauthgui 1.0
 import imtbaseImtCollectionSdl 1.0
-import imtauthTenantsSdl 1.0
+import imtauthContractsSdl 1.0
 
 /**
  * ShareDocumentDialog
@@ -215,7 +215,7 @@ Dialog {
 						visible: shareDialog.relatedTenants.length === 0
 						text: shareDialog.relationshipsLoading
 							? qsTr("Loading organizations...")
-							: qsTr("There are no related organizations. Documents can be shared only with organizations that have an active relationship with yours.")
+							: qsTr("There are no organizations to share with. Documents are shared with the parties of your contracts whose terms allow it.")
 						color: Style.inactiveTextColor
 						horizontalAlignment: Text.AlignHCenter
 						wrapMode: Text.WordWrap
@@ -470,17 +470,18 @@ Dialog {
 		}
 	}
 
-	GetTenantRelationshipsInput {
+	ContractTenantInput {
 		id: getRelationshipsInput
 	}
 
+	// The organizations whose contracts link them to this one and allow to share documents now
 	GqlSdlRequestSender {
 		id: getRelationshipsSender
 
-		gqlCommandId: ImtauthTenantsSdlCommandIds.s_getTenantRelationships
+		gqlCommandId: ImtauthContractsSdlCommandIds.s_getRelatedTenants
 
 		sdlObjectComp: Component {
-			GetTenantRelationshipsPayload {
+			GetRelatedTenantsPayload {
 				onFinished: {
 					shareDialog.relationshipsLoading = false
 
@@ -492,16 +493,15 @@ Dialog {
 					let currentTenantId = AuthorizationController.getTenantId()
 					let tenants = []
 					let knownIds = []
-					if (m_relationships){
-						for (let i = 0; i < m_relationships.count; i++){
-							let relationship = m_relationships.get(i).item
-							if (!relationship || relationship.m_status !== RelationshipStatusEnum.s_active){
+					if (m_relatedTenants){
+						for (let i = 0; i < m_relatedTenants.count; i++){
+							let relatedTenant = m_relatedTenants.get(i).item
+							if (!relatedTenant || !relatedTenant.m_isEffective || !relatedTenant.m_sharingContractIds || relatedTenant.m_sharingContractIds.length === 0){
 								continue
 							}
 
-							let isSource = String(relationship.m_sourceTenantId) === currentTenantId
-							let tenantId = isSource ? String(relationship.m_targetTenantId) : String(relationship.m_sourceTenantId)
-							let tenantName = isSource ? relationship.m_targetTenantName : relationship.m_sourceTenantName
+							let tenantId = String(relatedTenant.m_tenantId)
+							let tenantName = relatedTenant.m_tenantName
 							if (tenantId !== "" && tenantId !== currentTenantId && knownIds.indexOf(tenantId) < 0){
 								knownIds.push(tenantId)
 								tenants.push({"id": tenantId, "name": tenantName ? String(tenantName) : tenantId})

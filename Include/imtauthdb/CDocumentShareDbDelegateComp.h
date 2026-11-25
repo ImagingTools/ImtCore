@@ -24,6 +24,9 @@ public:
 		I_ASSIGN(m_shareFactCompPtr, "ShareFactory", "Factory used for creation of document share instances", true, "ShareFactory");
 	I_END_COMPONENT
 
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 	virtual istd::IChangeableUniquePtr CreateObjectFromRecord(
 				const QSqlRecord& record,
