@@ -682,9 +682,13 @@ export function layoutRichText(doc, options) {
 	function layoutBlock(block, room) {
 		const lines = [];
 		let line = newLine(block, true);
-		const finishLine = (synthetic = false) => {
+		// The spaces at the end of a line are dropped, except one at the end of a block of RichText that no break or wrap ended (StyledText drops it): Qt keeps it
+		// in the width and paints its background (the block cursor of a terminal is such a space).
+		const finishLine = (synthetic = false, keepSpace = false) => {
 			while (line.items.length > 0 && line.items[line.items.length - 1].space) {
-				const item = line.items.pop();
+				const item = line.items[line.items.length - 1];
+				if (keepSpace && line.items.length > 1 && line.width <= room + 0.001) break;
+				line.items.pop();
 				line.width -= item.width;
 			}
 			let height = line.height > 0 ? line.height : heightOf(infoOf(line.emptyStyle ?? baseStyle(), false));
@@ -755,7 +759,7 @@ export function layoutRichText(doc, options) {
 		const endsWithBreak = block.runs.length > 0 && block.runs[block.runs.length - 1].br === true;
 		if (line.items.length > 0 || endsWithBreak || lines.length === 0) {
 			if (line.items.length === 0 && endsWithBreak && line.afterSynthetic) line.trailingSynthetic = true;
-			finishLine(line.trailingSynthetic);
+			finishLine(line.trailingSynthetic, !endsWithBreak && !options.styled);
 		}
 
 		let height = 0;
@@ -836,14 +840,13 @@ export function paintRichText(r, layout, options) {
 		if (line.items.length === 0) continue;
 		const extra = 0;
 		for (const item of line.items) {
-			if (item.space && item === line.items[line.items.length - 1]) continue;
 			const style = item.style;
 			const color = style.href !== null ? linkColor : style.color !== null ? pack(style.color) : baseColor;
 			const info = item.info;
 			let baseline = line.y + ascent + extra;
 			if (style.script === -1) baseline += info.size * 0.35;
 			else if (style.script === 1) baseline -= info.size * 0.55;
-			if (style.background !== null && !item.space) r.fillQuad(item.x, line.y, item.width, line.height, pack(style.background));
+			if (style.background !== null) r.fillQuad(item.x, line.y, item.width, line.height, pack(style.background));
 			if (!item.space) {
 				let pen = item.x;
 				for (const ch of item.text) {

@@ -13603,6 +13603,14 @@
         <translation>Dieser Ordner ist leer</translation>
     </message>
     <message>
+        <source>This folder has no subfolders</source>
+        <translation>Dieser Ordner enthält keine Unterordner</translation>
+    </message>
+    <message>
+        <source>This location is outside the start folder</source>
+        <translation>Dieser Ort liegt außerhalb des Startordners</translation>
+    </message>
+    <message>
         <location line="+14"/>
         <source>Try a different filter, or clear it to see all items</source>
         <translation>Versuchen Sie einen anderen Filter oder entfernen Sie ihn, um alle Elemente anzuzeigen</translation>
@@ -20967,6 +20975,14 @@ Alle Beziehungen zu dieser Organisation werden ebenfalls entfernt.</translation>
         <location line="+1"/>
         <source>This folder is empty</source>
         <translation>Dieser Ordner ist leer</translation>
+    </message>
+    <message>
+        <source>This folder has no subfolders</source>
+        <translation>Dieser Ordner enthält keine Unterordner</translation>
+    </message>
+    <message>
+        <source>This location is outside the start folder</source>
+        <translation>Dieser Ort liegt außerhalb des Startordners</translation>
     </message>
     <message>
         <location line="+1"/>
