@@ -18,7 +18,7 @@ namespace imtrest
 {
 
 
-class IRequestEventHandler: public istd::IPolymorphic
+class IRequestEventHandler: virtual public istd::IPolymorphic
 {
 public:
 	virtual void OnRequestDestroyed(IRequest* request) = 0;
