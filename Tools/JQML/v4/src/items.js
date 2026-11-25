@@ -38,6 +38,8 @@ export const hooks = {
 	syncRepeater: null,
 	// (area) => void: a MouseArea waits for pressAndHold; () => seconds: the time of the engine.
 	watchHold: null,
+	// (flickable) => void: a Flickable runs on after the release (the engine calls its $flickTick with every frame).
+	watchFlick: null,
 	now: () => 0,
 	// (item) => void: a Binding or Connections item changed and must apply before the next statement.
 	syncBinding: null,
@@ -5319,6 +5321,12 @@ defineReadOnly(ImageItem.prototype, 'paintedHeight', function () {
 
 // ----- Flickable -----
 
+// Qt (measured): the pointer goes farther than this (px) before a drag starts; the content is thrown only above this velocity (px/s),
+// and not when the pointer rested for FLICK_IDLE seconds before the release.
+const FLICK_DRAG_THRESHOLD = 10;
+const FLICK_MIN_VELOCITY = 75;
+const FLICK_IDLE = 0.1;
+
 // A viewport onto its children: they are shifted by (-contentX, -contentY). Scrolls with the wheel and by
 // dragging an empty part of the viewport (a child that accepts the mouse keeps its own presses); no kinetic flick.
 class FlickableContentItem extends Item {
@@ -5360,9 +5368,56 @@ export class Flickable extends Item {
 		this.$contentH = 0;
 		this.$interactive = true;
 		this.$dragFrom = null;
+		this.$flickDeceleration = 1500;
+		this.$maximumFlickVelocity = 2500;
+		// the press that may become a drag: { x, y, cx, cy, ax, ay, samples, exceeded: [x, y], started: [x, y] }
+		this.$press = null;
+		// the flick of an axis after the release: null, or { start, from, v (signed, px/s), dur, bound }
+		this.$flickAxis = [null, null];
+		this.$flags = { dragging: false, flicking: false, moving: false };
+		this.$velocity = [0, 0];
+		this.$declareSignal('movementStarted', []);
+		this.$declareSignal('movementEnded', []);
+		this.$declareSignal('flickStarted', []);
+		this.$declareSignal('flickEnded', []);
+		this.$declareSignal('dragStarted', []);
+		this.$declareSignal('dragEnded', []);
 		// As in Qt the visual children live in contentItem, which is the only entry of `children`.
 		this.$content = new FlickableContentItem(this);
 		super.$adopt(this.$content);
+	}
+
+	// Sets moving, dragging or flicking and tells those who wait for it.
+	$setFlag(name, value) {
+		if (this.$flags[name] === value) return;
+		this.$flags[name] = value;
+		noteWrite(this, name);
+		const signal = name + 'Changed';
+		if (this.$sigs !== null && this.$sigs.has(signal)) this.$emit(signal, []);
+	}
+
+	// Qt (measured with QtTest): `moving` is set by the start of a drag and ends with the drag when nothing flicks on, otherwise with the flick.
+	$beginMovement() {
+		if (this.$flags.moving) return;
+		this.$setFlag('moving', true);
+		this.$emit('movementStarted', []);
+	}
+
+	$endMovement() {
+		if (!this.$flags.moving) return;
+		this.$setFlag('moving', false);
+		this.$emit('movementEnded', []);
+	}
+
+	$setVelocity(x, y) {
+		if (this.$velocity[0] !== x) {
+			this.$velocity[0] = x;
+			noteWrite(this, 'horizontalVelocity');
+		}
+		if (this.$velocity[1] !== y) {
+			this.$velocity[1] = y;
+			noteWrite(this, 'verticalVelocity');
+		}
 	}
 
 	get contentItem() {
@@ -5425,28 +5480,175 @@ export class Flickable extends Item {
 
 	$mousePressAt(sceneX, sceneY) {
 		this.$dragFrom = { x: sceneX, y: sceneY, cx: this.$contentX, cy: this.$contentY };
+		if (!this.$interactive) return;
+		// a press stops a flick that runs
+		if (this.$flags.flicking) this.cancelFlick();
+		this.$press = { x: sceneX, y: sceneY, cx: this.$contentX, cy: this.$contentY, ax: sceneX, ay: sceneY, samples: [], exceeded: [false, false], started: [false, false] };
 	}
 
+	// Qt (measured with QtTest): the drag of an axis starts at the first move after the one that went farther than 10 px from the press;
+	// the content follows the pointer from the place of that move.
 	$mouseMoveAt(sceneX, sceneY) {
-		const from = this.$dragFrom;
-		if (from === null || !this.$interactive) return;
-		this.contentX = clamp(from.cx - (sceneX - from.x), 0, this.$maxContentX);
-		this.contentY = clamp(from.cy - (sceneY - from.y), 0, this.$maxContentY);
+		const press = this.$press;
+		if (press === null || !this.$interactive) return;
+		const now = performance.now() / 1000;
+		press.samples.push({ t: now, x: sceneX, y: sceneY });
+		if (press.samples.length > 12) press.samples.shift();
+		const range = [this.$maxContentX, this.$maxContentY];
+		const pointer = [sceneX, sceneY];
+		const origin = [press.x, press.y];
+		for (let axis = 0; axis < 2; axis++) {
+			if (range[axis] <= 0 || press.started[axis]) continue;
+			if (press.exceeded[axis]) {
+				press.started[axis] = true;
+				if (axis === 0) {
+					press.ax = sceneX;
+					press.cx = this.$contentX;
+				} else {
+					press.ay = sceneY;
+					press.cy = this.$contentY;
+				}
+				const first = !this.$flags.dragging;
+				this.$setFlag('dragging', true);
+				this.$beginMovement();
+				if (first) this.$emit('dragStarted', []);
+			} else if (Math.abs(pointer[axis] - origin[axis]) > FLICK_DRAG_THRESHOLD) {
+				press.exceeded[axis] = true;
+			}
+		}
+		if (press.started[0]) this.contentX = clamp(press.cx - (sceneX - press.ax), 0, this.$maxContentX);
+		if (press.started[1]) this.contentY = clamp(press.cy - (sceneY - press.ay), 0, this.$maxContentY);
 	}
 
 	$pressChanged(pressed) {
-		if (!pressed) this.$dragFrom = null;
+		if (pressed) return;
+		this.$dragFrom = null;
+		const press = this.$press;
+		this.$press = null;
+		if (press === null || !this.$flags.dragging) return;
+		const now = performance.now() / 1000;
+		this.$setFlag('dragging', false);
+		this.$emit('dragEnded', []);
+		const velocity = [0, 0];
+		const samples = press.samples;
+		// the pointer that rested for 100 ms or more does not throw the content
+		if (samples.length > 1 && now - samples[samples.length - 1].t < FLICK_IDLE) {
+			for (let axis = 0; axis < 2; axis++) {
+				if (!press.started[axis]) continue;
+				let sum = 0;
+				let weights = 0;
+				for (let i = 1; i < samples.length; i++) {
+					const dt = samples[i].t - samples[i - 1].t;
+					if (dt <= 0 || samples[samples.length - 1].t - samples[i].t >= FLICK_IDLE) continue;
+					const delta = axis === 0 ? samples[i].x - samples[i - 1].x : samples[i].y - samples[i - 1].y;
+					sum += i * clamp(-delta / dt, -this.$maximumFlickVelocity, this.$maximumFlickVelocity);
+					weights += i;
+				}
+				velocity[axis] = weights > 0 ? sum / weights : 0;
+			}
+		}
+		if (!this.$startFlick(velocity[0], velocity[1])) this.$endMovement();
 	}
 
-	flick() {}
+	// Starts the flick of the axes whose velocity (px/s of the content) is above 75; true if one runs.
+	$startFlick(vx, vy) {
+		const velocity = [vx, vy];
+		const position = [this.$contentX, this.$contentY];
+		const range = [this.$maxContentX, this.$maxContentY];
+		const start = hooks.now();
+		let any = false;
+		for (let axis = 0; axis < 2; axis++) {
+			this.$flickAxis[axis] = null;
+			const v = clamp(velocity[axis], -this.$maximumFlickVelocity, this.$maximumFlickVelocity);
+			if (Math.abs(v) <= FLICK_MIN_VELOCITY || range[axis] <= 0 || this.$flickDeceleration <= 0) continue;
+			const room = v > 0 ? range[axis] - position[axis] : position[axis];
+			if (room <= 0) continue;
+			// the content stops at its end exactly: Qt keeps the velocity and takes the deceleration that the distance needs
+			const free = (v * v) / (2 * this.$flickDeceleration);
+			const bound = free > room;
+			const dur = bound ? (2 * room) / Math.abs(v) : Math.abs(v) / this.$flickDeceleration;
+			this.$flickAxis[axis] = { start, from: position[axis], v, dur, bound };
+			any = true;
+		}
+		if (!any) return false;
+		this.$beginMovement();
+		this.$setFlag('flicking', true);
+		this.$emit('flickStarted', []);
+		if (hooks.watchFlick !== null) hooks.watchFlick(this);
+		this.$update();
+		return true;
+	}
 
-	cancelFlick() {}
+	// The engine calls it with every frame while the content runs on; false when it came to rest.
+	$flickTick(seconds) {
+		let running = false;
+		const velocity = [0, 0];
+		for (let axis = 0; axis < 2; axis++) {
+			const state = this.$flickAxis[axis];
+			if (state === null) continue;
+			const t = clamp(seconds - state.start, 0, state.dur);
+			const speed = Math.abs(state.v);
+			const sign = state.v > 0 ? 1 : -1;
+			const decel = state.bound ? speed / state.dur : this.$flickDeceleration;
+			const travelled = speed * t - (decel * t * t) / 2;
+			const target = clamp(state.from + sign * travelled, 0, axis === 0 ? this.$maxContentX : this.$maxContentY);
+			if (axis === 0) this.contentX = target;
+			else this.contentY = target;
+			if (t >= state.dur) {
+				this.$flickAxis[axis] = null;
+			} else {
+				running = true;
+				velocity[axis] = sign * (speed - decel * t);
+			}
+		}
+		this.$setVelocity(velocity[0], velocity[1]);
+		if (running) return true;
+		this.$finishFlick();
+		return false;
+	}
+
+	$finishFlick() {
+		this.$flickAxis = [null, null];
+		this.$setVelocity(0, 0);
+		if (!this.$flags.flicking) return;
+		this.$setFlag('flicking', false);
+		this.$emit('flickEnded', []);
+		this.$endMovement();
+	}
+
+	// Qt: the arguments are the velocity of the content (a positive one scrolls towards the start)
+	flick(xVelocity, yVelocity) {
+		if (this.$flags.flicking) this.cancelFlick();
+		this.$startFlick(-toFloat(xVelocity), -toFloat(yVelocity));
+	}
+
+	cancelFlick() {
+		if (this.$flags.flicking) this.$finishFlick();
+	}
 
 	returnToBounds() {
 		this.contentX = clamp(this.$contentX, 0, this.$maxContentX);
 		this.contentY = clamp(this.$contentY, 0, this.$maxContentY);
 	}
 }
+
+defineReadOnly(Flickable.prototype, 'moving', function () {
+	return this.$flags.moving;
+});
+defineReadOnly(Flickable.prototype, 'dragging', function () {
+	return this.$flags.dragging;
+});
+defineReadOnly(Flickable.prototype, 'flicking', function () {
+	return this.$flags.flicking;
+});
+defineReadOnly(Flickable.prototype, 'horizontalVelocity', function () {
+	return this.$velocity[0];
+});
+defineReadOnly(Flickable.prototype, 'verticalVelocity', function () {
+	return this.$velocity[1];
+});
+defineField(Flickable.prototype, 'flickDeceleration', '$flickDeceleration', toFloat);
+defineField(Flickable.prototype, 'maximumFlickVelocity', '$maximumFlickVelocity', toFloat);
 
 function defineContent(name, field, sizeField = null) {
 	defineProp(

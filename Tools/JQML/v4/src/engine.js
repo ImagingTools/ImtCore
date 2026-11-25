@@ -640,6 +640,7 @@ export class Engine {
 		// (the arrows of a tree) is requested from the server once.
 		this.imageCache = new Map();
 		this.animations = new Set();
+		this.flicks = new Set(); // the Flickables whose content runs on after the release
 		this.carets = new Set(); // editors with the focus: their text cursor blinks
 		this.fresh = []; // bindings created since they were last evaluated
 		this.freshLoading = false; // the first values of the bindings are being worked out (evaluateFresh)
@@ -870,6 +871,7 @@ export class Engine {
 		hooks.syncModel = (model) => this.syncModelNow(model);
 		hooks.syncRepeater = (repeater) => this.syncRepeaterNow(repeater);
 		hooks.watchHold = (area) => this.holds.add(area);
+		hooks.watchFlick = (flickable) => this.flicks.add(flickable);
 		hooks.now = () => this.time;
 		hooks.syncBinding = (item) => this.syncBindingItems(item);
 		hooks.syncConnection = (item) => this.syncConnections(item);
@@ -919,7 +921,7 @@ export class Engine {
 	}
 
 	get isAnimated() {
-		if (this.usesTime) return true;
+		if (this.usesTime || this.flicks.size > 0) return true;
 		// PauseAnimation only waits: ticking it must not force a full scene redraw every frame
 		// (CustomTooltip's open delay would flicker the gallery while the pointer rests/moves).
 		// An animation of a hidden item (e.g. an indeterminate ProgressBar on another page) keeps running
@@ -949,6 +951,7 @@ export class Engine {
 		this.qmlBindings.clear();
 		this.pendingImages.clear();
 		this.animations.clear();
+		this.flicks.clear();
 		this.carets.clear();
 		this.fresh = [];
 		this.subQueue = [];
@@ -2399,6 +2402,9 @@ export class Engine {
 				if (item.$destroyed === true || !item.$active) this.carets.delete(item);
 				else item.$blink(seconds);
 			}
+		}
+		for (const flickable of [...this.flicks]) {
+			if (flickable.$destroyed === true || !flickable.$flickTick(seconds)) this.flicks.delete(flickable);
 		}
 		for (const area of [...this.holds]) {
 			if (area.$destroyed === true || !area.$pressed || area.$holdDeadline === 0) this.holds.delete(area);
