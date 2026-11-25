@@ -186,7 +186,7 @@ export class Scene {
 	moveFlickViews(x, y) {
 		for (const view of this.flickViews.slice()) {
 			if (view === this.pressed || !this.flickViews.includes(view)) continue;
-			if (this.pressed !== null && this.pressed.$preventStealing === true) return;
+			if (this.pressed !== null && (this.pressed.$preventStealing === true || this.pressed.$dragsTarget === true)) return;
 			view.$mouseMoveAt(x, y);
 			if (!view.$flags.dragging) continue;
 			const target = this.pressed;
@@ -205,7 +205,8 @@ export class Scene {
 		this.moveFlickViews(x, y);
 		if (this.pressed !== null) this.pressed.$mouseMoveAt(x, y);
 		this.setHovered(this.root.$itemAt(x, y));
-		if (this.hovered !== null && this.hovered !== this.pressed) this.hovered.$mouseMoveAt(x, y);
+		// a view that waits for the drag of the press below it is moved by moveFlickViews only
+		if (this.hovered !== null && this.hovered !== this.pressed && !this.flickViews.includes(this.hovered)) this.hovered.$mouseMoveAt(x, y);
 		this.syncCursor();
 	}
 
@@ -216,13 +217,21 @@ export class Scene {
 		this.pressedButton = button;
 		this.dragging = [];
 		this.flickViews = [];
+		let eaten = null;
 		if (button === 0) {
 			for (let p = target === null ? null : target.$parent; p !== null && p !== undefined; p = p.$parent) {
 				if (p.$isFlickView === true && p.$acceptsMouse) {
-					p.$mousePressAt(x, y);
+					if (p.$mousePressAt(x, y) === true && eaten === null) eaten = p;
 					this.flickViews.push(p);
 				}
 			}
+		}
+		// the press that stopped a flick is the view's: the item below the pointer does not get it
+		if (eaten !== null) {
+			this.flickViews = this.flickViews.filter((view) => view !== eaten);
+			this.pressed = eaten;
+			this.syncCursor();
+			return;
 		}
 		const hits = [];
 		this.root.$handlerItems(x, y, DragHandler, hits);

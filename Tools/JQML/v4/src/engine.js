@@ -603,6 +603,7 @@ export class Engine {
 		this.onError = null;
 		this.onLog = null;
 		this.onQuit = null; // Qt.quit() from a script
+		this.pointerDriver = null; // { down, up, move, advance }: the mouse of QtTest in the comparison runner
 
 		// Lenient mode (for large real-world projects): unknown types become placeholders, unknown
 		// properties and handlers are ignored, and a failing property does not stop the load.

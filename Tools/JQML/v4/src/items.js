@@ -3078,6 +3078,11 @@ export class MouseArea extends Item {
 		return false;
 	}
 
+	// An area that moves a target by the drag keeps the drag of the pointer: a Flickable below it does not take it (Qt, measured).
+	get $dragsTarget() {
+		return this.$mouseDrag.$target !== null;
+	}
+
 	// The press is taken away (the area was hidden, another item took the drag): `canceled`, and no `released` or `clicked` follow.
 	$cancelPress() {
 		if (!this.$pressed) return;
@@ -5556,12 +5561,20 @@ export class Flickable extends Item {
 		return vertical || horizontal;
 	}
 
+	// True when the press stopped a flick that was running: Qt (measured) keeps that press for the Flickable, the item below does not get it.
 	$mousePressAt(sceneX, sceneY) {
 		this.$dragFrom = { x: sceneX, y: sceneY, cx: this.$contentX, cy: this.$contentY };
-		if (!this.$interactive) return;
-		// a press stops a flick that runs
-		if (this.$flags.flicking) this.cancelFlick();
+		if (!this.$interactive) return false;
+		const stopped = this.$flags.flicking;
+		if (stopped) {
+			// the content stops, the movement goes on until the release
+			this.$flickAxis = [null, null];
+			this.$setVelocity(0, 0);
+			this.$setFlag('flicking', false);
+			this.$emit('flickEnded', []);
+		}
 		this.$press = { x: sceneX, y: sceneY, cx: this.$contentX, cy: this.$contentY, ax: sceneX, ay: sceneY, samples: [], exceeded: [false, false], started: [false, false] };
+		return stopped;
 	}
 
 	// Qt (measured with QtTest): the drag of an axis starts at the first move after the one that went farther than 10 px from the press;
@@ -5603,7 +5616,12 @@ export class Flickable extends Item {
 		this.$dragFrom = null;
 		const press = this.$press;
 		this.$press = null;
-		if (press === null || !this.$flags.dragging) return;
+		if (press === null) return;
+		if (!this.$flags.dragging) {
+			// a press that only stopped a flick: the movement ends with the release
+			if (this.$flags.moving && !this.$flags.flicking) this.$endMovement();
+			return;
+		}
 		const now = performance.now() / 1000;
 		this.$setFlag('dragging', false);
 		this.$emit('dragEnded', []);
@@ -7105,6 +7123,56 @@ export class TestCase extends Item {
 	keyClick(key, modifiers = 0) {
 		this.$send(toFloat(key), toFloat(modifiers), true);
 		this.$send(toFloat(key), toFloat(modifiers), false);
+	}
+
+	// The mouse of a test: the pointer of a window that the comparison runner provides (`engine.pointerDriver`), the positions are in the
+	// coordinates of `item`, a delay (ms) lets the time of the window pass before the event, and `wait` lets it pass.
+	$pointer() {
+		const driver = this.$engine.pointerDriver;
+		if (driver === null || driver === undefined) // without a window the mouse of QtTest fails as it does under offscreen qml (see the `mouseMove` of the globals)
+			throw new Error('QtQuickTest::fail');
+		return driver;
+	}
+
+	$pointerAt(item, x, y) {
+		this.$pointer().sync();
+		return [item.$sx + toFloat(x), item.$sy + toFloat(y)];
+	}
+
+	// Qt.LeftButton is the name 'LeftButton' in the engine, 1 in Qt: the number of Qt (1 left, 2 right, 4 middle) goes on.
+	$buttonNumber(button) {
+		if (typeof button === 'string') return { LeftButton: 1, RightButton: 2, MiddleButton: 4 }[button] || 1;
+		return toFloat(button);
+	}
+
+	mousePress(item, x = 0, y = 0, button = 1, modifiers = 0, delay = -1) {
+		const driver = this.$pointer();
+		if (delay > 0) driver.advance(delay);
+		const [px, py] = this.$pointerAt(item, x, y);
+		driver.down(px, py, this.$buttonNumber(button));
+	}
+
+	mouseRelease(item, x = 0, y = 0, button = 1, modifiers = 0, delay = -1) {
+		const driver = this.$pointer();
+		if (delay > 0) driver.advance(delay);
+		const [px, py] = this.$pointerAt(item, x, y);
+		driver.up(px, py, this.$buttonNumber(button));
+	}
+
+	mouseMove(item, x = 0, y = 0, delay = -1, buttons = 0) {
+		const driver = this.$pointer();
+		if (delay > 0) driver.advance(delay);
+		const [px, py] = this.$pointerAt(item, x, y);
+		driver.move(px, py);
+	}
+
+	mouseClick(item, x = 0, y = 0, button = 1, modifiers = 0, delay = -1) {
+		this.mousePress(item, x, y, button, modifiers, delay);
+		this.mouseRelease(item, x, y, button, modifiers, delay);
+	}
+
+	wait(ms = 0) {
+		this.$pointer().advance(toFloat(ms));
 	}
 }
 defineProp(
