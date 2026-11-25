@@ -1189,7 +1189,7 @@ Item {
 					anchors.leftMargin: Style.spacingS
 					anchors.right: rowItem.isGroup ? counterText.left : badgeItem.visible ? badgeItem.left : parent.right
 					anchors.rightMargin: Style.marginM
-					text: root.__names[rowItem.row]
+					text: root.__names[rowItem.row] !== undefined ? root.__names[rowItem.row] : ""
 					font.family: Style.fontFamily
 					font.pixelSize: Style.fontSizeM
 					font.bold: rowItem.isGroup

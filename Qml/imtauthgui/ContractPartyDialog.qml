@@ -161,12 +161,11 @@ Dialog {
 						model: roleModel
 					}
 
-					IntegerInputElementView {
+					SpinBoxElementView {
 						id: signaturesInput
-						placeHolderText: qsTr("1")
 						name: qsTr("Signatures needed")
-						bottomValue: 1
-						topValue: 10
+						from: 1
+						to: 10
 					}
 				}
 			}

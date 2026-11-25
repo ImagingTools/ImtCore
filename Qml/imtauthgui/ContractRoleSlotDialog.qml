@@ -84,20 +84,19 @@ Dialog {
 						changeable: slotDialog.initialRoleId === ""
 					}
 
-					IntegerInputElementView {
+					SpinBoxElementView {
 						id: minInput
-						placeHolderText: qsTr("e.g. 1")
 						name: qsTr("At least")
-						bottomValue: 0
-						topValue: 99
+						from: 0
+						to: 99
 					}
 
-					IntegerInputElementView {
+					SpinBoxElementView {
 						id: maxInput
-						placeHolderText: qsTr("Any number")
 						name: qsTr("At most")
-						bottomValue: 0
-						topValue: 99
+						description: qsTr("0: any number")
+						from: 0
+						to: 99
 					}
 				}
 			}

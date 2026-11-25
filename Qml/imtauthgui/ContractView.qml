@@ -159,7 +159,12 @@ ViewBase {
 
 	// --- The commands ---
 
+	// The commands shown by the last update: the panel hides when there are none
+	property int __shownCommands: 0
+
 	function __setCommand(commandId, isVisible) {
+		if (isVisible)
+			contractView.__shownCommands++
 		contractView.commandsController.setCommandVisible(commandId, isVisible)
 		contractView.commandsController.setCommandIsEnabled(commandId, !contractView.__busy)
 	}
@@ -167,6 +172,7 @@ ViewBase {
 	function updateCommands() {
 		if (!contractView.commandsController)
 			return
+		contractView.__shownCommands = 0
 		var view = contractView
 		var party = view.myParty
 		var isSuspended = party !== null && party.allocationsSuspended === true
@@ -174,7 +180,8 @@ ViewBase {
 		var proposal = view.terminationProposal
 		// A party answers until it has signed or declined
 		var isAnswering = view.myPartyState === "Reviewing" || view.myPartyState === "Approved"
-		view.__setCommand("Save", view.isEditable)
+		// Save is a button of the dialog; Ctrl+S still saves
+		view.__setCommand("Save", false)
 		view.__setCommand("Submit", view.isEditable && !view.isNew && !view.isSubmitted)
 		view.__setCommand("RemoveDraft", view.isEditable && !view.isNew && !view.isSubmitted)
 		// A refused or expired offer stands until the initiator changes it or withdraws it
@@ -195,16 +202,19 @@ ViewBase {
 		view.__setCommand("WithdrawTermination", view.canSign && proposal !== null && proposal.proposedByTenantId === view.tenantId)
 		view.__setCommand("SuspendPermissions", view.canSuspend && view.isConcluded && isSigned && party !== null && !isSuspended)
 		view.__setCommand("ResumePermissions", view.canSuspend && view.isConcluded && isSigned && party !== null && isSuspended)
+		view.commandsPanelVisible = view.__shownCommands > 0
 	}
 
 	onCommandActivated: {
+		if (commandId === "Save") {
+			contractView.save()
+			return
+		}
 		// Ctrl+S reaches a hidden command too
 		if (contractView.__busy || !contractView.commandsController.commandIsEnabled(commandId)
 				|| !contractView.commandsController.getCommandProperty(commandId, "m_visible"))
 			return
-		if (commandId === "Save")
-			contractView.save()
-		else if (commandId === "Submit")
+		if (commandId === "Submit")
 			contractView.submit()
 		else if (commandId === "RemoveDraft")
 			ModalDialogManager.showConfirmationDialog(qsTr("Remove draft"), qsTr("Remove the draft? It was never sent, so the parties do not see it."), function(result) {
@@ -354,9 +364,12 @@ ViewBase {
 
 	function __fillNew() {
 		contractView.title = qsTr("New contract")
-		contractView.draft = {"name": "", "description": "", "terms": "", "typeId": "", "effectiveFrom": "", "termDays": 0, "validUntil": "",
-							  "autoRenew": false, "renewalPeriodDays": 0, "renewalNoticeDays": 0, "terminationNoticeDays": 0, "signDeadline": "",
-							  "signOrder": "Parallel"}
+		// A year, a month of notice and a month to sign: a type or the initiator changes them
+		var signDeadline = new Date()
+		signDeadline.setDate(signDeadline.getDate() + 30)
+		contractView.draft = {"name": "", "description": "", "terms": "", "typeId": "", "effectiveFrom": "", "termDays": 365, "validUntil": "",
+							  "autoRenew": false, "renewalPeriodDays": 365, "renewalNoticeDays": 30, "terminationNoticeDays": 30,
+							  "signDeadline": signDeadline.toISOString(), "signOrder": "Parallel"}
 		contractView.internalData = {"internalNumber": "", "notes": "", "reminderDays": 0}
 		contractView.parties = [{"tenantId": contractView.tenantId, "tenantName": contractView.tenantName, "roleId": "", "roleName": "",
 								 "requiredSignatures": 1, "state": "Invited", "channel": "Initiator"}]
@@ -1114,7 +1127,9 @@ ViewBase {
 				}
 				ModalDialogManager.openDialog(allocationDialogComp, {"links": links, "tenantId": contractView.tenantId,
 																	 "productId": AuthorizationController.productId,
-																	 "permissionGroups": contractView.tenantApiClient ? contractView.tenantApiClient.tenantPermissions : []})
+																	 "tenantApiClient": contractView.tenantApiClient,
+																	 "scopeIds": contractView.stateManager && contractView.stateManager.tenantData
+																		 ? (contractView.stateManager.tenantData.m_tenantPermissions || []) : []})
 			}
 		}
 	}

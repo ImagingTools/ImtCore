@@ -405,13 +405,14 @@ Item {
 					GroupElementView {
 						width: parent.width
 
-						IntegerInputElementView {
+						SpinBoxElementView {
 							id: termDaysInput
-							placeHolderText: qsTr("0 for no term")
-							name: qsTr("Term, days")
+							name: qsTr("Term")
 							description: qsTr("0 for no term")
 							readOnly: !typeView.isChangeable
-							bottomValue: 0
+							from: 0
+							units: qsTr("days")
+							to: 36500
 						}
 
 						SwitchElementView {
@@ -420,30 +421,35 @@ Item {
 							readOnly: !typeView.isChangeable
 						}
 
-						IntegerInputElementView {
+						SpinBoxElementView {
 							id: renewalPeriodInput
-							placeHolderText: qsTr("e.g. 365")
 							visible: autoRenewSwitch.checked
-							name: qsTr("Renewal period, days")
+							name: qsTr("Renewal period")
 							readOnly: !typeView.isChangeable
-							bottomValue: 0
+							from: 0
+							units: qsTr("days")
+							to: 36500
 						}
 
-						IntegerInputElementView {
+						SpinBoxElementView {
 							id: renewalNoticeInput
-							placeHolderText: qsTr("e.g. 30")
 							visible: autoRenewSwitch.checked
-							name: qsTr("Stop the renewal at least, days before")
+							name: qsTr("Stop the renewal at least")
+							description: qsTr("Days before the end of the term")
 							readOnly: !typeView.isChangeable
-							bottomValue: 0
+							from: 0
+							units: qsTr("days")
+							to: 36500
 						}
 
-						IntegerInputElementView {
+						SpinBoxElementView {
 							id: terminationNoticeInput
-							placeHolderText: qsTr("e.g. 30")
-							name: qsTr("Notice period, days")
+							name: qsTr("Notice period")
+							description: qsTr("A party leaves this long after its notice; 0: at once")
 							readOnly: !typeView.isChangeable
-							bottomValue: 0
+							from: 0
+							units: qsTr("days")
+							to: 36500
 						}
 
 						SwitchElementView {
@@ -452,13 +458,12 @@ Item {
 							readOnly: !typeView.isChangeable
 						}
 
-						IntegerInputElementView {
+						SpinBoxElementView {
 							id: signaturesInput
-							placeHolderText: qsTr("1")
 							name: qsTr("Signatures of each party")
 							readOnly: !typeView.isChangeable
-							bottomValue: 1
-							topValue: 10
+							from: 1
+							to: 10
 						}
 					}
 				}

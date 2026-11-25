@@ -33,11 +33,9 @@ Item {
 	readonly property var __catalog: permissionsPage.editor && permissionsPage.editor.tenantApiClient ? permissionsPage.editor.tenantApiClient.allPermissions : []
 
 	Component.onCompleted: {
-		// The scope of the organization is what it can give
-		if (permissionsPage.editor && permissionsPage.editor.tenantApiClient) {
-			permissionsPage.editor.tenantApiClient.fetchTenantPermissions(permissionsPage.editor.tenantId)
+		// The names of the permissions; one request at a time, the provider keeps one pending request
+		if (permissionsPage.editor && permissionsPage.editor.tenantApiClient)
 			permissionsPage.editor.tenantApiClient.fetchAllPermissions()
-		}
 	}
 
 	// The names of the permissions; an id unknown to the product stays an id
@@ -121,9 +119,8 @@ Item {
 			anchors.rightMargin: Style.marginL
 			anchors.verticalCenter: parent.verticalCenter
 			wrapMode: Text.WordWrap
-			text: permissionsPage.allocationRows.length === 0
-				? qsTr("No permissions are given. The organization receiving permissions gives them to its groups once the contract is in force.")
-				: qsTr("The organization receiving permissions gives them to its groups once the contract is in force.")
+			text: (permissionsPage.allocationRows.length === 0 ? qsTr("No permissions are given yet.") + " " : "")
+				+ qsTr("A row is what one party gives another: permissions of the product, no more than the giver holds itself (its Available permissions). Once the contract is in force, the receiver chooses its groups with the button Groups; their members then work in the organization of the giver with these permissions.")
 			font.pixelSize: Style.fontSizeS
 			color: Style.inactiveTextColor
 		}

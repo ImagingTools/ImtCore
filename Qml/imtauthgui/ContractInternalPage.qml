@@ -89,13 +89,14 @@ Item {
 					readOnly: !internalPage.__canEdit
 				}
 
-				IntegerInputElementView {
+				SpinBoxElementView {
 					id: reminderDaysInput
-					placeHolderText: qsTr("e.g. 14")
-					name: qsTr("Remind of the deadlines, days before")
-					description: qsTr("0 for the default of the system")
+					name: qsTr("Remind of the deadlines")
+					description: qsTr("Days before a deadline; 0: the default of the system")
 					readOnly: !internalPage.__canEdit
-					bottomValue: 0
+					from: 0
+					units: qsTr("days")
+					to: 36500
 				}
 			}
 

@@ -84,24 +84,24 @@ Item {
 				DateTimePickerElementView {
 					id: effectiveFromInput
 					name: qsTr("In force from")
-					description: qsTr("Empty from the conclusion")
+					description: qsTr("Empty: from the day the last party signs")
 					canShowCurrentDate: false
 					readOnly: !periodPage.__isEditable
 				}
 
-				IntegerInputElementView {
+				SpinBoxElementView {
 					id: termDaysInput
-					placeHolderText: qsTr("0 for no term")
-					name: qsTr("Term, days")
-					description: qsTr("0 for no term")
+					name: qsTr("Term")
+					description: qsTr("Counted from the day it comes into force; 0: no term")
+					units: qsTr("days")
+					to: 36500
 					readOnly: !periodPage.__isEditable
-					bottomValue: 0
 				}
 
 				DateTimePickerElementView {
 					id: validUntilInput
 					name: qsTr("Valid until")
-					description: qsTr("Empty for no end")
+					description: qsTr("A fixed last day instead of the term; empty: none")
 					canShowCurrentDate: false
 					readOnly: !periodPage.__isEditable
 				}
@@ -112,30 +112,33 @@ Item {
 					readOnly: !periodPage.__isEditable
 				}
 
-				IntegerInputElementView {
+				SpinBoxElementView {
 					id: renewalPeriodInput
-					placeHolderText: qsTr("e.g. 365")
 					visible: autoRenewSwitch.checked
-					name: qsTr("Renewal period, days")
+					name: qsTr("Renewed for")
+					description: qsTr("Each renewal adds this time")
+					units: qsTr("days")
+					to: 36500
 					readOnly: !periodPage.__isEditable
-					bottomValue: 0
 				}
 
-				IntegerInputElementView {
+				SpinBoxElementView {
 					id: renewalNoticeInput
-					placeHolderText: qsTr("e.g. 30")
 					visible: autoRenewSwitch.checked
-					name: qsTr("Stop the renewal at least, days before")
+					name: qsTr("Stop the renewal at least")
+					description: qsTr("Days before the end of the term")
+					units: qsTr("days")
+					to: 3650
 					readOnly: !periodPage.__isEditable
-					bottomValue: 0
 				}
 
-				IntegerInputElementView {
+				SpinBoxElementView {
 					id: terminationNoticeInput
-					placeHolderText: qsTr("e.g. 30")
-					name: qsTr("Notice period, days")
+					name: qsTr("Notice period")
+					description: qsTr("A party leaves this long after its notice; 0: at once")
+					units: qsTr("days")
+					to: 3650
 					readOnly: !periodPage.__isEditable
-					bottomValue: 0
 				}
 			}
 
@@ -145,7 +148,7 @@ Item {
 				DateTimePickerElementView {
 					id: signDeadlineInput
 					name: qsTr("Sign until")
-					description: qsTr("Empty for no deadline")
+					description: qsTr("The offer lapses after this day; empty: no deadline")
 					canShowCurrentDate: false
 					readOnly: !periodPage.__isEditable
 				}

@@ -25,13 +25,52 @@ Dialog {
 	property var links: []
 	property string tenantId: ""
 	property string productId: ""
-	// The permission scope of this organization, as PermissionsTableView.rebuildFromFlatArray takes it
-	property var permissionGroups: []
+	// TenantManagementApiClient: the permissions of the product arrive after the dialog opens
+	property var tenantApiClient: null
+	// The permission scope of this organization: the ids of its Available permissions
+	property var scopeIds: []
+
+	Connections {
+		target: allocationDialog.tenantApiClient
+
+		function onAllPermissionsReceived() {
+			if (allocationDialog.contentItem)
+				allocationDialog.contentItem.__rebuildPermissions()
+		}
+	}
+
+	// The permissions of the product, as PermissionsTableView.rebuildFromFlatArray takes them
+	function productGroups() {
+		return allocationDialog.tenantApiClient ? (allocationDialog.tenantApiClient.allPermissions || []) : []
+	}
+
+	// The permissions of the product the organization holds
+	function ownGroups() {
+		var allowed = {}
+		for (var i = 0; i < allocationDialog.scopeIds.length; i++)
+			allowed[String(allocationDialog.scopeIds[i])] = true
+		var groups = allocationDialog.productGroups()
+		var result = []
+		for (var g = 0; g < groups.length; g++) {
+			var entries = groups[g].entries || []
+			var allowedEntries = []
+			for (var e = 0; e < entries.length; e++) {
+				if (allowed[String(entries[e].permissionId)])
+					allowedEntries.push(entries[e])
+			}
+			if (allowedEntries.length > 0)
+				result.push({"groupId": groups[g].groupId, "groupName": groups[g].groupName, "entries": allowedEntries})
+		}
+		return result
+	}
 
 	// The parameters of openDialog are set after the dialog is created: it is set up when it starts
 	onStarted: {
 		addButton(Enums.ok, qsTr("Add"), false, false, "primary")
 		addButton(Enums.cancel, qsTr("Cancel"), true)
+		if (allocationDialog.tenantApiClient) {
+			allocationDialog.tenantApiClient.fetchAllPermissions()
+		}
 		if (allocationDialog.contentItem)
 			allocationDialog.contentItem.init()
 	}
@@ -53,11 +92,13 @@ Dialog {
 			readonly property bool isReversed: directionModel.idAt(directionCB.currentIndex) === "BA"
 			readonly property string grantorTenantId: allocationContent.link ? (allocationContent.isReversed ? allocationContent.link.tenantBId : allocationContent.link.tenantAId) : ""
 			readonly property string granteeTenantId: allocationContent.link ? (allocationContent.isReversed ? allocationContent.link.tenantAId : allocationContent.link.tenantBId) : ""
-			// This organization gives what it holds: its scope is shown; another party is asked for its permissions by their ids
-			readonly property bool choosesPermissions: allocationContent.grantorTenantId === allocationDialog.tenantId
+			// This organization gives what it holds; for another party the permissions of the product are offered
+			readonly property bool isOwnGrant: allocationContent.grantorTenantId === allocationDialog.tenantId
+			readonly property string grantorName: allocationContent.link ? (allocationContent.isReversed ? allocationContent.link.tenantBName : allocationContent.link.tenantAName) : ""
+			readonly property string granteeName: allocationContent.link ? (allocationContent.isReversed ? allocationContent.link.tenantAName : allocationContent.link.tenantBName) : ""
 			readonly property string productId: productInput.text.trim()
 			property var checkedIds: []
-			readonly property var permissionIds: allocationContent.choosesPermissions ? allocationContent.checkedIds : allocationContent.__typedIds(idsInput.text)
+			readonly property var permissionIds: allocationContent.checkedIds
 			readonly property string comment: commentInput.text.trim()
 
 			// The time of the API of the end, empty while the contract is in force
@@ -73,15 +114,11 @@ Dialog {
 				return null
 			}
 
-			function __typedIds(text) {
-				var result = []
-				var parts = text.split(",")
-				for (var i = 0; i < parts.length; i++) {
-					var id = parts[i].trim()
-					if (id !== "" && result.indexOf(id) < 0)
-						result.push(id)
-				}
-				return result
+			function __rebuildPermissions() {
+				allocationContent.checkedIds = []
+				// Compared here: the bindings of the grantor may not be updated yet
+				var isOwn = allocationContent.grantorTenantId === allocationDialog.tenantId
+				permissionsView.rebuildFromFlatArray(isOwn ? allocationDialog.ownGroups() : allocationDialog.productGroups())
 			}
 
 			onPermissionIdsChanged: {
@@ -111,9 +148,18 @@ Dialog {
 				directionCB.currentIndex = directionModel.fill(directions, "id", "name", link.tenantBId === allocationDialog.tenantId ? "BA" : "AB")
 			}
 
-			onChoosesPermissionsChanged: {
-				if (allocationContent.choosesPermissions)
-					permissionsView.rebuildFromFlatArray(allocationDialog.permissionGroups)
+			onGrantorTenantIdChanged: {
+				rebuildTimer.restart()
+			}
+
+			// The table is rebuilt after the bindings of the chosen grantor are updated
+			Timer {
+				id: rebuildTimer
+				interval: 0
+				repeat: false
+				onTriggered: {
+					allocationContent.__rebuildPermissions()
+				}
 			}
 
 			function init() {
@@ -125,8 +171,7 @@ Dialog {
 				var first = links.length > 0 ? links[0].linkId : ""
 				linkCB.currentIndex = linkModel.fill(links, "linkId", "name", first)
 				productInput.text = allocationDialog.productId
-				if (allocationContent.choosesPermissions)
-					permissionsView.rebuildFromFlatArray(allocationDialog.permissionGroups)
+				allocationContent.__rebuildPermissions()
 			}
 
 			ChoiceModel {
@@ -172,17 +217,9 @@ Dialog {
 
 					TextInputElementView {
 						id: productInput
-						isRequired: true
+						readOnly: true
 						name: qsTr("Product")
-						placeHolderText: qsTr("Id of the product")
-					}
-
-					TextInputElementView {
-						id: idsInput
-						isRequired: true
-						visible: !allocationContent.choosesPermissions
-						name: qsTr("Permissions")
-						placeHolderText: qsTr("Ids of the permissions, separated by commas")
+						description: qsTr("The permissions work in this product")
 					}
 
 					DateTimePickerElementView {
@@ -199,11 +236,23 @@ Dialog {
 					}
 				}
 
+				// Who gets what: the members of the groups the receiver chooses act in the organization of the giver
+				BaseText {
+					width: parent.width
+					visible: allocationContent.link !== null
+					wrapMode: Text.WordWrap
+					font.pixelSize: Style.fontSizeS
+					color: Style.inactiveTextColor
+					text: allocationContent.isOwnGrant
+						? qsTr("Your organization gives what it holds itself (its Available permissions). Once the contract is in force, %1 gives them to its groups, and their members work in your organization with them.").arg(allocationContent.granteeName)
+						: qsTr("%1 gives these permissions to %2. Only the ones %1 holds itself (its Available permissions) work. Once the contract is in force, %2 gives them to its groups, and their members work in %1 with them.").arg(allocationContent.grantorName).arg(allocationContent.granteeName)
+				}
+
 				PermissionsTableView {
 					id: permissionsView
 					width: parent.width
-					height: Style.sizeHintS
-					visible: allocationContent.choosesPermissions
+					// The dialog stays inside the window; the table scrolls
+					height: Math.max(Style.sizeHintXXS / 2, Math.min(Style.sizeHintS, ModalDialogManager.activeView.height - 760))
 					showDetails: false
 					emptyText: qsTr("The organization holds no permissions to give. They are chosen on the page Available permissions.")
 

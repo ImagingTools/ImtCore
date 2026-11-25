@@ -30,11 +30,37 @@ Dialog {
 
 	property string __title: ""
 
+	// Save is a button of the dialog while the organization edits the terms; it leaves the dialog open
+	notClosingButtons: Enums.save
+	readonly property bool canEdit: contractDialog.contentItem && contractDialog.contentItem.view ? contractDialog.contentItem.view.isEditable : false
+	readonly property bool isBusy: contractDialog.contentItem && contractDialog.contentItem.view ? contractDialog.contentItem.view.isBusy : false
+
 	// The parameters of openDialog are set after the dialog is created: it is set up when it starts
 	onStarted: {
 		addButton(Enums.close, qsTr("Close"), true)
+		contractDialog.__updateSaveButton()
 		if (contractDialog.contentItem)
 			contractDialog.contentItem.view.start()
+	}
+
+	onCanEditChanged: {
+		contractDialog.__updateSaveButton()
+	}
+
+	onIsBusyChanged: {
+		if (contractDialog.buttons)
+			contractDialog.buttons.setButtonState(Enums.save, !contractDialog.isBusy)
+	}
+
+	onFinished: {
+		if (buttonId == Enums.save && contractDialog.contentItem)
+			contractDialog.contentItem.view.save()
+	}
+
+	function __updateSaveButton() {
+		contractDialog.removeButton(Enums.save)
+		if (contractDialog.canEdit)
+			contractDialog.insertButton(Enums.save, qsTr("Save"), !contractDialog.isBusy, 0)
 	}
 
 	contentComp: Component {

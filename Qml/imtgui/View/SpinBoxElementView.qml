@@ -15,6 +15,8 @@ ElementView {
     property real to: 999999
     property real stepSize: 1
     property real value: startValue
+    // Shown after the number, e.g. "days"
+    property string units: ""
 
     onStartValueChanged: {
         if (spinBox){
@@ -60,6 +62,7 @@ ElementView {
             to: root.to
             value: root.value
             stepSize: root.stepSize
+            units: root.units
             editable: !root.readOnly
             Component.onCompleted: {
                 root.spinBox = this

@@ -430,6 +430,7 @@ Item {
 			height: dateInput.calendarHeight;
 			hiddenBackground: true;
 			centered: false;
+			acceptOnClick: true;
 			onAccepted: {
 				dateInput.setDate(date);
 			}
