@@ -740,6 +740,7 @@ export function createTestApi({ engine, scene, canvas = null, nextFrame = null, 
 				scene.root.$updateRequested === true ||
 				engine.dirty.size > 0 ||
 				engine.animations.size > 0 ||
+				engine.flicks.size > 0 ||
 				(engine.pendingImages !== undefined && engine.pendingImages.size > 0) ||
 				(network !== null && network.count > 0)
 			);
