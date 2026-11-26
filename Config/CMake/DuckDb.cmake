@@ -5,7 +5,7 @@ if(APPLE)
 elseif(UNIX)
 	target_link_libraries(${PROJECT_NAME} PUBLIC ${IMTCOREDIR}/3rdParty/libduckdb/lib/GCC_Linux_x64/libduckdb.so)
 elseif(WIN32)
-	target_link_libraries(${PROJECT_NAME} PUBLIC ${IMTCOREDIR}/3rdParty/libduckdb/lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}/duckdb.lib)
+	target_link_libraries(${PROJECT_NAME} PUBLIC ${IMTCOREDIR}/3rdParty/libduckdb/lib/Windows_x64/duckdb.lib)
 
 	# duckdb.dll has no runtime output dir of its own, so only copy it next to actual binaries
 	get_target_property(IMTCORE_DUCKDB_TARGET_TYPE ${PROJECT_NAME} TYPE)
@@ -14,7 +14,7 @@ elseif(WIN32)
 			TARGET ${PROJECT_NAME}
 			POST_BUILD
 			COMMAND ${CMAKE_COMMAND} -E copy_if_different
-				${IMTCOREDIR}/3rdParty/libduckdb/lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}/duckdb.dll
+				${IMTCOREDIR}/3rdParty/libduckdb/lib/Windows_x64/duckdb.dll
 				$<TARGET_FILE_DIR:${PROJECT_NAME}>
 			COMMENT "Copying duckdb.dll runtime dependency for ${PROJECT_NAME}"
 			VERBATIM
