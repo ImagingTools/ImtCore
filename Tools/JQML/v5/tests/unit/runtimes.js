@@ -34,6 +34,8 @@ function built(){
     // the tests give the browser's requests as globalThis.XMLHttpRequest
     Object.defineProperty(context, 'XMLHttpRequest', { get: () => globalThis.XMLHttpRequest, configurable: true })
     // and the page's server as globalThis.fetch, URL and location
+    // and the canvas paths as globalThis.Path2D
+    Object.defineProperty(context, 'Path2D', { get: () => globalThis.Path2D, configurable: true })
     for(let name of ['fetch', 'URL', 'location']) Object.defineProperty(context, name, { get: () => globalThis[name], configurable: true })
     vm.createContext(context)
     vm.runInContext(fs.readFileSync(path.resolve(__dirname, '../../dist/core.js'), 'utf8'), context)

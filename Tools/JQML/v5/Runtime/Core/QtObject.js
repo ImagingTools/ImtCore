@@ -238,6 +238,12 @@ class QtObject {
         dropHolder(this)
         releaseGuards(this)
         if(this.$idScope) releaseId(this, this.$idScope)
+        // the objects made as values of its properties go first, then the children
+        let values = this.$valueObjects
+        if(values){
+            this.$valueObjects = null
+            for(let i = values.length - 1; i >= 0; i--) if(values[i].$valueOwner === this) values[i].$destroyNow()
+        }
         if(this.$children){
             for(let i = this.$children.length - 1; i >= 0; i--) this.$children[i].$destroyNow()
         }
@@ -294,6 +300,8 @@ function markAsDeleted(object){
         current.$f |= engine.DELETING
         let children = current.$children
         if(children) for(let i = 0; i < children.length; i++) stack.push(children[i])
+        let values = current.$valueObjects
+        if(values) for(let i = 0; i < values.length; i++) if(values[i].$valueOwner === current) stack.push(values[i])
     }
 }
 
@@ -316,6 +324,17 @@ function invalidateContext(owner, scope){
 }
 
 function emitOwnDestruction(object, owners){
+    // the objects made as values of its properties first, the last declared first (Qt: extra, then helper; the
+    // properties are written from the last declared one)
+    let values = object.$valueObjects
+    if(values){
+        for(let i = 0; i < values.length; i++){
+            let value = values[i]
+            if(value.$valueOwner !== object || (value.$f & engine.DESTROYED)) continue
+            if(value.$ownScope()) owners.push(value)
+            else emitOwnDestruction(value, owners)
+        }
+    }
     let children = object.$children
     if(children){
         for(let i = 0; i < children.length; i++){

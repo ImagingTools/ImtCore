@@ -623,7 +623,7 @@ class Codegen {
         }
         let props = []
         for(let p of el.propdefs){
-            let kind = QML_KIND[p.type] || 'var'
+            let kind = QML_KIND[p.type] || (/^list\s*</.test(p.type) ? 'list' : 'var')
             props.push(JSON.stringify(p.name) + ':' + (p.readonly ? '{kind:' + JSON.stringify(kind) + ',readonly:true}' : JSON.stringify(kind)))
         }
         let signals = el.signals.map(s => s.name + '(' + s.args.join(',') + ')')
@@ -738,7 +738,10 @@ class Codegen {
             let at = atOf(def.declAt || def.nameAt)
             if(def.element){
                 unit(named, at, 'named', null, () => {
-                    this.current.push(v + '.$write(' + constName + ',' + this.elementExpr(file, def.element, def.asComponent, post) + ');')
+                    let expr = this.elementExpr(file, def.element, def.asComponent, post)
+                    // the object is the property's (its QObject parent): destroyed with it
+                    if(def.asComponent) this.current.push(v + '.$write(' + constName + ',' + expr + ');')
+                    else this.current.push(v + '.$write(' + constName + ',JQ.ownValue(' + v + ',' + expr + '));')
                 })
                 continue
             }
@@ -760,16 +763,23 @@ class Codegen {
                 let viaAlias = (this.member(el, assign.name.split('.')[0]) || {}).kind === 'alias'
                 let line = viaAlias && assign.name.indexOf('.') < 0
                     ? 'JQ.aliasAssign(' + v + ',' + JSON.stringify(assign.name) + ',' + this.elementExpr(file, assign.element, assign.asComponent, post) + ');'
-                    : this.assignTarget(file, el, v, assign.name) + '=' + this.elementExpr(file, assign.element, assign.asComponent, post) + ';'
+                    : assign.asComponent
+                        ? this.assignTarget(file, el, v, assign.name) + '=' + this.elementExpr(file, assign.element, true, post) + ';'
+                        : this.assignTarget(file, el, v, assign.name) + '=JQ.ownValue(' + v + ',' + this.elementExpr(file, assign.element, false, post) + ');'
                 if(viaAlias) post.push(line)
                 else unit(named, at, 'named', null, () => this.current.push(line))
                 continue
             }
             if(assign.elements){
                 unit(named, at, 'named', null, () => {
-                    let vars = assign.elements.map(child => this.emitElement(file, child, v, post))
                     let m = this.member(el, assign.name)
-                    if(m && m.kind === 'prop' && LIST_VALUE.has(assign.name)) this.current.push(v + '.' + assign.name + '=[' + vars.join(',') + '];')
+                    // a list property of a type (states, transitions ...) or one declared list<T>: the objects of a
+                    // declared one are the object's (QObject parent), not its visual children
+                    let declaredList = m && m.qmlType && /^list\s*</.test(m.qmlType)
+                    let vars = assign.elements.map(child => declaredList
+                        ? 'JQ.ownValue(' + v + ',' + this.emitElement(file, child, 'null', post) + ')'
+                        : this.emitElement(file, child, v, post))
+                    if(m && m.kind === 'prop' && (LIST_VALUE.has(assign.name) || declaredList)) this.current.push(v + '.' + assign.name + '=[' + vars.join(',') + '];')
                 })
                 continue
             }

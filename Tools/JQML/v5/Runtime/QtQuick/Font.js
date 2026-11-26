@@ -27,10 +27,15 @@ class Font extends GroupObject {
             capitalization: v[Font.CAPITALIZATION],
             letterSpacing: v[Font.LETTERSPACING],
             wordSpacing: v[Font.WORDSPACING],
+            // the size the font was given in (QFont keeps a point size or a pixel size, the one set last)
+            pointSize: v[Font.POINTSIZE],
+            sizeUnit: this.$sizeUnit || 'pt',
         }
     }
 
     $write(id, value){
+        if(id === Font.PIXELSIZE && value > 0) this.$sizeUnit = 'px'
+        else if(id === Font.POINTSIZE && value > 0) this.$sizeUnit = 'pt'
         if(value > 0){
             if(id === Font.PIXELSIZE) this.$v[Font.POINTSIZE] = value * POINTS_PER_PIXEL
             if(id === Font.POINTSIZE) this.$v[Font.PIXELSIZE] = Math.round(value / POINTS_PER_PIXEL)
