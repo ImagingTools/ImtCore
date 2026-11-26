@@ -876,7 +876,7 @@ export class Item {
 		this.$dirtyKids = null;
 		this.$scope = null;
 		this.$anchors = null;
-		if (this.$fnNames !== undefined) for (const name of this.$fnNames) this[name] = null; // the functions of the item hold its scope
+		if (this.$fnNames !== undefined) for (const name of this.$fnNames) this[name] = undefined; // the functions of the item hold its scope; a script that still has the item tests `item.fn !== undefined` (CustomTooltip.hide), and null would pass that test and then fail to be called
 		if (this.$sigs !== null) for (const signal of this.$sigs.values()) signal.handlers = [];
 		this.$owned = undefined;
 		if (this.$defScope !== undefined) this.$defScope = null; // a Component: the scope it was written in
