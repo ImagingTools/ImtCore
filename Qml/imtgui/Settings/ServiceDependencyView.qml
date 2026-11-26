@@ -293,8 +293,9 @@ ParamEditorBase {
 								enabled: remoteFileController.state !== "Loading"
 
 								text: qsTr("Download Log")
-									remoteFileController.getFile(model.logId, String(model.name).replace(/[\\/:*?"<>|\x00-\x1f]/g, "_") + "Log.txt")
-									remoteFileController.getFile(model.logId, model.name + "Log.txt")
+
+								onClicked: {
+									remoteFileController.getFile(model.logId, String(model.name).replace(/[\\/:*?"<>|\x00-\x1f]/g, "_") + "Log.txt")
 								}
 							}
 						}
