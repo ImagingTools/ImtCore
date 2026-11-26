@@ -1,5 +1,6 @@
 // Loads every sample without a browser (no WebGL, no fonts) and checks that it loads, lays out and
 // paints. `node test/run.mjs [file.qml ...]`
+import { existsSync } from 'node:fs';
 import { readFile, readdir } from 'node:fs/promises';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -70,6 +71,11 @@ async function check(path) {
 async function main() {
 	let files = process.argv.slice(2);
 	if (files.length === 0) {
+		// The samples are not part of the repository: without them there is nothing to load (pass the files to check).
+		if (!existsSync(join(root, 'qml'))) {
+			console.log('Skipped: there is no folder qml/ with samples (pass the files to check)');
+			process.exit(0);
+		}
 		files = (await readdir(join(root, 'qml'))).filter((f) => f.endsWith('.qml')).map((f) => `qml/${f}`).sort();
 	}
 	let bad = 0;

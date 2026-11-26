@@ -92,7 +92,9 @@ function walkDocument(file, def, failures) {
 
 // test/compiler/broken/Main.qml is deliberately invalid QML (the compiler's own 'syntax error' test): parseQmlDocument with
 // checking off still gives back a tree, with text that is not valid JavaScript to start with, nothing mangleLocals could help.
-const EXCLUDE = /[\\/]test[\\/]compiler[\\/]broken[\\/]/;
+// The cases of JQML v5 (Tools/JQML/v5/tests/diff/cases) are written for the syntax of that engine (`as`, an object literal as a binding),
+// which the parser of v4 does not take: they are not documents of this engine.
+const EXCLUDE = /[\\/]test[\\/]compiler[\\/]broken[\\/]|[\\/]JQML[\\/]v5[\\/]tests[\\/]diff[\\/]cases[\\/]/;
 
 let files = 0;
 let skipped = 0;

@@ -1,0 +1,117 @@
+{
+    "name": "jqml4-composer",
+    "displayName": "JQML 4 Composer",
+    "description": "A visual composer of schemas that inherit each other and generate a JQML 4 application",
+    "version": "1.0.0",
+    "publisher": "imtcore",
+    "engines": {
+        "vscode": "^1.74.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCustomEditor:jqml4composer.editor",
+        "onCommand:jqml4composer.newSchema",
+        "onCommand:jqml4composer.generateApp",
+        "onCommand:jqml4composer.openSchemaAsText",
+        "onCommand:jqml4composer.reload"
+    ],
+    "main": "./src/extension.js",
+    "scripts": {
+        "build": "node scripts/build.mjs",
+        "test": "node scripts/build.mjs && node --test test/composer-schema.test.mjs test/composer-app.test.mjs",
+        "package": "node scripts/package.mjs"
+    },
+    "contributes": {
+        "configuration": {
+            "title": "JQML 4 Composer",
+            "properties": {
+                "jqml4composer.configPath": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Path to a JQML compiler JSON config with dirs/includes. It gives the Composer the modules of the project and is used to compile the generated application. Absolute path, ${workspaceFolder} and ${env:NAME} are supported."
+                },
+                "jqml4composer.env": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "default": {},
+                    "description": "Variables used for ${NAME} placeholders in the compiler config. They override the process environment."
+                },
+                "jqml4composer.importPaths": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [],
+                    "description": "Folders searched for <Module>/qmldir to resolve the modules that a schema imports. ${workspaceFolder} and ${env:NAME} are supported."
+                },
+                "jqml4composer.enginePath": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Optional root of the JQML v4 sources (the folder with src/items.js and compiler/compiler.js). Used to compile the generated application. Empty: the folder this extension was built from."
+                }
+            }
+        },
+        "commands": [
+            {
+                "command": "jqml4composer.newSchema",
+                "title": "JQML 4 Composer: New Schema"
+            },
+            {
+                "command": "jqml4composer.generateApp",
+                "title": "JQML 4 Composer: Generate Application from Schema",
+                "icon": "$(play)"
+            },
+            {
+                "command": "jqml4composer.openSchemaAsText",
+                "title": "JQML 4 Composer: Open Schema as Text",
+                "icon": "$(go-to-file)"
+            },
+            {
+                "command": "jqml4composer.reload",
+                "title": "JQML 4 Composer: Reload project"
+            }
+        ],
+        "customEditors": [
+            {
+                "viewType": "jqml4composer.editor",
+                "displayName": "JQML 4 Composer",
+                "selector": [
+                    {
+                        "filenamePattern": "*.jqschema"
+                    }
+                ],
+                "priority": "default"
+            }
+        ],
+        "menus": {
+            "editor/title": [
+                {
+                    "command": "jqml4composer.generateApp",
+                    "when": "activeCustomEditorId == jqml4composer.editor",
+                    "group": "navigation"
+                },
+                {
+                    "command": "jqml4composer.openSchemaAsText",
+                    "when": "activeCustomEditorId == jqml4composer.editor",
+                    "group": "navigation"
+                }
+            ],
+            "explorer/context": [
+                {
+                    "command": "jqml4composer.newSchema",
+                    "when": "explorerResourceIsFolder",
+                    "group": "navigation"
+                },
+                {
+                    "command": "jqml4composer.generateApp",
+                    "when": "resourceExtname == .jqschema",
+                    "group": "navigation"
+                }
+            ]
+        }
+    }
+}
