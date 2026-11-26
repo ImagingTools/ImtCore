@@ -239,7 +239,7 @@ ParamEditorBase {
 								anchors.verticalCenter: rowItem.verticalCenter
 								anchors.left: statusIndicator.right
 								anchors.leftMargin: Style.spacingS
-								width: serviceDependencyView.versionX - x - Style.spacingS
+								width: Math.max(0, statusText.x - x - Style.spacingS)
 								elide: Text.ElideRight
 								font.bold: true
 								text: model.name
@@ -262,9 +262,10 @@ ParamEditorBase {
 							}
 
 							BaseText {
+								id: statusText
 								anchors.verticalCenter: rowItem.verticalCenter
-								x: serviceDependencyView.versionX
-								width: rowItem.width - x - (downloadLogButton.visible ? downloadLogButton.width + Style.spacingS : 0)
+								x: Math.max(0, Math.min(serviceDependencyView.versionX, rowItem.width - Style.sizeHintBXS - (downloadLogButton.visible ? downloadLogButton.width + Style.spacingS : 0)))
+								width: Math.max(0, rowItem.width - x - (downloadLogButton.visible ? downloadLogButton.width + Style.spacingS : 0))
 								elide: Text.ElideRight
 								color: model.status === ServiceStatusEnum.s_dISCONNECTED || serviceDependencyView.getCredentialText(model.credentialStatus) !== "" ? Style.dangerColor : Style.textColor
 								text: serviceDependencyView.getStatusText(model.status, model.version) + (serviceDependencyView.getCredentialText(model.credentialStatus) !== "" ? " - " + serviceDependencyView.getCredentialText(model.credentialStatus) : "")
