@@ -42,21 +42,23 @@ void CModelChangeNotifierComp::OnUpdate(const istd::IChangeable::ChangeSet& /*ch
 
 	for (RequestNetworks& requestNetworks : m_registeredSubscribers){
 		for (const QByteArray& id : requestNetworks.networkRequests.keys()){
-			const imtrest::IRequest* networkRequest = requestNetworks.networkRequests[id];
-			if (networkRequest == nullptr){
-				continue;
-			}
+			for (const imtrest::IRequest* networkRequest : requestNetworks.networkRequests[id]){
+				Q_ASSERT(networkRequest != nullptr);
+				if (networkRequest == nullptr){
+					continue;
+				}
 
-			QByteArray body = QStringLiteral(R"({"type": "data","id": "%1","payload": {"data": {"%2": {}}}})")
-				.arg(id)
-				.arg(networkRequest->GetCommandId())
-				.toUtf8();
-			QByteArray reponseTypeId = QByteArrayLiteral("application/json; charset=utf-8");
-			const imtrest::IProtocolEngine& engine = networkRequest->GetProtocolEngine();
+				QByteArray body = QStringLiteral(R"({"type": "data","id": "%1","payload": {"data": {"%2": {}}}})")
+					.arg(id)
+					.arg(networkRequest->GetCommandId())
+					.toUtf8();
+				QByteArray reponseTypeId = QByteArrayLiteral("application/json; charset=utf-8");
+				const imtrest::IProtocolEngine& engine = networkRequest->GetProtocolEngine();
 
-			imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(*networkRequest, imtrest::IProtocolEngine::SC_OK, body, reponseTypeId).PopInterfacePtr());
-			if (responsePtr.IsValid()){
-				m_requestManagerCompPtr->SendResponse(networkRequest->GetRequestId(), responsePtr);
+				imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(*networkRequest, imtrest::IProtocolEngine::SC_OK, body, reponseTypeId).PopInterfacePtr());
+				if (responsePtr.IsValid()){
+					m_requestManagerCompPtr->SendResponse(networkRequest->GetRequestId(), responsePtr);
+				}
 			}
 		}
 	}

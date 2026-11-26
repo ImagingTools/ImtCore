@@ -7,8 +7,8 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 
-// ACF includes
-#include <iser/CJsonMemWriteArchive.h>
+// ImtCore includes
+#include <imtbase/IOperationContext.h>
 
 
 namespace imtservergql
@@ -34,6 +34,17 @@ bool CObjectCollectionChangeNotifierComp::IsRequestSupported(const imtgql::CGqlR
 	}
 
 	return BaseClass::IsRequestSupported(gqlRequest);
+}
+
+
+bool CObjectCollectionChangeNotifierComp::IsOpenFor(SubscriberKind subscriberKind, const imtgql::CGqlRequest& /*gqlRequest*/) const
+{
+	switch (subscriberKind){
+	case SK_USER:
+		return *m_isOpenToUsersAttrPtr || m_readPermissionsAttrPtr.GetCount() > 0;
+	default:
+		return false;
+	}
 }
 
 
@@ -133,32 +144,12 @@ void CObjectCollectionChangeNotifierComp::OnUpdate(const istd::IChangeable::Chan
 
 		imtbase::IOperationContext::OperationContextInfo info = operationContext.value<imtbase::IOperationContext::OperationContextInfo>();
 		operationContextObject.insert("ownerId", QString(info.id));
-		operationContextObject.insert("ownerName", info.name);
 
 		dataObject.insert("operationContext", operationContextObject);
 	}
 
 	if (!isRemoved){
 		dataObject.insert("itemId", QString(itemId));
-
-		// Send serialized item payload only when itemId is valid.
-		if (!itemId.isEmpty() && m_isSendItemSource.IsValid() && m_objectCollectionCompPtr.IsValid() && *m_isSendItemSource){
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			m_objectCollectionCompPtr->GetObjectData(itemId, dataPtr);
-			QByteArray representationData;
-			iser::ISerializable* objectPtr = dynamic_cast<iser::ISerializable*>(dataPtr.GetPtr());
-			if (objectPtr != nullptr){
-				iser::CJsonMemWriteArchive archive;
-
-				if (objectPtr->Serialize(archive)){
-					representationData = archive.GetData();
-				}
-				else{
-					Q_ASSERT(false);
-				}
-			}
-			dataObject.insert("item", QString(representationData));
-		}
 	}
 
 	QJsonDocument jsonDocument;
@@ -179,4 +170,3 @@ void CObjectCollectionChangeNotifierComp::OnUpdate(const istd::IChangeable::Chan
 
 
 } // namespace imtservergql
-

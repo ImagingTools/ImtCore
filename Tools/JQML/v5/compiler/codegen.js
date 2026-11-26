@@ -1,0 +1,1338 @@
+// Code generation for the prototype core (Docs/CoreDesign.md, 4.4):
+// one class per QML type, shared binding/handler functions, a build function per component body,
+// ids resolved to slots of the body's scope array $s.
+const JQ = require('../Runtime')
+const fs = require('fs')
+const path = require('path')
+const { rewriteValue, rewriteHandler, rewriteMethod, methodWaits, expressionText } = require('./expr')
+const { emitScript, loadScript, isPure } = require('./scripts')
+const { checkFile } = require('./checks')
+const { inlineModel } = require('./model')
+const { qtModule, transitiveModules, IMPORTED_TYPES } = require('../Runtime/Qt/modules')
+
+const JS_GLOBALS = new Set([
+    'Math', 'JSON', 'Date', 'Number', 'String', 'Boolean', 'Array', 'Object', 'RegExp', 'Error', 'TypeError', 'RangeError',
+    'Promise', 'Map', 'Set', 'WeakMap', 'WeakSet', 'Symbol', 'Infinity', 'NaN', 'undefined', 'isNaN', 'isFinite',
+    'parseInt', 'parseFloat', 'encodeURIComponent', 'decodeURIComponent', 'encodeURI', 'decodeURI', 'escape', 'unescape',
+    'console', 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'arguments', 'eval', 'window', 'document',
+    'navigator', 'location', 'localStorage', 'XMLHttpRequest', 'FileReader', 'Blob', 'URL', 'performance',
+    'qsTr', 'qsTranslate', 'Uint8Array', 'Int32Array', 'Float32Array', 'Float64Array', 'ArrayBuffer', 'DataView',
+    'globalThis', 'BigInt', 'Intl', 'Reflect', 'Proxy', 'alert', 'print', 'gc',
+])
+
+// QML types that only the C++ of the desktop host registers in a module (qmlRegisterType, qmlRegisterSingletonInstance
+// of com.imtcore.imtqml, Impl/JQMLHost/Main.cpp): a file importing the module may name them in code the page does not
+// run (an else of Qt.platform.os === "web"); the page has none of them
+const NATIVE_TYPES = new Map([
+    ['com.imtcore.imtqml', new Set(['NetworkEventInterceptor', 'DocumentServiceController', 'DataModelController'])],
+])
+
+const QML_KIND = {
+    int: 'int', real: 'real', double: 'real', bool: 'bool', string: 'string', url: 'string',
+    color: 'color', var: 'var', variant: 'var', Component: 'component',
+}
+
+const IDENT = /^[A-Za-z_$][\w$]*$/
+
+const FN_MARK = '\u0001'
+const FN_MARKS = /\u0001(\d+)\u0001/g
+const LOCAL_NAME = /\bT\d*_\w*\$(?!\(\))/
+
+// list properties whose element values are assigned as an array (data / children / resources only parent them)
+const LIST_VALUE = new Set(['states', 'transitions', 'targets', 'animations', 'changes', 'transform', 'filters', 'sorters'])
+
+// the list properties of an item an alias can name: an object declared in such an alias is appended to the list
+const LIST_ALIAS = new Set(['data', 'children', 'resources'])
+
+class TypeRef {
+    constructor(name, kind, Class, file, ref){
+        this.name = name
+        this.kind = kind          // 'builtin' | 'qml'
+        this.Class = Class
+        this.file = file
+        this.ref = ref
+        this.base = null
+    }
+}
+
+// a url of the bundle without `.` and `..`
+function normalizeUrl(url){
+    let parts = []
+    for(let part of url.split('/')){
+        if(part === '..') parts.pop()
+        else if(part && part !== '.') parts.push(part)
+    }
+    return parts.join('/')
+}
+
+// Literal AST: compiled as a plain assignment, no binding
+function isConstant(node){
+    if(!node) return false
+    switch(node[0]){
+        case 'stat': return isConstant(node[1])
+        case 'num': case 'string': case 'regexp': case 'atom': return true
+        case 'name': return node[1] === 'true' || node[1] === 'false' || node[1] === 'null' || node[1] === 'undefined'
+        case 'array': return node[1].every(isConstant)
+        case 'object': return node[1].every(pair => pair.length < 3 && isConstant(pair[1]))
+        case 'unary-prefix': case 'unary-postfix': return isConstant(node[2])
+        case 'binary': return isConstant(node[2]) && isConstant(node[3])
+        case 'conditional': return isConstant(node[1]) && isConstant(node[2]) && isConstant(node[3])
+        default: return false
+    }
+}
+
+// the FileModels of the inline components of every file: files[url + '#' + name]; file.inlineTypes: name -> FileModel
+function expandInlineComponents(files){
+    for(let file of [...files.values()]){
+        for(let el of file.elements){
+            for(let component of el.inlineComponents || []){
+                if(!file.inlineTypes) file.inlineTypes = new Map()
+                // the first one of a name; compiler/checks.js reports the others
+                if(file.inlineTypes.has(component.name)) continue
+                let model = inlineModel(file, component)
+                model.inlineTypes = file.inlineTypes
+                file.inlineTypes.set(component.name, model)
+                files.set(file.url + '#' + component.name, model)
+            }
+        }
+    }
+}
+
+class Codegen {
+    constructor(files, entry){
+        this.files = files              // url -> FileModel
+        this.fnCodes = []
+        this.entry = entry
+        this.types = new Map()          // builtin types
+        this.modules = files.$modules || new Map()
+        this.byDir = new Map()          // dir -> (type -> FileModel)
+        this.byName = new Map()         // type -> FileModels, for files that use a type without importing it
+        this.warnings = []
+        this.out = []
+        this.functionCount = 0
+        // inline components are types of their own; a document of Qt.createQmlObject has none (Qt cannot load them)
+        if(!files.$document) expandInlineComponents(files)
+        for(let name of Object.keys(JQ.types)){
+            this.types.set(name, new TypeRef(name, 'builtin', JQ.types[name], null, IDENT.test(name) ? 'JQ.types.' + name : 'JQ.types[' + JSON.stringify(name) + ']'))
+        }
+        // JavaScript resources: one const per file, module qualifiers are global like module types
+        this.scripts = new Map()        // .js file -> const name
+        this.scriptUrls = new Map()     // .js file -> its url in the bundle (its Qt resolves against it)
+        this.moduleScripts = new Map()  // qualifier -> const name
+        for(let [qualifier, fileName] of files.$scripts || []) this.moduleScripts.set(qualifier, this.scriptRef(fileName))
+        for(let file of files.values()){
+            file.scriptImports = new Map()
+            // a document of Qt.createQmlObject has no files: compiler/runtime.js imports the scripts of the bundle
+            if(typeof path.resolve !== 'function') continue
+            for(let imp of file.imports){
+                let target = String(imp.path || '').replace(/^["']|["']$/g, '')
+                if(!target.endsWith('.js')) continue
+                // qrc:/x.js: the file a .qrc declares at that resource path; its url is that path
+                let qrc = target.startsWith('qrc:')
+                let fileName = qrc ? (this.files.$qrcFile && this.files.$qrcFile(target, file.fileName)) : path.resolve(path.dirname(file.fileName), target)
+                if(!fileName || !fs.existsSync(fileName)){
+                    // Qt: the document is not loaded ("Script ... unavailable"); here the qualifier is an empty object
+                    this.warn(file, imp.line || 0, 'script ' + target + ' is not found')
+                    if(!fileName) fileName = path.resolve(path.dirname(file.fileName), target.replace(/^[a-z]+:\/*/i, ''))
+                }
+                let url = qrc ? target : (file.url || '').slice(0, (file.url || '').lastIndexOf('/') + 1) + target
+                if(!this.scriptUrls.has(path.normalize(fileName))) this.scriptUrls.set(path.normalize(fileName), normalizeUrl(url))
+                if(imp.as) file.scriptImports.set(imp.as, this.scriptRef(fileName))
+            }
+            // scripts imported by the documents of its Qt.createQmlObject calls (compiler/index.js documentImports)
+            for(let target of file.documentImports || []){
+                if(!target.endsWith('.js') || /^[a-z]+:/i.test(target)) continue
+                let fileName = path.resolve(path.dirname(file.fileName), target)
+                if(!fs.existsSync(fileName)) continue
+                let url = (file.url || '').slice(0, (file.url || '').lastIndexOf('/') + 1) + target
+                if(!this.scriptUrls.has(path.normalize(fileName))) this.scriptUrls.set(path.normalize(fileName), normalizeUrl(url))
+                this.scriptRef(fileName)
+            }
+        }
+        let refs = new Set()
+        for(let file of entry ? [entry, ...files.values()] : files.values()){
+            if(file.typeRef) continue
+            let ref = 'T_' + (file.inlineOf ? file.inlineOf.name + '$' : '') + file.name
+            for(let n = 2; refs.has(ref); n++) ref = 'T' + n + '_' + file.name
+            refs.add(ref)
+            file.typeRef = new TypeRef(file.name, 'qml', null, file, ref)
+            // visible in their file only, elsewhere as File.Name
+            if(file.inlineOf) continue
+            if(!this.byDir.has(file.dir)) this.byDir.set(file.dir, new Map())
+            this.byDir.get(file.dir).set(file.name, file)
+            if(!this.byName.has(file.name)) this.byName.set(file.name, [])
+            this.byName.get(file.name).push(file)
+        }
+        for(let file of files.values()) this.resolveImports(file)
+    }
+
+    // file.typeImports: modules ({ module }, { qt }) and dirs ({ dir }) imported without a qualifier, the last import
+    // first; file.namespaces: qualifier -> one of them
+    resolveImports(file){
+        file.typeImports = []
+        file.namespaces = new Map()
+        file.nativeNames = new Set()
+        for(let imp of file.imports){
+            let target = String(imp.path || '').replace(/^["']|["']$/g, '')
+            if(target.endsWith('.js')) continue
+            if(imp.isModule && !imp.as && NATIVE_TYPES.has(target)) for(let name of NATIVE_TYPES.get(target)) file.nativeNames.add(name)
+            let source = imp.isModule ? (this.modules.has(target) ? { module: target } : qtModule(target) ? { qt: target } : null) : imp.dirKey ? { dir: imp.dirKey } : null
+            if(imp.as) file.namespaces.set(imp.as, source)
+            else if(source) file.typeImports.unshift(source)
+        }
+        // QQmlObjectCreator::init makes the scripts of a document with its context: its own, then those of its modules
+        let eager = [...new Set(file.scriptImports.values())]
+        let moduleScripts = this.files.$moduleScripts || new Map()
+        let keys = file.imports.map(imp => imp.isModule ? String(imp.path) : imp.dirKey ? 'dir:' + imp.dirKey : null).concat(file.dir ? ['dir:' + file.dir] : [])
+        for(let key of keys){
+            for(let fileName of key && moduleScripts.get(key) || []){
+                let ref = this.scriptRef(fileName)
+                if(!eager.includes(ref)) eager.push(ref)
+            }
+        }
+        // a pure script is made on its first use: nothing tells it from one made here
+        file.eagerScripts = eager.filter(ref => !this.pureScript(ref))
+    }
+
+    importedType(source, name){
+        // a type of the runtime that a Qt module has to be imported for (QQmlImports: by the order of the imports)
+        if(source.qt){
+            let module = qtModule(source.qt)
+            return IMPORTED_TYPES.has(name) && module.types.has(name) ? this.types.get(module.key(name)) || null : null
+        }
+        let types = source.module ? this.modules.get(source.module) : this.byDir.get(source.dir)
+        let found = types && types.get(name)
+        return found ? found.typeRef : null
+    }
+
+    // the url of a script: from the file that imports it, or the url of a QML file of its directory (qmldir scripts)
+    scriptUrl(fileName){
+        let key = path.normalize(fileName)
+        if(this.scriptUrls.has(key)) return this.scriptUrls.get(key)
+        let declared = this.files.$qrcUrl ? this.files.$qrcUrl(fileName) : null
+        if(declared) return declared
+        let dir = path.dirname(key)
+        let neighbour = [...this.files.values()].find(file => file.url && path.dirname(path.normalize(file.fileName)) === dir)
+        let base = neighbour ? neighbour.url.slice(0, neighbour.url.lastIndexOf('/') + 1) : ''
+        return normalizeUrl(base + path.basename(key))
+    }
+
+    pureScript(ref){
+        if(!this.pureRefs) this.pureRefs = new Map()
+        if(!this.pureRefs.has(ref)){
+            let fileName = [...this.scripts].find(([, r]) => r === ref)
+            let pure = false
+            try {
+                pure = !!fileName && fs.existsSync(fileName[0]) && isPure(loadScript(fileName[0]).ast, (name) => JS_GLOBALS.has(name) || name === 'Qt')
+            } catch(error) {}
+            this.pureRefs.set(ref, pure)
+        }
+        return this.pureRefs.get(ref)
+    }
+
+    scriptRef(fileName){
+        let key = path.normalize(fileName)
+        if(!this.scripts.has(key)) this.scripts.set(key, '$js' + this.scripts.size)
+        return this.scripts.get(key)
+    }
+
+    warn(file, line, message){
+        this.warnings.push(file.fileName + ':' + line + ': warning: ' + message)
+    }
+
+    // Like QQmlImports: a qualified name looks in its module only; otherwise the builtin types (native
+    // replacements win over module files of the same name), the file's imports, the last one first,
+    // then its own dir, which ranks below every module import
+    typeOf(name, file = null, qualifier = ''){
+        // File.Name: an inline component of a QML type
+        let dot = name.lastIndexOf('.')
+        if(dot > 0){
+            let owner = this.typeOf(name.slice(0, dot), file, qualifier)
+            let inline = owner && owner.file && !owner.file.inlineOf && owner.file.inlineTypes && owner.file.inlineTypes.get(name.slice(dot + 1))
+            if(inline) return inline.typeRef
+        }
+        // the inline components of the document come first
+        if(!qualifier && file && file.inlineTypes && file.inlineTypes.has(name)) return file.inlineTypes.get(name).typeRef
+        if(qualifier){
+            let source = file.namespaces.get(qualifier)
+            return source && (this.importedType(source, name) || this.transitiveType([source], name))
+                || (IMPORTED_TYPES.has(name) ? null : this.types.get(name)) || null
+        }
+        if(this.types.has(name) && !IMPORTED_TYPES.has(name)) return this.types.get(name)
+        if(!file) return null
+        for(let source of file.typeImports){
+            let found = this.importedType(source, name)
+            if(found) return found
+        }
+        let indirect = this.transitiveType(file.typeImports, name)
+        if(indirect) return indirect
+        let own = this.importedType({ dir: file.dir }, name)
+        if(own) return own
+        // not imported: Qt fails, the old compiler took the type by name
+        let named = this.byName.get(name)
+        if(!named) return null
+        if(named.length > 1) this.warn(file, 0, name + ' is not imported and is ambiguous: ' + named.map(f => f.url).join(', ') + ', the last one is used')
+        return named[named.length - 1].typeRef
+    }
+
+    // the modules the imported Qt modules import (QtQuick.Controls: QtQuick.Controls.Basic), searched after every module
+    // a document imports itself
+    transitiveType(sources, name){
+        for(let source of sources){
+            if(!source || !source.qt) continue
+            for(let module of transitiveModules(source.qt)){
+                let found = this.importedType({ qt: module }, name)
+                if(found) return found
+            }
+        }
+        return null
+    }
+
+    // `Q.Name` of an element type: the qualifier and the name
+    splitType(file, type){
+        let dot = type.indexOf('.')
+        return dot > 0 && file.namespaces.has(type.slice(0, dot)) ? [type.slice(0, dot), type.slice(dot + 1)] : ['', type]
+    }
+
+    // ---- members ----------------------------------------------------------------
+
+    ownMember(el, name){
+        for(let p of el.propdefs){
+            if(p.name === name) return { kind: 'prop', qmlType: p.type, own: el }
+            if(p.name + 'Changed' === name) return { kind: 'signal', args: [], own: el }
+        }
+        for(let a of el.aliases){
+            if(a.name === name) return { kind: 'alias', own: el, alias: a }
+            if(a.name + 'Changed' === name) return { kind: 'signal', args: [], own: el }
+        }
+        for(let s of el.signals) if(s.name === name) return { kind: 'signal', args: s.args, own: el }
+        for(let m of el.methods) if(m.name === name) return { kind: 'method', own: el }
+        return null
+    }
+
+    typeMember(typeRef, name){
+        if(!typeRef) return null
+        if(typeRef.kind === 'builtin'){
+            let type = typeRef.Class.$type
+            let prop = type.propByName.get(name)
+            if(prop) return { kind: 'prop', prop, group: prop.group, builtin: true, componentKind: false }
+            let signal = type.signalByName.get(name)
+            if(signal !== undefined) return { kind: 'signal', args: type.signalArgs[signal] }
+            // a compiled QML class (Qt.createQmlObject at run time): its aliases are no properties of the type
+            if(typeRef.Class.$qmlAliases && typeRef.Class.$qmlAliases.includes(name)) return { kind: 'alias' }
+            // QML property names start lowercase: a capitalized name is a type (Component.Ready), not the attached getter
+            if(/^[a-z_$]/.test(name) && name in typeRef.Class.prototype) return { kind: 'method' }
+            return null
+        }
+        let root = typeRef.file.root
+        return this.ownMember(root, name) || this.typeMember(root.typeRef, name)
+    }
+
+    member(el, name){
+        return this.ownMember(el, name) || this.typeMember(el.typeRef, name)
+    }
+
+    // the attached object of a type of a module (ScrollBar.vertical, ContextMenu.menu, Layout.fillWidth): only with the
+    // module imported (Qt: "Non-existent attached object"); a member of the item otherwise
+    attachedMember(file, el, name){
+        if(/^[A-Z]/.test(name) && IMPORTED_TYPES.has(name) && !this.typeOf(name, file)) return null
+        return this.member(el, name)
+    }
+
+    // a type that is a component itself (Component, DelegateChooser: QQmlComponent subclasses): no implicit Component
+    // is made around it (QQmlPropertyValidator / QQmlComponentAndAliasResolver)
+    isComponentType(file, typeName){
+        if(typeName === 'Component') return true
+        let type = typeName ? this.typeOf(typeName, file) : null
+        return !!(type && type.kind === 'builtin' && (type.Class === JQ.types.Component || type.Class.prototype instanceof JQ.types.Component))
+    }
+
+    // the element is of the builtin type (or of a QML type built on it)
+    derivesFromBuiltin(el, typeName){
+        let Base = JQ.types[typeName]
+        if(!Base) return false
+        for(let typeRef = el.typeRef, depth = 0; typeRef && depth < 64; depth++){
+            if(typeRef.kind === 'builtin') return typeRef.Class === Base || typeRef.Class.prototype instanceof Base
+            typeRef = typeRef.file && typeRef.file.root && typeRef.file.root.typeRef
+        }
+        return false
+    }
+
+    isComponentProperty(el, name){
+        // a grouped or attached property: `TableView.editDelegate: Item {}` is a component of the attached object
+        let dot = name.indexOf('.')
+        if(dot > 0){
+            let group = this.member(el, name.slice(0, dot))
+            let Group = group && group.kind === 'prop' && group.builtin && group.prop.group
+            let sub = Group && Group.$type && Group.$type.propByName.get(name.slice(dot + 1))
+            return !!(sub && sub.kind === 'component')
+        }
+        let m = this.member(el, name)
+        if(!m) return false
+        if(m.kind === 'prop' && m.builtin) return m.prop.kind === 'component'
+        if(m.kind === 'prop') return m.qmlType === 'Component'
+        return false
+    }
+
+    classRef(el){
+        return el.className || this.use(el.typeRef)
+    }
+
+    // a QML type is defined on its first use, through its accessor T$()
+    use(typeRef){
+        return typeRef.kind === 'qml' ? '(' + typeRef.ref + '$())' : typeRef.ref
+    }
+
+    // ---- name resolution -----------------------------------------------------------
+
+    // memberEl: element whose members are the scope object (PropertyChanges: its target)
+    resolver(el, selfExpr, file, memberEl){
+        const resolve = (name) => {
+            if(name === '$self' || name === '$s' || name === 'JQ') return null
+            // qsTr of a QML document translates in the context of its file (lupdate: the file's base name)
+            if(name === 'qsTr' && !this.declaresName(el, name)) return 'JQ.qsTrIn(' + JSON.stringify(this.translationContext(file)) + ')'
+            // QQmlContextWrapper::lookup: the ids of the context, the scope object, the context object (the root of the
+            // component), then the same in the context above (an id of the document does not hide a property of an
+            // object of a component in it)
+            let depth = 0
+            if(el.scope && el.scope.ids.has(name)) return '$s[' + el.scope.ids.get(name) + ']'
+            if(name === 'parent') return selfExpr + '.parent'
+            // ListView in an expression is the type (ListView.Horizontal); its attached group only takes handlers
+            const valueMember = (target) => { let m = this.member(target, name); return m && !(m.group && m.group.$handlersOnly) }
+            if(valueMember(memberEl || el)) return selfExpr + '.' + name
+            depth = 0
+            for(let scope = el.scope; scope; scope = scope.parent, depth++){
+                if(depth > 0 && scope.ids.has(name)) return '$s' + '.$p'.repeat(depth) + '[' + scope.ids.get(name) + ']'
+                if(scope.isDelegate && (name === 'index' || name === 'model' || name === 'modelData')){
+                    return 'JQ.mctx($s' + '.$p'.repeat(depth) + ').' + name
+                }
+                if(scope.root && scope.root !== el && valueMember(scope.root)){
+                    return '$s' + '.$p'.repeat(depth) + '[0].' + name
+                }
+            }
+            if(name === 'Qt') return file.createsComponents || file.createsQmlObjects ? file.typeRef.ref + '$qt' : 'JQ.Qt'
+            if(file.scriptImports && file.scriptImports.has(name)) return 'JQ.si(' + file.scriptImports.get(name) + ',' + this.documentScope(file, el) + ')'
+            if(file.namespaces.has(name)){
+                let source = file.namespaces.get(name)
+                return 'JQ.ns(' + JSON.stringify(source && source.module || '') + ')'
+            }
+            let type = this.typeOf(name, file)
+            if(type) return (type.kind === 'qml' ? type.file.singleton : type.Class.$singleton) ? 'JQ.singleton(' + this.use(type) + ')' : this.use(type)
+            if(this.moduleScripts.has(name)) return 'JQ.si(' + this.moduleScripts.get(name) + ',' + this.documentScope(file, el) + ')'
+            if(JS_GLOBALS.has(name)) return null
+            // inside a delegate an unknown name is a model role: `text: name`
+            depth = 0
+            for(let scope = el.scope; scope; scope = scope.parent, depth++){
+                if(scope.isDelegate) return 'JQ.mrole($s,' + JSON.stringify(name) + ')'
+            }
+            if(name !== 'model' && name !== 'index' && name !== 'modelData' && name !== 'context' && !(file.nativeNames && file.nativeNames.has(name))) this.warn(file, el.line, name + ' is not found')
+            return 'JQ.ctx($s,' + JSON.stringify(name) + ')'
+        }
+        // Singleton.Value of an enum of a singleton type is a value of the type: no instance is made (a singleton reads
+        // its own enums while it is made)
+        resolve.typeMember = (name, property) => {
+            if(!/^[A-Z]/.test(property)) return null
+            let type = this.typeOf(name, file)
+            if(!type || !this.hasEnum(type, property)) return null
+            // the name is that type here (not an id or a property of the same name)
+            let source = resolve(name)
+            return source && source.startsWith('JQ.singleton(') ? this.use(type) + '.' + property : null
+        }
+        // T.Overlay of a namespace (import QtQuick.Templates as T) is Overlay of that module: the attached object of the
+        // scope object when the type has one (T.Overlay.overlay), as an unqualified Overlay
+        resolve.qualifiedMember = (namespace, name) => {
+            if(!file.namespaces.has(namespace) || !/^[A-Z]/.test(name) || (el.scope && el.scope.ids.has(namespace))) return null
+            if(!this.typeOf(name, file, namespace)) return null
+            let m = this.member(memberEl || el, name)
+            return m && m.kind === 'prop' && m.group && !m.group.$handlersOnly ? selfExpr + '.' + name : null
+        }
+        // x.createQmlObject(...) creates in the context of the call: the file, the scope and the names of its ids
+        if(file.createsQmlObjects || file.createsComponents){
+            resolve.callingContext = () => ({ qt: file.typeRef.ref + '$qt', scope: '$s', ids: this.scopeInfo(file, el.scope) })
+        }
+        return resolve
+    }
+
+    // an enum of the type (Type.Enum) or a value of one (Type.Value), declared by it or by a type it inherits
+    hasEnum(typeRef, property){
+        if(!/^[A-Z]/.test(property)) return false
+        for(let type = typeRef; type; type = type.kind === 'qml' ? type.file.root.typeRef : null){
+            if(type.kind !== 'qml') return !!type.Class && Object.prototype.hasOwnProperty.call(type.Class, property) && typeof type.Class[property] !== 'function'
+            for(let e of type.file.root.enums || []){
+                if(e.name === property || Object.prototype.hasOwnProperty.call(e.values || {}, property)) return true
+            }
+        }
+        return false
+    }
+
+    translationContext(file){
+        let owner = file.inlineOf || file
+        return path.basename(String(owner.fileName || owner.name || ''), '.qml')
+    }
+
+    // an id or a member of the scope named name (it would hide the global)
+    declaresName(el, name){
+        for(let scope = el.scope; scope; scope = scope.parent) if(scope.ids.has(name)) return true
+        return !!this.member(el, name)
+    }
+
+    // the scope of the document instance from the code of el: its scripts are per document instance
+    documentScope(file, el){
+        let depth = 0
+        for(let scope = el.scope; scope && scope !== file.scopes[0]; scope = scope.parent) depth++
+        return '$s' + '.$p'.repeat(depth)
+    }
+
+    fn(file, el, raw, value, params, selfExpr, memberEl){
+        let isBlock = value && value[0] === 'block'
+        let where = file.fileName + ':' + el.line
+        let { code } = rewriteValue(raw, isBlock, params, this.resolver(el, selfExpr, file, memberEl), where)
+        return this.defineFn(file, code)
+    }
+
+    // The generated functions take the object and its scope, so many are the same text: emitted once when they
+    // do not name anything local to their file (T_x$e1, T_x$qt, T_x$f1); only the accessor T_x$() is global
+    defineFn(file, code){
+        let name = file.typeRef.ref + '$f' + (++this.functionCount)
+        this.fnCodes.push(code)
+        this.out.push('const ' + name + '=' + FN_MARK + (this.fnCodes.length - 1) + FN_MARK + ';')
+        return name
+    }
+
+    sharedFunctions(text){
+        let counts = new Map()
+        for(let code of this.fnCodes) counts.set(code, (counts.get(code) || 0) + 1)
+        let names = new Map(), shared = []
+        let body = text.replace(FN_MARKS, (m, index) => {
+            let code = this.fnCodes[index]
+            if(counts.get(code) < 2 || LOCAL_NAME.test(code)) return code
+            if(!names.has(code)){
+                names.set(code, '$F' + names.size)
+                shared.push('const ' + names.get(code) + '=' + code + ';')
+            }
+            return names.get(code)
+        })
+        return shared.join('\n') + '\n' + body
+    }
+
+    // Names of the ids of a scope and its parents, for Qt.createQmlObject: { ids: { name: slot }, delegate, parent }
+    scopeInfo(file, scope){
+        let name = file.typeRef.ref + '$sc' + scope.index
+        if(!file.$scopeInfos) file.$scopeInfos = new Set()
+        if(!file.$scopeInfos.has(name)){
+            file.$scopeInfos.add(name)
+            let parent = scope.parent ? this.scopeInfo(file, scope.parent) : 'null'
+            this.out.push('const ' + name + '={ids:' + JSON.stringify(Object.fromEntries(scope.ids)) + ',delegate:' + scope.isDelegate + ',parent:' + parent + '};')
+        }
+        return name
+    }
+
+    // A scope keeps the names of its ids ($s.$i): a name a file does not resolve is looked up along the context chain at
+    // run time (JQ.ctx), in the ids and the root of each context, like QQmlContext
+    scopeNames(file, scope){
+        if(!scope.ids.size) return ''
+        let name = file.typeRef.ref + '$n' + scope.index
+        if(!file.$scopeNames) file.$scopeNames = new Set()
+        if(!file.$scopeNames.has(name)){
+            file.$scopeNames.add(name)
+            let ids = [...scope.ids].map(([id, slot]) => (IDENT.test(id) ? id : JSON.stringify(id)) + ':' + slot).join(',')
+            this.out.push('const ' + name + '={ids:{' + ids + '}};')
+        }
+        return '$s.$i=' + name + ';'
+    }
+
+    // ---- types ------------------------------------------------------------------------
+
+    resolveTypes(file){
+        this.resolveNew(file, file.elements.filter(el => !el.typeRef))
+        file.typeRef.base = file.root.typeRef
+    }
+
+    // Element values of properties become elements of the model before code is generated.
+    expandElementValues(file){
+        let queue = file.elements.slice()
+        while(queue.length){
+            let el = queue.shift()
+            for(let assign of el.assigns){
+                if(assign.elementNode && !assign.element){
+                    // `delegate: Component {...}` is already a component
+                    let asComponent = this.isComponentProperty(el, assign.name) && !this.isComponentType(file, assign.elementNode[1])
+                    let before = file.elements.length
+                    assign.element = file.elementValue(assign.elementNode, el.scope, null, asComponent)
+                    assign.asComponent = asComponent
+                    let created = file.elements.slice(before)
+                    this.resolveNew(file, created)
+                    queue.push(...created)
+                }
+                if(assign.elementNodes && !assign.elements){
+                    let before = file.elements.length
+                    assign.elements = assign.elementNodes.map(node => file.elementValue(node, el.scope, el, false))
+                    let created = file.elements.slice(before)
+                    this.resolveNew(file, created)
+                    queue.push(...created)
+                }
+            }
+            for(let def of el.propdefs){
+                if(def.elementNode && !def.element){
+                    let asComponent = def.type === 'Component' && def.elementNode[1] !== 'Component'
+                    let before = file.elements.length
+                    def.element = file.elementValue(def.elementNode, el.scope, null, asComponent)
+                    def.asComponent = asComponent
+                    let created = file.elements.slice(before)
+                    this.resolveNew(file, created)
+                    queue.push(...created)
+                }
+            }
+        }
+    }
+
+    resolveNew(file, elements){
+        for(let el of elements){
+            let [qualifier, name] = this.splitType(file, el.type)
+            el.type = name
+            let type = this.typeOf(name === 'ListElement' ? 'QtObject' : name, file, qualifier)
+            if(!type){
+                // `N.Thing` with no import as N: the qualifier is unknown (QQmlImports); a directory imported as N has no
+                // N/Thing.qml: the type loader does not find the file
+                let at = { line: el.line, col: el.col }
+                let legacy = 'type ' + el.type + ' is not found, Item is used'
+                let source = qualifier ? file.namespaces.get(qualifier) : null
+                if(source && source.dir !== undefined){
+                    this.report(file, 0, at, 'Type ' + qualifier + '.' + name + ' unavailable', legacy, { line: -1, col: -1, message: 'No such file or directory' })
+                } else {
+                    let message = !qualifier && name.indexOf('.') > 0
+                        ? name + ' - ' + name.slice(0, name.indexOf('.')) + ' is neither a type nor a namespace'
+                        : (qualifier ? qualifier + '.' : '') + name + ' is not a type'
+                    this.report(file, 2, at, message, legacy)
+                }
+                type = this.typeOf('Item')
+            }
+            el.typeRef = type
+        }
+    }
+
+    // ---- classes ----------------------------------------------------------------------
+
+    emitClass(file, el, className, isFileType){
+        el.className = className
+        let base = this.use(el.typeRef)
+        if(isFileType){
+            this.out.push(className + '=class ' + className + ' extends ' + base + '{constructor(p){super(p);' + className + '$build(this)}}')
+        } else {
+            this.out.push('class ' + className + ' extends ' + base + '{}')
+        }
+        let props = []
+        for(let p of el.propdefs){
+            let kind = QML_KIND[p.type] || (/^list\s*</.test(p.type) ? 'list' : 'var')
+            props.push(JSON.stringify(p.name) + ':' + (p.readonly ? '{kind:' + JSON.stringify(kind) + ',readonly:true}' : JSON.stringify(kind)))
+        }
+        let signals = el.signals.map(s => s.name + '(' + s.args.join(',') + ')')
+        for(let a of el.aliases) signals.push(a.name + 'Changed')
+        this.out.push('JQ.defineType(' + className + ',{props:{' + props.join(',') + '},qml:1,signals:' + JSON.stringify(signals) + '});' + className + '.$scopeKey="$s_' + className + '";')
+
+        for(let e of el.enums){
+            for(let key of Object.keys(e.values || {})) this.out.push(className + '.' + key + '=' + JSON.stringify(e.values[key]) + ';')
+            // Type.Enum.Value as well as Type.Value
+            this.out.push(className + '.' + e.name + '=' + JSON.stringify(e.values || {}) + ';')
+        }
+
+        let aliasTargets = [], listAliases = []
+        for(let a of el.aliases){
+            let slot = el.scope.ids.get(a.path[0])
+            // reported by compiler/checks.js
+            if(slot === undefined) continue
+            let target = 'this.$s_' + className + '[' + slot + ']'
+            if(a.path.length === 1){
+                this.out.push('Object.defineProperty(' + className + '.prototype,' + JSON.stringify(a.name) + ',{get(){return ' + target + '},configurable:true});')
+            } else {
+                let path = a.path.slice(1)
+                let owner = [target].concat(path.slice(0, -1)).join('.')
+                let last = path[path.length - 1]
+                this.out.push('Object.defineProperty(' + className + '.prototype,' + JSON.stringify(a.name) + ',{get(){return ' + owner + '.' + last + '},set(v){' + owner + '.' + last + '=v},configurable:true});')
+                if(LIST_ALIAS.has(last)){
+                    // an alias of the data / children / resources of an item: an object declared in it is appended
+                    listAliases.push(JSON.stringify(a.name) + ':(o)=>[o.$s_' + className + '[' + slot + ']' + path.slice(0, -1).map(p => '.' + p).join('') + ',' + JSON.stringify(last) + ']')
+                    continue
+                }
+                aliasTargets.push(JSON.stringify(a.name) + ':(o)=>{let t=o.$s_' + className + '[' + slot + ']' + path.slice(0, -1).map(p => '.' + p).join('') + ';return[t,t.constructor.$type.propByName.get(' + JSON.stringify(last) + ').id]}')
+            }
+        }
+        let defaultAlias = el.defaultAlias
+        if(isFileType && defaultAlias && defaultAlias.path.length === 2 && (defaultAlias.path[1] === 'data' || defaultAlias.path[1] === 'children')){
+            let slot = el.scope.ids.get(defaultAlias.path[0])
+            if(slot !== undefined) this.out.push(className + '.$defaultParent=(o)=>o.$s_' + className + '[' + slot + '];')
+        } else if(isFileType && defaultAlias && defaultAlias.path.length === 2){
+            // `default property alias content: pane.contentItem`: a child is assigned to that property
+            let slot = el.scope.ids.get(defaultAlias.path[0])
+            if(slot !== undefined) this.out.push(className + '.$defaultAssign=(o,c)=>{o.$s_' + className + '[' + slot + '].' + defaultAlias.path[1] + '=c};')
+        }
+        if(listAliases.length){
+            this.out.push(className + '.$listAliases=Object.assign({},' + base + '.$listAliases,{' + listAliases.join(',') + '});')
+        }
+        if(aliasTargets.length){
+            this.out.push(className + '.$aliases=Object.assign({},' + base + '.$aliases,{' + aliasTargets.join(',') + '});')
+        }
+        // the alias names and the required properties for the compiler at run time (Qt.createQmlObject), with the base's
+        if(el.aliases.length){
+            this.out.push(className + '.$qmlAliases=(' + base + '.$qmlAliases||[]).concat(' + JSON.stringify(el.aliases.map(a => a.name)) + ');')
+        }
+        let required = el.propdefs.filter(p => p.required && !p.value && !p.elementNode).map(p => p.name).concat(el.requiredNames || [])
+        if(required.length){
+            this.out.push(className + '.$qmlRequired=(' + base + '.$qmlRequired||[]).concat(' + JSON.stringify(required) + ');')
+        }
+
+        // a TestCase: its methods that wait are async (methodWaits), and so are the methods that call them
+        let waitNames = null
+        if(this.derivesFromBuiltin(el, 'TestCase')){
+            waitNames = new Set(['wait', 'tryCompare', 'tryVerify', 'waitForRendering', 'waitForItemPolished'])
+            for(let grew = true; grew;){
+                grew = false
+                for(let m of el.methods){
+                    if(waitNames.has(m.name)) continue
+                    if(methodWaits(m.raw, waitNames, file.fileName + ':' + m.line)){
+                        waitNames.add(m.name)
+                        grew = true
+                    }
+                }
+            }
+        }
+        for(let m of el.methods){
+            let prologue = 'const $self=this,$s=this.$s_' + className + ';'
+            let code = rewriteMethod(m.raw, prologue, this.resolver(el, '$self', file), file.fileName + ':' + m.line, waitNames)
+            // A QML method stays bound to its object when passed around (signal.connect(handler))
+            // the names of its parameters (FunctionFilter: the roles it takes), kept through a minification
+            let header = /function\s*[\w$]*\s*\(([^)]*)\)/.exec(m.raw)
+            let params = header ? header[1].split(',').map(p => p.trim().split(/[\s=]/)[0]).filter(Boolean) : []
+            this.out.push('JQ.defineMethod(' + className + ',' + JSON.stringify(m.name) + ',' + code + (params.length ? ',' + JSON.stringify(params) : '') + ');')
+        }
+    }
+
+    // ---- members of one element ---------------------------------------------------------
+
+    applyMembers(file, el, v, post){
+        let cls = this.classRef(el)
+
+        if(el.className && (el.methods.length || el.aliases.length)) this.current.push(v + '.$s_' + el.className + '=$s;')
+        // Loader resolves a relative source against its context: the file that declares it, also for a
+        // Loader that is the root of its own file
+        if(file.url && el !== file.root && this.inherits(el, JQ.types.Loader)) this.current.push(v + '.$base=' + JSON.stringify(file.url) + ';')
+
+        // The order of QQmlObjectCreator::setupBindings, which pushes the bindings onto allCreatedBindings; finalize
+        // enables them from the last pushed (a stack), and a binding subscribes to what it reads when it is enabled,
+        // which orders the notifications later. QmlIR::Object::appendBinding prepends a named binding (a property
+        // declaration with its value as well) and inserts a child of the default property by its position, and
+        // QmlUnitGenerator writes the value bindings, the signal handlers, the attached properties, the group
+        // properties and the bindings to aliases in that order. So: the named values from the last written to the
+        // first, the children (emitChildren), then the attached, group and alias bindings (lateMembers), each from the
+        // last written to the first.
+        let named = [], late = []
+        let unit = (list, at, kind, group, emit) => {
+            let start = this.current.length
+            emit()
+            list.push({ at, kind, group, code: this.current.splice(start) })
+        }
+        let atOf = (x) => x ? x.line * 100000 + (x.col || 0) : 0
+
+        for(let def of el.propdefs){
+            let constName = cls + '.' + def.name.toUpperCase()
+            let at = atOf(def.declAt || def.nameAt)
+            if(def.element){
+                unit(named, at, 'named', null, () => {
+                    let expr = this.elementExpr(file, def.element, def.asComponent, post)
+                    // the object is the property's (its QObject parent): destroyed with it
+                    if(def.asComponent) this.current.push(v + '.$write(' + constName + ',' + expr + ');')
+                    else this.current.push(v + '.$write(' + constName + ',JQ.ownValue(' + v + ',' + expr + '));')
+                })
+                continue
+            }
+            if(!def.value) continue
+            unit(named, at, 'named', null, () => this.assignValue(file, el, v, def.name, def.value, def.raw, constName, null, def.readonly))
+        }
+
+        for(let assign of el.assigns){
+            let at = atOf(assign)
+            // T.Overlay.modal: an attached property of a type of a namespace (import QtQuick.Templates as T) is the
+            // attached property of that type
+            let nsParts = assign.name.split('.')
+            if(nsParts.length > 2 && file.namespaces.has(nsParts[0]) && /^[A-Z]/.test(nsParts[1]) && this.typeOf(nsParts[1], file, nsParts[0])){
+                assign.name = nsParts.slice(1).join('.')
+                assign.qualified = true
+            }
+            if(assign.element){
+                // through an alias the target may be a later element of this body
+                let viaAlias = (this.member(el, assign.name.split('.')[0]) || {}).kind === 'alias'
+                let line = viaAlias && assign.name.indexOf('.') < 0
+                    ? 'JQ.aliasAssign(' + v + ',' + JSON.stringify(assign.name) + ',' + this.elementExpr(file, assign.element, assign.asComponent, post) + ');'
+                    : assign.asComponent
+                        ? this.assignTarget(file, el, v, assign.name) + '=' + this.elementExpr(file, assign.element, true, post) + ';'
+                        : this.assignTarget(file, el, v, assign.name) + '=JQ.ownValue(' + v + ',' + this.elementExpr(file, assign.element, false, post) + ');'
+                if(viaAlias) post.push(line)
+                else unit(named, at, 'named', null, () => this.current.push(line))
+                continue
+            }
+            if(assign.elements){
+                unit(named, at, 'named', null, () => {
+                    let m = this.member(el, assign.name)
+                    // a list property of a type (states, transitions ...) or one declared list<T>: the objects of a
+                    // declared one are the object's (QObject parent), not its visual children
+                    let declaredList = m && m.qmlType && /^list\s*</.test(m.qmlType)
+                    let vars = assign.elements.map(child => declaredList
+                        ? 'JQ.ownValue(' + v + ',' + this.emitElement(file, child, 'null', post) + ')'
+                        : this.emitElement(file, child, v, post))
+                    if(m && m.kind === 'prop' && (LIST_VALUE.has(assign.name) || declaredList)) this.current.push(v + '.' + assign.name + '=[' + vars.join(',') + '];')
+                })
+                continue
+            }
+            let parts = assign.name.split('.')
+            let first = assign.qualified ? this.member(el, parts[0]) : this.attachedMember(file, el, parts[0])
+            let kind = 'named', group = null
+            if(parts.length === 1 && first && first.kind === 'alias') kind = 'alias'
+            else if(parts.length > 1 && first && first.kind === 'prop' && first.group && !this.inherits(el, JQ.types.PropertyChanges)){
+                kind = /^[A-Z]/.test(parts[0]) ? 'attached' : 'group'
+                group = parts[0]
+            }
+            unit(kind === 'named' ? named : late, at, kind, group, () => this.assignProperty(file, el, v, assign))
+        }
+
+        // the named values: prepended, so written from the last to the first
+        named.sort((a, b) => b.at - a.at)
+        for(let u of named) this.current.push(...u.code)
+        el.$lateMembers = late
+
+        if(el.$subAssigns){
+            for(let [name, entries] of el.$subAssigns) post.push('JQ.subAssign(' + v + ',' + JSON.stringify(name) + ',[' + entries.join(',') + '],$s);')
+            el.$subAssigns = null
+        }
+
+        for(let handler of el.handlers) this.emitHandler(file, el, v, handler, post)
+
+        for(let a of el.aliases){
+            if(a.path.length < 2) continue
+            let slot = el.scope.ids.get(a.path[0])
+            if(slot === undefined) continue
+            let owner = '$s[' + slot + ']' + a.path.slice(1, -1).map(p => '.' + p).join('')
+            let last = a.path[a.path.length - 1]
+            post.push('JQ.forward(' + owner + ',' + owner + '.constructor.$type.signalByName.get(' + JSON.stringify(last + 'Changed') + '),' + v + ',' + cls + '.SIGNAL_' + a.name + 'Changed);')
+        }
+    }
+
+    // after the children: the attached properties, the group properties, the bindings to aliases (QmlUnitGenerator::
+    // writeBindings). A group (anchors, Layout) is prepended where it is first written, and its own bindings are
+    // prepended in its object: the groups from the last first written, each from its last binding; the aliases from
+    // the last written
+    lateMembers(el){
+        let late = el.$lateMembers
+        el.$lateMembers = null
+        if(!late || !late.length) return
+        let groups = (kind) => {
+            let byGroup = new Map()
+            for(let u of late){
+                if(u.kind !== kind) continue
+                if(!byGroup.has(u.group)) byGroup.set(u.group, [])
+                byGroup.get(u.group).push(u)
+            }
+            let list = Array.from(byGroup.values())
+            list.sort((a, b) => Math.min(...b.map(u => u.at)) - Math.min(...a.map(u => u.at)))
+            return list.flatMap(units => units.sort((a, b) => b.at - a.at))
+        }
+        let aliases = late.filter(u => u.kind === 'alias').sort((a, b) => b.at - a.at)
+        for(let u of [...groups('attached'), ...groups('group'), ...aliases]) this.current.push(...u.code)
+    }
+
+    assignTarget(file, el, v, name){
+        let parts = name.split('.')
+        return v + parts.map(p => IDENT.test(p) ? '.' + p : '[' + JSON.stringify(p) + ']').join('')
+    }
+
+    assignProperty(file, el, v, assign){
+        if(this.inherits(el, JQ.types.PropertyChanges) && !this.member(el, assign.name)){
+            this.assignChange(file, el, v, assign)
+            return
+        }
+        let parts = assign.name.split('.')
+        if(parts.length === 1){
+            let m = this.member(el, assign.name)
+            if(!m){
+                this.report(file, 2, assign.nameAt || assign, 'Cannot assign to non-existent property "' + assign.name + '"', el.type + '.' + assign.name + ' is not found')
+                return
+            }
+            if(m.kind === 'alias'){
+                this.assignAlias(file, el, v, assign)
+                return
+            }
+            let constName = this.classRef(el) + '.' + assign.name.toUpperCase()
+            this.assignValue(file, el, v, assign.name, assign.value, assign.raw, constName, null)
+            return
+        }
+        if(parts.length === 2){
+            let m = assign.qualified ? this.member(el, parts[0]) : this.attachedMember(file, el, parts[0])
+            if(m && (m.kind === 'alias' || (m.kind === 'prop' && !m.group))){
+                let entry = isConstant(assign.value)
+                    ? '[' + JSON.stringify(parts[1]) + ',false,(' + expressionText(assign.raw) + '\n)]'
+                    : '[' + JSON.stringify(parts[1]) + ',true,' + this.fn(file, el, assign.raw, assign.value, '$self,$s', '$self') + ']'
+                let list = el.$subAssigns || (el.$subAssigns = new Map())
+                if(!list.has(parts[0])) list.set(parts[0], [])
+                list.get(parts[0]).push(entry)
+                return
+            }
+            if(m && m.kind === 'prop' && m.group){
+                let groupClass = m.group
+                let groupRef = this.classRef(el) + '.$type.propByName.get(' + JSON.stringify(parts[0]) + ').group'
+                if(!groupClass.$type.propByName.get(parts[1])){
+                    this.report(file, 2, assign.nameAt || assign, 'Cannot assign to non-existent property "' + parts[1] + '"', el.type + '.' + assign.name + ' is not found')
+                    return
+                }
+                this.assignValue(file, el, v + '.' + parts[0], parts[1], assign.value, assign.raw, groupRef + '.' + parts[1].toUpperCase(), v)
+                return
+            }
+        }
+        // a group in a group: Drag.hotSpot.x
+        if(parts.length === 3){
+            let m = assign.qualified ? this.member(el, parts[0]) : this.attachedMember(file, el, parts[0])
+            let outer = m && m.kind === 'prop' && m.group
+            let inner = outer && outer.$type.propByName.get(parts[1])
+            if(inner && inner.group){
+                if(!inner.group.$type.propByName.get(parts[2])){
+                    this.report(file, 2, assign.nameAt || assign, 'Cannot assign to non-existent property "' + parts[2] + '"', el.type + '.' + assign.name + ' is not found')
+                    return
+                }
+                let groupRef = this.classRef(el) + '.$type.propByName.get(' + JSON.stringify(parts[0]) + ').group.$type.propByName.get(' + JSON.stringify(parts[1]) + ').group'
+                this.assignValue(file, el, v + '.' + parts[0] + '.' + parts[1], parts[2], assign.value, assign.raw, groupRef + '.' + parts[2].toUpperCase(), v)
+                return
+            }
+        }
+        // an attached object of no known type, or a group that is no member: errors of Qt; a known one is a gap of the runtime
+        let first = parts[0]
+        let legacy = el.type + '.' + assign.name + ' is not supported yet'
+        if(/^[A-Z]/.test(first) && !this.typeOf(first, file)) this.report(file, 2, assign, 'Non-existent attached object', legacy)
+        else if(/^[a-z]/.test(first) && !this.member(el, first)) this.report(file, 2, assign, 'Cannot assign to non-existent property "' + first + '"', legacy)
+        else this.warn(file, assign.line, legacy)
+    }
+
+    // A QML error of a document (compiler/checks.js): phase 1 QmlIR::IRBuilder, 2 the type compiler, 3 the creation.
+    // The build warns, with its own wording when it has one; a document of Qt.createQmlObject fails (compiler/runtime.js)
+    report(file, phase, at, message, warning){
+        this.warn(file, at ? at.line : 0, warning || message)
+    }
+
+    isQmlType(typeRef){
+        return !!typeRef && (typeRef.kind === 'qml' || !!typeRef.compiledQml)
+    }
+
+    // handler onX: the signal X, even where a property X exists too (MouseArea.pressed)
+    signalMember(el, name){
+        let m = this.member(el, name)
+        if(m && m.kind === 'signal') return m
+        for(let type = el.typeRef; type; type = type.kind === 'qml' ? type.file.root.typeRef : null){
+            if(type.kind === 'builtin'){
+                let id = type.Class.$type.signalByName.get(name)
+                return id === undefined ? null : { kind: 'signal', args: type.Class.$type.signalArgs[id] }
+            }
+            let own = this.ownMember(type.file.root, name)
+            if(own && own.kind === 'signal') return own
+        }
+        return null
+    }
+
+    inherits(el, Class){
+        for(let type = el.typeRef; type; type = type.kind === 'qml' ? type.file.root.typeRef : null){
+            if(type.kind === 'builtin') return type.Class === Class || type.Class.prototype instanceof Class
+        }
+        return false
+    }
+
+    // slot expression of an id visible from el, or null
+    idExpr(el, name){
+        let depth = 0
+        for(let scope = el.scope; scope; scope = scope.parent, depth++){
+            if(scope.ids.has(name)) return { expr: '$s' + '.$p'.repeat(depth) + '[' + scope.ids.get(name) + ']', scope }
+        }
+        return null
+    }
+
+    elementById(file, el, name){
+        let found = this.idExpr(el, name)
+        if(!found) return null
+        return file.elements.find(e => e.id === name && e.scope === found.scope) || null
+    }
+
+    // PropertyChanges { target: rect; width: 10; height: rect.width * 2 } or Qt 6: { rect.width: 10 }.
+    // Expressions take the target as their scope object, so its members resolve unqualified.
+    assignChange(file, el, v, assign){
+        let parts = assign.name.split('.')
+        let targetExpr = 'null', path = assign.name, targetEl = null
+        let byId = parts.length > 1 ? this.idExpr(el, parts[0]) : null
+        if(byId){
+            targetExpr = byId.expr
+            path = parts.slice(1).join('.')
+            targetEl = this.elementById(file, el, parts[0])
+        } else {
+            let target = el.assigns.find(a => a.name === 'target' && a.value)
+            let node = target && (target.value[0] === 'stat' ? target.value[1] : target.value)
+            if(node && node[0] === 'name') targetEl = this.elementById(file, el, node[1])
+        }
+        if(isConstant(assign.value)){
+            this.current.push(v + '.$change(' + targetExpr + ',' + JSON.stringify(path) + ',false,(' + expressionText(assign.raw) + '\n));')
+            return
+        }
+        let fn = this.fn(file, el, assign.raw, assign.value, '$self,$s', '$self', targetEl)
+        this.current.push(v + '.$change(' + targetExpr + ',' + JSON.stringify(path) + ',true,' + fn + ',$s);')
+    }
+
+    assignAlias(file, el, v, assign){
+        if(isConstant(assign.value)){
+            this.current.push(v + '.' + assign.name + '=(' + expressionText(assign.raw) + '\n);')
+            return
+        }
+        let fn = this.fn(file, el, assign.raw, assign.value, '$self,$s', '$self')
+        this.current.push('JQ.bindAlias(' + v + ',' + JSON.stringify(assign.name) + ',' + fn + ',$s);')
+    }
+
+    // target: element var or element var + '.group'; ownerVar: element var for a group (self of the expression)
+    assignValue(file, el, target, name, value, raw, constName, ownerVar, initialOnly){
+        let m = this.member(el, name)
+        if(m && m.builtin && m.prop.kind === 'script'){
+            let fn = this.fn(file, el, raw, value, '$self,$s', '$self')
+            this.current.push(target + '.$write(' + constName + ',{fn:' + fn + ',scope:$s});')
+            return
+        }
+        if(isConstant(value)){
+            if(initialOnly) this.current.push(target + '.$write(' + constName + ',(' + expressionText(raw) + '\n));')
+            else this.current.push(target + '.' + name + '=(' + expressionText(raw) + '\n);')
+            return
+        }
+        let fn = this.fn(file, el, raw, value, '$self,$s', '$self')
+        this.current.push(target + '.$bind(' + constName + ',' + fn + ',$s' + (ownerVar ? ',' + ownerVar : '') + ');')
+    }
+
+    emitHandler(file, el, v, handler, post){
+        let name = handler.name
+        let value = handler.value
+        let isFunctionValue = value && (value[0] === 'function' || (value[0] === 'stat' && value[1] && (value[1][0] === 'arrow' || value[1][0] === 'function')))
+        let kind = isFunctionValue ? 'function' : value && value[0] === 'block' ? 'block' : 'stat'
+        let where = file.fileName + ':' + handler.line
+        if(name === 'Component.onCompleted' || name === 'Component.onDestruction'){
+            let code = rewriteHandler(handler.raw, kind, '$self,$s', [], this.resolver(el, '$self', file), where)
+            let fnName = this.defineFn(file, code)
+            let signal = name === 'Component.onCompleted' ? 'SIGNAL_completed' : 'SIGNAL_destruction'
+            this.current.push(v + '.$on(JQ.QtObject.' + signal + ',' + fnName + ',$s);')
+            if(name === 'Component.onCompleted') this.current.push('JQ.engine.scheduleCompleted(' + v + ');')
+            return
+        }
+        if(name.indexOf('.') >= 0){
+            // a grouped attached property of the item (Keys.onPressed): its signal, the item as the handler's object
+            let [groupName, handlerName] = name.split('.')
+            let m = this.attachedMember(file, el, groupName)
+            let group = m && m.kind === 'prop' && m.group
+            let signalName = handlerName.length > 2 ? handlerName[2].toLowerCase() + handlerName.slice(3) : ''
+            let id = group && group.$type.signalByName.get(signalName)
+            if(id == null || !/^on[A-Z]/.test(handlerName)){
+                let legacy = 'attached handler ' + name + ' is not supported yet'
+                if(!group && /^[A-Z]/.test(groupName) && !this.typeOf(groupName, file)) this.report(file, 2, handler, 'Non-existent attached object', legacy)
+                else this.warn(file, handler.line, legacy)
+                return
+            }
+            let code = rewriteHandler(handler.raw, kind, '$self,$s', group.$type.signalArgs[id] || [], this.resolver(el, '$self', file), where)
+            let fnName = this.defineFn(file, code)
+            this.current.push('JQ.handleGroup(' + v + '.' + groupName + ',' + id + ',' + fnName + ',$s,' + v + ');')
+            return
+        }
+        if(this.isConnections(el)){
+            let signalName = name[2].toLowerCase() + name.slice(3)
+            let args = kind === 'function' ? [] : this.connectionsSignalArgs(el, signalName)
+            let code = rewriteHandler(handler.raw, kind, '$self,$s', args, this.resolver(el, '$self', file), where)
+            let fnName = this.defineFn(file, code)
+            this.current.push(v + '.$handle(' + JSON.stringify(signalName) + ',' + fnName + ',$s' + (handler.declaredFunction ? ',true' : '') + ');')
+            return
+        }
+        let signalName = name[2].toLowerCase() + name.slice(3)
+        let m = this.signalMember(el, signalName)
+        if(!m || m.kind !== 'signal'){
+            this.report(file, 2, handler, 'Cannot assign to non-existent property "' + name + '"', el.type + ' has no signal ' + signalName)
+            return
+        }
+        let code = rewriteHandler(handler.raw, kind, '$self,$s', m.args || [], this.resolver(el, '$self', file), where)
+        let fnName = this.defineFn(file, code)
+        this.current.push(v + '.$on(' + this.classRef(el) + '.SIGNAL_' + signalName + ',' + fnName + ',$s);')
+    }
+
+    isConnections(el){
+        for(let type = el.typeRef; type; type = type.kind === 'qml' ? type.file.root.typeRef : null){
+            if(type.kind === 'builtin') return type.Class === JQ.types.Connections || type.Class.prototype instanceof JQ.types.Connections
+        }
+        return false
+    }
+
+    // Names of the signal arguments for `onFoo:` handlers: from the target known at compile time
+    // (`target: someId` or the parent), otherwise none
+    connectionsSignalArgs(el, signalName){
+        let target = el.parent
+        let assign = el.assigns.find(a => a.name === 'target')
+        if(assign){
+            target = null
+            let raw = (assign.raw || '').trim()
+            for(let scope = el.scope; scope && !target; scope = scope.parent){
+                if(scope.ids.has(raw)) target = el.scope && this.elementById(scope, raw)
+            }
+            if(raw === 'parent') target = el.parent
+        }
+        if(!target) return []
+        let m = this.member(target, signalName)
+        return m && m.kind === 'signal' ? m.args || [] : []
+    }
+
+    elementById(scope, id){
+        for(let file of this.files.values()){
+            for(let el of file.elements) if(el.scope === scope && el.id === id) return el
+        }
+        return null
+    }
+
+    // `function onFoo(args) {...}` in Connections is a handler; any `onFoo:` handler makes them ignored (Qt docs).
+    // It stays a method of the Connections too: the other functions call it by its name (QQmlConnections is the
+    // scope object of its functions)
+    prepareConnections(file){
+        for(let el of file.elements){
+            if(!this.isConnections(el)) continue
+            let functions = el.methods.filter(m => /^on[A-Z]/.test(m.name))
+            // attached handlers (Component.onCompleted) are no handlers of the Connections
+            if(el.handlers.some(h => !h.name.includes('.'))) continue
+            for(let m of functions) el.handlers.push({ name: m.name, value: ['function'], raw: m.raw.replace(/^function\s+[\w$]+\s*\(/, 'function('), line: m.line, declaredFunction: true })
+        }
+    }
+
+    // ---- elements and component bodies -----------------------------------------------------
+
+    elementClass(file, el){
+        if(!el.className && el.hasMembers()){
+            this.emitClass(file, el, file.typeRef.ref + '$e' + el.index, false)
+        }
+        if(el.type === 'Component' && el.componentBody) this.prepareBody(file, el.componentBody)
+    }
+
+    prepareBody(file, root){
+        if(root.$prepared) return
+        root.$prepared = true
+        for(let el of file.elements){
+            if(el.scope === root.scope) this.elementClass(file, el)
+        }
+    }
+
+    // Statements creating el under parentVar, appended to this.current; returns the variable
+    // Like QQmlObjectCreator: the object is built with its handlers and children first and then
+    // added to its parent, so its onParentChanged sees the parent being set
+    emitElement(file, el, parentVar, post){
+        let v = 'e' + el.index
+        // a QML type is built in this context: its document sees it from the start (its scripts are made then)
+        if(this.isQmlType(el.typeRef)) this.current.push('const ' + v + '=JQ.make(' + this.classRef(el) + ',$s);')
+        else this.current.push('const ' + v + '=new ' + this.classRef(el) + '(null);')
+        if(el.slot >= 0) this.current.push('$s[' + el.slot + ']=' + v + ';' + (el.slot > 0 ? v + '.$idScope=$s;' : ''))
+        if(el.type === 'Component' && el.componentBody){
+            this.current.push(v + '.$build=($parent,$ctx)=>' + this.bodyFunction(file, el.componentBody) + '($parent,$s,$ctx);')
+        }
+        this.applyMembers(file, el, v, post)
+        this.emitChildren(file, el, v, post, this.classRef(el))
+        this.lateMembers(el)
+        if(parentVar !== 'null') this.current.push(v + '.$setParent(' + parentVar + ');')
+        return v
+    }
+
+    // typeRef: the class whose default property receives the children
+    emitChildren(file, el, v, post, classRef){
+        let children = el.children
+        if(!children.length) return
+        if(el.typeRef.name === 'ListModel' || (el.typeRef.base && el.typeRef.base.name === 'ListModel')){
+            if(children.every(child => child.type === 'ListElement')){
+                this.current.push(v + '.$init([' + children.map(child => this.listElement(file, child)).join(',') + ']);')
+                return
+            }
+        }
+        // A default property holding a component (Repeater.delegate): the child is the delegate
+        let defaultProperty = el.typeRef.kind === 'builtin' && el.typeRef.Class.$defaultProperty
+        // ...a component itself (a DelegateChooser) is the value as it is
+        if(defaultProperty && children.length === 1 && this.isComponentProperty(el, defaultProperty) && this.isComponentType(file, children[0].type)){
+            post.push(v + '.' + defaultProperty + '=' + this.elementExpr(file, children[0], false, post) + ';')
+            return
+        }
+        if(defaultProperty && children.length === 1 && this.isComponentProperty(el, defaultProperty) && !this.isComponentType(file, children[0].type)){
+            let child = children[0]
+            if(!child.$asDelegate){
+                child.$asDelegate = true
+                file.reparentToScope(child, file.newScope(el.scope, true))
+            }
+            post.push(v + '.' + defaultProperty + '=' + this.elementExpr(file, child, true, post) + ';')
+            return
+        }
+        if(this.hasDefaultAssign(el.typeRef)){
+            for(let child of children){
+                if(child.onProp){
+                    let cv = this.emitElement(file, child, v, post)
+                    this.current.push(cv + '.$setTarget(' + v + ',' + JSON.stringify(child.onProp) + ');')
+                    continue
+                }
+                let cv = this.emitElement(file, child, 'null', post)
+                this.current.push('JQ.defaultAssign(' + classRef + ',' + v + ',' + cv + ');')
+            }
+            return
+        }
+        let parent = v
+        if(this.hasDefaultParent(el.typeRef)){
+            parent = v + '$d'
+            this.current.push('const ' + parent + '=JQ.defaultParent(' + classRef + ',' + v + ');')
+        }
+        for(let child of children){
+            if(child.onProp){
+                let cv = this.emitElement(file, child, v, post)
+                this.current.push(cv + '.$setTarget(' + v + ',' + JSON.stringify(child.onProp) + ');')
+                continue
+            }
+            this.emitElement(file, child, parent, post)
+        }
+    }
+
+    // A QML type in the chain declares `default property alias x: id.prop` of an object property (not data / children)
+    hasDefaultAssign(typeRef){
+        for(let type = typeRef; type; type = type.kind === 'qml' ? type.file.root.typeRef : null){
+            if(type.kind === 'builtin') return false
+            let alias = type.file.root.defaultAlias
+            if(alias && alias.path.length === 2) return alias.path[1] !== 'data' && alias.path[1] !== 'children'
+            if(type.file.root.propdefs.some(p => p.defaultProp)) return false
+        }
+        return false
+    }
+
+    // A QML type in the chain declares `default property alias x: id.data`
+    hasDefaultParent(typeRef){
+        for(let type = typeRef; type; type = type.kind === 'qml' ? type.file.root.typeRef : null){
+            if(type.kind === 'builtin') return !!type.Class.$defaultParent
+            let alias = type.file.root.defaultAlias
+            if(alias && alias.path.length === 2 && (alias.path[1] === 'data' || alias.path[1] === 'children')) return true
+        }
+        return false
+    }
+
+    // ListElement { name: "a"; items: [ ListElement {...} ] } -> {"name":("a"),"items":[...]}
+    listElement(file, el){
+        let fields = []
+        for(let assign of el.assigns){
+            if(assign.elementNodes){
+                let nested = assign.elementNodes.map(node => this.listElement(file, file.elementValue(node, el.scope, null, false)))
+                fields.push(JSON.stringify(assign.name) + ':[' + nested.join(',') + ']')
+            } else if(assign.raw !== undefined){
+                fields.push(JSON.stringify(assign.name) + ':(' + expressionText(assign.raw) + '\n)')
+            }
+        }
+        return '{' + fields.join(',') + '}'
+    }
+
+    // Expression for an element value of a property: a component bound to this scope, or an object
+    // created in place (its ids belong to the owner's scope; Qt gives it no visual parent)
+    elementExpr(file, el, asComponent, post){
+        if(asComponent){
+            let body = this.bodyFunction(file, el)
+            return 'new JQ.types.Component(null,($parent,$ctx)=>' + body + '($parent,$s,$ctx))'
+        }
+        this.elementClass(file, el)
+        return this.emitElement(file, el, 'null', post)
+    }
+
+    // A function building the component body whose root is el, in a scope of its own
+    bodyFunction(file, el){
+        if(el.$bodyFunction) return el.$bodyFunction
+        this.prepareBody(file, el)
+        let name = file.typeRef.ref + '$b' + el.index
+        el.$bodyFunction = name
+        let saved = this.current
+        this.current = []
+        let post = []
+        let size = el.scope.slots
+        this.current.push('const $s=new Array(' + size + ');$s.$p=$ps;$s.$ctx=$ctx||null;$s.$n=JQ.engine.nextScope();' + this.scopeNames(file, el.scope))
+        this.emitElement(file, el, '$parent', post)
+        this.current.push('e' + el.index + '.$own=$s;')
+        let body = this.current.concat(post)
+        this.current = saved
+        this.out.push('function ' + name + '($parent,$ps,$ctx){' + body.join('') + 'return e' + el.index + '}')
+        return name
+    }
+
+    // The only child of a default property holding a component (Repeater.delegate) is a delegate: it gets its own
+    // scope before any class of the file is declared, so the aliases of those classes use the delegate's slots
+    prepareDelegates(file){
+        for(let el of file.elements.slice()){
+            let defaultProperty = el.typeRef && el.typeRef.kind === 'builtin' && el.typeRef.Class.$defaultProperty
+            if(!defaultProperty || el.children.length !== 1 || !this.isComponentProperty(el, defaultProperty)) continue
+            let child = el.children[0]
+            if(this.isComponentType(file, child.type)) continue
+            if(child.$asDelegate) continue
+            child.$asDelegate = true
+            file.reparentToScope(child, file.newScope(el.scope, true))
+        }
+    }
+
+    // document: a document of Qt.createQmlObject compiled in the browser (compiler/runtime.js). It is not registered in
+    // the bundle, its class is made at once, and its root scope continues the calling context (Qt.$qmlCaller).
+    emitFile(file, document = false){
+        let className = file.typeRef.ref
+        let root = file.root
+        this.prepareDelegates(file)
+        this.out.push('// ---- ' + file.fileName)
+        let url = JSON.stringify(file.url || file.name + '.qml')
+        if(document){
+            this.out.push('let ' + className + '=null;')
+        } else {
+            // most types of a bundle are never used: the registries hold the accessor, the class is made on the first use
+            this.out.push('let ' + className + '=null;function ' + className + '$(){return ' + className + '||' + className + '$init()}' + className + '$.$lazy=true;')
+            if(!file.inlineOf) this.out.push('JQ.files[' + url + ']=' + className + '$;')
+            if(file.module && !file.inlineOf) this.out.push('JQ.qmlModule(' + JSON.stringify(file.module) + ')[' + JSON.stringify(file.name) + ']=' + className + '$;')
+        }
+        let start = this.out.length
+        this.emitClass(file, root, className, true)
+        if(file.createsComponents || file.createsQmlObjects) this.out.push('const ' + className + '$qt=JQ.Qt.$at(' + url + ');')
+        if(file.singleton) this.out.push(className + '.$singleton=true;')
+        this.prepareBody(file, root)
+
+        this.current = []
+        let post = []
+        this.current.push('const $s=new Array(' + root.scope.slots + ');$s[0]=$root;$root.$own=$s;$s.$n=JQ.engine.nextScope();' + (document ? '$s.$p=JQ.Qt.$qmlCaller;' : '') + this.scopeNames(file, root.scope))
+        if(file.eagerScripts && file.eagerScripts.length) this.current.push('JQ.inContext($root);JQ.sis($s,[' + file.eagerScripts.join(',') + ']);')
+        this.applyMembers(file, root, '$root', post)
+        this.emitChildren(file, root, '$root', post, this.use(root.typeRef))
+        this.lateMembers(root)
+        let body = this.current.concat(post)
+        this.out.push('function ' + className + '$build($root){' + body.join('') + '}')
+        let definition = this.out.splice(start)
+        if(document) this.out.push(definition.join('\n') + '\nreturn ' + className)
+        else this.out.push('function ' + className + '$init(){' + definition.join('\n') + '\nreturn ' + className + '}')
+    }
+
+    generate(){
+        for(let file of this.files.values()) this.resolveTypes(file)
+        for(let file of this.files.values()) this.expandElementValues(file)
+        for(let file of this.files.values()) this.prepareConnections(file)
+        for(let file of this.files.values()) checkFile(this, file, false)
+        // a script may import scripts: the map grows while it is emitted
+        let scriptEnv = {
+            isGlobal: (name) => JS_GLOBALS.has(name) || name === 'Qt',
+            importRef: (imp, fileName) => {
+                if(imp.file){
+                    let target = path.resolve(path.dirname(fileName), imp.target)
+                    if(!this.scriptUrls.has(path.normalize(target))) this.scriptUrls.set(path.normalize(target), normalizeUrl(this.scriptUrl(fileName).replace(/[^/]*$/, '') + imp.target))
+                    return this.scriptRef(target)
+                }
+                return 'JQ.ns(' + JSON.stringify(this.modules.has(imp.target) ? imp.target : '') + ')'
+            },
+        }
+        for(let [fileName, ref] of this.scripts){
+            if(fs.existsSync(fileName)) this.out.push(emitScript(ref, fileName, this.scriptUrl(fileName), scriptEnv))
+            else this.out.push('const ' + ref + '=JQ.script("",true,()=>({}),()=>[]);')
+        }
+        // the scripts of the modules, for the documents of Qt.createQmlObject
+        for(let [key, fileNames] of this.files.$moduleScripts || []){
+            if(!key.startsWith('dir:')) this.out.push('JQ.moduleScripts[' + JSON.stringify(key) + ']=[' + fileNames.map(f => this.scriptRef(f)).join(',') + '];')
+        }
+        for(let file of this.files.values()) this.emitFile(file)
+        return this.sharedFunctions(this.out.join('\n'))
+    }
+}
+
+module.exports = { Codegen, TypeRef }

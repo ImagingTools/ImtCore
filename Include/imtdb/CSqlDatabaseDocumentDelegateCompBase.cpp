@@ -987,6 +987,12 @@ bool CSqlDatabaseDocumentDelegateCompBase::ClearDependentMetaInfo(const MetaFiel
 
 // protected methods
 
+QVariantMap CSqlDatabaseDocumentDelegateCompBase::GetAdditionalInsertValues(const istd::IChangeable& /*object*/) const
+{
+	return QVariantMap();
+}
+
+
 QByteArray CSqlDatabaseDocumentDelegateCompBase::PrepareInsertNewObjectQuery(
 			const QByteArray& typeId,
 			const QByteArray& objectId,
@@ -1066,6 +1072,12 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::PrepareInsertNewObjectQuery(
 						/*9*/ QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs),
 						/*10*/ QStringLiteral("Active")
 					);
+
+	const QVariantMap additionalValues = GetAdditionalInsertValues(object);
+	for (auto it = additionalValues.cbegin(); it != additionalValues.cend(); ++it){
+		columnsClause += ", " + imtdb::QuoteIdentifier(it.key());
+		valuesClause += it.value().isNull() ? QStringLiteral(", NULL") : QStringLiteral(", '%1'").arg(SqlEncode(it.value().toString()));
+	}
 
 	query += QStringLiteral(R"(INSERT INTO %1 "%2"(%3) VALUES(%4);)")
 				.arg(
@@ -1238,6 +1250,12 @@ void CSqlDatabaseDocumentDelegateCompBase::EnsureTenantBindingTableExists() cons
 		return;
 	}
 
+	if (!AddColumnIfMissing(*m_databaseEngineCompPtr, CreateTenantBindingTableName(), QStringLiteral("TenantType"), QStringLiteral("INTEGER"), QStringLiteral("0"))){
+		qWarning() << __FILE__ << __LINE__
+					<< "\n\t| TenantType column could not be added to TenantEntityBindings";
+		return;
+	}
+
 	m_tenantBindingTableInitialized = true;
 }
 
@@ -1314,6 +1332,19 @@ QString CSqlDatabaseDocumentDelegateCompBase::CreateTenantBindingFilterQuery(con
 }
 
 
+QString CSqlDatabaseDocumentDelegateCompBase::CreatePersonalSpacesFilterQuery() const
+{
+	const QString organizationBindingsLookup = QStringLiteral(R"(SELECT 1 FROM %1 tenantBindings WHERE tenantBindings."EntityType" = '%2' AND tenantBindings."EntityId" = %3 AND tenantBindings."TenantType" = %4 AND COALESCE(tenantBindings."TenantId", '') <> '')")
+				.arg(
+							CreateTenantBindingTableName(),
+							SqlEncode(GetTableName()),
+							GetDocumentIdTextExpression(),
+							QString::number(static_cast<int>(imtbase::TT_ORGANIZATION)));
+
+	return QStringLiteral("NOT EXISTS (%1)").arg(organizationBindingsLookup);
+}
+
+
 QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateTenantBindingInsertQuery(
 			const QByteArray& tenantId,
 			const QByteArray& entityId,
@@ -1325,8 +1356,10 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateTenantBindingInsertQuery(
 	}
 
 	QByteArray ownerId;
+	imtbase::TenantType tenantType = imtbase::TT_ORGANIZATION;
 	if (operationContextPtr != nullptr){
 		ownerId = operationContextPtr->GetOperationOwnerId().id;
+		tenantType = operationContextPtr->GetTenantType();
 	}
 
 	const QByteArray databaseDriverId = m_databaseEngineCompPtr.IsValid() ? m_databaseEngineCompPtr->GetDatabaseDriverId() : QByteArray();
@@ -1338,17 +1371,18 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateTenantBindingInsertQuery(
 			? QString()
 			: QStringLiteral(R"( ON CONFLICT ("TenantId", "EntityType", "EntityId") DO NOTHING)");
 
-	const QString query = QStringLiteral(R"(%1 %2 ("Id", "TenantId", "EntityType", "EntityId", "CreatedAt", "CreatedByUserId") VALUES ('%3', '%4', '%5', '%6', '%7', %8)%9;)")
+	const QString query = QStringLiteral(R"(%1 %2 ("Id", "TenantId", "TenantType", "EntityType", "EntityId", "CreatedAt", "CreatedByUserId") VALUES ('%3', '%4', %5, '%6', '%7', '%8', %9)%10;)")
 								.arg(
 									/*1*/ conflictClause,
 									/*2*/ CreateTenantBindingTableName(),
 									/*3*/ QUuid::createUuid().toString(QUuid::WithoutBraces),
 									/*4*/ SqlEncode(tenantId),
-									/*5*/ SqlEncode(GetTableName()),
-									/*6*/ SqlEncode(entityId),
-									/*7*/ QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs),
-									/*8*/ ownerId.isEmpty() ? QStringLiteral("NULL") : QStringLiteral("'%1'").arg(SqlEncode(ownerId)),
-									/*9*/ onConflictClause
+									/*5*/ QString::number(static_cast<int>(tenantType)),
+									/*6*/ SqlEncode(GetTableName()),
+									/*7*/ SqlEncode(entityId),
+									/*8*/ QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs),
+									/*9*/ ownerId.isEmpty() ? QStringLiteral("NULL") : QStringLiteral("'%1'").arg(SqlEncode(ownerId)),
+									/*10*/ onConflictClause
 								);
 
 	EnsureTenantBindingTableExists();
@@ -1391,12 +1425,20 @@ QString CSqlDatabaseDocumentDelegateCompBase::CreateDocumentShareTableName() con
 
 QString CSqlDatabaseDocumentDelegateCompBase::CreateTenantFilterQuery(const imtauth::ITenantFilterParam& tenantFilter) const
 {
-	const QByteArray tenantId = tenantFilter.GetTenantId();
+	const imtbase::TenantType tenantType = tenantFilter.GetTenantType();
 	const imtauth::TenantFilterMode filterMode = tenantFilter.GetFilterMode();
 	const bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
 
+	// A collection without isolation has no personal spaces; an organization still reaches its own filter (e.g. the members of Users)
+	const QByteArray tenantId = (tenantType == imtbase::TT_USER && !useTenantBindings) ? QByteArray() : tenantFilter.GetTenantId();
+
 	if (useTenantBindings || !tenantId.isEmpty()){
 		EnsureTenantBindingTableExists();
+	}
+
+	// Every personal space at once: the superuser outside of organizations
+	if (useTenantBindings && tenantType == imtbase::TT_USER && tenantId.isEmpty()){
+		return CreatePersonalSpacesFilterQuery();
 	}
 
 	const QString ownFilterQuery = CreateTenantBindingFilterQuery(tenantId, filterMode);
@@ -1416,6 +1458,22 @@ QString CSqlDatabaseDocumentDelegateCompBase::CreateTenantFilterQuery(const imta
 					+ QStringLiteral(R"( AND COALESCE(tenantBindings."TenantId", '') <> '' AND tenantBindings."TenantId" <> ')") + SqlEncode(tenantId) + '\'';
 
 		accessibleFilterQuery = QStringLiteral("(%1) OR NOT EXISTS (%2)").arg(ownFilterQuery, foreignBindingsLookup);
+	}
+
+	// A user shares no documents and receives none
+	if (tenantType == imtbase::TT_USER){
+		switch (sharingScope){
+		case imtauth::SS_ACCESSIBLE:
+			return accessibleFilterQuery;
+		case imtauth::SS_INCOMING:
+		case imtauth::SS_OUTGOING:
+			return QStringLiteral("1 = 0");
+		case imtauth::SS_OWN:
+		case imtauth::SS_ALL:
+			break;
+		}
+
+		return ownFilterQuery;
 	}
 
 	if (sharingScope != imtauth::SS_OWN && !EnsureDocumentShareTableExists()){
@@ -1494,6 +1552,7 @@ QString CSqlDatabaseDocumentDelegateCompBase::CreateReceivedDocumentFilterQuery(
 
 	const bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
 	if (		!useTenantBindings ||
+				tenantFilterPtr->GetTenantType() != imtbase::TT_ORGANIZATION ||
 				tenantFilterPtr->GetTenantId().isEmpty() ||
 				tenantFilterPtr->GetFilterMode() == imtauth::TFM_EXCLUDE ||
 				tenantFilterPtr->GetSharingScope() == imtauth::SS_OWN ||
@@ -2285,6 +2344,10 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::GetObjectSelectionQuery(const Q
 		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
 	}
 
+	// The id comes from the client. An id that is no UUID is compared as text: a uuid column finds nothing instead of failing
+	const QString escapedObjectId = imtdb::EscapeSql(QString::fromUtf8(objectId));
+	const bool isUuid = !QUuid::fromString(QString::fromUtf8(objectId)).isNull();
+
 	if (IsSQLite()){
 		return QStringLiteral(R"(
 		SELECT
@@ -2303,7 +2366,7 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::GetObjectSelectionQuery(const Q
 					/*2*/ *m_tableNameAttrPtr,
 					/*3*/ documentFilterQuery,
 					/*4*/ s_documentIdColumn,
-					/*5*/ objectId,
+					/*5*/ escapedObjectId,
 					/*6*/ CreateJsonExtractSql(
 						s_revisionInfoColumn,
 						s_revisionNumberKey,
@@ -2326,16 +2389,17 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::GetObjectSelectionQuery(const Q
 				FROM %1 "%2"
 				WHERE %7 = 1
 			) AS root1 ON root1."%4" = root."%4"
-			WHERE (%3) AND root."%4" = '%6' ORDER BY %8 DESC)")
+			WHERE (%3) AND root."%4"%9 = '%6' ORDER BY %8 DESC)")
 			.arg(
 				/*1*/ schemaPrefix,
 				/*2*/ *m_tableNameAttrPtr,
 				/*3*/ documentFilterQuery,
 				/*4*/ s_documentIdColumn,
 				/*5*/ s_lastModifiedColumn,
-				/*6*/ objectId,
+				/*6*/ escapedObjectId,
 				/*7*/ CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
-				/*8*/ CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int, QStringLiteral("root"))
+				/*8*/ CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int, QStringLiteral("root")),
+				/*9*/ isUuid ? QString() : QStringLiteral("::text")
 			).toUtf8();
 }
 

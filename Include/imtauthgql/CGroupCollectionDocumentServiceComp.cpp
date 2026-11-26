@@ -10,6 +10,7 @@
 #include <imtauth/IUserGroupInfo.h>
 #include <imtauth/imtauth.h>
 #include <imtauthgql/CAssignmentCollector.h>
+#include <imtauthgql/imtauthgql.h>
 
 // Generated includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/GroupCollectionDocumentService.h>
@@ -59,10 +60,19 @@ sdl::V1_0::imtauth::CGroupData CGroupCollectionDocumentServiceComp::OnGetGroupRe
 	response.name = groupPtr->GetName();
 	response.description = groupPtr->GetDescription();
 
-	// Roles are productId-scoped on IPrincipal; without a tenant context
-	// here the roles of all products are collected.
+	// Roles are productId-scoped on IPrincipal; only a superuser sees the roles of all products.
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const imtauth::IUserInfo* contextUserPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
+	const bool isProductBound = contextUserPtr != nullptr && !contextUserPtr->IsAdmin();
+	const QByteArray productId = isProductBound ? gqlContextPtr->GetProductId() : QByteArray();
+	// An empty product would collect the roles of all products
+	if (isProductBound && productId.isEmpty()){
+		errorMessage = QStringLiteral("The product of the request is not known");
+		return sdl::V1_0::imtauth::CGroupData();
+	}
+
 	CAssignmentCollector collector;
-	collector.CollectGroup(*groupPtr, groupPtr->GetObjectUuid(), QByteArray(), getGroupRepresentationRequest.GetRequestInfo().isUsersRequested);
+	collector.CollectGroup(*groupPtr, groupPtr->GetObjectUuid(), productId, getGroupRepresentationRequest.GetRequestInfo().isUsersRequested);
 	collector.FillGroup(response);
 
 	imtsdl::TElementList<sdl::V1_0::imtauth::CGroupSystemInfo> systemInfoList;
@@ -122,6 +132,10 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CGroupCollectionDocumentServiceComp
 		return response;
 	}
 
+	const QByteArray contextProductId = gqlRequest.GetRequestContext() != nullptr ? gqlRequest.GetRequestContext()->GetProductId() : QByteArray();
+	const QByteArrayList previousPermissions = groupPtr->GetPermissions(contextProductId);
+	const QByteArrayList previousUsers = groupPtr->GetUsers();
+
 	sdl::V1_0::imtauth::CGroupData groupData;
 	if (arguments.input->group){
 		groupData = *arguments.input->group;
@@ -166,7 +180,21 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CGroupCollectionDocumentServiceComp
 
 	if (groupData.roles && groupData.productId){
 		QByteArray productId = *groupData.productId;
-		groupPtr->SetRoles(productId, CAssignmentCollector::GetDirectIds(groupData.roles));
+		const QByteArrayList roleIds = CAssignmentCollector::GetDirectIds(groupData.roles);
+		if (!CheckAdministeredProduct(gqlRequest.GetRequestContext(), productId, errorMessage)
+					|| !CheckRolesOfProduct(groupPtr->GetRoleProvider(), roleIds, productId, errorMessage)){
+			return response;
+		}
+		groupPtr->SetRoles(productId, roleIds);
+	}
+
+	// New members get all permissions of the group, the others only what the change adds
+	const bool hasNewUsers = HasNewGroupMembers(previousUsers, groupPtr->GetUsers());
+	if (hasNewUsers &&!CheckGroupGrantsInOtherProducts(gqlRequest.GetRequestContext(), *groupPtr, errorMessage)){
+		return response;
+	}
+	if (!CheckGrantedPermissions(gqlRequest.GetRequestContext(), hasNewUsers ? QByteArrayList() : previousPermissions, groupPtr->GetPermissions(contextProductId), errorMessage)){
+		return response;
 	}
 
 	// The system of a group is never taken from the client: a group without a system is internal.

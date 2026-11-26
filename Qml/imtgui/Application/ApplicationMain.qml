@@ -10,13 +10,13 @@ import imtauthUsersSdl 1.0
 
 Item {
 	id: application;
-	
+
 	anchors.fill: parent;
-	
+
 	property Decorators decorators: decorators_
-	
+
 	property alias localSettings: clientSettingsController.json
-	
+
 	property alias thumbDecMenuPanelRadius: thumbnailDecorator.menuPanelRadius;
 
 	property bool serverReady: true; // [deprecated]
@@ -28,77 +28,51 @@ Item {
 	
 	property bool firstModelsIsInit: false;
 	property bool serverConnected: subscriptionManager_.status == 1;
-	
+
 	property alias subscriptionManager: subscriptionManager_;
-	
+
 	property alias loadPageByClick: thumbnailDecorator.loadPageByClick;
 	property alias canRecoveryPassword: thumbnailDecorator.canRecoveryPassword;
 
 	property alias authConnectionState: connectionState.authConnectionState
 	property alias pageAboutProvider: pageAboutProvider
-	
-	// TODO: ConnectionStateMachine.qml
+
 	QtObject {
 		id: connectionState
+		objectName: "connectionState"
 
+		property int appConnectionState: !application.useWebSocketSubscription ? 1 : (application.webSocketPort < 0 ? 0 : subscriptionManager_.status)
+		property int authConnectionState: 1
 		property int totalStatus: -1
-		
-		property var status : ({
+		property var status: ({
 			TRY_CONNECTING_TO_AUTH_SERVER: 0,
 			AUTH_SERVER_CONNECTION_ERROR: 1,
 			TRY_CONNECTING_TO_APP_SERVER: 2,
 			APP_SERVER_CONNECTION_ERROR: 3,
 			CONNECTION_SUCCESFUL: 4
 		})
-		
-		// 0 - WebSocket.Connecting, 1 - WebSocket.Open, 2 - WebSocket.Closing, 3 - WebSocket.Closed, 4 - WebSocket.Error
-		//
-		// Until the WebSocket has been given a URL it still reports its initial
-		// Closed state - and the port it needs only arrives with the first
-		// GetApplicationInfo response. Reporting that as APP_SERVER_CONNECTION_ERROR
-		// meant every cold start emitted ServerConnectionError at t=0 and, whenever
-		// the first response took longer than statusTimer's second, showed
-		// "Server connection error" instead of "Try connecting...". Report
-		// "connecting" for the whole window in which the port is still unknown.
-		property int appConnectionState: {
-			if (!application.useWebSocketSubscription){
-				return 1;
-			}
 
-			if (application.webSocketPort < 0){
-				return 0;
-			}
+		onAppConnectionStateChanged: connectionState.checkState()
+		onAuthConnectionStateChanged: connectionState.checkState()
 
-			return subscriptionManager_.status;
-		}
-		property int authConnectionState: 1 // -1 - Unknown, 0 - Connecting, 1 - Connected, 2 - Disconnected
-
-		onAppConnectionStateChanged: {
-			checkState()
-		}
-		
-		onAuthConnectionStateChanged: {
-			checkState()
-		}
-		
 		function checkState(){
-			if (authConnectionState == 1 && appConnectionState == 1){
-				totalStatus = status.CONNECTION_SUCCESFUL
+			if (connectionState.appConnectionState == 1 && connectionState.authConnectionState == 1){
+				connectionState.totalStatus = connectionState.status.CONNECTION_SUCCESFUL
 			}
-			else if (appConnectionState == 0){
-				totalStatus = status.TRY_CONNECTING_TO_APP_SERVER
+			else if (connectionState.appConnectionState == 0){
+				connectionState.totalStatus = connectionState.status.TRY_CONNECTING_TO_APP_SERVER
 			}
-			else if (appConnectionState == 4 || appConnectionState == 3){
-				totalStatus = status.APP_SERVER_CONNECTION_ERROR
+			else if (connectionState.appConnectionState == 3 || connectionState.appConnectionState == 4){
+				connectionState.totalStatus = connectionState.status.APP_SERVER_CONNECTION_ERROR
 			}
-			else if (authConnectionState == 0){
-				totalStatus = status.TRY_CONNECTING_TO_AUTH_SERVER
+			else if (connectionState.authConnectionState == 0){
+				connectionState.totalStatus = connectionState.status.TRY_CONNECTING_TO_AUTH_SERVER
 			}
-			else if (authConnectionState == 2){
-				totalStatus = status.AUTH_SERVER_CONNECTION_ERROR
+			else if (connectionState.authConnectionState == 2){
+				connectionState.totalStatus = connectionState.status.AUTH_SERVER_CONNECTION_ERROR
 			}
 		}
-		
+
 		onTotalStatusChanged: {
 			if (totalStatus == status.TRY_CONNECTING_TO_AUTH_SERVER){
 				internal.errorMessage = qsTr("Connecting to the authorization server...")
@@ -113,7 +87,15 @@ Item {
 				internal.loadingVisible = false
 			}
 			else if (totalStatus == status.TRY_CONNECTING_TO_APP_SERVER){
-				internal.errorMessage = qsTr("Connecting to ") + application.getServerUrl() + " ..."
+				// The address of the server comes with the client settings, maybe after this state, maybe never (the address is given to the engine).
+				// A web client gives the location of the page (an object): the server is its origin, as the address of the client settings
+				// (scheme://host:port); the path of the page is not the address of the server
+				internal.errorMessage = Qt.binding(function(){
+					let serverLocation = application.getServerUrl();
+					let serverUrl = (serverLocation && serverLocation.origin) ? serverLocation.origin : String(serverLocation);
+
+					return (serverUrl.indexOf("://:") >= 0) ? qsTr("Connecting to the server...") : qsTr("Connecting to ") + serverUrl + " ...";
+				})
 				internal.errorDescription = ""
 				internal.retryVisible = false
 				internal.loadingVisible = true
@@ -123,38 +105,40 @@ Item {
 				internal.errorDescription = qsTr("The application is paused until the connection is back. The open pages stay as they are.")
 				internal.retryVisible = true
 				internal.loadingVisible = false
-				ModalDialogManager.onServerConnectionError();
-				Events.sendEvent("ServerConnectionError");
 			}
 			else if (totalStatus == status.CONNECTION_SUCCESFUL){
-				thumbnailDecorator.stackView.clear();
 				statusTimer.stop()
+				thumbnailDecorator.stackView.clear();
 				Events.sendEvent("SearchVisible", true);
 				Events.sendEvent("SetUserPanelEnabled", true);
-				
 				application.firstModelsInit()
-				
 				return
 			}
 
+			statusTimer.interval = totalStatus == status.APP_SERVER_CONNECTION_ERROR ? 3000 : 1000
 			statusTimer.restart()
 		}
 	}
-	
+
 	Timer {
 		id: statusTimer
-		interval: 1000
 		repeat: false
 		onTriggered: {
+			if (connectionState.totalStatus == connectionState.status.APP_SERVER_CONNECTION_ERROR){
+				ModalDialogManager.onServerConnectionError();
+				Events.sendEvent("ServerConnectionError");
+			}
+
 			thumbnailDecorator.stackView.clear();
-			
+
 			Events.sendEvent("SearchVisible", false);
 			Events.sendEvent("SetUserPanelEnabled", false);
-			
-			application.showMessagePage(internal.errorMessage, internal.loadingVisible)
+
+			// showMessagePage() would assign internal.errorMessage and drop its Qt.binding (the server address may arrive later)
+			thumbnailDecorator.stackView.addPage(application.messagePageComp);
 		}
 	}
-	
+
 	QtObject {
 		id: internal
 		property string errorMessage: "";
@@ -170,19 +154,22 @@ Item {
 
 		internal.errorMessage = message;
 		internal.loadingVisible = loadingVisible;
-		
+
 		thumbnailDecorator.stackView.addPage(messagePageComp);
 	}
-	
+
 	signal saveSettings(string json);
 	signal settingsSaved();
 	signal settingsSaveFailed();
-	
+
 	Component.onCompleted: {
 		setDecorators()
 		timer.onTriggeredFunc();
+
+		// The first state of the connection comes with no change signal: a server that does not answer from the start would leave the window empty
+		connectionState.checkState();
 	}
-	
+
 	// Dragging a window edge changes width and height on nearly every frame, and each
 	// change used to dispatch two global Events immediately - so a resize walked every
 	// subscriber list of three event keys, allocating a fresh parameters object each
@@ -229,7 +216,7 @@ Item {
 			}
 		}
 	}
-	
+
 	// WebSocket port, resolved from the merged GetApplicationInfo response (see
 	// ApplicationInfoProvider / CApplicationInfoControllerComp). -1 means "not known
 	// yet"; the retry Timer below re-fetches until it is.
@@ -303,34 +290,34 @@ Item {
 	property DesignSchemaProvider designProvider : DesignSchemaProvider
 	{
 	}
-	
+
 	property LanguageProvider languageProvider : LanguageProvider
 	{
 	}
-	
+
 	ClientSettingsController {
 		id: clientSettingsController
-		
+
 		onSaveSettings: {
 			application.saveSettings(paramsSet.toJson())
 		}
-		
+
 		onUrlChanged: {
 			// AuthorizationController.logout();
 			application.reconnect();
 		}
 	}
-	
+
 	UserSettingsController {
 		id: userSettingsController
-		
+
 		onParamModelCreated: {
 			let languageSelectionParam = application.languageProvider.selectionParam;
 			let languageParamter = getParameterById(application.languageProvider.typeId);
 			if (languageParamter.m_data !== languageSelectionParam.toJson()){
 				application.languageProvider.selectionParam.createFromJson(languageParamter.m_data)
 			}
-			
+
 			let designSelectionParam = application.designProvider.selectionParam;
 			let designParamter = getParameterById(application.designProvider.typeId)
 			if (designParamter.m_data !== designSelectionParam.toJson()){
@@ -338,11 +325,11 @@ Item {
 			}
 		}
 	}
-	
+
 	PageAboutProvider {
 		id: pageAboutProvider
 	}
-	
+
 	SubscriptionManager {
 		id: subscriptionManager_;
 		active: application.useWebSocketSubscription;
@@ -363,7 +350,7 @@ Item {
 			}
 		}
 	}
-	
+
 	function getWebSocketUrl(serverUrl){
 		try {
 			let url = new URL(serverUrl);
@@ -394,26 +381,26 @@ Item {
 			return "";
 		}
 	}
-	
+
 	Component {
 		id: serverLogProviderComp
 		ServerLogProvider {}
 	}
-	
+
 	Component {
 		id: serviceDependencyViewComp
 		ServiceDependencyView {}
 	}
-	
+
 	ThumbnailDecorator {
 		id: thumbnailDecorator;
-		
+
 		anchors.fill: parent;
 		Component.onCompleted: {
 			settingsController.registerParamEditor("ServerLog", serverLogProviderComp)
 			settingsController.registerParamEditor("ServiceDependency", serviceDependencyViewComp)
 		}
-		
+
 		function fillPreferenceParamsSet(){
 			if (Qt.platform.os !== "web"){
 				settingsController.registerParamsSetController("Network", qsTr("Network"), clientSettingsController)
@@ -425,16 +412,25 @@ Item {
 			}
 		}
 	}
-	
+
+	// The pages and the views behind them depend on the language of the user, which comes with the settings,
+	// so they are updated after the settings are applied, not beside them.
 	function updateAllModels(){
-		userSettingsController.getSettings()
+		userSettingsController.getSettings(function(){
+			thumbnailDecorator.updateModels();
+		})
+	}
+
+	function showApplication(){
+		thumbnailDecorator.drawingContainer.content = Style.drawingContainerDecorator;
+		thumbnailDecorator.showPage(undefined)
 		thumbnailDecorator.updateModels();
 	}
-	
+
 	function onSimpleUserManagement(){
 		application.updateAllModels();
 	}
-	
+
 	// After forced logout (session/refresh expired) open the login UI immediately
 	// instead of leaving the user on a connection-status overlay.
 	function enterLoggedOutUi(){
@@ -458,7 +454,7 @@ Item {
 		thumbnailDecorator.showPage(thumbnailDecorator.authorizationPageComp);
 		AuthorizationController.updateUserManagementModel();
 	}
-	
+
 	function firstModelsInit(force){
 		if (!force){
 			force = false
@@ -481,19 +477,19 @@ Item {
 
 		firstModelsIsInit = true;
 	}
-	
+
 	function connectToWebSocketServer(){
 		if (!application.useWebSocketSubscription){
 			return;
 		}
-		
+
 		subscriptionManager_.active = false;
 		let serverUrl = getServerUrl();
 		let webSocketServerUrl = getWebSocketUrl(serverUrl);
 		subscriptionManager_.url = webSocketServerUrl;
 		subscriptionManager_.active = true;
 	}
-	
+
 	// Applies the login / superuser-setup / simple-dashboard routing decision from
 	// the latest known userMode + superuser status (both arrive together in the
 	// merged ApplicationInfoProvider response - see CApplicationInfoControllerComp).
@@ -566,16 +562,18 @@ Item {
 		}
 
 		function onLoggedIn(){
-			thumbnailDecorator.drawingContainer.content = Style.drawingContainerDecorator;
-			thumbnailDecorator.showPage(undefined)
-			
-			application.updateAllModels();
+			userSettingsController.getSettings(application.showApplication)
 		}
 
 		function onTenantSelected(tenantId){
 			application.updateAllModels();
 		}
-		
+
+		// The pages and commands the permissions open are read again
+		function onAccessChanged(){
+			application.updateAllModels();
+		}
+
 		function onLoggedOut(){
 			thumbnailDecorator.stopLoading();
 			NavigationController.clear();
@@ -585,7 +583,7 @@ Item {
 			application.firstModelsIsInit = false;
 		}
 	}
-	
+
 	// Retries the bootstrap fetch until a WebSocket port is known. The first retry is
 	// deliberately quick (a cold start that just lost a race with the server should
 	// not cost three seconds), then backs off so an unreachable server is not polled

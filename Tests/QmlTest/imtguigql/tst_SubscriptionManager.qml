@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import QtTest 1.12
 import QtWebSockets 1.2
+import imtcontrols 1.0
 import imtguigql 1.0
 
 TestCase {
@@ -8,12 +9,15 @@ TestCase {
 
 	name: "SubscriptionManager"
 
-	// Plays the server side the way the ImtCore server does: connection_ack, and silence after a start.
+	// Plays the server side the way the ImtCore server does: connection_ack, and start_ack after a start it accepts.
 	WebSocketServer {
 		id: server
 
 		property var connection: null
 		property var receivedTypes: []
+		property var stoppedIds: []
+		// The codes the next starts are refused with, one each
+		property var refusalCodes: []
 
 		listen: true
 		port: 0
@@ -26,10 +30,30 @@ TestCase {
 				types.push(request.type)
 				server.receivedTypes = types
 
+				if (request.type === "stop"){
+					let stopped = server.stoppedIds
+					stopped.push(request.id)
+					server.stoppedIds = stopped
+				}
+
 				if (request.type === "connection_init"){
 					webSocket.sendTextMessage(JSON.stringify({"type": "connection_ack"}))
 				}
+				else if (request.type === "start" && server.refusalCodes.length > 0){
+					let codes = server.refusalCodes
+					let code = codes.shift()
+					server.refusalCodes = codes
+					server.sendError(request.id, code)
+				}
+				else if (request.type === "start"){
+					webSocket.sendTextMessage(JSON.stringify({"type": "start_ack", "id": request.id}))
+				}
 			})
+		}
+
+		function sendError(subscriptionId, code){
+			server.connection.sendTextMessage(JSON.stringify({"type": "error", "id": subscriptionId,
+				"payload": [{"message": "Refused", "extensions": {"type": "Warning", "code": code}}]}))
 		}
 
 		function startCount(){
@@ -71,9 +95,33 @@ TestCase {
 		}
 	}
 
+	// Plays the AuthorizationController: counts the requests for a new access token, and refreshes when asked to
+	QtObject {
+		id: authorization
+
+		property int unauthorizedCount: 0
+		property var manager: null
+
+		function onUnauthorized(parameters){
+			authorization.unauthorizedCount++
+			if (authorization.manager){
+				authorization.manager.onAccessTokenRefreshed({})
+			}
+		}
+	}
+
 	function init(){
 		server.connection = null
 		server.receivedTypes = []
+		server.stoppedIds = []
+		server.refusalCodes = []
+		authorization.unauthorizedCount = 0
+		authorization.manager = null
+		Events.subscribeEvent("AccessTokenUnauthorized", authorization.onUnauthorized)
+	}
+
+	function cleanup(){
+		Events.unSubscribeEvent("AccessTokenUnauthorized", authorization.onUnauthorized)
 	}
 
 	// A connected manager with one subscription the server has received.
@@ -83,9 +131,27 @@ TestCase {
 		client.registerSubscription()
 
 		tryCompare(manager, "status", WebSocket.Open, 5000)
-		tryVerify(function(){ return server.startCount() === 1 }, 5000, "The subscription is started")
 
-		return {"manager": manager, "client": client}
+		let context = {"manager": manager, "client": client}
+		waitStarted(context, 1)
+
+		return context
+	}
+
+	// The server got the start number `count` and the client has handled its start_ack:
+	// a refresh it causes has happened, so the count of refreshes can be compared right after.
+	function waitStarted(context, count){
+		tryVerify(function(){ return server.startCount() === count }, 10000, "Start " + count + " reaches the server")
+		tryVerify(function(){
+			let model = context.manager.subscriptionModel
+			for (let i = 0; i < model.length; ++i){
+				if (model[i]["subscription"] === context.client){
+					return model[i]["status"] === "registered"
+				}
+			}
+
+			return false
+		}, 5000, "Start " + count + " is acknowledged on the client")
 	}
 
 	function dropConnection(context){
@@ -132,7 +198,7 @@ TestCase {
 		context.client.deliveryEnabled = false
 
 		dropConnection(context)
-		tryVerify(function(){ return server.startCount() === 2 }, 10000)
+		waitStarted(context, 2)
 		compare(context.client.refreshCount, 0, "Not while hidden")
 
 		context.client.deliveryEnabled = true
@@ -154,7 +220,7 @@ TestCase {
 
 		// the manager reconnects on its own after its retry interval
 		tryCompare(context.manager, "status", WebSocket.Open, 10000)
-		tryVerify(function(){ return server.startCount() === 2 }, 5000, "Started again on the new connection")
+		waitStarted(context, 2)
 		compare(context.client.refreshCount, 1)
 	}
 
@@ -162,9 +228,9 @@ TestCase {
 		let context = connect()
 
 		dropConnection(context)
-		tryVerify(function(){ return server.startCount() === 2 }, 10000)
+		waitStarted(context, 2)
 		dropConnection(context)
-		tryVerify(function(){ return server.startCount() === 3 }, 10000)
+		waitStarted(context, 3)
 
 		compare(context.client.refreshCount, 2)
 	}
@@ -178,7 +244,7 @@ TestCase {
 		// a refreshed token starts the failed subscription again
 		context.manager.onAccessTokenRefreshed({})
 
-		tryVerify(function(){ return server.startCount() === 2 }, 5000)
+		waitStarted(context, 2)
 		compare(context.client.refreshCount, 1)
 	}
 
@@ -188,8 +254,132 @@ TestCase {
 		// stop + start on a live connection: nothing is missed in between
 		context.manager.onAccessTokenRefreshed({})
 
-		tryVerify(function(){ return server.startCount() === 2 }, 5000)
+		waitStarted(context, 2)
 		compare(context.client.refreshCount, 0)
+	}
+
+	function test_unavailableAuthorizationIsAskedAgain(){
+		let context = connect()
+		context.manager.authorizationRetryInterval = 100
+		context.manager.authorizationRetryDelay = 100
+
+		// Unavailable again at the next registration: it goes on asking, it does not give up
+		server.refusalCodes = ["AuthorizationUnavailable", "AuthorizationUnavailable"]
+		server.sendError(context.client.subscriptionId, "AuthorizationUnavailable")
+		tryCompare(context.client, "state", "Error", 5000)
+
+		tryVerify(function(){ return server.startCount() === 4 }, 5000, "Asked again after each unavailable answer")
+		wait(500)
+		compare(server.startCount(), 4, "Not asked again once the server stays silent after a start")
+	}
+
+	function test_changedPermissionsSubscribeAgainAtOnce(){
+		let context = connect()
+
+		server.sendError(context.client.subscriptionId, "PermissionsChanged")
+
+		waitStarted(context, 2)
+		compare(context.client.refreshCount, 1, "What happened meanwhile is read again")
+	}
+
+	function test_refusalIsFinal_data(){
+		return [
+			{"tag": "forbidden", "code": "Forbidden"},
+			{"tag": "unauthorized", "code": "Unauthorized"},
+			{"tag": "no code", "code": ""}
+		]
+	}
+
+	function test_refusalIsFinal(data){
+		let context = connect()
+		context.manager.authorizationRetryInterval = 100
+		context.manager.authorizationRetryDelay = 100
+
+		server.sendError(context.client.subscriptionId, data.code)
+		tryCompare(context.client, "state", "Error", 5000)
+
+		wait(700)
+		compare(server.startCount(), 1, "A refused subscription waits for a new token or a reconnect")
+	}
+
+	// The access token expired: the server refuses a new start of it and ends a subscription whose session ended.
+	// A request of the page would ask for a new token on its 401; a subscription has to ask by itself, or it stays dead.
+	function test_unauthorizedAsksForANewToken_data(){
+		return [
+			{"tag": "registration refused", "phase": "registration", "starts": 2},
+			{"tag": "established subscription ended", "phase": "established", "starts": 2},
+			{"tag": "registration after a reconnect", "phase": "reconnect", "starts": 3}
+		]
+	}
+
+	function test_unauthorizedAsksForANewToken(data){
+		let manager = createTemporaryObject(managerComp, testCase, {"url": server.url})
+		let client = createTemporaryObject(clientComp, testCase)
+		let context = {"manager": manager, "client": client}
+		authorization.manager = manager
+
+		if (data.phase === "registration"){
+			server.refusalCodes = ["Unauthorized"]
+			client.registerSubscription()
+		}
+		else{
+			client.registerSubscription()
+			tryCompare(manager, "status", WebSocket.Open, 5000)
+			waitStarted(context, 1)
+
+			if (data.phase === "established"){
+				server.sendError(client.subscriptionId, "Unauthorized")
+			}
+			else{
+				server.refusalCodes = ["Unauthorized"]
+				dropConnection(context)
+			}
+		}
+
+		tryCompare(authorization, "unauthorizedCount", 1, 10000, "The subscription asks for a new access token")
+		waitStarted(context, data.starts)
+		compare(authorization.unauthorizedCount, 1, "Asked once")
+	}
+
+	function test_otherRefusalsDoNotAskForANewToken_data(){
+		return [
+			{"tag": "forbidden", "code": "Forbidden"},
+			{"tag": "authorization unavailable", "code": "AuthorizationUnavailable"},
+			{"tag": "permissions changed", "code": "PermissionsChanged"}
+		]
+	}
+
+	function test_otherRefusalsDoNotAskForANewToken(data){
+		let context = connect()
+
+		server.sendError(context.client.subscriptionId, data.code)
+		// A changed permission is started again at once, so its error state may already be over
+		tryVerify(function(){ return context.client.state === "Error" || server.startCount() > 1 }, 5000, "The refusal reached the client")
+
+		wait(300)
+		compare(authorization.unauthorizedCount, 0)
+	}
+
+	// A sign-out clears the manager; the connection stays open for the next user, the subscriptions of this one must not
+	function test_clearStopsTheSubscriptionsAtTheServer(){
+		let context = connect()
+		let subscriptionId = context.client.subscriptionId
+
+		context.manager.clear()
+
+		tryCompare(server, "stoppedIds", [subscriptionId], 5000)
+		compare(context.manager.subscriptionModel.length, 0)
+	}
+
+	function test_clearDoesNotStopARefusedSubscription(){
+		let context = connect()
+		server.sendError(context.client.subscriptionId, "Forbidden")
+		tryCompare(context.client, "state", "Error", 5000)
+
+		context.manager.clear()
+
+		wait(300)
+		compare(server.stoppedIds.length, 0, "The server holds nothing of it")
 	}
 
 	function test_subscriptionRegisteredWhileDisconnectedIsNotAResume(){
@@ -199,7 +389,38 @@ TestCase {
 
 		manager.active = true
 
-		tryVerify(function(){ return server.startCount() === 1 }, 5000)
+		waitStarted({"manager": manager, "client": client}, 1)
 		compare(client.refreshCount, 0, "It was never live before, so nothing was missed")
+	}
+
+	// A dropped connection is opened again at once: the application does not show it as lost
+	function test_droppedConnectionIsOpenedAgainAtOnce(){
+		let context = connect()
+		context.manager.reconnectInterval = 60000
+
+		dropConnection(context)
+		let dropped = Date.now()
+
+		tryCompare(context.manager, "status", WebSocket.Open, 1500, "Not after the pause for an unreachable server")
+		verify(Date.now() - dropped < 1500, "Opened again in " + (Date.now() - dropped) + " ms")
+		waitStarted(context, 2)
+	}
+
+	// A server out of reach is not asked again and again: after the first attempt the pause holds
+	function test_unreachableServerIsAskedAfterThePause(){
+		let context = connect()
+		let manager = context.manager
+
+		server.listen = false
+		dropConnection(context)
+
+		verify(manager.timer.running, "An attempt is planned")
+		compare(manager.timer.interval, manager.firstReconnectInterval, "The first one at once")
+
+		// The first attempt is under way or failed: the next one waits
+		tryVerify(function(){ return manager.reconnectAttempts >= 2 }, 10000)
+		compare(manager.timer.interval, manager.reconnectInterval, "Then after the pause")
+
+		server.listen = true
 	}
 }

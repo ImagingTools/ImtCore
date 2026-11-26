@@ -2,13 +2,16 @@
 // glyphs are rasterized into atlas pages (canvases) that the renderer uploads as textures.
 //
 // Without a font family the 8x8 look of SDL's debug font is emulated: every character occupies
-// a square cell of `pixelSize` and is drawn with the generic monospace font of the browser.
+// a square cell of `pixelSize` and is drawn with the generic monospace font of the browser. A family
+// that is not installed is drawn with the sans-serif font of the browser.
 
 const PAGE_SIZE = 1024;
 const MAX_PAGES = 4;
 const GLYPH_PAD = 1;
 const MAX_RASTER_PX = 256;
 const GENERIC_FAMILIES = new Set(['serif', 'sans-serif', 'monospace', 'cursive', 'fantasy', 'system-ui', 'ui-monospace']);
+// The family of text whose families are not installed (Segoe UI on macOS or Linux)
+const FALLBACK_FAMILY = 'sans-serif';
 
 function makeCanvas(width, height) {
 	if (typeof OffscreenCanvas !== 'undefined') {
@@ -97,13 +100,26 @@ export function parseFontWeight(buffer) {
 
 // Texture pages the glyphs are packed into (shelf packing).
 export class GlyphAtlas {
-	constructor() {
+	// onReset: called after the pages are emptied (the font manager drops the glyph entries of every font).
+	constructor(onReset = null) {
 		this.pages = [];
+		// The pages a reset took out of `pages`; newPage() takes them again, so there are never more than MAX_PAGES canvases
+		// (and textures), whatever still refers to an old page.
+		this.spare = [];
 		this.generation = 0;
+		// Functions that are called before the pages are emptied: a renderer that has queued draws of these pages submits them.
+		this.beforeReset = new Set();
+		this.onReset = onReset;
 		this.newPage();
 	}
 
 	newPage() {
+		const spare = this.spare.pop();
+		if (spare !== undefined) {
+			this.clearPage(spare);
+			this.pages.push(spare);
+			return spare;
+		}
 		const canvas = makeCanvas(PAGE_SIZE, PAGE_SIZE);
 		const context = canvas ? canvas.getContext('2d') : null;
 		// `coverage`: renderer applies luminance-aware stem gamma (dark text thins, light text keeps fringes).
@@ -167,9 +183,13 @@ export class GlyphAtlas {
 
 	// Empties every page; all glyph entries become invalid (see `generation`).
 	reset() {
+		for (const submit of this.beforeReset) submit();
 		this.generation++;
-		for (const page of this.pages) this.clearPage(page);
+		// the first page is emptied now, the others when newPage() takes them again
+		this.clearPage(this.pages[0]);
+		for (let i = this.pages.length - 1; i > 0; i--) this.spare.push(this.pages[i]);
 		this.pages.length = 1;
+		if (this.onReset !== null) this.onReset();
 	}
 }
 
@@ -234,8 +254,9 @@ export class FontInfo {
 		if (style === null) {
 			this.ascent = 0;
 			this.lineHeight = size;
-			// Qt's built-in box font (used when no fonts are installed): line spacing is 7/6 of the pixel size.
-			this.lineSpacing = Math.round((size * 7) / 6);
+			// Qt's built-in box font (used when no fonts are installed): the line spacing, measured for every size from 8 to 60, is 8/7 of the
+			// pixel size rounded up.
+			this.lineSpacing = Math.ceil((size * 8) / 7);
 			this.underlineY = size - Math.max(1, size * 0.08);
 			this.strikeY = size * 0.5;
 			this.lineWidth = Math.max(1, size * 0.08);
@@ -288,8 +309,9 @@ export class FontManager {
 	setDevicePixelRatio(dpr) {
 		if (dpr !== this.dpr) {
 			this.dpr = dpr;
-			this.infos.clear();
+			// the reset first: the fonts that are dropped from `infos` also drop their glyphs, if something still holds them
 			if (this.atlas) this.atlas.reset();
+			this.infos.clear();
 		}
 	}
 
@@ -303,7 +325,15 @@ export class FontManager {
 
 	ensureAtlas() {
 		if (this.atlas === null && this.measureContext() !== null) {
-			this.atlas = new GlyphAtlas();
+			// The glyphs of an emptied atlas are no use: every cached font drops them now, not only when it is used again
+			// (a zoom makes a font for each size it passes, most of them are not used again).
+			this.atlas = new GlyphAtlas(() => {
+				const generation = this.atlas.generation;
+				for (const info of this.infos.values()) {
+					info.glyphs.clear();
+					info.generation = generation;
+				}
+			});
 		}
 		return this.atlas;
 	}
@@ -346,7 +376,8 @@ export class FontManager {
 		return widths[0] !== widths[1] || widths[2] !== widths[3];
 	}
 
-	// The first available family of a comma-separated list, or null.
+	// The first available family of a comma-separated list. When none is installed, the sans-serif font of the browser: Qt
+	// takes a font of the system for a family that is missing (the built-in look of Qt is only for a system without fonts).
 	resolveFamily(list) {
 		if (this.resolved.has(list)) return this.resolved.get(list);
 		let result = null;
@@ -356,9 +387,12 @@ export class FontManager {
 				break;
 			}
 		}
-		if (result === null && !this.warned.has(list)) {
-			this.warned.add(list);
-			if (this.onWarning) this.onWarning(`Font family '${list}' not found, using the built-in font`);
+		if (result === null) {
+			result = FALLBACK_FAMILY;
+			if (!this.warned.has(list)) {
+				this.warned.add(list);
+				if (this.onWarning) this.onWarning(`Font family '${list}' not found, using ${FALLBACK_FAMILY}`);
+			}
 		}
 		this.resolved.set(list, result);
 		return result;

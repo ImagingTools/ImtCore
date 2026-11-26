@@ -284,184 +284,188 @@
 <context>
     <name>Attribute</name>
     <message>
+        <source>My role</source>
+        <translation>Моя роль</translation>
+    </message>
+    <message>
         <source>{actor} invited you to &quot;{subject}&quot;</source>
-        <translation type="vanished">Приглашение в «{subject}» от {actor}</translation>
+        <translation>Приглашение в «{subject}» от {actor}</translation>
     </message>
     <message>
         <source>{actor} accepted the invitation to &quot;{subject}&quot;</source>
-        <translation type="vanished">Приглашение в «{subject}» принято: {actor}</translation>
+        <translation>Приглашение в «{subject}» принято: {actor}</translation>
     </message>
     <message>
         <source>{actor} declined the invitation to &quot;{subject}&quot;</source>
-        <translation type="vanished">Приглашение в «{subject}» отклонено: {actor}</translation>
+        <translation>Приглашение в «{subject}» отклонено: {actor}</translation>
     </message>
     <message>
         <source>The invitation to &quot;{subject}&quot; was withdrawn</source>
-        <translation type="vanished">Приглашение в «{subject}» отозвано</translation>
+        <translation>Приглашение в «{subject}» отозвано</translation>
     </message>
     <message>
         <source>You are now the owner of &quot;{subject}&quot;</source>
-        <translation type="vanished">Теперь вы владелец «{subject}»</translation>
+        <translation>Теперь вы владелец «{subject}»</translation>
     </message>
     <message>
         <source>{member} is now the owner of &quot;{subject}&quot;</source>
-        <translation type="vanished">Новый владелец «{subject}»: {member}</translation>
+        <translation>Новый владелец «{subject}»: {member}</translation>
     </message>
     <message>
         <source>Your permissions in &quot;{subject}&quot; were changed</source>
-        <translation type="vanished">Ваши права в «{subject}» изменены</translation>
+        <translation>Ваши права в «{subject}» изменены</translation>
     </message>
     <message>
         <source>You are no longer a member of &quot;{subject}&quot;</source>
-        <translation type="vanished">Вы больше не участник «{subject}»</translation>
+        <translation>Вы больше не участник «{subject}»</translation>
     </message>
     <message>
         <source>{member} is no longer a member of &quot;{subject}&quot;</source>
-        <translation type="vanished">{member} больше не участник «{subject}»</translation>
+        <translation>{member} больше не участник «{subject}»</translation>
     </message>
     <message>
         <source>New message from &quot;{subject}&quot;</source>
-        <translation type="vanished">Новое сообщение от «{subject}»</translation>
+        <translation>Новое сообщение от «{subject}»</translation>
     </message>
     <message>
         <source>&quot;{partner}&quot; wants to connect to &quot;{subject}&quot;</source>
-        <translation type="vanished">«{partner}» хочет подключиться к «{subject}»</translation>
+        <translation>«{partner}» хочет подключиться к «{subject}»</translation>
     </message>
     <message>
         <source>&quot;{partner}&quot; accepted the connection request of &quot;{subject}&quot;</source>
-        <translation type="vanished">Запрос «{subject}» на подключение к «{partner}» принят</translation>
+        <translation>Запрос «{subject}» на подключение к «{partner}» принят</translation>
     </message>
     <message>
         <source>&quot;{partner}&quot; declined the connection request of &quot;{subject}&quot;</source>
-        <translation type="vanished">Запрос «{subject}» на подключение к «{partner}» отклонён</translation>
+        <translation>Запрос «{subject}» на подключение к «{partner}» отклонён</translation>
     </message>
     <message>
         <source>The connection of &quot;{subject}&quot; with &quot;{partner}&quot; was removed</source>
-        <translation type="vanished">Подключение «{subject}» к «{partner}» удалено</translation>
+        <translation>Подключение «{subject}» к «{partner}» удалено</translation>
     </message>
     <message>
         <source>&quot;{partner}&quot; proposes a relationship to &quot;{subject}&quot;</source>
-        <translation type="vanished">«{partner}» предлагает связь с «{subject}»</translation>
+        <translation>«{partner}» предлагает связь с «{subject}»</translation>
     </message>
     <message>
         <source>The relationship of &quot;{subject}&quot; with &quot;{partner}&quot; was accepted</source>
-        <translation type="vanished">Связь «{subject}» с «{partner}» принята</translation>
+        <translation>Связь «{subject}» с «{partner}» принята</translation>
     </message>
     <message>
         <source>The relationship proposal of &quot;{subject}&quot; with &quot;{partner}&quot; was declined</source>
-        <translation type="vanished">Предложение о связи «{subject}» с «{partner}» отклонено</translation>
+        <translation>Предложение о связи «{subject}» с «{partner}» отклонено</translation>
     </message>
     <message>
         <source>The relationship of &quot;{subject}&quot; with &quot;{partner}&quot; ended</source>
-        <translation type="vanished">Связь «{subject}» с «{partner}» завершена</translation>
+        <translation>Связь «{subject}» с «{partner}» завершена</translation>
     </message>
     <message>
         <source>{count, plural, =1 {New message in &quot;{subject}&quot;} other {# new messages in &quot;{subject}&quot;}}</source>
-        <translation type="vanished">{count, plural, =1 {Новое сообщение в «{subject}»} one {# новое сообщение в «{subject}»} few {# новых сообщения в «{subject}»} many {# новых сообщений в «{subject}»} other {# нового сообщения в «{subject}»}}</translation>
+        <translation>{count, plural, =1 {Новое сообщение в «{subject}»} one {# новое сообщение в «{subject}»} few {# новых сообщения в «{subject}»} many {# новых сообщений в «{subject}»} other {# нового сообщения в «{subject}»}}</translation>
     </message>
     <message>
         <source>{actor} assigned you to &quot;{subject}&quot;</source>
-        <translation type="vanished">{actor} назначает вас на «{subject}»</translation>
+        <translation>{actor} назначает вас на «{subject}»</translation>
     </message>
     <message>
         <source>Organization</source>
-        <translation type="vanished">Организация</translation>
+        <translation>Организация</translation>
     </message>
     <message>
         <source>Connection request</source>
-        <translation type="vanished">Запрос на подключение</translation>
+        <translation>Запрос на подключение</translation>
     </message>
     <message>
         <source>Connection</source>
-        <translation type="vanished">Подключение</translation>
+        <translation>Подключение</translation>
     </message>
     <message>
         <source>Relationship proposal</source>
-        <translation type="vanished">Предложение о связи</translation>
+        <translation>Предложение о связи</translation>
     </message>
     <message>
         <source>Relationship</source>
-        <translation type="vanished">Связь</translation>
+        <translation>Связь</translation>
     </message>
     <message>
         <source>Message from organization</source>
-        <translation type="vanished">Сообщение от организации</translation>
+        <translation>Сообщение от организации</translation>
     </message>
     <message>
         <source>Invitation received</source>
-        <translation type="vanished">Получено приглашение</translation>
+        <translation>Получено приглашение</translation>
     </message>
     <message>
         <source>Invitation accepted</source>
-        <translation type="vanished">Приглашение принято</translation>
+        <translation>Приглашение принято</translation>
     </message>
     <message>
         <source>Invitation declined</source>
-        <translation type="vanished">Приглашение отклонено</translation>
+        <translation>Приглашение отклонено</translation>
     </message>
     <message>
         <source>Invitation withdrawn</source>
-        <translation type="vanished">Приглашение отозвано</translation>
+        <translation>Приглашение отозвано</translation>
     </message>
     <message>
         <source>Ownership received</source>
-        <translation type="vanished">Вы стали владельцем</translation>
+        <translation>Вы стали владельцем</translation>
     </message>
     <message>
         <source>Ownership transferred</source>
-        <translation type="vanished">Владение передано</translation>
+        <translation>Владение передано</translation>
     </message>
     <message>
         <source>Permissions changed</source>
-        <translation type="vanished">Права изменены</translation>
+        <translation>Права изменены</translation>
     </message>
     <message>
         <source>Membership ended</source>
-        <translation type="vanished">Участие завершено</translation>
+        <translation>Участие завершено</translation>
     </message>
     <message>
         <source>Member left</source>
-        <translation type="vanished">Участник вышел</translation>
+        <translation>Участник вышел</translation>
     </message>
     <message>
         <source>Connection request received</source>
-        <translation type="vanished">Получен запрос на подключение</translation>
+        <translation>Получен запрос на подключение</translation>
     </message>
     <message>
         <source>Connection request approved</source>
-        <translation type="vanished">Запрос на подключение одобрен</translation>
+        <translation>Запрос на подключение одобрен</translation>
     </message>
     <message>
         <source>Connection request rejected</source>
-        <translation type="vanished">Запрос на подключение отклонён</translation>
+        <translation>Запрос на подключение отклонён</translation>
     </message>
     <message>
         <source>Connection removed</source>
-        <translation type="vanished">Подключение удалено</translation>
+        <translation>Подключение удалено</translation>
     </message>
     <message>
         <source>Relationship proposal received</source>
-        <translation type="vanished">Получено предложение о связи</translation>
+        <translation>Получено предложение о связи</translation>
     </message>
     <message>
         <source>Relationship proposal approved</source>
-        <translation type="vanished">Предложение о связи одобрено</translation>
+        <translation>Предложение о связи одобрено</translation>
     </message>
     <message>
         <source>Relationship proposal rejected</source>
-        <translation type="vanished">Предложение о связи отклонено</translation>
+        <translation>Предложение о связи отклонено</translation>
     </message>
     <message>
         <source>Relationship ended</source>
-        <translation type="vanished">Связь прекращена</translation>
+        <translation>Связь прекращена</translation>
     </message>
     <message>
         <source>New message</source>
-        <translation type="vanished">Новое сообщение</translation>
+        <translation>Новое сообщение</translation>
     </message>
     <message>
         <source>Ticket assigned</source>
-        <translation type="vanished">Назначена заявка</translation>
+        <translation>Назначена заявка</translation>
     </message>
     <message>
         <source>Notifications</source>
@@ -469,31 +473,31 @@
     </message>
     <message>
         <source>Notification</source>
-        <translation type="vanished">Уведомление</translation>
+        <translation>Уведомление</translation>
     </message>
     <message>
         <source>Severity</source>
-        <translation type="vanished">Важность</translation>
+        <translation>Важность</translation>
     </message>
     <message>
         <source>Mark as read</source>
-        <translation type="vanished">Отметить как прочитанное</translation>
+        <translation>Отметить как прочитанное</translation>
     </message>
     <message>
         <source>Mark all as read</source>
-        <translation type="vanished">Отметить все как прочитанные</translation>
+        <translation>Отметить все как прочитанные</translation>
     </message>
     <message>
         <source>Parent organization</source>
-        <translation type="vanished">Родительская организация</translation>
+        <translation>Родительская организация</translation>
     </message>
     <message>
         <source>Members</source>
-        <translation type="vanished">Участники</translation>
+        <translation>Участники</translation>
     </message>
     <message>
         <source>Client (CommandLine)</source>
-        <translation type="vanished">Клиент (командная строка)</translation>
+        <translation>Клиент (командная строка)</translation>
     </message>
     <message>
         <source>. ImagingTools</source>
@@ -501,23 +505,23 @@
     </message>
     <message>
         <source>Design token generator</source>
-        <translation type="vanished">Генератор дизайн-токенов</translation>
+        <translation>Генератор дизайн-токенов</translation>
     </message>
     <message>
         <source>ImagingTools</source>
-        <translation type="vanished">ImagingTools</translation>
+        <translation>ImagingTools</translation>
     </message>
     <message>
         <source>Client</source>
-        <translation type="vanished">Клиент</translation>
+        <translation>Клиент</translation>
     </message>
     <message>
         <source>Server</source>
-        <translation type="vanished">Сервер</translation>
+        <translation>Сервер</translation>
     </message>
     <message>
         <source>AddressElements</source>
-        <translation type="vanished">Элементы адреса</translation>
+        <translation>Элементы адреса</translation>
     </message>
     <message>
         <source>. xxxx &lt;my company&gt;</source>
@@ -525,87 +529,87 @@
     </message>
     <message>
         <source>(C) 2018 ImagingTools GmbH. All rights reserved.</source>
-        <translation type="vanished">(C) 2018 ImagingTools GmbH. Все права защищены.</translation>
+        <translation>(C) 2018 ImagingTools GmbH. Все права защищены.</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="vanished">Настройки</translation>
+        <translation>Настройки</translation>
     </message>
     <message>
         <source>Preference File</source>
-        <translation type="vanished">Файл настроек</translation>
+        <translation>Файл настроек</translation>
     </message>
     <message>
         <source>Light</source>
-        <translation type="vanished">Светлая</translation>
+        <translation>Светлая</translation>
     </message>
     <message>
         <source>Dark</source>
-        <translation type="vanished">Темная</translation>
+        <translation>Темная</translation>
     </message>
     <message>
         <source>General</source>
-        <translation type="vanished">Основное</translation>
+        <translation>Основное</translation>
     </message>
     <message>
         <source>Language</source>
-        <translation type="vanished">Язык</translation>
+        <translation>Язык</translation>
     </message>
     <message>
         <source>http://localhost:7778</source>
-        <translation type="vanished">http://localhost:7778</translation>
+        <translation>http://localhost:7778</translation>
     </message>
     <message>
         <source>Design Schema</source>
-        <translation type="vanished">Дизайн схема</translation>
+        <translation>Дизайн схема</translation>
     </message>
     <message>
         <source>DocumentInfo</source>
-        <translation type="vanished">Информация о документе</translation>
+        <translation>Информация о документе</translation>
     </message>
     <message>
         <source>Network</source>
-        <translation type="vanished">Сеть</translation>
+        <translation>Сеть</translation>
     </message>
     <message>
         <source>Preferences</source>
-        <translation type="vanished">Настройки</translation>
+        <translation>Настройки</translation>
     </message>
     <message>
         <source>^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$</source>
-        <translation type="vanished">^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$</translation>
+        <translation>^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$</translation>
     </message>
     <message>
         <source>Instance Mask</source>
-        <translation type="vanished">Маска экземпляра</translation>
+        <translation>Маска экземпляра</translation>
     </message>
     <message>
         <source>Database Settings</source>
-        <translation type="vanished">Настройки базы данных</translation>
+        <translation>Настройки базы данных</translation>
     </message>
     <message>
         <source>ImtCore</source>
-        <translation type="vanished">ImtCore</translation>
+        <translation>ImtCore</translation>
     </message>
     <message>
         <source>STL</source>
-        <translation type="vanished">STL</translation>
+        <translation>STL</translation>
     </message>
     <message>
         <source>Revision</source>
-        <translation type="vanished">Ревизия</translation>
+        <translation>Ревизия</translation>
     </message>
     <message>
         <source>qrc:/qml/imtcolgui/CollectionWorkspacePageView.qml</source>
-        <translation type="vanished">qrc:/qml/imtcolgui/CollectionWorkspacePageView.qml</translation>
+        <translation>qrc:/qml/imtcolgui/CollectionWorkspacePageView.qml</translation>
     </message>
     <message>
         <source>New Role</source>
-        <translation type="vanished">Новая роль</translation>
+        <translation>Новая роль</translation>
     </message>
     <message>
         <source>New Group</source>
-        <translation type="vanished">Новая группа</translation>
+        <translation>Новая группа</translation>
     </message>
     <message>
         <source>System Name</source>
@@ -613,23 +617,23 @@
     </message>
     <message>
         <source>New User</source>
-        <translation type="vanished">Новый пользователь</translation>
+        <translation>Новый пользователь</translation>
     </message>
     <message>
         <source>qrc:/qml/imtguigql/GqlCollectionDocManagerPageView.qml</source>
-        <translation type="vanished">qrc:/qml/imtguigql/GqlCollectionDocManagerPageView.qml</translation>
+        <translation>qrc:/qml/imtguigql/GqlCollectionDocManagerPageView.qml</translation>
     </message>
     <message>
         <source>qrc:/qml/imtgui/View/SearchPage.qml</source>
-        <translation type="vanished">qrc:/qml/imtgui/View/SearchPage.qml</translation>
+        <translation>qrc:/qml/imtgui/View/SearchPage.qml</translation>
     </message>
     <message>
         <source>Icons/Search</source>
-        <translation type="vanished">Icons/Search</translation>
+        <translation>Icons/Search</translation>
     </message>
     <message>
         <source>qrc:/qml/imtdocgui/SearchPageSingleDocumentView.qml</source>
-        <translation type="vanished">qrc:/qml/imtdocgui/SearchPageSingleDocumentView.qml</translation>
+        <translation>qrc:/qml/imtdocgui/SearchPageSingleDocumentView.qml</translation>
     </message>
     <message>
         <source>Search</source>
@@ -637,7 +641,7 @@
     </message>
     <message>
         <source>qrc:/qml/imtauthgui/AdministrationView.qml</source>
-        <translation type="vanished">qrc:/qml/imtauthgui/AdministrationView.qml</translation>
+        <translation>qrc:/qml/imtauthgui/AdministrationView.qml</translation>
     </message>
     <message>
         <source>Admin</source>
@@ -645,23 +649,23 @@
     </message>
     <message>
         <source>Alias</source>
-        <translation type="vanished">Псевдоним</translation>
+        <translation>Псевдоним</translation>
     </message>
     <message>
         <source>/// \file $(FilePath)</source>
-        <translation type="vanished">/// \file $(FilePath)</translation>
+        <translation>/// \file $(FilePath)</translation>
     </message>
     <message>
         <source>Algorithm</source>
-        <translation type="vanished">Алгоритм</translation>
+        <translation>Алгоритм</translation>
     </message>
     <message>
         <source>Encoding Format</source>
-        <translation type="vanished">Формат кодирования</translation>
+        <translation>Формат кодирования</translation>
     </message>
     <message>
         <source>Type</source>
-        <translation type="vanished">Тип</translation>
+        <translation>Тип</translation>
     </message>
     <message>
         <location filename="../../../Include/imtauth/CUserChangeGeneratorComp.cpp" line="+81"/>
@@ -686,87 +690,87 @@
     </message>
     <message>
         <source>File Path</source>
-        <translation type="vanished">Путь к файлу</translation>
+        <translation>Путь к файлу</translation>
     </message>
     <message>
         <source>Key Files</source>
-        <translation type="vanished">Файлы ключей</translation>
+        <translation>Файлы ключей</translation>
     </message>
     <message>
         <source>Remove All</source>
-        <translation type="vanished">Удалить все</translation>
+        <translation>Удалить все</translation>
     </message>
     <message>
         <source>Restore All</source>
-        <translation type="vanished">Восстановить все</translation>
+        <translation>Восстановить все</translation>
     </message>
     <message>
         <source>Duplicate</source>
-        <translation type="vanished">Дублировать</translation>
+        <translation>Дублировать</translation>
     </message>
     <message>
         <source>Restore</source>
-        <translation type="vanished">Восстановить</translation>
+        <translation>Восстановить</translation>
     </message>
     <message>
         <source>Certificate Files</source>
-        <translation type="vanished">Файлы сертификатов</translation>
+        <translation>Файлы сертификатов</translation>
     </message>
     <message>
         <source>Enable SSL</source>
-        <translation type="vanished">Включить SSL</translation>
+        <translation>Включить SSL</translation>
     </message>
     <message>
         <source>Local Certificate</source>
-        <translation type="vanished">Локальный сертификат</translation>
+        <translation>Локальный сертификат</translation>
     </message>
     <message>
         <source>CA Certificate</source>
-        <translation type="vanished">Сертификат ЦС</translation>
+        <translation>Сертификат ЦС</translation>
     </message>
     <message>
         <source>Private Key</source>
-        <translation type="vanished">Закрытый ключ</translation>
+        <translation>Закрытый ключ</translation>
     </message>
     <message>
         <source>Verification Mode</source>
-        <translation type="vanished">Режим проверки</translation>
+        <translation>Режим проверки</translation>
     </message>
     <message>
         <source>Protocol</source>
-        <translation type="vanished">Протокол</translation>
+        <translation>Протокол</translation>
     </message>
     <message>
         <source>LDAP</source>
-        <translation type="vanished">LDAP</translation>
+        <translation>LDAP</translation>
     </message>
     <message>
         <source>Full Screen</source>
-        <translation type="vanished">Полный экран</translation>
+        <translation>Полный экран</translation>
     </message>
     <message>
         <source>PageViewParam</source>
-        <translation type="vanished">Параметры просмотра страницы</translation>
+        <translation>Параметры просмотра страницы</translation>
     </message>
     <message>
         <source>qrc:/qml/imtdocgui/MultiDocWorkspacePageView.qml</source>
-        <translation type="vanished">qrc:/qml/imtdocgui/MultiDocWorkspacePageView.qml</translation>
+        <translation>qrc:/qml/imtdocgui/MultiDocWorkspacePageView.qml</translation>
     </message>
     <message>
         <source>../../imtdocgui/MultiDocWorkspacePageView.qml</source>
-        <translation type="vanished">../../imtdocgui/MultiDocWorkspacePageView.qml</translation>
+        <translation>../../imtdocgui/MultiDocWorkspacePageView.qml</translation>
     </message>
     <message>
         <source>qrc:/qml/imtdocgui/SingleDocumentWorkspacePageView.qml</source>
-        <translation type="vanished">qrc:/qml/imtdocgui/SingleDocumentWorkspacePageView.qml</translation>
+        <translation>qrc:/qml/imtdocgui/SingleDocumentWorkspacePageView.qml</translation>
     </message>
     <message>
         <source>Icons/History</source>
-        <translation type="vanished">Icons/History</translation>
+        <translation>Icons/History</translation>
     </message>
     <message>
         <source>History</source>
-        <translation type="vanished">История</translation>
+        <translation>История</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -777,11 +781,11 @@
     </message>
     <message>
         <source>Session</source>
-        <translation type="vanished">Сессия</translation>
+        <translation>Сессия</translation>
     </message>
     <message>
         <source>User Connection</source>
-        <translation type="vanished">Подключение пользователя</translation>
+        <translation>Подключение пользователя</translation>
     </message>
     <message>
         <location line="-45"/>
@@ -808,19 +812,19 @@
     </message>
     <message>
         <source>SMTP</source>
-        <translation type="vanished">SMTP</translation>
+        <translation>SMTP</translation>
     </message>
     <message>
         <source>Server Address</source>
-        <translation type="vanished">Адрес сервера</translation>
+        <translation>Адрес сервера</translation>
     </message>
     <message>
         <source>Port</source>
-        <translation type="vanished">Порт</translation>
+        <translation>Порт</translation>
     </message>
     <message>
         <source>465</source>
-        <translation type="vanished">465</translation>
+        <translation>465</translation>
     </message>
     <message>
         <source>qqmbxszuzxnylorx</source>
@@ -836,155 +840,155 @@
     </message>
     <message>
         <source>Activate it if you want your server to work using SSL</source>
-        <translation type="vanished">Активируйте, если хотите, чтобы сервер работал по SSL</translation>
+        <translation>Активируйте, если хотите, чтобы сервер работал по SSL</translation>
     </message>
     <message>
         <source>Local Cert</source>
-        <translation type="vanished">Локальный сертификат</translation>
+        <translation>Локальный сертификат</translation>
     </message>
     <message>
         <source>SSL Protocol</source>
-        <translation type="vanished">SSL-протокол</translation>
+        <translation>SSL-протокол</translation>
     </message>
     <message>
         <source>Verify Mode</source>
-        <translation type="vanished">Режим проверки</translation>
+        <translation>Режим проверки</translation>
     </message>
     <message>
         <source>Ca Cert</source>
-        <translation type="vanished">Сертификат ЦС</translation>
+        <translation>Сертификат ЦС</translation>
     </message>
     <message>
         <source>SSL Configuration</source>
-        <translation type="vanished">Настройки SSL</translation>
+        <translation>Настройки SSL</translation>
     </message>
     <message>
         <source>Key Type</source>
-        <translation type="vanished">Тип ключа</translation>
+        <translation>Тип ключа</translation>
     </message>
     <message>
         <source>Select the file with your private key</source>
-        <translation type="vanished">Выберите файл с вашим закрытым ключом</translation>
+        <translation>Выберите файл с вашим закрытым ключом</translation>
     </message>
     <message>
         <source>Message Info</source>
-        <translation type="vanished">Информация о сообщении</translation>
+        <translation>Информация о сообщении</translation>
     </message>
     <message>
         <source>User Settings</source>
-        <translation type="vanished">Настройки пользователя</translation>
+        <translation>Настройки пользователя</translation>
     </message>
     <message>
         <source>English</source>
-        <translation type="vanished">Английский</translation>
+        <translation>Английский</translation>
     </message>
     <message>
         <source>German</source>
-        <translation type="vanished">Немецкий</translation>
+        <translation>Немецкий</translation>
     </message>
     <message>
         <source>Russian</source>
-        <translation type="vanished">Русский</translation>
+        <translation>Русский</translation>
     </message>
     <message>
         <source>Server Connection Interface</source>
-        <translation type="vanished">Интерфейс подключения к серверу</translation>
+        <translation>Интерфейс подключения к серверу</translation>
     </message>
     <message>
         <source>OBJ</source>
-        <translation type="vanished">OBJ</translation>
+        <translation>OBJ</translation>
     </message>
     <message>
         <source>X</source>
-        <translation type="vanished">X</translation>
+        <translation>X</translation>
     </message>
     <message>
         <source>Z</source>
-        <translation type="vanished">Z</translation>
+        <translation>Z</translation>
     </message>
     <message>
         <source>Last Message</source>
-        <translation type="vanished">Последнее сообщение</translation>
+        <translation>Последнее сообщение</translation>
     </message>
     <message>
         <source>Unread</source>
-        <translation type="vanished">Непрочитанные</translation>
+        <translation>Непрочитанные</translation>
     </message>
     <message>
         <source>Participants</source>
-        <translation type="vanished">Участники</translation>
+        <translation>Участники</translation>
     </message>
     <message>
         <source>Last Updated</source>
-        <translation type="vanished">Последнее обновление</translation>
+        <translation>Последнее обновление</translation>
     </message>
     <message>
         <source>Import</source>
-        <translation type="vanished">Импорт</translation>
+        <translation>Импорт</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="vanished">Экспорт</translation>
+        <translation>Экспорт</translation>
     </message>
     <message>
         <source>#</source>
-        <translation type="vanished">#</translation>
+        <translation>#</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="vanished">Заголовок</translation>
+        <translation>Заголовок</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation type="vanished">Статус</translation>
+        <translation>Статус</translation>
     </message>
     <message>
         <source>Priority</source>
-        <translation type="vanished">Приоритет</translation>
+        <translation>Приоритет</translation>
     </message>
     <message>
         <source>Assignees</source>
-        <translation type="vanished">Исполнители</translation>
+        <translation>Исполнители</translation>
     </message>
     <message>
         <source>Created</source>
-        <translation type="vanished">Создано</translation>
+        <translation>Создано</translation>
     </message>
     <message>
         <source>Icons/Conversation</source>
-        <translation type="vanished">Icons/Conversation</translation>
+        <translation>Icons/Conversation</translation>
     </message>
     <message>
         <source>Conversations</source>
-        <translation type="vanished">Беседы</translation>
+        <translation>Беседы</translation>
     </message>
     <message>
         <source>Icons/Ticket</source>
-        <translation type="vanished">Icons/Ticket</translation>
+        <translation>Icons/Ticket</translation>
     </message>
     <message>
         <source>Tickets</source>
-        <translation type="vanished">Заявки</translation>
+        <translation>Заявки</translation>
     </message>
     <message>
         <source>Conversation</source>
-        <translation type="vanished">Беседа</translation>
+        <translation>Беседа</translation>
     </message>
     <message>
         <source>Ticket</source>
-        <translation type="vanished">Заявка</translation>
+        <translation>Заявка</translation>
     </message>
     <message>
         <source>TenantInvitation</source>
-        <translation type="vanished">TenantInvitation</translation>
+        <translation>TenantInvitation</translation>
     </message>
     <message>
         <source>TenantMembership</source>
-        <translation type="vanished">TenantMembership</translation>
+        <translation>TenantMembership</translation>
     </message>
     <message>
         <source>Tenant</source>
-        <translation type="vanished">Тенант</translation>
+        <translation>Тенант</translation>
     </message>
     <message>
         <source>Tenant Name</source>
@@ -992,35 +996,35 @@
     </message>
     <message>
         <source>Members Count</source>
-        <translation type="vanished">Количество участников</translation>
+        <translation>Количество участников</translation>
     </message>
     <message>
         <source>Active</source>
-        <translation type="vanished">Активный</translation>
+        <translation>Активный</translation>
     </message>
     <message>
         <source>Updated</source>
-        <translation type="vanished">Обновлено</translation>
+        <translation>Обновлено</translation>
     </message>
     <message>
         <source>New Organization</source>
-        <translation type="vanished">Новая организация</translation>
+        <translation>Новая организация</translation>
     </message>
     <message>
         <source>Owner</source>
-        <translation type="vanished">Владелец</translation>
+        <translation>Владелец</translation>
     </message>
     <message>
         <source>New Tenant</source>
-        <translation type="vanished">Новый тенант</translation>
+        <translation>Новый тенант</translation>
     </message>
     <message>
         <source>Icons/SupportDesk</source>
-        <translation type="vanished">Icons/SupportDesk</translation>
+        <translation>Icons/SupportDesk</translation>
     </message>
     <message>
         <source>qrc:/qml/imtdeskgui/TicketCollectionView.qml</source>
-        <translation type="vanished">qrc:/qml/imtdeskgui/TicketCollectionView.qml</translation>
+        <translation>qrc:/qml/imtdeskgui/TicketCollectionView.qml</translation>
     </message>
     <message>
         <source>Support</source>
@@ -1028,275 +1032,275 @@
     </message>
     <message>
         <source>Attachment</source>
-        <translation type="vanished">Вложение</translation>
+        <translation>Вложение</translation>
     </message>
     <message>
         <source>ChatMessage</source>
-        <translation type="vanished">ChatMessage</translation>
+        <translation>ChatMessage</translation>
     </message>
     <message>
         <source>Y</source>
-        <translation type="vanished">Y</translation>
+        <translation>Y</translation>
     </message>
     <message>
         <source>rad</source>
-        <translation type="vanished">rad</translation>
+        <translation>rad</translation>
     </message>
     <message>
         <source>Search radius</source>
-        <translation type="vanished">Радиус поиска</translation>
+        <translation>Радиус поиска</translation>
     </message>
     <message>
         <source>Mu</source>
-        <translation type="vanished">Mu</translation>
+        <translation>Mu</translation>
     </message>
     <message>
         <source>Minimum angle</source>
-        <translation type="vanished">Минимальный угол</translation>
+        <translation>Минимальный угол</translation>
     </message>
     <message>
         <source>Maximum angle</source>
-        <translation type="vanished">Максимальный угол</translation>
+        <translation>Максимальный угол</translation>
     </message>
     <message>
         <source>Maximum surface angle</source>
-        <translation type="vanished">Максимальный угол поверхности</translation>
+        <translation>Максимальный угол поверхности</translation>
     </message>
     <message>
         <source>Maximum nearest neighbors</source>
-        <translation type="vanished">Максимальное количество соседних точек</translation>
+        <translation>Максимальное количество соседних точек</translation>
     </message>
     <message>
         <source>Design</source>
-        <translation type="vanished">Дизайн</translation>
+        <translation>Дизайн</translation>
     </message>
     <message>
         <source>commodity</source>
-        <translation type="vanished">товар</translation>
+        <translation>товар</translation>
     </message>
     <message>
         <source>excise</source>
-        <translation type="vanished">акциз</translation>
+        <translation>акциз</translation>
     </message>
     <message>
         <source>job</source>
-        <translation type="vanished">работа</translation>
+        <translation>работа</translation>
     </message>
     <message>
         <source>service</source>
-        <translation type="vanished">услуга</translation>
+        <translation>услуга</translation>
     </message>
     <message>
         <source>gamblingBet</source>
-        <translation type="vanished">ставка</translation>
+        <translation>ставка</translation>
     </message>
     <message>
         <source>gamblingPrize</source>
-        <translation type="vanished">выигрыш</translation>
+        <translation>выигрыш</translation>
     </message>
     <message>
         <source>lottery</source>
-        <translation type="vanished">лотерея</translation>
+        <translation>лотерея</translation>
     </message>
     <message>
         <source>lotteryPrize</source>
-        <translation type="vanished">лотерейный выигрыш</translation>
+        <translation>лотерейный выигрыш</translation>
     </message>
     <message>
         <source>intellectualActivity</source>
-        <translation type="vanished">интеллектуальная деятельность</translation>
+        <translation>интеллектуальная деятельность</translation>
     </message>
     <message>
         <source>payment</source>
-        <translation type="vanished">оплата</translation>
+        <translation>оплата</translation>
     </message>
     <message>
         <source>agentCommission</source>
-        <translation type="vanished">агентское вознаграждение</translation>
+        <translation>агентское вознаграждение</translation>
     </message>
     <message>
         <source>pay</source>
-        <translation type="vanished">выплата</translation>
+        <translation>выплата</translation>
     </message>
     <message>
         <source>another</source>
-        <translation type="vanished">прочее</translation>
+        <translation>прочее</translation>
     </message>
     <message>
         <source>proprietaryLaw</source>
-        <translation type="vanished">имущественное право</translation>
+        <translation>имущественное право</translation>
     </message>
     <message>
         <source>nonOperatingIncome</source>
-        <translation type="vanished">внереализационный доход</translation>
+        <translation>внереализационный доход</translation>
     </message>
     <message>
         <source>otherContributions</source>
-        <translation type="vanished">прочие взносы</translation>
+        <translation>прочие взносы</translation>
     </message>
     <message>
         <source>merchantTax</source>
-        <translation type="vanished">торговый сбор</translation>
+        <translation>торговый сбор</translation>
     </message>
     <message>
         <source>resortFee</source>
-        <translation type="vanished">курортный сбор</translation>
+        <translation>курортный сбор</translation>
     </message>
     <message>
         <source>deposit</source>
-        <translation type="vanished">залог</translation>
+        <translation>залог</translation>
     </message>
     <message>
         <source>consumption</source>
-        <translation type="vanished">расход</translation>
+        <translation>расход</translation>
     </message>
     <message>
         <source>soleProprietorCPIContributions</source>
-        <translation type="vanished">взносы ИП на ОПС</translation>
+        <translation>взносы ИП на ОПС</translation>
     </message>
     <message>
         <source>cpiContributions</source>
-        <translation type="vanished">взносы на ОПС</translation>
+        <translation>взносы на ОПС</translation>
     </message>
     <message>
         <source>soleProprietorCMIContributions</source>
-        <translation type="vanished">взносы ИП на ОМС</translation>
+        <translation>взносы ИП на ОМС</translation>
     </message>
     <message>
         <source>cmiContributions</source>
-        <translation type="vanished">взносы на ОМС</translation>
+        <translation>взносы на ОМС</translation>
     </message>
     <message>
         <source>csiContributions</source>
-        <translation type="vanished">взносы на ОСС</translation>
+        <translation>взносы на ОСС</translation>
     </message>
     <message>
         <source>casinoPayment</source>
-        <translation type="vanished">оплата казино</translation>
+        <translation>оплата казино</translation>
     </message>
     <message>
         <source>fundsIssuance</source>
-        <translation type="vanished">выдача средств</translation>
+        <translation>выдача средств</translation>
     </message>
     <message>
         <source>exciseWithoutMarking</source>
-        <translation type="vanished">подакцизный товар без маркировки</translation>
+        <translation>подакцизный товар без маркировки</translation>
     </message>
     <message>
         <source>exciseWithMarking</source>
-        <translation type="vanished">подакцизный товар с маркировкой</translation>
+        <translation>подакцизный товар с маркировкой</translation>
     </message>
     <message>
         <source>commodityWithoutMarking</source>
-        <translation type="vanished">товар без маркировки</translation>
+        <translation>товар без маркировки</translation>
     </message>
     <message>
         <source>commodityWithMarking</source>
-        <translation type="vanished">товар с маркировкой</translation>
+        <translation>товар с маркировкой</translation>
     </message>
     <message>
         <source>piece</source>
-        <translation type="vanished">штука</translation>
+        <translation>штука</translation>
     </message>
     <message>
         <source>gram</source>
-        <translation type="vanished">грамм</translation>
+        <translation>грамм</translation>
     </message>
     <message>
         <source>kilogram</source>
-        <translation type="vanished">килограмм</translation>
+        <translation>килограмм</translation>
     </message>
     <message>
         <source>ton</source>
-        <translation type="vanished">тонна</translation>
+        <translation>тонна</translation>
     </message>
     <message>
         <source>centimeter</source>
-        <translation type="vanished">сантиметр</translation>
+        <translation>сантиметр</translation>
     </message>
     <message>
         <source>decimeter</source>
-        <translation type="vanished">дециметр</translation>
+        <translation>дециметр</translation>
     </message>
     <message>
         <source>meter</source>
-        <translation type="vanished">метр</translation>
+        <translation>метр</translation>
     </message>
     <message>
         <source>squareCentimeter</source>
-        <translation type="vanished">кв. сантиметр</translation>
+        <translation>кв. сантиметр</translation>
     </message>
     <message>
         <source>squareDecimeter</source>
-        <translation type="vanished">кв. дециметр</translation>
+        <translation>кв. дециметр</translation>
     </message>
     <message>
         <source>squareMeter</source>
-        <translation type="vanished">кв. метр</translation>
+        <translation>кв. метр</translation>
     </message>
     <message>
         <source>milliliter</source>
-        <translation type="vanished">миллилитр</translation>
+        <translation>миллилитр</translation>
     </message>
     <message>
         <source>liter</source>
-        <translation type="vanished">литр</translation>
+        <translation>литр</translation>
     </message>
     <message>
         <source>cubicMeter</source>
-        <translation type="vanished">куб. метр</translation>
+        <translation>куб. метр</translation>
     </message>
     <message>
         <source>kilowattHour</source>
-        <translation type="vanished">киловатт·час</translation>
+        <translation>киловатт·час</translation>
     </message>
     <message>
         <source>gkal</source>
-        <translation type="vanished">Гкал</translation>
+        <translation>Гкал</translation>
     </message>
     <message>
         <source>day</source>
-        <translation type="vanished">день</translation>
+        <translation>день</translation>
     </message>
     <message>
         <source>hour</source>
-        <translation type="vanished">час</translation>
+        <translation>час</translation>
     </message>
     <message>
         <source>minute</source>
-        <translation type="vanished">минута</translation>
+        <translation>минута</translation>
     </message>
     <message>
         <source>second</source>
-        <translation type="vanished">секунда</translation>
+        <translation>секунда</translation>
     </message>
     <message>
         <source>kilobyte</source>
-        <translation type="vanished">килобайт</translation>
+        <translation>килобайт</translation>
     </message>
     <message>
         <source>megabyte</source>
-        <translation type="vanished">мегабайт</translation>
+        <translation>мегабайт</translation>
     </message>
     <message>
         <source>gigabyte</source>
-        <translation type="vanished">гигабайт</translation>
+        <translation>гигабайт</translation>
     </message>
     <message>
         <source>terabyte</source>
-        <translation type="vanished">терабайт</translation>
+        <translation>терабайт</translation>
     </message>
     <message>
         <source>otherUnits</source>
-        <translation type="vanished">другие единицы</translation>
+        <translation>другие единицы</translation>
     </message>
     <message>
         <source>Icons/AdminPanel</source>
-        <translation type="vanished">Icons/AdminPanel</translation>
+        <translation>Icons/AdminPanel</translation>
     </message>
     <message>
         <source>qrc:/qml/imtauthgui/UserActionCollectionView.qml</source>
-        <translation type="vanished">qrc:/qml/imtauthgui/UserActionCollectionView.qml</translation>
+        <translation>qrc:/qml/imtauthgui/UserActionCollectionView.qml</translation>
     </message>
     <message>
         <source>Workspace</source>
@@ -1308,167 +1312,167 @@
     </message>
     <message>
         <source>Icons/Dashboard</source>
-        <translation type="vanished">Icons/Dashboard</translation>
+        <translation>Icons/Dashboard</translation>
     </message>
     <message>
         <source>fullPrepayment</source>
-        <translation type="vanished">полная предоплата</translation>
+        <translation>полная предоплата</translation>
     </message>
     <message>
         <source>prepayment</source>
-        <translation type="vanished">предоплата</translation>
+        <translation>предоплата</translation>
     </message>
     <message>
         <source>advance</source>
-        <translation type="vanished">аванс</translation>
+        <translation>аванс</translation>
     </message>
     <message>
         <source>fullPayment</source>
-        <translation type="vanished">полный расчёт</translation>
+        <translation>полный расчёт</translation>
     </message>
     <message>
         <source>partialPayment</source>
-        <translation type="vanished">частичный расчёт</translation>
+        <translation>частичный расчёт</translation>
     </message>
     <message>
         <source>credit</source>
-        <translation type="vanished">кредит</translation>
+        <translation>кредит</translation>
     </message>
     <message>
         <source>creditPayment</source>
-        <translation type="vanished">оплата кредита</translation>
+        <translation>оплата кредита</translation>
     </message>
     <message>
         <source>cash</source>
-        <translation type="vanished">наличные</translation>
+        <translation>наличные</translation>
     </message>
     <message>
         <source>electronically</source>
-        <translation type="vanished">электронно</translation>
+        <translation>электронно</translation>
     </message>
     <message>
         <source>prepaid</source>
-        <translation type="vanished">предоплачено</translation>
+        <translation>предоплачено</translation>
     </message>
     <message>
         <source>other</source>
-        <translation type="vanished">прочее</translation>
+        <translation>прочее</translation>
     </message>
     <message>
         <source>Sell</source>
-        <translation type="vanished">Продажа</translation>
+        <translation>Продажа</translation>
     </message>
     <message>
         <source>Buy</source>
-        <translation type="vanished">Покупка</translation>
+        <translation>Покупка</translation>
     </message>
     <message>
         <source>SellReturn</source>
-        <translation type="vanished">Возврат продажи</translation>
+        <translation>Возврат продажи</translation>
     </message>
     <message>
         <source>BuyReturn</source>
-        <translation type="vanished">Возврат покупки</translation>
+        <translation>Возврат покупки</translation>
     </message>
     <message>
         <source>Receipt</source>
-        <translation type="vanished">Чек</translation>
+        <translation>Чек</translation>
     </message>
     <message>
         <source>New sensor</source>
-        <translation type="vanished">Новый сенсор</translation>
+        <translation>Новый сенсор</translation>
     </message>
     <message>
         <source>Personal Access Token</source>
-        <translation type="vanished">Персональный токен доступа</translation>
+        <translation>Персональный токен доступа</translation>
     </message>
     <message>
         <source>Action</source>
-        <translation type="vanished">Действие</translation>
+        <translation>Действие</translation>
     </message>
     <message>
         <source>Target</source>
-        <translation type="vanished">Цель</translation>
+        <translation>Цель</translation>
     </message>
     <message>
         <source>Timestamp</source>
-        <translation type="vanished">Отметка времени</translation>
+        <translation>Отметка времени</translation>
     </message>
     <message>
         <source>Open</source>
-        <translation type="vanished">Открыть</translation>
+        <translation>Открыть</translation>
     </message>
     <message>
         <source>New Customer</source>
-        <translation type="vanished">Новый заказчик</translation>
+        <translation>Новый заказчик</translation>
     </message>
     <message>
         <source>User Action</source>
-        <translation type="vanished">Действие пользователя</translation>
+        <translation>Действие пользователя</translation>
     </message>
     <message>
         <source>:/qml/imtgui/Settings/SettingsTextInput.qml</source>
-        <translation type="vanished">:/qml/imtgui/Settings/SettingsTextInput.qml</translation>
+        <translation>:/qml/imtgui/Settings/SettingsTextInput.qml</translation>
     </message>
     <message>
         <source>:/qml/imtgui/Settings/DatabaseInput.qml</source>
-        <translation type="vanished">:/qml/imtgui/Settings/DatabaseInput.qml</translation>
+        <translation>:/qml/imtgui/Settings/DatabaseInput.qml</translation>
     </message>
     <message>
         <source>Roles</source>
-        <translation type="vanished">Роли</translation>
+        <translation>Роли</translation>
     </message>
     <message>
         <source>Users</source>
-        <translation type="vanished">Пользователи</translation>
+        <translation>Пользователи</translation>
     </message>
     <message>
         <source>Role Name</source>
-        <translation type="vanished">Название роли</translation>
+        <translation>Название роли</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation type="vanished">Редактировать</translation>
+        <translation>Редактировать</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation type="vanished">Удалить</translation>
+        <translation>Удалить</translation>
     </message>
     <message>
         <source>New</source>
-        <translation type="vanished">Новый</translation>
+        <translation>Новый</translation>
     </message>
     <message>
         <source>Close</source>
-        <translation type="vanished">Закрыть</translation>
+        <translation>Закрыть</translation>
     </message>
     <message>
         <source>Undo</source>
-        <translation type="vanished">Отменить</translation>
+        <translation>Отменить</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="vanished">Сохранить</translation>
+        <translation>Сохранить</translation>
     </message>
     <message>
         <source>(C) 2020 ImagingTools GmbH. All rights reserved.</source>
-        <translation type="vanished">(C) 2020 ImagingTools GmbH. Все права защищены.</translation>
+        <translation>(C) 2020 ImagingTools GmbH. Все права защищены.</translation>
     </message>
     <message>
         <source>Redo</source>
-        <translation type="vanished">Восстановить</translation>
+        <translation>Восстановить</translation>
     </message>
     <message>
         <source>Icons/Redo</source>
-        <translation type="vanished">Icons/Redo</translation>
+        <translation>Icons/Redo</translation>
     </message>
     <message>
         <source>Icons/Save</source>
-        <translation type="vanished">Icons/Save</translation>
+        <translation>Icons/Save</translation>
     </message>
     <message>
         <source>Icons/Close</source>
-        <translation type="vanished">Icons/Close</translation>
+        <translation>Icons/Close</translation>
     </message>
     <message>
         <location filename="../../../Include/imtauth/CRoleChangeGeneratorComp.cpp" line="+55"/>
@@ -1514,15 +1518,15 @@
     </message>
     <message>
         <source>Last Connection</source>
-        <translation type="vanished">Последнее подключение</translation>
+        <translation>Последнее подключение</translation>
     </message>
     <message>
         <source>Icons/Undo</source>
-        <translation type="vanished">Icons/Undo</translation>
+        <translation>Icons/Undo</translation>
     </message>
     <message>
         <source>Group Name</source>
-        <translation type="vanished">Название группы</translation>
+        <translation>Название группы</translation>
     </message>
     <message>
         <location line="-30"/>
@@ -1546,7 +1550,7 @@
     </message>
     <message>
         <source>Email</source>
-        <translation type="vanished">Почтовый адрес</translation>
+        <translation>Почтовый адрес</translation>
     </message>
     <message>
         <source>Groups</source>
@@ -1554,51 +1558,51 @@
     </message>
     <message>
         <source>Text file</source>
-        <translation type="vanished">Текстовый файл</translation>
+        <translation>Текстовый файл</translation>
     </message>
     <message>
         <source>Edit License</source>
-        <translation type="vanished">Редактировать лицензию</translation>
+        <translation>Редактировать лицензию</translation>
     </message>
     <message>
         <source>Report</source>
-        <translation type="vanished">Отчет</translation>
+        <translation>Отчет</translation>
     </message>
     <message>
         <source>Report Files</source>
-        <translation type="vanished">Файлы отчетов</translation>
+        <translation>Файлы отчетов</translation>
     </message>
     <message>
         <source>NO_USER_MANAGEMENT</source>
-        <translation type="vanished">NO_USER_MANAGEMENT</translation>
+        <translation>NO_USER_MANAGEMENT</translation>
     </message>
     <message>
         <source>OPTIONAL_USER_MANAGEMENT</source>
-        <translation type="vanished">OPTIONAL_USER_MANAGEMENT</translation>
+        <translation>OPTIONAL_USER_MANAGEMENT</translation>
     </message>
     <message>
         <source>STRONG_USER_MANAGEMENT</source>
-        <translation type="vanished">STRONG_USER_MANAGEMENT</translation>
+        <translation>STRONG_USER_MANAGEMENT</translation>
     </message>
     <message>
         <source>SDL Generator version</source>
-        <translation type="vanished">Версия генератора SDL</translation>
+        <translation>Версия генератора SDL</translation>
     </message>
     <message>
         <source>SDL code generator</source>
-        <translation type="vanished">Генератор кода SDL</translation>
+        <translation>Генератор кода SDL</translation>
     </message>
     <message>
         <source>SDL Code generator</source>
-        <translation type="vanished">Генератор кода SDL</translation>
+        <translation>Генератор кода SDL</translation>
     </message>
     <message>
         <source>? ImagingTools</source>
-        <translation type="vanished">? ImagingTools</translation>
+        <translation>? ImagingTools</translation>
     </message>
     <message>
         <source>OAS Code generator</source>
-        <translation type="vanished">Генератор кода OAS</translation>
+        <translation>Генератор кода OAS</translation>
     </message>
     <message>
         <location filename="../../../Include/imtauth/CUserChangeGeneratorComp.cpp" line="-1"/>
@@ -1607,7 +1611,7 @@
     </message>
     <message>
         <source>Username</source>
-        <translation type="vanished">Логин</translation>
+        <translation>Логин</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -3875,6 +3879,14 @@
         <source>Set description</source>
         <translation>Установить описание</translation>
     </message>
+    <message>
+        <source>Delete the selected item?</source>
+        <translation>Удалить выбранный элемент?</translation>
+    </message>
+    <message>
+        <source>Delete &quot;%1&quot;?</source>
+        <translation>Удалить «%1»?</translation>
+    </message>
 </context>
 <context>
     <name>CollectionStructureCommandsObserver</name>
@@ -3988,12 +4000,12 @@
     </message>
     <message>
         <location line="+65"/>
-        <source>Delete all items with the current filter ?</source>
+        <source>Delete all items with the current filter?</source>
         <translation>Удалить все элементы с текущим фильтром?</translation>
     </message>
     <message>
         <location line="+3"/>
-        <source>Delete all data from this collection ?</source>
+        <source>Delete all data from this collection?</source>
         <translation>Удалить все данные из этой коллекции?</translation>
     </message>
     <message>
@@ -4075,6 +4087,18 @@
         <location line="+8"/>
         <source>Set Description</source>
         <translation>Установить описание</translation>
+    </message>
+    <message>
+        <source>Delete the selected item?</source>
+        <translation>Удалить выбранный элемент?</translation>
+    </message>
+    <message>
+        <source>Delete the selected items (%1)?</source>
+        <translation>Удалить выбранные элементы (%1)?</translation>
+    </message>
+    <message>
+        <source>Delete &quot;%1&quot;?</source>
+        <translation>Удалить «%1»?</translation>
     </message>
 </context>
 <context>
@@ -4893,7 +4917,7 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Delete the selected revision ?</source>
+        <source>Delete the selected revision?</source>
         <translation>Удалить выбранную ревизию?</translation>
     </message>
     <message>
@@ -6149,6 +6173,14 @@
         <translation>Эта папка пуста</translation>
     </message>
     <message>
+        <source>This folder has no subfolders</source>
+        <translation>В этой папке нет подпапок</translation>
+    </message>
+    <message>
+        <source>This location is outside the start folder</source>
+        <translation>Это расположение находится вне начальной папки</translation>
+    </message>
+    <message>
         <location line="+14"/>
         <source>Try a different filter, or clear it to see all items</source>
         <translation>Попробуйте другой фильтр или очистите его, чтобы увидеть все элементы</translation>
@@ -7368,6 +7400,89 @@
         <location line="+102"/>
         <source>Per page:</source>
         <translation>На странице:</translation>
+    </message>
+</context>
+<context>
+    <name>PartnerTermsDialog</name>
+    <message>
+        <source>Partner</source>
+        <translation>Партнёр</translation>
+    </message>
+    <message>
+        <source>Supplier</source>
+        <translation>Поставщик</translation>
+    </message>
+    <message>
+        <source>Customer</source>
+        <translation>Заказчик</translation>
+    </message>
+    <message>
+        <source>Affiliate</source>
+        <translation>Аффилированная организация</translation>
+    </message>
+    <message>
+        <source>Parent organization</source>
+        <translation>Материнская организация</translation>
+    </message>
+    <message>
+        <source>Subsidiary</source>
+        <translation>Дочерняя организация</translation>
+    </message>
+    <message>
+        <source>Send request</source>
+        <translation>Отправить запрос</translation>
+    </message>
+    <message>
+        <source>Propose terms</source>
+        <translation>Предложить условия</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Отмена</translation>
+    </message>
+    <message>
+        <source>Organizations do not see each other. You can connect only by the code the partner gave you.</source>
+        <translation>Организации не видят друг друга. Подключиться можно только по коду, который дал партнёр.</translation>
+    </message>
+    <message>
+        <source>Partner&apos;s code</source>
+        <translation>Код партнёра</translation>
+    </message>
+    <message>
+        <source>Enter code...</source>
+        <translation>Введите код...</translation>
+    </message>
+    <message>
+        <source>We are for them</source>
+        <translation>Мы для них</translation>
+    </message>
+    <message>
+        <source>They are for us</source>
+        <translation>Они для нас</translation>
+    </message>
+    <message>
+        <source>Scope</source>
+        <translation>Область</translation>
+    </message>
+    <message>
+        <source>Optional — empty applies to all resources</source>
+        <translation>Необязательно — пусто означает все ресурсы</translation>
+    </message>
+    <message>
+        <source>Message to the partner</source>
+        <translation>Сообщение партнёру</translation>
+    </message>
+    <message>
+        <source>Optional</source>
+        <translation>Необязательно</translation>
+    </message>
+    <message>
+        <source>The partner accepts the request once: the connection and the relationship come into force together. Access to your data is given separately, with grants.</source>
+        <translation>Партнёр принимает запрос один раз: подключение и отношения вступают в силу вместе. Доступ к вашим данным выдаётся отдельно, через права доступа.</translation>
+    </message>
+    <message>
+        <source>The new terms come into force when the partner accepts them.</source>
+        <translation>Новые условия вступят в силу, когда партнёр их примет.</translation>
     </message>
 </context>
 <context>
@@ -9728,95 +9843,6 @@ Errors: 0</source>
     </message>
 </context>
 <context>
-    <name>RelationshipView</name>
-    <message>
-        <location filename="../../../Qml/imtauthgui/RelationshipView.qml" line="+75"/>
-        <source>Select the partner organization.</source>
-        <translation>Выберите организацию-партнёра.</translation>
-    </message>
-    <message>
-        <location line="+68"/>
-        <source>Partner Organization</source>
-        <translation>Организация-партнёр</translation>
-    </message>
-    <message>
-        <location line="+11"/>
-        <location line="+70"/>
-        <source>Select organization...</source>
-        <translation>Выберите организацию...</translation>
-    </message>
-    <message>
-        <location line="-64"/>
-        <source>Select</source>
-        <translation>Выбрать</translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <source>My Role</source>
-        <translation>Моя роль</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Partner Role</source>
-        <translation>Роль партнёра</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Scope</source>
-        <translation>Область</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Optional — empty applies to all resources</source>
-        <translation>Необязательно — если пусто, применяется ко всем ресурсам</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Description</source>
-        <translation>Описание</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Optional description</source>
-        <translation>Необязательное описание</translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>The changes take effect when the partner organization approves them.</source>
-        <translation>Изменения вступят в силу после их одобрения организацией-партнёром.</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>The relationship comes into force when the partner organization approves it.</source>
-        <translation>Отношения вступят в силу после их одобрения организацией-партнёром.</translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>Sending...</source>
-        <translation>Отправка...</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Propose Changes</source>
-        <translation>Предложить изменения</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Send Proposal</source>
-        <translation>Отправить предложение</translation>
-    </message>
-    <message>
-        <location line="+15"/>
-        <source>No connected organizations. Connect one under Relationships first.</source>
-        <translation>Нет связанных организаций. Сначала добавьте связь в разделе «Связи».</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Choose another organization. Current and partner organizations must be different.</source>
-        <translation>Выберите другую организацию. Текущая организация и организация-партнёр должны различаться.</translation>
-    </message>
-</context>
-<context>
     <name>RemoteCollectionView</name>
     <message>
         <location filename="../../../Qml/imtguigql/RemoteCollectionView.qml" line="+142"/>
@@ -10083,6 +10109,14 @@ Errors: 0</source>
         <location line="+345"/>
         <source>Permissions</source>
         <translation>Права</translation>
+    </message>
+    <message>
+        <source>Please enter the role name, the Role-ID is made from it</source>
+        <translation>Введите название роли, из него создаётся Role-ID</translation>
+    </message>
+    <message>
+        <source>Correct the highlighted fields before saving</source>
+        <translation>Исправьте выделенные поля перед сохранением</translation>
     </message>
 </context>
 <context>
@@ -11082,33 +11116,8 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+3"/>
-        <source>Invited</source>
-        <translation>Приглашён</translation>
-    </message>
-    <message>
-        <location line="+3"/>
         <source>Delegated</source>
         <translation>Делегирован</translation>
-    </message>
-    <message>
-        <location line="+59"/>
-        <source>Invited by: %1</source>
-        <translation>Приглашён: %1</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Unknown</source>
-        <translation>Неизвестный</translation>
-    </message>
-    <message>
-        <location line="+18"/>
-        <source>Accept</source>
-        <translation>Принять</translation>
-    </message>
-    <message>
-        <location line="+26"/>
-        <source>Reject</source>
-        <translation>Отклонить</translation>
     </message>
     <message>
         <location line="+67"/>
@@ -11148,11 +11157,6 @@ ID входных данных: </translation>
         <translation>Я участник</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>I am invited</source>
-        <translation>Я приглашён</translation>
-    </message>
-    <message>
         <location line="+115"/>
         <source>Activate organization</source>
         <translation>Активация организации</translation>
@@ -11161,16 +11165,6 @@ ID входных данных: </translation>
         <location line="+1"/>
         <source>&quot;%1&quot; is inactive. Activate it and switch to it?</source>
         <translation>Организация «%1» неактивна. Активировать её и переключиться на неё?</translation>
-    </message>
-    <message>
-        <location line="+22"/>
-        <source>Switch organization</source>
-        <translation>Переключение организации</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>An organization can be edited only while you work in it. Switch to &quot;%1&quot; and open it?</source>
-        <translation>Организацию можно редактировать, только работая в ней. Переключиться на «%1» и открыть её?</translation>
     </message>
     <message>
         <location line="+146"/>
@@ -11206,236 +11200,6 @@ ID входных данных: </translation>
         <location line="+36"/>
         <source>The organization &quot;%1&quot; was created inactive. Activate it to work in it.</source>
         <translation>Организация «%1» создана неактивной. Активируйте её, чтобы работать в ней.</translation>
-    </message>
-</context>
-<context>
-    <name>TenantConnectOrganizationPage</name>
-    <message>
-        <location filename="../../../Qml/imtauthgui/TenantConnectOrganizationPage.qml" line="+98"/>
-        <source>Connection request sent successfully</source>
-        <translation>Запрос на подключение успешно отправлен</translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <location line="+15"/>
-        <source>Approve failed</source>
-        <translation>Не удалось одобрить</translation>
-    </message>
-    <message>
-        <location line="-13"/>
-        <location line="+15"/>
-        <source>Reject failed</source>
-        <translation>Не удалось отклонить</translation>
-    </message>
-    <message>
-        <location line="-13"/>
-        <location line="+15"/>
-        <source>Cancel failed</source>
-        <translation>Не удалось отменить</translation>
-    </message>
-    <message>
-        <location line="+16"/>
-        <source>Approved</source>
-        <translation>Одобрен</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Connection request approved</source>
-        <translation>Запрос на подключение одобрен</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Rejected</source>
-        <translation>Отклонён</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Connection request rejected</source>
-        <translation>Запрос на подключение отклонён</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Canceled</source>
-        <translation>Отменён</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Connection request canceled</source>
-        <translation>Запрос на подключение отменён</translation>
-    </message>
-    <message>
-        <location line="+18"/>
-        <source>Connection removed</source>
-        <translation>Подключение удалено</translation>
-    </message>
-    <message>
-        <location line="+12"/>
-        <location line="+84"/>
-        <source>Unknown Organization</source>
-        <translation>Неизвестная организация</translation>
-    </message>
-    <message>
-        <location line="+27"/>
-        <source>Connect Organization</source>
-        <translation>Подключить организацию</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Enter the Connection Code of the organization you want to connect with.</source>
-        <translation>Введите код подключения организации, с которой хотите связаться.</translation>
-    </message>
-    <message>
-        <location line="+31"/>
-        <source>Connection Code</source>
-        <translation>Код подключения</translation>
-    </message>
-    <message>
-        <location line="+15"/>
-        <source>Enter code...</source>
-        <translation>Введите код...</translation>
-    </message>
-    <message>
-        <location line="+18"/>
-        <source>Message (optional)</source>
-        <translation>Сообщение (необязательно)</translation>
-    </message>
-    <message>
-        <location line="+15"/>
-        <source>Add a message...</source>
-        <translation>Добавьте сообщение...</translation>
-    </message>
-    <message>
-        <location line="+16"/>
-        <source>Sending...</source>
-        <translation>Отправка...</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Send Request</source>
-        <translation>Отправить запрос</translation>
-    </message>
-    <message>
-        <location line="+23"/>
-        <source>Incoming Requests</source>
-        <translation>Входящие запросы</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>No pending incoming requests.</source>
-        <translation>Нет ожидающих входящих запросов.</translation>
-    </message>
-    <message>
-        <location line="+21"/>
-        <source>Sent Requests</source>
-        <translation>Отправленные запросы</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>No pending sent requests.</source>
-        <translation>Нет ожидающих отправленных запросов.</translation>
-    </message>
-    <message>
-        <location line="+21"/>
-        <source>Established Connections</source>
-        <translation>Установленные подключения</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Organizations you are connected with.</source>
-        <translation>Организации, с которыми у вас есть подключение.</translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>No established connections yet.</source>
-        <translation>Установленных подключений пока нет.</translation>
-    </message>
-    <message>
-        <location line="+20"/>
-        <location line="+15"/>
-        <location line="+15"/>
-        <source>Organization</source>
-        <translation>Организация</translation>
-    </message>
-    <message>
-        <location line="-29"/>
-        <location line="+15"/>
-        <source>Message</source>
-        <translation>Сообщение</translation>
-    </message>
-    <message>
-        <location line="-14"/>
-        <source>Received</source>
-        <translation>Получен</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <location line="+15"/>
-        <source>State</source>
-        <translation>Состояние</translation>
-    </message>
-    <message>
-        <location line="-1"/>
-        <source>Sent</source>
-        <translation>Отправлен</translation>
-    </message>
-    <message>
-        <location line="+14"/>
-        <source>Owner</source>
-        <translation>Владелец</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Connected since</source>
-        <translation>Подключено с</translation>
-    </message>
-    <message>
-        <location line="+19"/>
-        <source>Approving...</source>
-        <translation>Одобрение...</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Rejecting...</source>
-        <translation>Отклонение...</translation>
-    </message>
-    <message>
-        <location line="+24"/>
-        <source>Approve</source>
-        <translation>Одобрить</translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <source>Reject</source>
-        <translation>Отклонить</translation>
-    </message>
-    <message>
-        <location line="+27"/>
-        <source>Canceling...</source>
-        <translation>Отмена...</translation>
-    </message>
-    <message>
-        <location line="+20"/>
-        <source>Cancel</source>
-        <translation>Отмена</translation>
-    </message>
-    <message>
-        <location line="+25"/>
-        <source>Remove</source>
-        <translation>Удалить</translation>
-    </message>
-    <message>
-        <location line="+20"/>
-        <source>Remove connection</source>
-        <translation>Удалить подключение</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Are you sure you want to remove the connection with &quot;%1&quot;?
-
-All relationships with this organization will also be removed.</source>
-        <translation>Вы уверены, что хотите удалить подключение к «%1»?
-
-Все связи с этой организацией также будут удалены.</translation>
     </message>
 </context>
 <context>
@@ -11791,6 +11555,26 @@ All relationships with this organization will also be removed.</source>
 </context>
 <context>
     <name>TenantEditor</name>
+    <message>
+        <source>Organization</source>
+        <translation>Организация</translation>
+    </message>
+    <message>
+        <source>People</source>
+        <translation>Люди</translation>
+    </message>
+    <message>
+        <source>Members and invitations</source>
+        <translation>Участники и приглашения</translation>
+    </message>
+    <message>
+        <source>External links</source>
+        <translation>Внешние связи</translation>
+    </message>
+    <message>
+        <source>Partners</source>
+        <translation>Партнёры</translation>
+    </message>
     <message>
         <location filename="../../../Qml/imtauthgui/TenantEditor.qml" line="+209"/>
         <location line="+11"/>
@@ -12225,8 +12009,8 @@ All relationships with this organization will also be removed.</source>
     </message>
     <message>
         <location line="+139"/>
-        <source>Manage Organization Permissions...</source>
-        <translation>Управление правами в организации...</translation>
+        <source>Permissions in Detail...</source>
+        <translation>Подробнее...</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -12363,6 +12147,22 @@ All relationships with this organization will also be removed.</source>
         <source>Type or choose a user to invite</source>
         <translation>Введите или выберите пользователя для приглашения</translation>
     </message>
+    <message>
+        <source>Administrator</source>
+        <translation>Администратор</translation>
+    </message>
+    <message>
+        <source>Special permissions</source>
+        <translation>Особые права</translation>
+    </message>
+    <message>
+        <source>Make Administrator</source>
+        <translation>Сделать администратором</translation>
+    </message>
+    <message>
+        <source>Make Member</source>
+        <translation>Сделать участником</translation>
+    </message>
 </context>
 <context>
     <name>TenantMessagesPage</name>
@@ -12420,56 +12220,162 @@ All relationships with this organization will also be removed.</source>
     </message>
 </context>
 <context>
-    <name>TenantMyConnectionsPage</name>
+    <name>TenantPartnersPage</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/TenantMyConnectionsPage.qml" line="+21"/>
-        <source>Relationship</source>
-        <translation>Связь</translation>
+        <source>The request was sent to the partner</source>
+        <translation>Запрос отправлен партнёру</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Relationships</source>
-        <translation>Отношения</translation>
+        <source>The partnership came into force</source>
+        <translation>Партнёрство вступило в силу</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>My Relationships</source>
-        <translation>Мои отношения</translation>
+        <source>The request was declined</source>
+        <translation>Запрос отклонён</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Business relationships with other organizations. Creating or modifying a relationship requires approval from both parties.</source>
-        <translation>Деловые отношения с другими организациями. Создание или изменение отношений требует согласия обеих сторон.</translation>
+        <source>The request was withdrawn</source>
+        <translation>Запрос отозван</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <source>The new terms were sent to the partner</source>
+        <translation>Новые условия отправлены партнёру</translation>
+    </message>
+    <message>
+        <source>The new terms came into force</source>
+        <translation>Новые условия вступили в силу</translation>
+    </message>
+    <message>
+        <source>The new terms were declined</source>
+        <translation>Новые условия отклонены</translation>
+    </message>
+    <message>
+        <source>The new terms were withdrawn</source>
+        <translation>Новые условия отозваны</translation>
+    </message>
+    <message>
+        <source>The partnership was ended</source>
+        <translation>Партнёрство прекращено</translation>
+    </message>
+    <message>
+        <source>supplier</source>
+        <translation>поставщик</translation>
+    </message>
+    <message>
+        <source>customer</source>
+        <translation>заказчик</translation>
+    </message>
+    <message>
+        <source>affiliate</source>
+        <translation>аффилированная организация</translation>
+    </message>
+    <message>
+        <source>parent organization</source>
+        <translation>материнская организация</translation>
+    </message>
+    <message>
+        <source>subsidiary</source>
+        <translation>дочерняя организация</translation>
+    </message>
+    <message>
+        <source>partner</source>
+        <translation>партнёр</translation>
+    </message>
+    <message>
+        <source>We are %1, they are %2</source>
+        <translation>Мы — %1, они — %2</translation>
+    </message>
+    <message>
+        <source>Unknown organization</source>
+        <translation>Неизвестная организация</translation>
+    </message>
+    <message>
+        <source>Connection without terms</source>
+        <translation>Подключение без условий</translation>
+    </message>
+    <message>
+        <source>Waiting for your answer</source>
+        <translation>Ждёт вашего ответа</translation>
+    </message>
+    <message>
+        <source>Waiting for the partner</source>
+        <translation>Ждёт ответа партнёра</translation>
+    </message>
+    <message>
+        <source>No terms yet</source>
+        <translation>Условий пока нет</translation>
+    </message>
+    <message>
+        <source>Active</source>
+        <translation>Действует</translation>
+    </message>
+    <message>
+        <source>New terms wait for the partner</source>
+        <translation>Новые условия ждут ответа партнёра</translation>
+    </message>
+    <message>
+        <source>New terms wait for your answer</source>
+        <translation>Новые условия ждут вашего ответа</translation>
+    </message>
+    <message>
+        <source>End of the partnership proposed</source>
+        <translation>Предложено прекратить партнёрство</translation>
+    </message>
+    <message>
+        <source>Partners</source>
+        <translation>Партнёры</translation>
+    </message>
+    <message>
+        <source>Organizations you work with. A partnership is in force when both sides agree.</source>
+        <translation>Организации, с которыми вы работаете. Партнёрство действует, когда согласны обе стороны.</translation>
+    </message>
+    <message>
+        <source>Invite partner</source>
+        <translation>Пригласить партнёра</translation>
+    </message>
+    <message>
+        <source>No partners yet. Invite one by the code the partner gave you.</source>
+        <translation>Партнёров пока нет. Пригласите партнёра по коду, который он вам дал.</translation>
+    </message>
+    <message>
         <source>Partner</source>
         <translation>Партнёр</translation>
     </message>
     <message>
-        <location line="+0"/>
-        <source>Partner role</source>
-        <translation>Роль партнёра</translation>
+        <source>Terms</source>
+        <translation>Условия</translation>
     </message>
     <message>
-        <location line="+0"/>
-        <source>Our role</source>
-        <translation>Наша роль</translation>
+        <source>State</source>
+        <translation>Состояние</translation>
     </message>
     <message>
-        <location line="+0"/>
-        <source>Status</source>
-        <translation>Статус</translation>
+        <source>Accept</source>
+        <translation>Принять</translation>
     </message>
     <message>
-        <location line="+0"/>
-        <source>Description</source>
-        <translation>Описание</translation>
+        <source>Decline</source>
+        <translation>Отклонить</translation>
     </message>
     <message>
-        <location line="+49"/>
-        <source>The proposal was sent to the partner organization</source>
-        <translation>Предложение отправлено организации-партнёру</translation>
+        <source>Withdraw</source>
+        <translation>Отозвать</translation>
+    </message>
+    <message>
+        <source>Change terms</source>
+        <translation>Изменить условия</translation>
+    </message>
+    <message>
+        <source>End</source>
+        <translation>Прекратить</translation>
+    </message>
+    <message>
+        <source>End partnership</source>
+        <translation>Прекращение партнёрства</translation>
+    </message>
+    <message>
+        <source>End the partnership with &quot;%1&quot;? The relationship with this organization ends with it.</source>
+        <translation>Прекратить партнёрство с «%1»? Отношения с этой организацией прекратятся вместе с ним.</translation>
     </message>
 </context>
 <context>
@@ -12595,103 +12501,6 @@ All relationships with this organization will also be removed.</source>
     <message>
         <source>Description</source>
         <translation type="vanished">Описание</translation>
-    </message>
-</context>
-<context>
-    <name>TenantRelationshipProposalsPage</name>
-    <message>
-        <location filename="../../../Qml/imtauthgui/TenantRelationshipProposalsPage.qml" line="+82"/>
-        <source>Change of the relationship</source>
-        <translation>Изменение отношений</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>End of the relationship</source>
-        <translation>Прекращение отношений</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>New relationship</source>
-        <translation>Новые отношения</translation>
-    </message>
-    <message>
-        <location line="+69"/>
-        <source>Relationship proposal approved</source>
-        <translation>Предложение об отношениях одобрено</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Relationship proposal rejected</source>
-        <translation>Предложение об отношениях отклонено</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Relationship proposal withdrawn</source>
-        <translation>Предложение об отношениях отозвано</translation>
-    </message>
-    <message>
-        <location line="+35"/>
-        <source>Incoming Proposals</source>
-        <translation>Входящие предложения</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>A relationship comes into force or changes only when both organizations agree.</source>
-        <translation>Отношения вступают в силу или изменяются только с согласия обеих организаций.</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>No proposals are waiting for your answer.</source>
-        <translation>Нет предложений, ожидающих вашего ответа.</translation>
-    </message>
-    <message>
-        <location line="+21"/>
-        <source>Sent Proposals</source>
-        <translation>Отправленные предложения</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>No proposals are waiting for the partner&apos;s answer.</source>
-        <translation>Нет предложений, ожидающих ответа партнёра.</translation>
-    </message>
-    <message>
-        <location line="+20"/>
-        <location line="+14"/>
-        <source>Partner</source>
-        <translation>Партнёр</translation>
-    </message>
-    <message>
-        <location line="-13"/>
-        <location line="+14"/>
-        <source>Proposal</source>
-        <translation>Предложение</translation>
-    </message>
-    <message>
-        <location line="-13"/>
-        <location line="+14"/>
-        <source>Roles</source>
-        <translation>Роли</translation>
-    </message>
-    <message>
-        <location line="-13"/>
-        <location line="+14"/>
-        <source>Description</source>
-        <translation>Описание</translation>
-    </message>
-    <message>
-        <location line="+22"/>
-        <source>Approve</source>
-        <translation>Одобрить</translation>
-    </message>
-    <message>
-        <location line="+10"/>
-        <source>Reject</source>
-        <translation>Отклонить</translation>
-    </message>
-    <message>
-        <location line="+23"/>
-        <source>Withdraw</source>
-        <translation>Отозвать</translation>
     </message>
 </context>
 <context>
@@ -13574,6 +13383,14 @@ All relationships with this organization will also be removed.</source>
         <translation>Эта папка пуста</translation>
     </message>
     <message>
+        <source>This folder has no subfolders</source>
+        <translation>В этой папке нет подпапок</translation>
+    </message>
+    <message>
+        <source>This location is outside the start folder</source>
+        <translation>Это расположение находится вне начальной папки</translation>
+    </message>
+    <message>
         <location line="+1"/>
         <source>No matching items</source>
         <translation>Нет подходящих элементов</translation>
@@ -14127,34 +13944,55 @@ All relationships with this organization will also be removed.</source>
 <context>
     <name>UserPanel</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/UserPanel.qml" line="+159"/>
-        <source>(delegated)</source>
-        <translation>(делегировано)</translation>
-    </message>
-    <message>
-        <location line="+138"/>
+        <location filename="../../../Qml/imtauthgui/UserPanel.qml"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location line="+56"/>
-        <location line="+337"/>
         <source>Profile</source>
         <translation>Профиль</translation>
     </message>
     <message>
-        <location line="-333"/>
-        <source>Organization</source>
-        <translation>Организация</translation>
+        <source>Personal space</source>
+        <translation>Личное пространство</translation>
     </message>
     <message>
-        <location line="+13"/>
-        <location line="+146"/>
-        <source>No organization</source>
-        <translation>Нет организации</translation>
+        <source>Work in</source>
+        <translation>Работать в</translation>
     </message>
     <message>
-        <location line="-141"/>
+        <source>Invitations: %1</source>
+        <translation>Приглашения: %1</translation>
+    </message>
+    <message>
+        <source>All organizations</source>
+        <translation>Все организации</translation>
+    </message>
+    <message>
+        <source>Accept</source>
+        <translation>Принять</translation>
+    </message>
+    <message>
+        <source>Reject</source>
+        <translation>Отклонить</translation>
+    </message>
+    <message>
+        <source>Owner</source>
+        <translation>Владелец</translation>
+    </message>
+    <message>
+        <source>Creator</source>
+        <translation>Создатель</translation>
+    </message>
+    <message>
+        <source>Member</source>
+        <translation>Участник</translation>
+    </message>
+    <message>
+        <source>Delegated</source>
+        <translation>Делегирован</translation>
+    </message>
+    <message>
         <source>Logout</source>
         <translation>Выход из системы</translation>
     </message>
@@ -16506,6 +16344,83 @@ All relationships with this organization will also be removed.</source>
         <location filename="../../../Include/imtservergql/CStructureControllerCompBase.cpp" line="+300"/>
         <source>Internal error</source>
         <translation>Внутренняя ошибка</translation>
+    </message>
+</context>
+<context>
+    <name>ConnectedProductCollectionView</name>
+    <message>
+        <source>All tokens of its servers are revoked. Its roles stay.</source>
+        <translation>Все токены его серверов будут отозваны. Его роли сохранятся.</translation>
+    </message>
+</context>
+<context>
+    <name>CRoleDocumentValidatorComp</name>
+    <message>
+        <source>Role-ID can&apos;t be empty!</source>
+        <translation>Role-ID не может быть пустым!</translation>
+    </message>
+    <message>
+        <source>Role with ID: &apos;%1&apos; already exists</source>
+        <translation>Роль с ID &apos;%1&apos; уже существует</translation>
+    </message>
+    <message>
+        <source>Permission &apos;%1&apos; is not allowed for tenant &apos;%2&apos;</source>
+        <translation>Разрешение &apos;%1&apos; недоступно для организации &apos;%2&apos;</translation>
+    </message>
+    <message>
+        <source>The parent role &apos;%1&apos; belongs to another organization</source>
+        <translation>Родительская роль &apos;%1&apos; принадлежит другой организации</translation>
+    </message>
+    <message>
+        <source>The parent role &apos;%1&apos; belongs to another product</source>
+        <translation>Родительская роль &apos;%1&apos; принадлежит другому продукту</translation>
+    </message>
+</context>
+<context>
+    <name>CAuthorizationControllerComp</name>
+    <message>
+        <source>Invalid login or password. Login: &apos;%1&apos;</source>
+        <translation>Неверный логин или пароль. Логин: &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>Attempts left before the account is locked for %1: %2.</source>
+        <translation>Осталось попыток до блокировки учётной записи на %1: %2.</translation>
+    </message>
+    <message>
+        <source>Attempts left before the account is locked until an administrator unlocks it: %1.</source>
+        <translation>Осталось попыток до блокировки учётной записи, снять которую сможет только администратор: %1.</translation>
+    </message>
+    <message>
+        <source>It stays locked until an administrator unlocks it.</source>
+        <translation>Она останется заблокированной, пока её не разблокирует администратор.</translation>
+    </message>
+    <message>
+        <source>Try again in %1.</source>
+        <translation>Повторите попытку через %1.</translation>
+    </message>
+    <message>
+        <source>Too many invalid sign-in attempts. The account is locked. %1</source>
+        <translation>Слишком много неудачных попыток входа. Учётная запись заблокирована. %1</translation>
+    </message>
+    <message>
+        <source>1 second</source>
+        <translation>1 сек.</translation>
+    </message>
+    <message>
+        <source>%1 seconds</source>
+        <translation>%1 сек.</translation>
+    </message>
+    <message>
+        <source>1 minute</source>
+        <translation>1 мин.</translation>
+    </message>
+    <message>
+        <source>%1 minutes</source>
+        <translation>%1 мин.</translation>
+    </message>
+    <message>
+        <source>%1 hours</source>
+        <translation>%1 ч.</translation>
     </message>
 </context>
 </TS>

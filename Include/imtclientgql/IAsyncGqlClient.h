@@ -40,48 +40,19 @@ public:
 	typedef istd::TSharedInterfacePtr<imtgql::IGqlRequest> GqlRequestPtr;
 	typedef istd::TSharedInterfacePtr<imtgql::IGqlResponse> GqlResponsePtr;
 
-	enum ErrorCategory
-	{
-		EC_NONE = 0,
-		EC_NETWORK,
-		EC_TIMEOUT,
-		EC_INVALID_REQUEST,
-		EC_INTERNAL,
-		/**
-			The server handled the request and answered with GraphQL \c errors.
-			Only reported by \c SendModelRequest; a raw \c GqlResult carries such an answer as a
-			successful response.
-		*/
-		EC_SERVER_ERROR,
-		/**
-			The answer is not a JSON object or does not match the requested model.
-			Only reported by \c SendModelRequest.
-		*/
-		EC_INVALID_RESPONSE
-	};
-
-	struct GqlResult
-	{
-		GqlResponsePtr responsePtr;
-		ErrorCategory errorCategory = EC_NONE;
-		QString errorMessage;
-
-		explicit operator bool() const {
-			return errorCategory == EC_NONE && responsePtr.IsValid();
-		}
-	};
+	using ErrorCategory = IGqlClient::ErrorCategory;
+	using GqlResult = IGqlClient::GqlResult;
+	static constexpr ErrorCategory EC_NONE = IGqlClient::EC_NONE;
+	static constexpr ErrorCategory EC_NETWORK = IGqlClient::EC_NETWORK;
+	static constexpr ErrorCategory EC_TIMEOUT = IGqlClient::EC_TIMEOUT;
+	static constexpr ErrorCategory EC_INVALID_REQUEST = IGqlClient::EC_INVALID_REQUEST;
+	static constexpr ErrorCategory EC_INTERNAL = IGqlClient::EC_INTERNAL;
+	static constexpr ErrorCategory EC_SERVER_ERROR = IGqlClient::EC_SERVER_ERROR;
+	static constexpr ErrorCategory EC_INVALID_RESPONSE = IGqlClient::EC_INVALID_RESPONSE;
+	static constexpr ErrorCategory EC_ACCESS_DENIED = IGqlClient::EC_ACCESS_DENIED;
 
 	template<class SdlClass>
-	struct GqlModelResult
-	{
-		SdlClass model;
-		ErrorCategory errorCategory = EC_INTERNAL;
-		QString errorMessage;
-
-		explicit operator bool() const {
-			return errorCategory == EC_NONE;
-		}
-	};
+	using GqlModelResult = IGqlClient::GqlModelResult<SdlClass>;
 
 	/**
 		Dispatch a request to the server asynchronously.
@@ -110,31 +81,7 @@ public:
 		const QByteArray commandId = request.GetCommandId();
 		return SendRequest(requestPtr)
 			.then([commandId](const IAsyncGqlClient::GqlResult& result) {
-				if (result.errorCategory != IAsyncGqlClient::EC_NONE) {
-					return GqlModelResult<SdlClass>{{}, result.errorCategory, result.errorMessage};
-				}
-				if (!result.responsePtr.IsValid()) {
-					return GqlModelResult<SdlClass>{{}, EC_INVALID_RESPONSE, QStringLiteral("Response is missing")};
-				}
-
-				QString errorMessage;
-				CClientRequestModelHelpers::ParseError parseError = CClientRequestModelHelpers::PE_NONE;
-				auto model = CClientRequestModelHelpers::ParseModelResponse<SdlClass>(
-					result.responsePtr->GetResponseData(), commandId, errorMessage, &parseError);
-
-				ErrorCategory errorCategory = EC_NONE;
-				switch (parseError){
-				case CClientRequestModelHelpers::PE_NONE:
-					break;
-				case CClientRequestModelHelpers::PE_SERVER_ERROR:
-					errorCategory = EC_SERVER_ERROR;
-					break;
-				case CClientRequestModelHelpers::PE_INVALID_RESPONSE:
-					errorCategory = EC_INVALID_RESPONSE;
-					break;
-				}
-
-				return GqlModelResult<SdlClass>{model, errorCategory, errorMessage};
+				return CClientRequestModelHelpers::ParseModelResult<SdlClass>(result, commandId);
 			});
 	}
 };

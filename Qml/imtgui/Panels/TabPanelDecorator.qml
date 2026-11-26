@@ -35,9 +35,26 @@ DecoratorBase {
 
 	property bool signalLoading: false;
 	property bool isLoading: tabPanelDecorator.signalLoading || (tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.contentLoading : false);
+	property bool skeletonDelayElapsed: false;
+
+	onIsLoadingChanged: {
+		if (!tabPanelDecorator.isLoading){
+			tabPanelDecorator.skeletonDelayElapsed = false;
+		}
+	}
+
+	// The title skeleton is shown only when the load lasts longer than Style.skeletonDelay
+	Timer {
+		interval: Style.skeletonDelay;
+		running: tabPanelDecorator.isLoading;
+		onTriggered: {
+			tabPanelDecorator.skeletonDelayElapsed = true;
+		}
+	}
 
 	Connections {
-		target: tabPanelDecorator.baseElement;
+		// baseElement is set after the decorator is created; until then null, else Connections listens to the decorator itself
+		target: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement : null;
 
 		function onStartContentLoading(){
 			tabPanelDecorator.signalLoading = true;
@@ -141,7 +158,10 @@ DecoratorBase {
 			anchors.verticalCenter: parent.verticalCenter;
 			width: visible ? firsElementImage.width : 0;
 			height: parent.height;
-			visible: firsElementImage.status === Image.Ready;
+			// The place is held while the icon loads - on the web it arrives a moment
+			// after the tab, and again on every switch between Normal and Active - so
+			// the tab does not widen under it. Only an icon that failed gives it up.
+			visible: firsElementImage.source != "" && firsElementImage.status !== Image.Error;
 
 			Image {
 				id: firsElementImage;
@@ -200,7 +220,7 @@ DecoratorBase {
 				anchors.left: parent.left;
 				width: parent.width;
 				height: Style.iconSizeXXS;
-				visible: tabPanelDecorator.isLoading;
+				visible: tabPanelDecorator.isLoading && tabPanelDecorator.skeletonDelayElapsed;
 				animated: visible;
 			}
 		}

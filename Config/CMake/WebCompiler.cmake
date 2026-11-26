@@ -222,16 +222,27 @@ function(jqml_compile_web2)
 
 endfunction(jqml_compile_web2)
 
-# Resolve and validate the selected JQML compiler version.
+# Declared only when not set yet, so a value given before keeps working as it did
+if(NOT DEFINED JQML_VERSION)
+	set(JQML_VERSION "" CACHE STRING "JQML version served at <ProductName>/Views/html/: v3, v4 or v5; empty takes the product's jqmlversion, then v3")
+	set_property(CACHE JQML_VERSION PROPERTY STRINGS "" v3 v4 v5)
+endif()
+if(NOT DEFINED JQML_WEB_ALL_VERSIONS)
+	set(JQML_WEB_ALL_VERSIONS "" CACHE STRING "Also build the other JQML versions, version N at <ProductName>/Views/htmlN/: ON or OFF; empty takes the product's jqmlallversions, then OFF")
+	set_property(CACHE JQML_WEB_ALL_VERSIONS PROPERTY STRINGS "" ON OFF)
+endif()
+
+# Resolve and validate the selected JQML compiler version:
+# JQML_VERSION (CMake), then the JQML_VERSION environment variable, then the product's jqmlversion, then v3.
 function(jqml_resolve_version out_version out_compiler)
-	if(NOT DEFINED JQML_VERSION OR "${JQML_VERSION}" STREQUAL "")
-		if(DEFINED ENV{JQML_VERSION} AND NOT "$ENV{JQML_VERSION}" STREQUAL "")
-			set(_jqml_version "$ENV{JQML_VERSION}")
-		else()
-			set(_jqml_version "v3")
-		endif()
-	else()
+	if(NOT "${JQML_VERSION}" STREQUAL "")
 		set(_jqml_version "${JQML_VERSION}")
+	elseif(NOT "$ENV{JQML_VERSION}" STREQUAL "")
+		set(_jqml_version "$ENV{JQML_VERSION}")
+	elseif(NOT "${jqmlversion}" STREQUAL "")
+		set(_jqml_version "${jqmlversion}")
+	else()
+		set(_jqml_version "v3")
 	endif()
 
 	if(NOT "${_jqml_version}" MATCHES "^v[345]$")
@@ -295,11 +306,53 @@ function(jqml3_qmldir_qml_files out_var config_path)
 	set(${out_var}_OK TRUE PARENT_SCOPE)
 endfunction()
 
+# The JavaScript sources of the JQML version VERSION (its runtime and its compiler): a web client is compiled again when
+# one of them changes, not only when a qml file does. The folders of the version except node_modules, the tests, the
+# editor extension and dist; CONFIGURE_DEPENDS: a file that is added or removed is seen by the next build.
+function(jqml_runtime_files out_var version)
+	set(_jqml_dir "${IMTCOREDIR}/Tools/JQML/${version}")
+	set(_jqml_sources)
+	file(GLOB _jqml_children CONFIGURE_DEPENDS LIST_DIRECTORIES true "${_jqml_dir}/*")
+
+	foreach(_jqml_child ${_jqml_children})
+		get_filename_component(_jqml_name "${_jqml_child}" NAME)
+		if(NOT IS_DIRECTORY "${_jqml_child}" OR _jqml_name MATCHES "^(node_modules|tests?|vscode-extension|dist)$")
+			continue()
+		endif()
+		file(GLOB_RECURSE _jqml_found CONFIGURE_DEPENDS "${_jqml_child}/*.js")
+		list(APPEND _jqml_sources ${_jqml_found})
+	# Track consumed runtime bundles without including unrelated dist artifacts.
+
+	file(GLOB _jqml_bundles CONFIGURE_DEPENDS
+
+		"${_jqml_dir}/dist/main.js"
+
+		"${_jqml_dir}/dist/core.js"
+
+		"${_jqml_dir}/dist/qmlcompiler.js")
+
+	list(APPEND _jqml_sources ${_jqml_bundles})
+
+	endforeach()
+	set(${out_var} "${_jqml_sources}" PARENT_SCOPE)
+endfunction()
+
 function(jq_compile_web)
 	set(QRC_WEB_FILE ${buildwebdir}/Resources/qmlJsWeb.qrc)
 	set(QRC_CPP_WEB_FILE ${buildwebdir}/Resources/qrc_${resname}Web.cpp)
 
 	jqml_resolve_version(JQML_VERSION JQML_COMPILER)
+	message(STATUS "JQML ${JQML_VERSION} for ${PROJECT_NAME}")
+
+	# JQML_WEB_ALL_VERSIONS (CMake), then the environment variable, then the product's jqmlallversions
+	if(NOT "${JQML_WEB_ALL_VERSIONS}" STREQUAL "")
+		set(_jqml_all "${JQML_WEB_ALL_VERSIONS}")
+	elseif(NOT "$ENV{JQML_WEB_ALL_VERSIONS}" STREQUAL "")
+		set(_jqml_all "$ENV{JQML_WEB_ALL_VERSIONS}")
+	else()
+		set(_jqml_all "${jqmlallversions}")
+	endif()
+	message(STATUS "JQML all versions for ${PROJECT_NAME}: ${_jqml_all}")
 
 	if(NOT PYTHONEXE)
 		set(PYTHONEXE "$ENV{PYTHONEXE}")
@@ -325,6 +378,20 @@ function(jq_compile_web)
 
 	message("NODE_EXE_JQ ${NODE_EXE}")
 
+	# v5 only, so v3 and v4 builds configure as before: a missing submodule, an LFS pointer instead of node.exe,
+	# no node on the PATH or a node older than 12 fail here, not in the build
+	if(JQML_VERSION STREQUAL "v5" OR _jqml_all)
+		execute_process(COMMAND "${NODE_EXE}" --version OUTPUT_VARIABLE _jqml_node_version RESULT_VARIABLE _jqml_node_result
+			OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+		if(NOT _jqml_node_result EQUAL 0 OR NOT _jqml_node_version MATCHES "^v([0-9]+)")
+			message(FATAL_ERROR "Node.js does not run: '${NODE_EXE}'. On Windows run 'git submodule update --init 3rdParty/nodejs' "
+				"and 'git lfs pull' in ImtCore; elsewhere install Node.js or set NODE_EXE.")
+		endif()
+		if(CMAKE_MATCH_1 LESS 12)
+			message(FATAL_ERROR "JQML v5 needs Node.js 12 or newer, '${NODE_EXE}' is ${_jqml_node_version}")
+		endif()
+	endif()
+
 	list(LENGTH webdirs DIRS_COUNT)
 
 	set(INDEX 0)
@@ -335,11 +402,17 @@ function(jq_compile_web)
 	if(inputjs)
 		jqml3_qmldir_qml_files(DEPEND_LIST "${inputjs}")
 		set(_jqml_list_ok "${DEPEND_LIST_OK}")
+		if(NOT _jqml_list_ok)
+			# the qml files are not dependencies then: a change of one of them does not compile the client again
+			message(WARNING "JQML: the qml files of ${inputjs} are not known (see the message above), a changed qml file does not rebuild the web client of ${PROJECT_NAME}")
+		endif()
 		if(startqml)
 			list(APPEND DEPEND_LIST "${startqml}")
 		endif()
 		list(APPEND DEPEND_LIST "${inputjs}")
 	endif()
+
+	jqml_runtime_files(_jqml_runtime ${JQML_VERSION})
 
 	message(VERBOSE "DIRS_COUNT ${DIRS_COUNT}")
 
@@ -387,10 +460,22 @@ function(jq_compile_web)
 		-i ${appicon}
 		-o ${buildwebdir}/Resources/
 		-m html
-		DEPENDS ${DEPEND_LIST} ${sdldependency}
+		DEPENDS ${DEPEND_LIST} ${_jqml_runtime} ${sdldependency}
 		COMMENT "Create html for ${PROJECT_NAME}"
 		VERBATIM
 	)
+
+	# v5: the compiled QML of a Release build is minified; JQML_MINIFY ON / OFF decides for any build
+	set(_jqml_minify_args)
+	if(JQML_VERSION STREQUAL "v5")
+		if(DEFINED JQML_MINIFY)
+			if(JQML_MINIFY)
+				set(_jqml_minify_args --minify)
+			endif()
+		elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+			set(_jqml_minify_args --minify)
+		endif()
+	endif()
 
 	# JS build
 	add_custom_command(
@@ -408,10 +493,74 @@ function(jq_compile_web)
 		-r ${dataroot}
 		-e ${startqml}
 		-m js
-		DEPENDS ${DEPEND_LIST} ${sdldependency}
+		${_jqml_minify_args}
+		DEPENDS ${DEPEND_LIST} ${_jqml_runtime} ${sdldependency}
 		COMMENT "WEB COMPILER for ${PROJECT_NAME}"
 		VERBATIM
 	)
+
+	# JQML_WEB_ALL_VERSIONS: the other versions too, version N at <ProductName>/Views/htmlN/index.html
+	set(_jqml_extra_outputs)
+	set(_jqml_extra_qrc_files)
+	if(_jqml_all)
+		foreach(_jqml_extra v3 v4 v5)
+			if(_jqml_extra STREQUAL JQML_VERSION)
+				continue()
+			endif()
+
+			string(SUBSTRING ${_jqml_extra} 1 1 _jqml_number)
+			set(_jqml_extra_dir ${IMTCOREDIR}/Tools/JQML/${_jqml_extra})
+			set(_jqml_extra_out ${buildwebdir}/Resources/${_jqml_extra})
+			set(_jqml_extra_qrc ${_jqml_extra_out}/qmlJsWeb${_jqml_number}.qrc)
+			jqml_runtime_files(_jqml_extra_runtime ${_jqml_extra})
+
+			# the version's own file list under its own prefix
+			file(READ ${_jqml_extra_dir}/dist/qmlJsWeb.qrc _jqml_qrc)
+			string(REPLACE "prefix=\"/html\"" "prefix=\"/html${_jqml_number}\"" _jqml_qrc "${_jqml_qrc}")
+			file(CONFIGURE OUTPUT ${_jqml_extra_qrc} CONTENT "${_jqml_qrc}" @ONLY)
+
+			add_custom_command(
+				OUTPUT
+				${_jqml_extra_out}/index.html
+				COMMAND ${CMAKE_COMMAND} -E make_directory ${_jqml_extra_out}
+				COMMAND ${PYTHONEXE} ${_jqml_extra_dir}/preparesources.py ${_jqml_extra_dir}/dist ${_jqml_extra_out}
+				COMMAND ${CMAKE_COMMAND} -E env ${envvar}
+				TARGETNAME=${TARGETNAME}
+				${NODE_EXE}
+				${_jqml_extra_dir}/compiler/compiler.js
+				-n index
+				-i ${appicon}
+				-o ${_jqml_extra_out}/
+				-m html
+				WORKING_DIRECTORY ${_jqml_extra_dir}
+				DEPENDS ${DEPEND_LIST} ${_jqml_extra_runtime} ${sdldependency}
+				COMMENT "Create html ${_jqml_extra} for ${PROJECT_NAME}"
+				VERBATIM
+			)
+
+			add_custom_command(
+				OUTPUT
+				${_jqml_extra_out}/index.js
+				WORKING_DIRECTORY ${_jqml_extra_dir}
+				COMMAND ${CMAKE_COMMAND} -E env ${envvar}
+				TARGETNAME=${TARGETNAME}
+				${NODE_EXE}
+				${_jqml_extra_dir}/compiler/compiler.js
+				-c ${inputjs}
+				-n index
+				-o ${_jqml_extra_out}/
+				-r ${dataroot}
+				-e ${startqml}
+				-m js
+				DEPENDS ${DEPEND_LIST} ${_jqml_extra_runtime} ${sdldependency} ${_jqml_extra_out}/index.html
+				COMMENT "WEB COMPILER ${_jqml_extra} for ${PROJECT_NAME}"
+				VERBATIM
+			)
+
+			list(APPEND _jqml_extra_outputs ${_jqml_extra_out}/index.html ${_jqml_extra_out}/index.js)
+			list(APPEND _jqml_extra_qrc_files ${_jqml_extra_qrc})
+		endforeach()
+	endif()
 
 	add_custom_command(
 		OUTPUT ${QRC_CPP_WEB_FILE}
@@ -421,11 +570,13 @@ function(jq_compile_web)
 		-name ${resname}Web
 		${QRC_WEB_FILE}
 		${TRANSLATIONS_QRC_FILE}
+		${_jqml_extra_qrc_files}
 		-o ${QRC_CPP_WEB_FILE}
 		DEPENDS
 		${buildwebdir}/Resources/index.js
 		${buildwebdir}/Resources/index.html
 		${TRANSLATIONS_QRC_FILE}
+		${_jqml_extra_outputs}
 		COMMENT
 		"Compile QRC_WEB_FILE"
 	)
@@ -558,6 +709,9 @@ macro(getImtLicQmlWebDirs webdirs buildwebdir)
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtlicsdl/SDL/1.0/QML/imtlicProductsSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtlicProductsSdl)
 
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtlicsdl/SDL/1.0/QML/imtlicProductCollectionDocumentServiceSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtlicProductCollectionDocumentServiceSdl)
+
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtlicsdl/SDL/1.0/QML/imtlicLicensesSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtlicLicensesSdl)
 endmacro(getImtLicQmlWebDirs)
@@ -592,6 +746,18 @@ macro(getImtAuthQmlWebDirs webdirs buildwebdir)
 
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthPersonalAccessTokensSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthPersonalAccessTokensSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthServerTokensSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthServerTokensSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthConnectedProductsSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthConnectedProductsSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthConnectedProductCollectionDocumentServiceSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthConnectedProductCollectionDocumentServiceSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthProductPermissionCatalogSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthProductPermissionCatalogSdl)
 
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthPermissionsSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthPermissionsSdl)

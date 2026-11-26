@@ -3,8 +3,12 @@
 
 
 // Qt includes
+#include <QtNetwork/QSslConfiguration>
 #include <QtWebSockets/QWebSocket>
 #include <QtCore/QSharedPointer>
+
+// STL includes
+#include <atomic>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -59,7 +63,8 @@ public:
 		I_ASSIGN(m_httpProtocolEngineCompPtr, "HttpProtocolEngine", "Http Protocol engine used in the server", false, "HttpProtocolEngine");
 		I_ASSIGN(m_subscriberEngineCompPtr, "SubscriberEngine", "Subscriber engine used in the server", false, "SubscriberEngine");
 		I_ASSIGN(m_startServerOnCreateAttrPtr, "StartServerOnCreate", "If enabled, the server will be started on after component creation", true, true);
-		I_ASSIGN(m_webServerInterfaceCompPtr, "WebServerConnectionInterface", "Parameter providing the WebSocket-server port to be listened", true, "WebServerConnectionInterface");
+		I_ASSIGN(m_webServerInterfaceCompPtr, "WebServerConnectionInterface", "Parameter providing the WebSocket-server port to be listened. A change of its WebSocket port moves the server to the new port", true, "WebServerConnectionInterface");
+		I_ASSIGN_TO(m_webServerInterfaceModelCompPtr, m_webServerInterfaceCompPtr, false);
 		I_ASSIGN(m_sslConfigurationCompPtr, "SslConfiguration", "SSL Configuration is used by networking classes to relay information about an open SSL connection and to allow the server to control certain features of that connection.", false, "SslConfiguration")
 		I_ASSIGN_TO(m_sslConfigurationModelCompPtr, m_sslConfigurationCompPtr, false)
 		I_ASSIGN(m_sslConfigurationManagerCompPtr, "SslConfigurationManager", "SSL configuration manager, used to create an SSL configuration for server", false, "SslConfigurationManager")
@@ -115,8 +120,56 @@ protected:
 	virtual ServerStatus GetServerStatus() const override;
 
 private:
+	enum ModelId
+	{
+		MI_SSL_CONFIGURATION,
+		MI_SERVER_CONNECTION
+	};
+
 	bool EnsureServerStarted();
+
+	/**
+		Listen with a new server object, secure as the SSL configuration asks. If it asks for the encryption and it cannot be made, the
+		server does not listen and has no server object: it is not started without the encryption.
+	*/
 	bool StartListening(const QHostAddress& address = QHostAddress::Any, quint16 port = 0);
+
+	void StopListening();
+
+	/**
+		Get the encryption that the SSL configuration asks for.
+		\return \c false if it is asked for, but cannot be made.
+	*/
+	bool GetSecureConnection(bool& isSecure, QSslConfiguration& sslConfiguration) const;
+
+	/**
+		Close the connections and listen again: after a change of the SSL configuration the clients connect again with it. The connections
+		are closed as a client closes them: their workers finish through the usual disconnection and are used again.
+	*/
+	bool RestartServer();
+
+	/**
+		Start the server again with the changed SSL configuration, if the server is to work. The same configuration (the settings are
+		loaded again) changes nothing, the connections stay.
+	*/
+	void RestartForSslConfiguration();
+
+	/**
+		Listen on the port of the server connection interface, if the port is changed and the server is to work (started on creation or
+		by StartServer and not stopped). The established connections stay. When the new port cannot be listened on, the server stays
+		on the previous port. A port of the system (0) or of no protocol (-1) is not followed.
+	*/
+	void MoveToConfiguredPort();
+
+	/**
+		Stop the threads of the connections and wait for them: they use the component.
+	*/
+	void StopConnectionThreads();
+
+	/**
+		Listen on another port with the same server object: the sockets of the established connections belong to it.
+	*/
+	bool ListenAgain(quint16 port);
 
 private Q_SLOTS:
 	void HandleNewConnections();
@@ -139,6 +192,7 @@ private:
 	I_REF(ISubscriberEngine, m_subscriberEngineCompPtr);
 	I_ATTR(bool, m_startServerOnCreateAttrPtr);
 	I_REF(imtcom::IServerConnectionInterface, m_webServerInterfaceCompPtr);
+	I_REF(imod::IModel, m_webServerInterfaceModelCompPtr);
 	I_REF(iprm::IParamsSet, m_sslConfigurationCompPtr);
 	I_REF(imod::IModel, m_sslConfigurationModelCompPtr);
 	I_REF(imtcom::ISslConfigurationManager, m_sslConfigurationManagerCompPtr);
@@ -147,6 +201,17 @@ private:
 	I_REF(iprm::IOptionsList, m_subprotocolListCompPtr);
 
 	bool m_isInitialized = false;
+
+	/**
+		The server is started (on creation or by StartServer) and not stopped by StopServer: a new port is taken by it.
+	*/
+	std::atomic<bool> m_isStartRequested = false;
+
+	/**
+		The port of the server connection interface that the server has tried last, -1 before. A port that could not be listened on is
+		not tried again on each notification, only a changed one.
+	*/
+	int m_requestedPort = -1;
 };
 
 

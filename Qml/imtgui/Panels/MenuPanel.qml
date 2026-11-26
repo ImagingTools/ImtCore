@@ -41,6 +41,9 @@ Rectangle {
 	// Model for pages with bottom alignment
 	property TreeItemModel bottomPagesModel: TreeItemModel {};
 
+	// IDs of the folded groups, in the form ",groupA,groupB,".
+	property string collapsedGroups: ",";
+
 	property int spacing: 0;
 	signal activePageChanged;
 
@@ -92,8 +95,9 @@ Rectangle {
 	width: Style.enableMenuPanelCollapse ? menuPanel.collapsedWidth : menuPanel.rowWidth;
 
 	// Logged out the page list is cleared, and a rail with nothing in it is just a
-	// white stripe beside the sign-in page.
-	visible: !menuPanel.railMode || allPages.count > 0;
+	// white stripe beside the sign-in page. Signed in it stays even without pages:
+	// it holds the account, the only way to sign out.
+	visible: !menuPanel.railMode || allPages.count > 0 || menuPanel.loggedIn;
 
 	// Folded or open is the user's choice, so it outlives a page reload. Read and
 	// written by key like AuthorizationController does - declared properties on
@@ -110,6 +114,8 @@ Rectangle {
 
 			menuPanel.menuDefaultWidth = menuPanel.expandedWidth;
 		}
+
+		menuPanel.collapsedGroups = menuPanel.storage.value("collapsedGroups", ",");
 
 		Events.subscribeEvent("MenuModelRequest", menuPanel.onMenuModelRequest);
 		Events.subscribeEvent("UpdatePageVisualStatus", menuPanel.updateVisualStatus);
@@ -295,6 +301,9 @@ Rectangle {
 		}
 
 		menuPanel.width = menuPanel.collapsed ? menuPanel.collapsedWidth : menuPanel.expandedWidth;
+
+		// The stored state is for a wide window: a window that is already narrow folds the menu again.
+		menuPanel.updateAutoCollapse();
 	}
 
 	function updateAutoCollapse(){
@@ -395,6 +404,76 @@ Rectangle {
 		bottomAlignmentPages.model = bottomPagesModel;
 	}
 
+	// The page carries the name of its group
+	function getPageGroupName(pagesModel, index){
+		if (!pagesModel || index < 0 || index >= pagesModel.getItemsCount() || !pagesModel.containsKey("groupName", index)){
+			return "";
+		}
+
+		let groupName = pagesModel.getData("groupName", index);
+
+		return groupName ? groupName : "";
+	}
+
+	function getPageGroupId(pagesModel, index){
+		if (!pagesModel || index < 0 || index >= pagesModel.getItemsCount()){
+			return "";
+		}
+
+		if (!pagesModel.containsKey("groupId", index)){
+			return "";
+		}
+
+		let groupId = pagesModel.getData("groupId", index);
+
+		return groupId ? groupId : "";
+	}
+
+	// True for the first page of a group: the group title is shown above it.
+	function isGroupStart(pagesModel, index){
+		let groupId = menuPanel.getPageGroupId(pagesModel, index);
+		if (groupId === ""){
+			return false;
+		}
+
+		return menuPanel.getPageGroupId(pagesModel, index - 1) !== groupId;
+	}
+
+	// True where a group has ended or the bottom-aligned pages begin: a separator is shown above the page,
+	// so pages outside the group do not look like part of it (also when the group is folded).
+	function isSectionBreak(pagesModel, index){
+		if (!pagesModel || index <= 0 || index >= pagesModel.getItemsCount()){
+			return false;
+		}
+
+		if (menuPanel.isGroupStart(pagesModel, index)){
+			return false;
+		}
+
+		let previousGroupId = menuPanel.getPageGroupId(pagesModel, index - 1);
+		let groupId = menuPanel.getPageGroupId(pagesModel, index);
+		if (previousGroupId !== "" && groupId === ""){
+			return true;
+		}
+
+		let previousAlignment = pagesModel.containsKey("alignment", index - 1) ? pagesModel.getData("alignment", index - 1) : 0;
+		let alignment = pagesModel.containsKey("alignment", index) ? pagesModel.getData("alignment", index) : 0;
+
+		return previousAlignment !== 64 && alignment === 64;
+	}
+
+	function toggleGroup(groupId){
+		let key = groupId + ",";
+		if (menuPanel.collapsedGroups.indexOf("," + key) >= 0){
+			menuPanel.collapsedGroups = menuPanel.collapsedGroups.replace("," + key, ",");
+		}
+		else{
+			menuPanel.collapsedGroups = menuPanel.collapsedGroups + key;
+		}
+
+		menuPanel.storage.setValue("collapsedGroups", menuPanel.collapsedGroups);
+	}
+
 	function setActivePage(pageId){
 		for (let i = 0; i < menuPanel.model.getItemsCount(); i++){
 			let id = menuPanel.model.getData("id", i);
@@ -408,46 +487,81 @@ Rectangle {
 
 
 	property Component delegate: Component {
-		MenuPanelButton {
-			objectName: model["id"] + "Button"
+		Column {
+			id: pageItem;
 
-			width: Style.enableMenuPanelCollapse ? menuPanel.expandedWidth : (decorator_ ? decorator_.width : 0);
-			height: Style.enableMenuPanelCollapse ? menuPanel.rowHeight : (decorator_ ? decorator_.height : 0);
+			property string groupId: menuPanel.getPageGroupId(allPages.model, model.index);
+			property bool groupCollapsed: pageItem.groupId !== "" && menuPanel.collapsedGroups.indexOf("," + pageItem.groupId + ",") >= 0;
 
-			Component.onCompleted: {
-				if (model.index === 0 && menuPanel.activePageIndex === -1){
-					this.clicked();
+			MenuPanelGroupHeader {
+				width: pageButton.width;
+
+				visible: menuPanel.isSectionBreak(allPages.model, model.index);
+				separatorOnly: true;
+				panelCollapsed: menuPanel.collapsed;
+				collapsedPanelWidth: menuPanel.collapsedWidth;
+			}
+
+			MenuPanelGroupHeader {
+				width: pageButton.width;
+
+				visible: menuPanel.isGroupStart(allPages.model, model.index);
+				groupId: pageItem.groupId;
+				title: menuPanel.getPageGroupName(allPages.model, model.index);
+				groupCollapsed: pageItem.groupCollapsed;
+				panelCollapsed: menuPanel.collapsed;
+				collapsedPanelWidth: menuPanel.collapsedWidth;
+
+				onClicked: {
+					menuPanel.toggleGroup(pageItem.groupId);
 				}
 			}
 
-			text:  model["name"];
-			badge: menuPanel.badgesRevision >= 0 ? menuPanel.getBadge(model["id"]) : "";
-			textColor: Style.textColor;
-			fontName: menuPanel.fontName;
-			menuPanelRef: menuPanel;
-			iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["icon"], "On", "Selected"):
-													"../../../" + Style.getIconPath(model["icon"], "On", "Normal");
+			MenuPanelButton {
+				id: pageButton;
 
-			selected: menuPanel.activePageIndex === model.index;
-			property string pageId: model["id"];
+				visible: menuPanel.collapsed || !pageItem.groupCollapsed || pageButton.selected;
 
-			onClicked: {
-				menuPanel.setActivePage(model.id)
-			}
+				objectName: model["id"] + "Button"
 
-			onWidthChanged: {
-				menuPanel.buttonWidth = Math.max(menuPanel.buttonWidth, width);
-			}
+				width: Style.enableMenuPanelCollapse ? menuPanel.expandedWidth : (decorator_ ? decorator_.width : 0);
+				height: Style.enableMenuPanelCollapse ? menuPanel.rowHeight : (decorator_ ? decorator_.height : 0);
 
-			onHeightChanged: {
-				menuPanel.buttonHeight = height;
-			}
+				Component.onCompleted: {
+					if (model.index === 0 && menuPanel.activePageIndex === -1){
+						this.clicked();
+					}
+				}
 
-			NavigableItem {
-				paths: [model["id"]]
-				onActivated: {
-					// Through setActivePage, so activePageId follows a page reached by history too.
-					menuPanel.setActivePage(model["id"])
+				text:  model["name"];
+				badge: menuPanel.badgesRevision >= 0 ? menuPanel.getBadge(model["id"]) : "";
+				textColor: Style.textColor;
+				fontName: menuPanel.fontName;
+				menuPanelRef: menuPanel;
+				iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["icon"], "On", "Selected"):
+														"../../../" + Style.getIconPath(model["icon"], "On", "Normal");
+
+				selected: menuPanel.activePageIndex === model.index;
+				property string pageId: model["id"];
+
+				onClicked: {
+					menuPanel.setActivePage(model.id)
+				}
+
+				onWidthChanged: {
+					menuPanel.buttonWidth = Math.max(menuPanel.buttonWidth, width);
+				}
+
+				onHeightChanged: {
+					menuPanel.buttonHeight = height;
+				}
+
+				NavigableItem {
+					paths: [model["id"]]
+					onActivated: {
+						// Through setActivePage, so activePageId follows a page reached by history too.
+						menuPanel.setActivePage(model["id"])
+					}
 				}
 			}
 		}
@@ -866,27 +980,64 @@ anchors.topMargin: menuPanel.railMode ? Style.marginXS
 				: !menuPanel.centered ? (Style.enableMenuPanelCollapse ? Style.marginXL + Style.marginXXXS : Style.marginM)
 				: parent.height - bottomAlignmentColumn.height - height > 0 ? (parent.height - bottomAlignmentColumn.height - height) / 2 : 0
 
-			visible: !allPagesFlick.visible;
+			// Not "visible": a hidden Column stops updating its height, and the overflow check above reads it.
+			opacity: allPagesFlick.visible ? 0 : 1;
+			enabled: !allPagesFlick.visible;
 
 			Repeater{
 				id: topAlignmentPages;
 
 				delegate: Component {
-					MenuPanelButton {
-						objectName: model["id"] + "Button"
+					Column {
+						id: topPageItem;
 
-						width: Style.enableMenuPanelCollapse ? menuPanel.expandedWidth : (decorator_ ? decorator_.width : 0);
-						height: Style.enableMenuPanelCollapse ? menuPanel.rowHeight : (decorator_ ? decorator_.height : 0);
+						property string groupId: menuPanel.getPageGroupId(topAlignmentPages.model, model.index);
+						property bool groupCollapsed: topPageItem.groupId !== "" && menuPanel.collapsedGroups.indexOf("," + topPageItem.groupId + ",") >= 0;
 
-						text:  model["name"];
-						badge: menuPanel.badgesRevision >= 0 ? menuPanel.getBadge(model["id"]) : "";
-						textColor: Style.textColor;
-						menuPanelRef: menuPanel;
-						iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["icon"], "On", "Selected"):
-																"../../../" + Style.getIconPath(model["icon"], "On", "Normal");
-						selected: menuPanel.activePageIndex <= topAlignmentPages.count - 1 ? model.index === menuPanel.activePageIndex : false;
-						onClicked: {
-							menuPanel.setActivePage(model.id)
+						MenuPanelGroupHeader {
+							width: topPageButton.width;
+
+							visible: menuPanel.isSectionBreak(topAlignmentPages.model, model.index);
+							separatorOnly: true;
+							panelCollapsed: menuPanel.collapsed;
+							collapsedPanelWidth: menuPanel.collapsedWidth;
+						}
+
+						MenuPanelGroupHeader {
+							width: topPageButton.width;
+
+							visible: menuPanel.isGroupStart(topAlignmentPages.model, model.index);
+							groupId: topPageItem.groupId;
+							title: menuPanel.getPageGroupName(topAlignmentPages.model, model.index);
+							groupCollapsed: topPageItem.groupCollapsed;
+							panelCollapsed: menuPanel.collapsed;
+							collapsedPanelWidth: menuPanel.collapsedWidth;
+
+							onClicked: {
+								menuPanel.toggleGroup(topPageItem.groupId);
+							}
+						}
+
+						MenuPanelButton {
+							id: topPageButton;
+
+							visible: menuPanel.collapsed || !topPageItem.groupCollapsed || topPageButton.selected;
+
+							objectName: model["id"] + "Button"
+
+							width: Style.enableMenuPanelCollapse ? menuPanel.expandedWidth : (decorator_ ? decorator_.width : 0);
+							height: Style.enableMenuPanelCollapse ? menuPanel.rowHeight : (decorator_ ? decorator_.height : 0);
+
+							text:  model["name"];
+							badge: menuPanel.badgesRevision >= 0 ? menuPanel.getBadge(model["id"]) : "";
+							textColor: Style.textColor;
+							menuPanelRef: menuPanel;
+							iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["icon"], "On", "Selected"):
+																	"../../../" + Style.getIconPath(model["icon"], "On", "Normal");
+							selected: menuPanel.activePageIndex <= topAlignmentPages.count - 1 ? model.index === menuPanel.activePageIndex : false;
+							onClicked: {
+								menuPanel.setActivePage(model.id)
+							}
 						}
 					}
 				}
@@ -901,7 +1052,9 @@ anchors.topMargin: menuPanel.railMode ? Style.marginXS
 
 			width: menuPanel.rowWidth;
 
-			visible: !allPagesFlick.visible;
+			// Not "visible": a hidden Column stops updating its height, and the overflow check above reads it.
+			opacity: allPagesFlick.visible ? 0 : 1;
+			enabled: !allPagesFlick.visible;
 
 			Repeater{
 				id: bottomAlignmentPages;

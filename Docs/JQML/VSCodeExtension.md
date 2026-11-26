@@ -36,3 +36,5 @@ After changing settings, reload the window or re-open a `.qml` file.
 ## Debug from source
 
 From `Tools/JQML/v3`, run the **Launch JQML Extension** configuration. Tests: `npm run test-language`.
+
+The extension for JQML 4 is described in [VSCodeExtensionV4.md](VSCodeExtensionV4.md).

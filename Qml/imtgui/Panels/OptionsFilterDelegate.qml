@@ -20,8 +20,8 @@ FilterDelegateBase {
 	onCollectionFilterChanged: {
 		if (collectionFilter && selectionParam && internal.delaySignal){
 			let optionId = getOptionId(selectionParam.m_selectedIndex)
-			optionSelectionChanged([optionId], [selectionParam.m_selectedIndex])
-			
+			optionSelectionChanged([optionId], [selectionParam.m_selectedIndex], false)
+
 			internal.delaySignal = false
 		}
 	}
@@ -296,11 +296,17 @@ FilterDelegateBase {
 					height: popupMenuContainer.itemHeight
 					text: model.item["m_name"]
 					enabled: model.item["m_enabled"]
-					selected: filterDelegate.selectionParam.m_selectedIndex === model.index;
-					icon.source: selected ? "qrc:/" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal) : ""
-					
+					// The row under the pointer or keyboard is highlighted, as in the default delegate of PopupMenuDialog;
+					// the chosen option keeps its check mark
+					selected: popupMenuContainer.selectedIndex === model.index;
+					icon.source: filterDelegate.selectionParam.m_selectedIndex === model.index ? "qrc:/" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal) : ""
+
 					onClicked: {
 						popupMenuContainer.finished(model.item.m_id, model.index);
+					}
+
+					onEntered: {
+						popupMenuContainer.selectedIndex = model.index;
 					}
 				}
 			}

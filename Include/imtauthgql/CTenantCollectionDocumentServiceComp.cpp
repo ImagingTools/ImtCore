@@ -168,15 +168,21 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 
 	// Populate the organization permissions available to the *current user* within this tenant
 	// (used by TenantEditor to know what org features the user can manage)
+	QByteArrayList currentUserOrganizationPermissions;
 	if (m_membershipManagerCompPtr.IsValid() && gqlContextPtr != nullptr){
 		QByteArray currentUid = gqlContextPtr->GetUserId();
 		if (!currentUid.isEmpty()){
 			imtauth::ITenantMembershipUniquePtr myMs = m_membershipManagerCompPtr->FindMembership(currentUid, tenantId);
 			if (myMs.IsValid()){
-				response.currentUserOrganizationPermissions.Emplace().FromList(myMs->GetOrganizationPermissions());
+				currentUserOrganizationPermissions = myMs->GetOrganizationPermissions();
+				response.currentUserOrganizationPermissions.Emplace().FromList(currentUserOrganizationPermissions);
 			}
 		}
 	}
+
+	// The permissions of the members are read by whom GetOrganizationPermissions gives them
+	const bool canViewMemberPermissions = isSystemAdmin || isCreator || isOwner
+				|| HasAnyOrganizationPermission(currentUserOrganizationPermissions, {s_viewOrganizationPermissionsPermission});
 
 	if (m_membershipManagerCompPtr.IsValid()){
 		QByteArrayList membershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
@@ -202,6 +208,10 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 
 				if (m_userCollectionCompPtr.IsValid()){
 					memberEntry.name = imtauth::GetUserName(*m_userCollectionCompPtr, userId);
+				}
+
+				if (canViewMemberPermissions){
+					memberEntry.organizationPermissions.Emplace().FromList(membershipPtr->GetOrganizationPermissions());
 				}
 
 				response.members->push_back(memberEntry);
@@ -669,6 +679,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 		saveParams.userId = userLogin;
 		saveParams.documentId = documentId;
 		saveParams.operationContextPtr = gqlContextPtr != nullptr ? &operationContext : nullptr;
+		saveParams.languageId = gqlContextPtr != nullptr ? gqlContextPtr->GetLanguageId() : QByteArray();
 		QByteArray saveTaskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, saveParams);
 		const imtdoc::IDocumentService::TaskResult saveResult = m_documentManagerCompPtr->WaitForTaskFinished(saveTaskId);
 		if (saveResult.status != imtdoc::IDocumentService::OS_OK){

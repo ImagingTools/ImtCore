@@ -22,6 +22,12 @@ public:
 		Get path to the document manager on this page.
 	*/
 	virtual QString GetStartSourceItem() const = 0;
+
+	/**
+		Get the menu group this page belongs to: its ID, name and icon.
+		\return nullptr if the page is not part of any group.
+	*/
+	virtual const IGuiElementModel* GetGroup() const = 0;
 };
 
 

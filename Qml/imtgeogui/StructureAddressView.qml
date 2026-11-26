@@ -5,6 +5,7 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
+import imtauthgui 1.0
 // SDL imports
 import imtbaseImtCollectionSdl 1.0
 import imtbaseComplexCollectionFilterSdl 1.0
@@ -51,7 +52,7 @@ Item {
 	property Component addressTreeSdlObjectComp: null
 
 	property GqlRequestSender addAddressRequest: GqlRequestSender{
-		permissionPath: structureAddressesContainer.permissionPath
+		permissionPath: structureAddressesContainer.permissionPath === "" ? "" : structureAddressesContainer.permissionPath + "/Edit/Add"
 		gqlCommandId: "AddressAdd";
 
 		function createQueryParams(query){
@@ -81,7 +82,7 @@ Item {
 	}
 
 	property GqlRequestSender updateAddressRequest: GqlRequestSender{
-		permissionPath: structureAddressesContainer.permissionPath
+		permissionPath: structureAddressesContainer.permissionPath === "" ? "" : structureAddressesContainer.permissionPath + "/Edit/Change"
 		gqlCommandId: "AddressUpdate";
 
 		function createQueryParams(query){
@@ -100,9 +101,30 @@ Item {
 	}
 
 	property GqlSdlRequestSender removeAddressRequest: GqlSdlRequestSender{
-		permissionPath: structureAddressesContainer.permissionPath
+		permissionPath: structureAddressesContainer.permissionPath === "" ? "" : structureAddressesContainer.permissionPath + "/Edit/Remove"
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_removeElements
 		requestType: 1
+	}
+
+	// The buttons need the permissions of the path: Edit/Add, Edit/Change and Edit/Remove. Without a path all are shown.
+	function isButtonAllowed(buttonId){
+		if (structureAddressesContainer.permissionPath === ""){
+			return true;
+		}
+
+		if (buttonId === "Add"){
+			return PermissionsController.checkPermission(structureAddressesContainer.permissionPath + "/Edit/Add");
+		}
+
+		if (buttonId === "Edit"){
+			return PermissionsController.checkPermission(structureAddressesContainer.permissionPath + "/Edit/Change");
+		}
+
+		if (buttonId === "Delete"){
+			return PermissionsController.checkPermission(structureAddressesContainer.permissionPath + "/Edit/Remove");
+		}
+
+		return true;
 	}
 
 	function getAddressTypeName(index){
@@ -158,7 +180,8 @@ Item {
 			contentComp: Component {
 				Item {
 					width: editAddressDialog.width;
-					height: editAddressDialog.height - 100;
+					// The title and the row of buttons (with its margins) take the rest of the dialog.
+					height: editAddressDialog.height - Style.controlHeightL - Style.controlHeightM - 2 * Style.marginL;
 
 					clip: true;
 
@@ -550,6 +573,7 @@ Item {
 				model: buttonsModel;
 				delegate: Button{
 
+					visible: structureAddressesContainer.isButtonAllowed(model.ids);
 					width: 200;
 					height: Style.buttonHeightM;
 

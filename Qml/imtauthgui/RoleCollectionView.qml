@@ -21,7 +21,7 @@ RemoteCollectionView {
 			documentManager: roleCollectionViewContainer.documentManager;
 
 			removeDialogTitle: qsTr("Deleting a role");
-			removeMessage: qsTr("Delete the selected role ?");
+			removeNameFieldId: "roleName";
 
 			Component.onCompleted: {
 				registerDocumentType("Role", qsTr("Role"))

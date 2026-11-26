@@ -8,9 +8,15 @@
 // ACF includes
 #include <iprm/IParamsSet.h>
 
+// ImtCore includes
+#include <imtdoc/IDocumentService.h>
+
 
 namespace imtdoc
 {
+
+
+class IDocumentService;
 
 
 /**
@@ -22,6 +28,11 @@ static const QByteArray s_objectIdParamId = QByteArrayLiteral("ObjectId");
 	ID of the \c imeas::INumericValue with the collection object revision in the document source parameters.
 */
 static const QByteArray s_revisionParamId = QByteArrayLiteral("Revision");
+
+/**
+	ID of the \c iprm::IIdParam with the language of the caller in the validation parameters.
+*/
+static const QByteArray s_languageIdParamId = QByteArrayLiteral("LanguageId");
 
 
 /**
@@ -62,6 +73,24 @@ QByteArray GetObjectIdFromParams(const iprm::IParamsSet* paramsPtr);
 	Returns -1 if \a paramsPtr is null or does not reference an object revision.
 */
 int GetRevisionFromParams(const iprm::IParamsSet* paramsPtr);
+
+/**
+	Extracts the language of the caller from the validation parameters, a validator answers in it.
+	Returns an empty ID if \a paramsPtr is null or carries no language.
+*/
+QByteArray GetLanguageIdFromParams(const iprm::IParamsSet* paramsPtr);
+
+/**
+	Returns the collection object ID of the document \a documentId the user \a userId has opened in \a documentService.
+	Returns an empty ID for a document never saved or not opened.
+*/
+QByteArray GetDocumentObjectId(const IDocumentService& documentService, const QByteArray& userId, const QByteArray& documentId);
+
+/**
+	Whether the opened document of the user has a stored object behind it: a new document has none until it is saved.
+	A document that is not opened counts as stored.
+*/
+bool IsDocumentStored(const IDocumentService& documentService, const QByteArray& userId, const QByteArray& documentId);
 
 
 } // namespace imtdoc

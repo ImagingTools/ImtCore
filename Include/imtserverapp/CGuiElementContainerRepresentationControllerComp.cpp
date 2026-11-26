@@ -158,7 +158,7 @@ bool CGuiElementContainerRepresentationControllerComp::GetRepresentationFromData
 			sortedItems.append(value.toObject());
 		}
 	}
-	std::sort(sortedItems.begin(), sortedItems.end(), [](const QJsonObject& item1, const QJsonObject& item2){
+	std::stable_sort(sortedItems.begin(), sortedItems.end(), [](const QJsonObject& item1, const QJsonObject& item2){
 		const int alignment1 = item1.value(QStringLiteral("alignment")).toInt();
 		const int alignment2 = item2.value(QStringLiteral("alignment")).toInt();
 		// Keep the original behavior: top/default-aligned items go before bottom-aligned items.

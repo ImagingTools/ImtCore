@@ -29,7 +29,7 @@ const int s_defaultResponseStatus = 200;
 class CGqlTestReply: public QNetworkReply
 {
 public:
-	CGqlTestReply(QNetworkAccessManager::Operation operation, const QNetworkRequest& request, int status, const QByteArray& data, QObject* parentPtr)
+	CGqlTestReply(QNetworkAccessManager::Operation operation, const QNetworkRequest& request, int status, const QByteArray& data, int delay, QObject* parentPtr)
 		:QNetworkReply(parentPtr),
 		m_data(data),
 		m_offset(0)
@@ -43,7 +43,7 @@ public:
 		open(QIODevice::ReadOnly);
 
 		// a real reply never finishes before the caller has connected to it
-		QTimer::singleShot(0, this, [this](){
+		QTimer::singleShot(delay, this, [this](){
 			setFinished(true);
 			Q_EMIT metaDataChanged();
 			Q_EMIT readyRead();
@@ -112,9 +112,11 @@ protected:
 			requestHeaders.insert(QString::fromUtf8(headerId).toLower(), QString::fromUtf8(request.rawHeader(headerId)));
 		}
 
-		const QByteArray responseBody = m_transport.RegisterRequest(requestBody, requestHeaders);
+		int responseStatus = 0;
+		int responseDelay = 0;
+		const QByteArray responseBody = m_transport.RegisterRequest(requestBody, requestHeaders, responseStatus, responseDelay);
 
-		return new CGqlTestReply(operation, request, m_transport.GetResponseStatus(), responseBody, this);
+		return new CGqlTestReply(operation, request, responseStatus, responseBody, responseDelay, this);
 	}
 
 private:
@@ -277,7 +279,7 @@ void CGqlTestTransport::SetResponseStatus(int responseStatus)
 }
 
 
-QByteArray CGqlTestTransport::RegisterRequest(const QByteArray& requestBody, const QVariantMap& requestHeaders)
+QByteArray CGqlTestTransport::RegisterRequest(const QByteArray& requestBody, const QVariantMap& requestHeaders, int& responseStatus, int& responseDelay)
 {
 	m_lastRequestBody = requestBody;
 	m_lastRequestHeaders = requestHeaders;
@@ -286,9 +288,25 @@ QByteArray CGqlTestTransport::RegisterRequest(const QByteArray& requestBody, con
 	const QString commandId = parseRequest(QString::fromUtf8(requestBody)).value(QStringLiteral("commandId")).toString();
 	m_requestedCommands.append(commandId);
 
+	QVariantMap requestInfo;
+	requestInfo.insert(QStringLiteral("commandId"), commandId);
+	requestInfo.insert(QStringLiteral("body"), QString::fromUtf8(requestBody));
+	requestInfo.insert(QStringLiteral("headers"), requestHeaders);
+	m_requests.append(requestInfo);
+
 	QByteArray responseBody = m_responseBody;
 	if (!m_queuedResponses.value(commandId).isEmpty()){
 		responseBody = m_queuedResponses[commandId].takeFirst();
+	}
+
+	responseStatus = m_responseStatus;
+	if (!m_queuedStatuses.value(commandId).isEmpty()){
+		responseStatus = m_queuedStatuses[commandId].takeFirst();
+	}
+
+	responseDelay = 0;
+	if (!m_queuedDelays.value(commandId).isEmpty()){
+		responseDelay = m_queuedDelays[commandId].takeFirst();
 	}
 
 	Q_EMIT requestReceived();
@@ -303,7 +321,10 @@ void CGqlTestTransport::reset()
 	m_lastRequestBody.clear();
 	m_lastRequestHeaders.clear();
 	m_queuedResponses.clear();
+	m_queuedStatuses.clear();
+	m_queuedDelays.clear();
 	m_requestedCommands.clear();
+	m_requests.clear();
 	Q_EMIT requestReceived();
 
 	SetResponseBody(QString::fromUtf8(s_defaultResponseBody));
@@ -317,9 +338,27 @@ void CGqlTestTransport::queueResponse(const QString& commandId, const QString& r
 }
 
 
+void CGqlTestTransport::queueStatus(const QString& commandId, int status)
+{
+	m_queuedStatuses[commandId].append(status);
+}
+
+
+void CGqlTestTransport::queueDelay(const QString& commandId, int delay)
+{
+	m_queuedDelays[commandId].append(delay);
+}
+
+
 QStringList CGqlTestTransport::requestedCommands() const
 {
 	return m_requestedCommands;
+}
+
+
+QVariantList CGqlTestTransport::requests() const
+{
+	return m_requests;
 }
 
 

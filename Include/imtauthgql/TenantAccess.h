@@ -29,6 +29,7 @@ static const inline QByteArray s_changeOrganizationRolePermission = QByteArrayLi
 static const inline QByteArray s_viewOrganizationGroupsPermission = QByteArrayLiteral("/OrganizationManagement/Groups/View");
 static const inline QByteArray s_changeOrganizationGroupPermission = QByteArrayLiteral("/OrganizationManagement/Groups/Edit/Change");
 static const inline QByteArray s_viewOrganizationPermissionsPermission = QByteArrayLiteral("/OrganizationManagement/Permissions/View");
+static const inline QByteArray s_changeOrganizationPermissionsPermission = QByteArrayLiteral("/OrganizationManagement/Permissions/Change");
 static const inline QByteArray s_viewOrganizationConnectionsPermission = QByteArrayLiteral("/OrganizationManagement/Connections/View");
 static const inline QByteArray s_viewOrganizationConnectionCodePermission = QByteArrayLiteral("/OrganizationManagement/Connections/ViewCode");
 static const inline QByteArray s_connectOrganizationPermission = QByteArrayLiteral("/OrganizationManagement/Connections/Edit/Connect");
@@ -38,6 +39,13 @@ static const inline QByteArray s_removeOrganizationConnectionPermission = QByteA
 */
 QByteArrayList GetEditOrganizationPermissions();
 QByteArrayList GetEditOrganizationMemberPermissions();
+
+/**
+	Check that the caller may remove the organization: its creator, its owner or a superuser.
+	An organization is shared by all products, so no permission of a product role removes it.
+	\param tenantPtr The organization, null when it could not be read: that refuses.
+*/
+bool CheckTenantRemovalAccess(const imtgql::IGqlContext* gqlContextPtr, const imtauth::ITenantInfo* tenantPtr, QString& errorMessage);
 
 /**
 	Tell whether the organization permissions held include any of the requested ones (\see imtauth::HasPermission).

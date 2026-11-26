@@ -478,8 +478,11 @@ Rectangle{
 		}
 		treeViewGql.setContentWidth();
 
-		if(index === -1){
-			treeViewGql.forceRefresh();
+		// The signals were blocked, so the list does not know about the new rows: it is refreshed once, at the same scroll position.
+		let contentY_ = list.contentY;
+		treeViewGql.forceRefresh();
+		if(index !== -1){
+			list.contentY = contentY_;
 		}
 
 		treeViewGql.inserted(index);

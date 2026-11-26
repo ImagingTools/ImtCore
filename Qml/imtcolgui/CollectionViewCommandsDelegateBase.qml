@@ -16,7 +16,11 @@ ViewCommandsDelegateBase {
 	property string collectionId: collectionView  ? collectionView.collectionId : "";
 
 	property string removeDialogTitle: qsTr("Deleting a selected element");
-	property string removeMessage: qsTr("Remove selected item from the collection ?");
+	// Empty: the question names the selected object or gives the count
+	property string removeMessage: "";
+	property string removeNameFieldId: "name";
+	// What else happens on removal, shown under the question
+	property string removeConsequenceText: "";
 
 	property TreeItemModel contextMenuModel: TreeItemModel {}
 
@@ -455,11 +459,11 @@ ViewCommandsDelegateBase {
 			else {
 				let fileName = filePath
 				let fileNameWithExt = fileName;
+				let ext = "";
 				let parts = filePath.split('/')
 				if (parts.length > 0){
 					fileNameWithExt = parts[parts.length - 1];
 					let data = parts[parts.length - 1].split('.')
-					let ext = "";
 					if (data.length > 0){
 						ext = data[data.length - 1]
 						fileName = data[0]
@@ -552,8 +556,44 @@ ViewCommandsDelegateBase {
 		}
 	}
 
+	// The question is taken when the dialog opens: it names the selection of that moment
 	function onRemove(params){
-		ModalDialogManager.openDialog(removeDialog, {});
+		ModalDialogManager.openDialog(removeDialog, {"message": collectionViewCommandsDelegate.getRemoveMessage()});
+	}
+
+	function getRemoveQuestion(){
+		if (collectionViewCommandsDelegate.removeMessage !== ""){
+			return collectionViewCommandsDelegate.removeMessage;
+		}
+
+		if (!collectionViewCommandsDelegate.collectionView){
+			return qsTr("Delete the selected item?");
+		}
+
+		let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
+		if (indexes.length > 1){
+			return qsTr("Delete the selected items (%1)?").arg(indexes.length);
+		}
+
+		let elements = collectionViewCommandsDelegate.collectionView.table.elements;
+		let fieldId = collectionViewCommandsDelegate.removeNameFieldId;
+		if (indexes.length === 1 && elements && elements.containsKey(fieldId, indexes[0])){
+			let name = String(elements.getData(fieldId, indexes[0]));
+			if (name !== ""){
+				return qsTr("Delete \"%1\"?").arg(name);
+			}
+		}
+
+		return qsTr("Delete the selected item?");
+	}
+
+	function getRemoveMessage(){
+		let question = collectionViewCommandsDelegate.getRemoveQuestion();
+		if (collectionViewCommandsDelegate.removeConsequenceText === ""){
+			return question;
+		}
+
+		return question + "\n\n" + collectionViewCommandsDelegate.removeConsequenceText;
 	}
 
 	function onRemoveAll(){
@@ -564,10 +604,10 @@ ViewCommandsDelegateBase {
 
 		let message = ""
 		if (collectionView.hasActiveFilter()){
-			message = qsTr("Delete all items with the current filter ?")
+			message = qsTr("Delete all items with the current filter?")
 		}
 		else{
-			message = qsTr("Delete all data from this collection ?")
+			message = qsTr("Delete all data from this collection?")
 		}
 
 		ModalDialogManager.openDialog(removeAllDialogComp, {message: message});
@@ -762,6 +802,7 @@ ViewCommandsDelegateBase {
 		id: removeDialog;
 		ImtControls.MessageDialog {
 			width: Style.sizeHintM;
+			destructive: true;
 			title: collectionViewCommandsDelegate.removeDialogTitle;
 			message: collectionViewCommandsDelegate.removeMessage;
 			onFinished: {
@@ -781,6 +822,7 @@ ViewCommandsDelegateBase {
 		id: removeAllDialogComp
 		ImtControls.MessageDialog {
 			width: 400;
+			destructive: true;
 			title: qsTr("Deleting elements");
 			onFinished: {
 				let collectionView = collectionViewCommandsDelegate.collectionView

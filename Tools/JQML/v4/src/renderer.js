@@ -94,9 +94,14 @@ export class Renderer {
 		this.drawCalls = 0;
 		this.vertexCount = 0;
 
-		const atlas = fonts.ensureAtlas();
-		if (atlas !== null) {
-			this.page = atlas.pages[0];
+		// The draws that are queued only refer to the pages: they are sent before a page is emptied for new glyphs.
+		// The atlas is a singleton, so the renderer is in its `beforeReset` only while it has queued geometry
+		// (from reserve() until submit() or beginFrame()); otherwise the atlas would keep every renderer alive.
+		this.atlas = fonts.ensureAtlas();
+		this.atlasHooked = false;
+		this.onAtlasReset = () => this.submit();
+		if (this.atlas !== null) {
+			this.page = this.atlas.pages[0];
 			this.whiteUv = 2 / this.page.size;
 		}
 
@@ -186,6 +191,7 @@ export class Renderer {
 		this.ni = 0;
 		this.segStart = 0;
 		this.cmds.length = 0;
+		this.unhookAtlas();
 		this.stencilLevel = 0;
 		this.clipX0 = 0;
 		this.clipY0 = 0;
@@ -268,6 +274,14 @@ export class Renderer {
 		this.nv = 0;
 		this.ni = 0;
 		this.segStart = 0;
+		this.unhookAtlas();
+	}
+
+	// Removes the renderer from the atlas' `beforeReset`: nothing that refers to the pages is queued.
+	unhookAtlas() {
+		if (!this.atlasHooked) return;
+		this.atlas.beforeReset.delete(this.onAtlasReset);
+		this.atlasHooked = false;
 	}
 
 	// Binds the texture of a page, creating it and uploading the canvas when needed.
@@ -345,7 +359,13 @@ export class Renderer {
 
 	reserve(vertices, indices) {
 		if (this.nv + vertices > MAX_VERTICES || this.ni + indices > this.indices.length) this.submit();
-		return vertices <= MAX_VERTICES && indices <= this.indices.length;
+		if (vertices > MAX_VERTICES || indices > this.indices.length) return false;
+		// Geometry is about to be queued: an atlas reset has to submit it first (see the constructor).
+		if (!this.atlasHooked && this.atlas !== null) {
+			this.atlas.beforeReset.add(this.onAtlasReset);
+			this.atlasHooked = true;
+		}
+		return true;
 	}
 
 	vertex(x, y, u, v, color) {
@@ -366,6 +386,43 @@ export class Renderer {
 		const x1 = x + w;
 		const y1 = y + h;
 		const base = this.nv;
+		// A line thinner than a pixel (a border of 0.5) covers the centre of a pixel at one position and none at the next: it
+		// flickers and vanishes while the content scrolls. Upright, such a side takes one whole pixel.
+		if (mb === 0 && mc === 0) {
+			const dpr = this.dpr;
+			let dx0 = (ma * x + me) * dpr;
+			let dx1 = (ma * x1 + me) * dpr;
+			let dy0 = (md * y + mf) * dpr;
+			let dy1 = (md * y1 + mf) * dpr;
+			if (dx1 < dx0) [dx0, dx1] = [dx1, dx0];
+			if (dy1 < dy0) [dy0, dy1] = [dy1, dy0];
+			const thinX = dx1 - dx0 < 1;
+			const thinY = dy1 - dy0 < 1;
+			if (thinX || thinY) {
+				if (thinX) {
+					dx0 = Math.floor((dx0 + dx1) / 2);
+					dx1 = dx0 + 1;
+				}
+				if (thinY) {
+					dy0 = Math.floor((dy0 + dy1) / 2);
+					dy1 = dy0 + 1;
+				}
+				this.vertex(dx0 / dpr, dy0 / dpr, u, u, color);
+				this.vertex(dx1 / dpr, dy0 / dpr, u, u, color);
+				this.vertex(dx1 / dpr, dy1 / dpr, u, u, color);
+				this.vertex(dx0 / dpr, dy1 / dpr, u, u, color);
+				const hair = this.indices;
+				let j = this.ni;
+				hair[j++] = base;
+				hair[j++] = base + 1;
+				hair[j++] = base + 2;
+				hair[j++] = base;
+				hair[j++] = base + 2;
+				hair[j++] = base + 3;
+				this.ni = j;
+				return;
+			}
+		}
 		this.vertex(ma * x + mc * y + me, mb * x + md * y + mf, u, u, color);
 		this.vertex(ma * x1 + mc * y + me, mb * x1 + md * y + mf, u, u, color);
 		this.vertex(ma * x1 + mc * y1 + me, mb * x1 + md * y1 + mf, u, u, color);
@@ -417,6 +474,33 @@ export class Renderer {
 			idx[i++] = base + 2;
 			idx[i++] = base + 3;
 			this.ni = i;
+		}
+		this.bindPage(previous);
+	}
+
+	// A picture (a texture page of its own) on a convex polygon of the local space: `uvs` are the positions in the picture of the points.
+	imageFan(page, points, uvs, opacity) {
+		const n = points.length >> 1;
+		if (n < 3) return;
+		const previous = this.page;
+		this.bindPage(page);
+		if (this.reserve(n, (n - 2) * 3)) {
+			const { ma, mb, mc, md, me, mf } = this;
+			const color = this.packRgba(255, 255, 255, opacity);
+			const base = this.nv;
+			for (let i = 0; i < n; i++) {
+				const x = points[2 * i];
+				const y = points[2 * i + 1];
+				this.vertex(ma * x + mc * y + me, mb * x + md * y + mf, uvs[2 * i], uvs[2 * i + 1], color);
+			}
+			const idx = this.indices;
+			let k = this.ni;
+			for (let i = 1; i < n - 1; i++) {
+				idx[k++] = base;
+				idx[k++] = base + i;
+				idx[k++] = base + i + 1;
+			}
+			this.ni = k;
 		}
 		this.bindPage(previous);
 	}

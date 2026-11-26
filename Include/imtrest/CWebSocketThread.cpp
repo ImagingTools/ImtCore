@@ -4,6 +4,8 @@
 
 // Qt includes
 #include <QtCore/QMutableListIterator>
+#include <QtCore/QRegularExpression>
+#include <QtCore/QUuid>
 
 // ImtCore includes
 #include <imtrest/IProtocolEngine.h>
@@ -16,12 +18,18 @@ namespace imtrest
 {
 
 
+// A frame carries the token of the sender, and the token of a server does not expire: it must not reach a log
+static const QRegularExpression s_authenticationTokenExpression(QStringLiteral(R"re("(x-authentication-token|x-server-token)"\s*:\s*"[^"]*")re"), QRegularExpression::CaseInsensitiveOption);
+
+
 
 CWebSocketThread::CWebSocketThread(CWebSocketServerComp* parent)
 	:QThread(parent),
 	m_status(ST_START)
 {
 	qRegisterMetaType<ConstResponsePtr>("ConstResponsePtr");
+
+	m_connectionId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	m_server = parent;
 
@@ -55,7 +63,11 @@ CWebSocketThread::CWebSocketThread(CWebSocketServerComp* parent)
 
 void CWebSocketThread::SetWebSocket(QWebSocket* webSocketPtr)
 {
-	m_socket = webSocketPtr;
+	{
+		QMutexLocker lock(&m_socketMutex);
+
+		m_socket = webSocketPtr;
+	}
 
 	start();
 }
@@ -63,6 +75,8 @@ void CWebSocketThread::SetWebSocket(QWebSocket* webSocketPtr)
 
 const QWebSocket* CWebSocketThread::GetWebSocket() const
 {
+	QMutexLocker lock(&m_socketMutex);
+
 	return m_socket;
 }
 
@@ -81,9 +95,9 @@ CWebSocketThread::Status CWebSocketThread::GetSocketStatus()
 }
 
 
-QByteArray CWebSocketThread::GetRequestId()
+QByteArray CWebSocketThread::GetConnectionId() const
 {
-	return m_requestId;
+	return m_connectionId;
 }
 
 
@@ -110,6 +124,9 @@ void CWebSocketThread::run()
 	// connect(webSocketPtr.data(), &QWebSocket::disconnected, this, &CWebSocketThread::OnSocketDisconnected);
 
 	exec();
+
+	// The server that is destroyed quits the loop of a connected client: its subscriptions are released while the server waits
+	ReleaseRequests();
 }
 
 
@@ -150,6 +167,7 @@ void CWebSocketThread::ProcessTextMessage(const QString& textMessage)
 	}
 
 	QString message = QStringLiteral("Web socket text message received: %1").arg(textMessage);
+	message.replace(s_authenticationTokenExpression, QStringLiteral("\"\\1\":\"***\""));
 	m_server->SendVerboseMessage(message, "CWebSocketServerComp");
 
 	imtrest::IRequestUniquePtr newRequestPtr = m_enginePtr->CreateRequest(*m_requestServerHandlerPtr);
@@ -161,6 +179,7 @@ void CWebSocketThread::ProcessTextMessage(const QString& textMessage)
 		}
 
 		webSocketRequest->SetBody(textMessage.toUtf8());
+		webSocketRequest->SetConnectionId(m_connectionId);
 
 		imtrest::CWebSocketRequest::MethodType methodType = webSocketRequest->GetMethodType();
 		if (methodType == CWebSocketRequest::MT_START || methodType == CWebSocketRequest::MT_SUBSCRIBE){
@@ -223,6 +242,7 @@ void CWebSocketThread::ProcessTextMessage(const QString& textMessage)
 							newHttpRequestPtr->SetHeader(QByteArrayLiteral("id"), queryRequestId);
 						}
 						newHttpRequestPtr->SetBody(body);
+						newHttpRequestPtr->SetConnectionId(m_connectionId);
 						newHttpRequestPtr->SetMethodType(CHttpRequest::MT_POST);
 						newHttpRequestPtr->SetCommandId("/" + m_productId + "/graphql");
 	
@@ -262,13 +282,15 @@ void CWebSocketThread::ProcessTextMessage(const QString& textMessage)
 
 void CWebSocketThread::OnSocketDisconnected()
 {
-	// Explicitly clean up subscription requests parented to this thread.
-	// Their destructors call OnRequestDestroyed on publishers, cleanly
-	// unregistering subscriptions before the QWebSocket is destroyed.
-	qDeleteAll(m_requestList);
-	m_requestList.clear();
+	// The subscriptions are unregistered before the QWebSocket is destroyed
+	ReleaseRequests();
 
-	m_socket = nullptr;
+	{
+		QMutexLocker lock(&m_socketMutex);
+
+		m_socket = nullptr;
+	}
+
 	exit();
 }
 
@@ -310,9 +332,23 @@ void CWebSocketThread::OnTimeout()
 }
 
 
+void CWebSocketThread::ReleaseRequests()
+{
+	// Their destructors call OnRequestDestroyed on publishers, cleanly unregistering subscriptions
+	qDeleteAll(m_requestList);
+	m_requestList.clear();
+}
+
+
 QPointer<QWebSocket> CWebSocketThread::GetValidWebSocket() const
 {
-	QPointer<QWebSocket> webSocketPtr = m_socket;
+	QPointer<QWebSocket> webSocketPtr;
+	{
+		QMutexLocker lock(&m_socketMutex);
+
+		webSocketPtr = m_socket;
+	}
+
 	if (webSocketPtr.isNull() || !webSocketPtr->isValid()){
 		return {};
 	}
@@ -353,8 +389,15 @@ void CWebSocketThread::OnSslErrors(const QList<QSslError> &errors)
 
 void CWebSocketThread::OnSendTextMessage(const QByteArray& data) const
 {
-	if (!m_socket.isNull()){
-		m_socket->sendTextMessage(data);
+	QPointer<QWebSocket> webSocketPtr;
+	{
+		QMutexLocker lock(&m_socketMutex);
+
+		webSocketPtr = m_socket;
+	}
+
+	if (!webSocketPtr.isNull()){
+		webSocketPtr->sendTextMessage(data);
 	}
 }
 

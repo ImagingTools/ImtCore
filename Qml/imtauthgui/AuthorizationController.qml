@@ -19,6 +19,8 @@ QtObject {
 	
 	property string permissionPath: ""
 	property string productId: "";
+	// The product whose data a console administers now; requests go in its context while it is set.
+	property string administeredProductId: "";
 	
 	signal userModeChanged(string userMode);
 	signal superuserExistResult(string status, string error);
@@ -57,11 +59,14 @@ QtObject {
 	signal membershipNotificationsResumed();
 	// The organizations the user may switch to changed: what shows them reads them again
 	signal organizationsChanged();
+	// The permissions of the session changed (granted or taken) and are read again: what shows them is rebuilt
+	signal accessChanged();
 
 	// Properties to store remember me state and credentials
 	property bool rememberMe: false
 	property string lastUser: ""
 	property string storedRefreshToken: ""
+	property bool __loginSettingsLoading: false
 	property string currentTenantId: ""
 	property string currentTenantName: ""
 	property var __permissionsRefreshCallbacks: []
@@ -73,8 +78,27 @@ QtObject {
 	property string __activationTenantId: ""
 
 	property bool __refreshInProgress: false
+	property int __sessionGeneration: 0
+	property bool __switchAwaitingPermissions: false
+	property bool __permissionsInFlight: false
+	property bool __permissionsRetried: false
+	property bool __browserSessionStored: false
 	property var __pendingRetryQueue: []
+	// Part of the lifetime of an access token after which it is refreshed ahead
+	property real refreshAheadRatio: 0.8
+	// A refresh the server could not answer is asked again after this pause (ms); the session is kept meanwhile
+	property int refreshRetryInterval: 5000
+	// A request refused again this soon (ms) after it was sent again with a new token is not refreshed and sent again once more
+	property int repeatedRefusalWindow: 30000
+	property var __recentRetries: []
+	// What the server answered about the superuser before a remembered session was restored
+	property string __restoreStatus: ""
+	property string __restoreError: ""
+	// The token of the session a logout closes at the server
+	property string __logoutToken: ""
 	property bool __authFailedDuringSwitch: false
+	// When a refusal of a subscription asked for a refresh last
+	property real __subscriptionRefreshAt: 0
 
 	// Sign-in with external accounts: set per application in ACC (ExternalLoginEnabled), delivered with GetApplicationInfo.
 	readonly property bool externalLoginEnabled: ApplicationInfoProvider.externalLoginEnabled
@@ -104,7 +128,7 @@ QtObject {
 			return
 		if (!root.userTokenProvider.accessToken || root.userTokenProvider.accessToken === "")
 			return
-		__pendingInvitationsRequest.send(__pendingInvitationsInput)
+		root.__sendBound(root.__pendingInvitationsRequest, root.__pendingInvitationsInput)
 	}
 
 	function __startTenantTracking() {
@@ -181,7 +205,10 @@ QtObject {
 	}
 	
 	// Watch for changes and save to LocalStorage
-	onRememberMeChanged: saveLoginSettings()
+	onRememberMeChanged: {
+		if (!root.__loginSettingsLoading)
+			storage.setValue("Login_rememberMe", root.rememberMe ? "true" : "false")
+	}
 	onLastUserChanged: saveLoginSettings()
 	onStoredRefreshTokenChanged: saveLoginSettings()
 
@@ -193,13 +220,36 @@ QtObject {
 	onLoggedIn: {
 		root.__clearPreparedLogins()
 		root.__startTenantTracking()
+		root.__accessSubscription.registerSubscription()
 	}
 	onLoggedOut: {
 		root.__clearPreparedLogins()
 		root.__stopTenantTracking()
-		__refreshInProgress = false
-		__pendingRetryQueue = []
-		__authFailedDuringSwitch = false
+		root.__accessSubscription.unRegisterSubscription()
+		__subscriptionRefreshAt = 0
+	}
+
+	property Timer __refreshAheadTimer: Timer {
+		repeat: false
+		onTriggered: {
+			root.__refreshAhead()
+		}
+	}
+
+	property Connections __accessTokenConnections: Connections {
+		target: root.userTokenProvider
+
+		function onAccessTokenChanged() {
+			root.__scheduleRefreshAhead(root.userTokenProvider.accessToken)
+		}
+	}
+
+	property Timer __refreshRetryTimer: Timer {
+		interval: root.refreshRetryInterval
+		onTriggered: {
+			if (!root.__refreshInProgress && root.userTokenProvider.refreshToken)
+				root.__startRefresh()
+		}
 	}
 	// The application info can arrive after a restored session has already logged in.
 	onTenantsEnabledChanged: {
@@ -254,6 +304,36 @@ QtObject {
 		}
 	}
 
+	// The server tells a change of the access of the session: the permissions apply at once, not with the next refresh
+	property SubscriptionClient __accessSubscription: SubscriptionClient {
+		gqlCommandId: "OnAccessChanged"
+		autoSubscribe: false
+
+		function getHeaders() { return {} }
+
+		onMessageReceived: {
+			root.__onAccessChanged(true)
+		}
+
+		// Changes may have been missed while the connection was down: told only when the permissions differ
+		onRefreshRequired: {
+			root.__onAccessChanged(false)
+		}
+	}
+
+	function __onAccessChanged(isChangeTold) {
+		if (!root.isLoggedIn())
+			return
+
+		let permissionsBefore = root.normalizePermissions(root.userTokenProvider.permissions).join(";")
+		root.refreshPermissions(function(){
+			let permissionsAfter = root.normalizePermissions(root.userTokenProvider.permissions).join(";")
+			if (isChangeTold || permissionsAfter !== permissionsBefore) {
+				root.accessChanged()
+			}
+		})
+	}
+
 	// The members of the organization of the session; the server sends it to everybody working inside it
 	property SubscriptionClient __organizationMembersSubscription: SubscriptionClient {
 		gqlCommandId: "OnOrganizationMembersChanged"
@@ -278,10 +358,14 @@ QtObject {
 	}
 	
 	function loadLoginSettings() {
+		// The change handlers save the login settings: while they are read, nothing is saved, otherwise the values that are not read yet are
+		// written over the stored ones
+		root.__loginSettingsLoading = true;
 		let rememberMeStr = storage.value("Login_rememberMe", "");
 		root.rememberMe = (rememberMeStr === "true");
 		root.lastUser = storage.value("Login_lastUser", "");
 		root.storedRefreshToken = storage.value("Login_storedRefreshToken", "");
+		root.__loginSettingsLoading = false;
 	}
 
 	function normalizePermissions(rawPermissions) {
@@ -322,37 +406,46 @@ QtObject {
 			root.__permissionsRefreshCallbacks = callbacks;
 		}
 
-		getPermissionsInput.m_accessToken = root.userTokenProvider.accessToken;
-		getPermissionsGqlSender.send(getPermissionsInput);
+		if (!root.__permissionsInFlight) {
+			root.__permissionsInFlight = true
+			getPermissionsInput.m_accessToken = root.userTokenProvider.accessToken
+			root.__sendBound(getPermissionsGqlSender, getPermissionsInput)
+		}
 	}
 
 	function __completePermissionsRefresh(){
+		root.__permissionsInFlight = false
+		root.__permissionsRetried = false
+		let generation = root.__sessionGeneration
 		let callbacks = root.__permissionsRefreshCallbacks;
 		root.__permissionsRefreshCallbacks = [];
 
-		for (let i = 0; i < callbacks.length; i++){
+		for (let i = 0; i < callbacks.length && generation === root.__sessionGeneration; i++){
 			callbacks[i](true);
 		}
 	}
 	
 	function saveLoginSettings() {
+		if (root.__loginSettingsLoading){
+			return;
+		}
+
 		storage.setValue("Login_rememberMe", root.rememberMe ? "true" : "false");
 		storage.setValue("Login_lastUser", root.lastUser);
 		storage.setValue("Login_storedRefreshToken", root.storedRefreshToken);
-	}
-	
-	function clearLoginSettings() {
-		root.rememberMe = false;
-		root.lastUser = "";
-		root.storedRefreshToken = "";
-		
-		storage.remove("Login_rememberMe");
-		storage.remove("Login_lastUser");
-		storage.remove("Login_storedRefreshToken");
+		let ownToken = root.storedRefreshToken && root.storedRefreshToken === root.userTokenProvider.refreshToken &&
+				root.lastUser === root.userTokenProvider.login
+		storage.setValue("Login_sessionKey", ownToken ? root.__sessionKey(root.getAccessToken()) : "");
 	}
 	
 	property XmlHttpRequestProxy requestProxy: XmlHttpRequestProxy {
 		onForbidden: {
+			if (credentialsChanged && !(gqlRequestRef && gqlRequestRef.sessionOwner))
+				return
+			if (gqlRequestRef && gqlRequestRef.sessionOwner &&
+					(gqlRequestRef.detachedLogout || !gqlRequestRef.isCurrent())) {
+				return
+			}
 			// Access denied by permissions/role — session itself is not stale, so a
 			// token refresh cannot fix it. Log out immediately, no retry.
 			console.warn("Auth: HTTP 403 Forbidden — logout")
@@ -360,9 +453,13 @@ QtObject {
 		}
 
 		onUnauthorized: {
+			if (credentialsChanged && !(gqlRequestRef && gqlRequestRef.sessionOwner)) {
+				root.__dropRequest(gqlRequestRef)
+				return
+			}
 			// Access token expired/rejected by server — reactive recovery via refresh token.
 			console.warn("Auth: HTTP 401 Unauthorized")
-			root.handleAuthFailure(gqlData, gqlRequestRef)
+			root.handleAuthFailure(gqlData, gqlRequestRef, gqlHeaders)
 		}
 
 		onInternalError: {
@@ -372,7 +469,14 @@ QtObject {
 
 	// WebSocket subscription path reports the same Unauthorized/Forbidden prefixes.
 	function onAccessTokenUnauthorizedEvent(parameters) {
+		// Refused again soon after the refresh it asked for: the token is not the cause, no refresh in a loop
+		if (Date.now() - root.__subscriptionRefreshAt < root.repeatedRefusalWindow) {
+			console.warn("Auth: WebSocket auth failure (401) again after a refresh — not refreshed again")
+			return
+		}
+
 		console.warn("Auth: WebSocket auth failure (401) — attempting refresh")
+		root.__subscriptionRefreshAt = Date.now()
 		root.handleAuthFailure("", null)
 	}
 
@@ -396,18 +500,181 @@ QtObject {
 	}
 
 	function __sendWithoutAccessToken(sender, input) {
-		var savedToken = userTokenProvider.authorizationGqlModel.GetGlobalAccessToken()
-		userTokenProvider.authorizationGqlModel.SetGlobalAccessToken("")
-		sender.send(input)
-		userTokenProvider.authorizationGqlModel.SetGlobalAccessToken(savedToken)
+		let generation = root.__sessionGeneration
+		let accessToken = root.getAccessToken()
+		let model = root.userTokenProvider.authorizationGqlModel
+		let savedToken = model.GetGlobalAccessToken()
+		model.SetGlobalAccessToken("")
+		// JQML v3 has neither throw nor try without catch
+		try {
+			sender.send(input)
+		} catch (error) {
+			console.warn("Auth: the request could not be sent:", error)
+		}
+		if (generation === root.__sessionGeneration && accessToken === root.getAccessToken())
+			model.SetGlobalAccessToken(savedToken)
 	}
 
-	function handleAuthFailure(gqlData, gqlRequestRef) {
-		if (gqlRequestRef) {
+	// A request sent again with a fresh token and refused again: the token is not the cause, it fails
+	function __requestId(headers) {
+		let names = Object.keys(headers || {})
+		for (let i = 0; i < names.length; i++) {
+			if (names[i].toLowerCase() === "x-request-id")
+				return headers[names[i]]
+		}
+		return ""
+	}
+
+	function __isRepeatedRefusal(gqlData, gqlRequestRef, requestId) {
+		let now = Date.now()
+		let isRepeated = false
+		let retries = []
+		for (let i = 0; i < root.__recentRetries.length; i++) {
+			let retry = root.__recentRetries[i]
+			if (now - retry.time > root.repeatedRefusalWindow) {
+				continue
+			}
+			if (!isRepeated && retry.gqlRequestRef === gqlRequestRef &&
+					(requestId || retry.requestId ? requestId === retry.requestId : retry.gqlData === gqlData)) {
+				isRepeated = true
+				continue
+			}
+			retries.push(retry)
+		}
+		root.__recentRetries = retries
+
+		return isRepeated
+	}
+
+	// The refused requests that are not sent again end failed
+	function __dropPendingRequests() {
+		var queue = root.__pendingRetryQueue
+		root.__pendingRetryQueue = []
+		for (var i = 0; i < queue.length; i++) {
+			root.__dropRequest(queue[i].gqlRequestRef)
+		}
+	}
+
+	function __dropRequest(gqlRequestRef) {
+		try {
+			if (gqlRequestRef && gqlRequestRef.onAuthorizationLost) {
+				gqlRequestRef.onAuthorizationLost()
+			}
+		} catch (e) {
+			console.warn("Auth: a dropped request could not be ended:", e)
+		}
+	}
+
+	// Each transport owner lives until its own reply; the SDL decoder is shared,
+	// but a late reply never dispatches into a new operation on that decoder.
+	property Component __boundRequest: Component {
+		GqlSdlRequestSender {
+			id: request
+			property var sessionOwner
+			property int generation
+			property string userId
+			property string tenantId
+			property string accessToken
+			property string closingRefreshToken
+			readonly property bool detachedLogout: request.sessionOwner === root.logoutGqlSender || request.sessionOwner === root.logoutRefreshGqlSender
+			gqlCommandId: request.sessionOwner.gqlCommandId
+			requestType: request.sessionOwner.requestType
+			permissionPath: request.sessionOwner.permissionPath
+			inputObjectComp: request.sessionOwner.inputObjectComp
+
+			function isCurrent() {
+				return request.detachedLogout || (request.generation === root.__sessionGeneration &&
+						request.userId === root.userTokenProvider.userId && request.tenantId === root.currentTenantId &&
+						request.accessToken === root.getAccessToken())
+			}
+			function canDispatch() {
+				if (!request.isCurrent())
+					return false
+				if (request.sessionOwner === root.refreshTokenForLoginGqlSender)
+					return root.__checkRestoreSettings()
+				return request.detachedLogout || root.__checkSharedSession()
+			}
+			function getHeaders() { return request.sessionOwner.getHeaders() }
+			function onResult(data) {
+				if (request.canDispatch()) {
+					if (request.sessionOwner === root.logoutRefreshGqlSender) {
+						if (data && data.ok && data.userSession && data.userSession.accessToken)
+							root.__sendLogout(data.userSession.accessToken, "")
+					}
+					else if (!request.detachedLogout)
+						request.sessionOwner.onResult(data)
+				}
+				request.destroy()
+			}
+			function onError(message, type) {
+				if (!request.detachedLogout && request.canDispatch())
+					request.sessionOwner.onError(message, type, request.state)
+				request.destroy()
+			}
+			function onAuthorizationLost() {
+				if (request.canDispatch()) {
+					if (request.sessionOwner === root.logoutGqlSender && request.closingRefreshToken !== "") {
+						root.logoutRefreshGqlSender.refreshToken = request.closingRefreshToken
+						root.__sendBound(root.logoutRefreshGqlSender)
+					}
+					else if (!request.detachedLogout)
+						request.sessionOwner.onAuthorizationLost()
+				}
+				request.destroy()
+			}
+			onFinished: {
+				if (request.state === "Forbidden")
+					request.destroy()
+			}
+		}
+	}
+
+	function __sendBound(sender, input, closingRefreshToken) {
+		let request = root.__boundRequest.createObject(root, {
+			"sessionOwner": sender, "generation": root.__sessionGeneration, "userId": root.userTokenProvider.userId,
+			"tenantId": root.currentTenantId, "accessToken": root.getAccessToken(),
+			"closingRefreshToken": closingRefreshToken || ""
+		})
+		if (request.detachedLogout || sender === root.refreshTokenGqlSender || sender === root.refreshTokenForLoginGqlSender)
+			root.__sendWithoutAccessToken(request, input)
+		else
+			request.send(input)
+	}
+
+	function handleAuthFailure(gqlData, gqlRequestRef, gqlHeaders) {
+		// The requests of the session itself are not refreshed and sent again: each handles its refusal
+		let owner = gqlRequestRef ? gqlRequestRef.sessionOwner : null
+		if (owner && (gqlRequestRef.detachedLogout || !gqlRequestRef.isCurrent() ||
+				owner === root.refreshTokenGqlSender || owner === root.refreshTokenForLoginGqlSender)) {
+			root.__dropRequest(gqlRequestRef)
+			return
+		}
+
+		let requestId = root.__requestId(gqlHeaders)
+		if (gqlRequestRef && root.__isRepeatedRefusal(gqlData, gqlRequestRef, requestId)) {
+			console.warn("Auth: refused again with the refreshed token — not sent again")
+			root.__dropRequest(gqlRequestRef)
+			return
+		}
+
+		if (owner === root.getPermissionsGqlSender) {
+			// Its input also names the access token. Rebuild it after refresh, not from the old body.
+			root.__permissionsInFlight = false
+			gqlRequestRef.destroy()
+			if (root.__permissionsRetried) {
+				root.getPermissionsGqlSender.onError("", "")
+				return
+			}
+			root.__permissionsRetried = true
+		}
+		else if (gqlRequestRef) {
 			var queue = root.__pendingRetryQueue.slice()
 			queue.push({
 				"gqlData": gqlData,
-				"gqlRequestRef": gqlRequestRef
+				"gqlRequestRef": gqlRequestRef,
+				"generation": root.__sessionGeneration,
+				"requestId": requestId,
+				"gqlHeaders": gqlHeaders ? gqlHeaders : {}
 			})
 			root.__pendingRetryQueue = queue
 		}
@@ -415,58 +682,202 @@ QtObject {
 		if (root.__refreshInProgress)
 			return
 
-		// A request sent during a tenant switch carries the token the switch closes: it is repeated with the new one
-		if (root.__tenantSwitchInProgress) {
+		// Wait for selection. Success drops old work; failure leaves the old tenant current.
+		if (root.__tenantSwitchInProgress && !root.__switchAwaitingPermissions && owner !== root.selectTenantGqlSender) {
 			root.__authFailedDuringSwitch = true
 			return
 		}
 
 		if (!root.userTokenProvider.refreshToken || root.userTokenProvider.refreshToken === "") {
 			if (!root.isLoggedIn()) {
-				root.__pendingRetryQueue = []
+				root.__dropPendingRequests()
 				return
 			}
 
 			console.warn("Auth: no refresh token — logout")
-			root.__pendingRetryQueue = []
 			root.logoutForce(qsTr("Your session is no longer valid. Please sign in again."))
 			return
 		}
 
-		root.__refreshInProgress = true
+		root.__startRefresh()
+	}
 
-		root.__sendWithoutAccessToken(root.refreshTokenGqlSender)
+	function __sessionKey(accessToken) {
+		let claims = root.__readTokenClaims(accessToken)
+		if (!claims || !claims.sessionId || !claims.userId)
+			return ""
+		return JSON.stringify([claims.sessionId, claims.userId, claims.tenantId || "", claims.productId || ""])
+	}
+
+	// Native Settings needs an explicit sync at credential boundaries to read
+	// another application's writes. Ordinary replies use the current view.
+	function __syncLoginSettings() {
+		if (Qt.platform.os !== "web" && root.storage.sync)
+			root.storage.sync()
+	}
+
+	// null denotes a different or unidentifiable writer. A login name alone
+	// cannot distinguish two sessions of the same account.
+	function __sharedRefreshToken() {
+		let local = root.userTokenProvider.refreshToken
+		let localAccess = root.getAccessToken()
+		let browserToken = String(root.storage.value("refreshToken", ""))
+		let browserAccess = String(root.storage.value("accessToken", ""))
+		if (root.__browserSessionStored && !browserAccess)
+			return null
+		if ((browserToken || browserAccess) &&
+				(root.storage.value("userId", root.getUserId()) !== root.getUserId() ||
+				root.storage.value("tenantId", root.currentTenantId) !== root.currentTenantId))
+			return null
+
+		let browserChanged = (browserAccess && browserAccess !== localAccess) || (browserToken && browserToken !== local)
+		let key = browserChanged ? root.__sessionKey(localAccess) : ""
+		if (browserChanged && (!key || key !== root.__sessionKey(browserAccess)))
+			return null
+
+		if (!root.rememberMe)
+			return browserToken || local
+
+		let remembered = String(root.storage.value("Login_storedRefreshToken", ""))
+		if (!remembered)
+			return root.storedRefreshToken ? null : browserToken || local
+
+		let login = String(root.storage.value("Login_lastUser", ""))
+		if (login && login !== root.userTokenProvider.login)
+			return null
+		if (remembered !== local) {
+			key = key || root.__sessionKey(localAccess)
+			if (!key || key !== root.storage.value("Login_sessionKey", ""))
+				return null
+		}
+		return browserToken || remembered
+	}
+
+	function __checkSharedSession() {
+		if (!root.isLoggedIn() || root.__sharedRefreshToken() !== null)
+			return true
+		root.__endLocalSession(qsTr("The signed-in session has changed. Please sign in again."), false)
+		return false
+	}
+
+	function __readRefreshToken() {
+		root.__syncLoginSettings()
+		let token = root.__sharedRefreshToken()
+		if (token === null)
+			root.__endLocalSession(qsTr("The signed-in session has changed. Please sign in again."), false)
+		return token
+	}
+
+	function __adoptStoredRefreshToken(token) {
+		if (!token || token === root.userTokenProvider.refreshToken)
+			return false
+		root.userTokenProvider.refreshToken = token
+		root.setRefreshToken(token)
+		return true
+	}
+
+	function __startRefresh() {
+		let token = root.__readRefreshToken()
+		if (token === null)
+			return
+		root.__refreshInProgress = true
+		root.__adoptStoredRefreshToken(token)
+		root.__sendBound(root.refreshTokenGqlSender)
+	}
+
+	// The access token is refreshed before it expires: requests and subscriptions are not refused for it first
+	function __refreshAhead() {
+		if (root.__refreshInProgress || root.__tenantSwitchInProgress || !root.userTokenProvider.refreshToken || root.userTokenProvider.refreshToken === "") {
+			return
+		}
+
+		root.__startRefresh()
+	}
+
+	// The lifetime (s) of an access token as its issuer wrote it, 0 when it does not tell it
+	// The claims of an access token, null when it is no JWT
+	function __readTokenClaims(token) {
+		let parts = String(token).split(".")
+		if (parts.length < 2) {
+			return null
+		}
+
+		let payload = parts[1].replace(/-/g, "+").replace(/_/g, "/")
+		while (payload.length % 4 !== 0) {
+			payload += "="
+		}
+
+		try {
+			return JSON.parse(Qt.atob(payload))
+		}
+		catch (e) {
+			return null
+		}
+	}
+
+	// Due when the part of its lifetime is used. A token kept from before (a reloaded page) may have little left:
+	// then soon. Never later than the part of the lifetime from now, whatever the clock of the client says
+	function __scheduleRefreshAhead(token) {
+		let claims = root.__readTokenClaims(token)
+		let lifetime = (claims && claims.exp && claims.iat) ? claims.exp - claims.iat : 0
+		if (lifetime <= 0) {
+			root.__refreshAheadTimer.stop()
+			return
+		}
+
+		let dueMs = (claims.exp - lifetime * (1 - root.refreshAheadRatio)) * 1000 - Date.now()
+		root.__refreshAheadTimer.interval = Math.max(1000, Math.min(lifetime * 1000 * root.refreshAheadRatio, dueMs))
+		root.__refreshAheadTimer.restart()
 	}
 
 	function completeTokenRefresh(ok) {
 		if (!root.__refreshInProgress)
 			return
 
-		root.__refreshInProgress = false
-
 		if (!ok) {
+			let token = root.__readRefreshToken()
+			if (token === null)
+				return
+			// Tabs of a browser share the stored session: another tab rotated the refresh token, the refresh is asked again with its one
+			if (root.__adoptStoredRefreshToken(token)) {
+				console.warn("Auth: refresh token rotated elsewhere meanwhile — refreshed again with the stored one")
+				root.__sendBound(root.refreshTokenGqlSender)
+				return
+			}
+
 			// Session/refresh rejected by server → logout.
 			console.warn("Auth: refresh failed — logout")
-			root.__pendingRetryQueue = []
-			root.logoutForce(qsTr("Your session has expired. Please sign in again."))
+			root.__endLocalSession(qsTr("Your session has expired. Please sign in again."), true)
 			return
 		}
 
+		root.__refreshInProgress = false
 		console.log("Auth: refresh succeeded")
 		// Re-register WS subscriptions that failed with the old access token.
 		Events.sendEvent("AccessTokenRefreshed", {})
 
 		root.__retryPendingRequests()
+		if (!root.__tenantSwitchInProgress)
+			root.__startPendingTenantSwitch()
 	}
 
 	function __retryPendingRequests() {
 		var queue = root.__pendingRetryQueue
 		root.__pendingRetryQueue = []
+		let retries = root.__recentRetries.slice()
 		for (var i = 0; i < queue.length; i++) {
 			var item = queue[i]
+			if (item.generation !== root.__sessionGeneration) {
+				root.__dropRequest(item.gqlRequestRef)
+				continue
+			}
+			retries.push({"gqlData": item.gqlData, "requestId": item.requestId, "gqlRequestRef": item.gqlRequestRef, "time": Date.now()})
 			try {
+				// Sent again as it was, with the headers of its sender (the permission path decides the answer) and the new token
 				if (item.gqlRequestRef && item.gqlData !== undefined && item.gqlData !== null) {
-					item.gqlRequestRef.setGqlQuery(item.gqlData)
+					if (item.gqlRequestRef.sessionOwner)
+						item.gqlRequestRef.accessToken = root.getAccessToken()
+					item.gqlRequestRef.setGqlQuery(item.gqlData, item.gqlHeaders)
 				}
 			} catch (e) {
 				// One stale/destroyed sender (e.g. the view that issued it was closed while
@@ -474,6 +885,26 @@ QtObject {
 				console.warn("Auth: dropped a queued retry — original request sender no longer valid:", e)
 			}
 		}
+		root.__recentRetries = retries
+	}
+
+	// The server could not answer the refresh: the session is kept, the refusals wait, the refresh is asked again
+	function __onRefreshUnreachable() {
+		if (!root.__refreshInProgress)
+			return
+
+		root.__refreshInProgress = false
+		console.warn("Auth: refresh could not reach the server — asked again in", root.refreshRetryInterval, "ms")
+		root.__refreshRetryTimer.restart()
+	}
+
+	// A remembered session could not be restored: the sign-in is shown; a refused refresh token is forgotten
+	function __finishRestoreWithoutSession(isRefused) {
+		if (isRefused) {
+			root.clearRefreshToken()
+		}
+
+		root.superuserExistResult(root.__restoreStatus, root.__restoreError)
 	}
 
 	property Connections __applicationInfoConnections: Connections {
@@ -492,24 +923,24 @@ QtObject {
 				if (Qt.platform.os === "web"){
 					// Check storage for existing session tokens
 					let token = root.storage.value("accessToken", "");
-					let refreshToken = root.storage.value("refreshToken", "");
 					if (token && token !== ""){
-						AuthorizationController.readDataFromStorage();
-						AuthorizationController.setAccessToken(token);
-						AuthorizationController.setRefreshToken(refreshToken);
-							AuthorizationController.refreshPermissions(function(){
-								AuthorizationController.loggedIn();
-							});
+						root.readDataFromStorage()
+						root.setAccessToken(root.getAccessToken())
+						root.setRefreshToken(root.userTokenProvider.refreshToken)
+						root.refreshPermissions(function(){ root.loggedIn() })
 
 						return;
 					}
 
-					AuthorizationController.removeDataFromStorage();
+					root.removeDataFromStorage();
 				}
 
 				// For both platforms, settings are loaded automatically via PlatformSettings
 				// Try to restore session with refresh token if available
 				if (root.rememberMe && root.storedRefreshToken !== "" && root.lastUser !== "") {
+					// Told on when the session cannot be restored: the application shows the sign-in on it
+					root.__restoreStatus = status
+					root.__restoreError = error
 					root.loginWithRefreshToken(root.lastUser, root.storedRefreshToken);
 					return;
 				}
@@ -522,6 +953,12 @@ QtObject {
 	property UserTokenProvider userTokenProvider: UserTokenProvider {
 		productId: root.productId;
 		onAccepted: {
+			root.__endSessionWork()
+			let claims = root.__readTokenClaims(accessToken)
+			root.currentTenantId = claims && claims.tenantId ? claims.tenantId : ""
+			root.currentTenantName = ""
+			if (!root.rememberMe)
+				root.clearRefreshToken()
 			root.saveRefreshTokenIfRememberMe();
 
 			if (isTokenGlobal){
@@ -549,6 +986,9 @@ QtObject {
 	}
 	
 	function readDataFromStorage(){
+		if (root.isLoggedIn())
+			return
+		root.__browserSessionStored = true
 		userTokenProvider.accessToken = storage.value("accessToken", "");
 		userTokenProvider.refreshToken = storage.value("refreshToken", "");
 		userTokenProvider.userId = storage.value("userId", "");
@@ -571,10 +1011,12 @@ QtObject {
 		}
 
 		root.currentTenantName = tenantName;
-		storage.setValue("tenantName", tenantName);
+		if (Qt.platform.os === "web" && root.__checkSharedSession())
+			storage.setValue("tenantName", tenantName);
 	}
 
 	function saveDataToStorage(){
+		root.__browserSessionStored = true
 		storage.setValue("accessToken", userTokenProvider.accessToken);
 		storage.setValue("refreshToken", userTokenProvider.refreshToken);
 		storage.setValue("userId", userTokenProvider.userId);
@@ -600,32 +1042,45 @@ QtObject {
 
 	function saveRefreshTokenIfRememberMe(){
 		if (root.rememberMe) {
+			root.__loginSettingsLoading = true
 			root.storedRefreshToken = userTokenProvider.refreshToken;
 			root.lastUser = userTokenProvider.login;
-			
-			if (Qt.platform.os === "web"){
-				saveDataToStorage();
-			}
+			root.__loginSettingsLoading = false
+			root.saveLoginSettings()
 		}
-		else {
-			clearRefreshToken();
-		}
+		if (Qt.platform.os === "web")
+			root.saveDataToStorage()
 	}
 
 	function clearRefreshToken(){
+		root.__loginSettingsLoading = true
 		root.storedRefreshToken = "";
 		root.lastUser = "";
 		root.rememberMe = false;
-		
-		if (Qt.platform.os === "web"){
-			storage.remove("refreshToken");
-		}
+		root.__loginSettingsLoading = false
+		root.saveLoginSettings()
 	}
 
 	function loginWithRefreshToken(userName, refreshToken){
+		if (root.isLoggedIn())
+			return
+		root.__sessionGeneration++
 		refreshTokenForLoginGqlSender.userName = userName;
 		refreshTokenForLoginGqlSender.refreshToken = refreshToken;
-		root.__sendWithoutAccessToken(refreshTokenForLoginGqlSender);
+		if (root.__checkRestoreSettings())
+			root.__sendBound(refreshTokenForLoginGqlSender);
+	}
+
+	function __checkRestoreSettings() {
+		if (!root.rememberMe)
+			return true
+		root.__syncLoginSettings()
+		if (root.storage.value("Login_storedRefreshToken", "") !== refreshTokenForLoginGqlSender.refreshToken ||
+				root.storage.value("Login_lastUser", "") !== refreshTokenForLoginGqlSender.userName) {
+			root.__finishRestoreWithoutSession(false)
+			return false
+		}
+		return true
 	}
 
 	function updateSuperuserModel(){
@@ -653,13 +1108,55 @@ QtObject {
 	}
 	
 	function logout(){
-		logoutForce();
-		// logoutGqlSender.send();
+		// The session ends at the server too, or its refresh token and its subscriptions keep working there.
+		// Sent before the local token is cleared: every runtime takes the token while the request is made
+		if (root.userTokenProvider.accessToken !== ""){
+			root.__syncLoginSettings()
+			let token = root.__sharedRefreshToken()
+			root.__sendLogout(root.getAccessToken(), token || root.userTokenProvider.refreshToken)
+		}
+
+		root.logoutForce()
+	}
+
+	function __sendLogout(accessToken, refreshToken) {
+		root.__logoutToken = accessToken
+		if (refreshToken)
+			root.__sendBound(root.logoutGqlSender, null, refreshToken)
+		else
+			root.__sendWithoutAccessToken(root.logoutGqlSender)
+		root.__logoutToken = ""
+	}
+
+	function __endSessionWork() {
+		root.__sessionGeneration++
+		root.__browserSessionStored = false
+		root.__permissionsRefreshCallbacks = []
+		root.__permissionsInFlight = false
+		root.__permissionsRetried = false
+		root.__refreshInProgress = false
+		root.__refreshRetryTimer.stop()
+		root.__tenantRemovalSwitchInProgress = false
+		root.__tenantSwitchInProgress = false
+		root.__switchAwaitingPermissions = false
+		root.__authFailedDuringSwitch = false
+		root.__hasPendingTenantSwitch = false
+		root.__pendingTenantId = ""
+		root.__activationTenantId = ""
+		root.__recentRetries = []
+		root.__dropPendingRequests()
 	}
 	
 	// reasonMessage: optional user-facing explanation for forced logout (session expiry, etc.).
 	// Voluntary logout() leaves it empty so no popup is shown.
 	function logoutForce(reasonMessage){
+		root.__syncLoginSettings()
+		root.__endLocalSession(reasonMessage, root.__sharedRefreshToken() !== null)
+	}
+
+	function __endLocalSession(reasonMessage, ownsSession) {
+		let ownsSettings = ownsSession && (!root.storage.value("Login_storedRefreshToken", "") || root.rememberMe)
+		root.__endSessionWork()
 		if (reasonMessage && reasonMessage !== ""){
 			PopupManager.addWarningMessage(reasonMessage, true)
 		}
@@ -674,17 +1171,23 @@ QtObject {
 		currentTenantName = ""
 		pendingInvitations = []
 		pendingInvitationsCount = 0
-		// Drop, do not invoke: the queued continuations emit loggedIn().
-		__permissionsRefreshCallbacks = []
 		setAccessToken("");
 		setRefreshToken("");
 		
-		if (Qt.platform.os === "web"){
+		if (ownsSession && Qt.platform.os === "web"){
 			removeDataFromStorage();
 		}
 		
 		// Clear rememberMe state via PlatformSettings
-		clearRefreshToken();
+		if (ownsSettings)
+			clearRefreshToken();
+		else {
+			root.__loginSettingsLoading = true
+			root.rememberMe = false
+			root.lastUser = ""
+			root.storedRefreshToken = ""
+			root.__loginSettingsLoading = false
+		}
 		
 		loggedOut();
 	}
@@ -706,6 +1209,7 @@ QtObject {
 	}
 	
 	function login(login, password){
+		root.__sessionGeneration++
 		userTokenProvider.authorization(login, password)
 	}
 	
@@ -751,7 +1255,7 @@ QtObject {
 
 	function selectTenant(tenantId){
 		let normalizedTenantId = tenantId || ""
-		if (__tenantSwitchInProgress) {
+		if (__tenantSwitchInProgress || root.__refreshInProgress) {
 			__pendingTenantId = normalizedTenantId
 			__hasPendingTenantSwitch = true
 			return
@@ -759,7 +1263,7 @@ QtObject {
 
 		__tenantSwitchInProgress = true
 		selectTenantInput.m_tenantId = normalizedTenantId
-		selectTenantGqlSender.send(selectTenantInput)
+		root.__sendBound(selectTenantGqlSender, selectTenantInput)
 	}
 
 	// Activates the inactive organization and switches to it.
@@ -782,7 +1286,7 @@ QtObject {
 
 		setTenantActiveInput.m_tenantId = root.__activationTenantId
 		setTenantActiveInput.m_isActive = true
-		setTenantActiveGqlSender.send(setTenantActiveInput)
+		root.__sendBound(setTenantActiveGqlSender, setTenantActiveInput)
 	}
 
 	function __reportTenantSelectionFailure(message) {
@@ -793,13 +1297,18 @@ QtObject {
 
 	function __completeTenantSwitch() {
 		__tenantSwitchInProgress = false
+		root.__switchAwaitingPermissions = false
 		// Refused after the new token was taken over, or the switch failed: the token is refreshed
 		if (root.__authFailedDuringSwitch) {
 			root.__authFailedDuringSwitch = false
 			root.handleAuthFailure("", null)
 		}
 
-		if (!__hasPendingTenantSwitch)
+		root.__startPendingTenantSwitch()
+	}
+
+	function __startPendingTenantSwitch() {
+		if (!__hasPendingTenantSwitch || root.__refreshInProgress)
 			return
 
 		let tenantId = __pendingTenantId
@@ -905,17 +1414,44 @@ QtObject {
 	}
 
 	property GqlSdlRequestSender logoutGqlSender: GqlSdlRequestSender {
+		id: logoutSender
 		permissionPath: root.permissionPath
+		requestType: 1;
 		gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_logout;
+		// Without a refresh fallback, no reply can change the session.
+		readonly property var sessionOwner: logoutSender
+		readonly property bool detachedLogout: true
 		inputObjectComp: Component {
-			TokenInput {}
-		}
-		sdlObjectComp: Component {
-			LogoutPayload {
-				onFinished: {
-					root.logoutForce();
-				}
+			TokenInput {
+				m_accessToken: root.__logoutToken;
 			}
+		}
+
+		// The session it closes is named by this token, not by the one the client has now
+		function getHeaders() {
+			var headers = ({})
+			headers[root.authenticationTokenHeaderId] = root.__logoutToken
+			return headers
+		}
+
+	}
+
+	property GqlSdlRequestSender logoutRefreshGqlSender: GqlSdlRequestSender {
+		permissionPath: root.permissionPath
+		requestType: 1;
+		gqlCommandId: ImtauthSessionsSdlCommandIds.s_refreshToken;
+
+		property string refreshToken: ""
+
+		inputObjectComp: Component {
+			RefreshTokenInput {
+				m_refreshToken: root.logoutRefreshGqlSender.refreshToken;
+			}
+		}
+
+
+		function getHeaders() {
+			return root.__emptyAuthTokenHeaders()
 		}
 	}
 
@@ -931,7 +1467,7 @@ QtObject {
 					root.userTokenProvider.permissions = root.normalizePermissions(m_permissions);
 
 					if (Qt.platform.os === "web"){
-						root.saveDataToStorage();
+						root.storage.setValue("permissions", root.userTokenProvider.permissions.join(";"));
 					}
 
 					root.__completePermissionsRefresh();
@@ -959,7 +1495,22 @@ QtObject {
 		sdlObjectComp: Component {
 			RefreshTokenPayload {
 				onFinished: {
+					// Signed out while it was under way: the answer must not sign in again
+					if (!root.__refreshInProgress){
+						return;
+					}
+
 					if (m_ok && m_userSession){
+						root.__syncLoginSettings()
+						if (!root.__checkSharedSession())
+							return
+						let key = root.__sessionKey(root.getAccessToken())
+						if (m_userSession.m_userId !== root.userTokenProvider.userId ||
+								(m_userSession.m_tenantId || "") !== root.currentTenantId ||
+								(key && key !== root.__sessionKey(m_userSession.m_accessToken))) {
+							root.logoutForce(qsTr("The signed-in session has changed. Please sign in again."))
+							return
+						}
 						root.userTokenProvider.accessToken = m_userSession.m_accessToken;
 						root.userTokenProvider.refreshToken = m_userSession.m_refreshToken;
 						root.currentTenantId = m_userSession.m_tenantId || "";
@@ -971,10 +1522,10 @@ QtObject {
 						if (Qt.platform.os === "web"){
 							XMLHttpRequest.QMLAuthToken = m_userSession.m_accessToken
 							XMLHttpRequest.QMLAuthRefreshToken = m_userSession.m_refreshToken
-							root.saveDataToStorage()
 						}
 
 						root.saveRefreshTokenIfRememberMe();
+						root.__permissionsInFlight = false
 						root.refreshPermissions();
 						root.completeTokenRefresh(true);
 					}
@@ -994,10 +1545,20 @@ QtObject {
 				root.completeTokenRefresh(false);
 		}
 
-		function onError(message, type) {
-			console.warn("Auth: refreshToken request error:", message, type)
-			// Suppress modal dialogs for refresh failures — completeTokenRefresh handles logout.
+		// Refused as Unauthorized: the refresh token is not accepted
+		function onAuthorizationLost() {
 			root.completeTokenRefresh(false);
+		}
+
+		function onError(message, type, transportState) {
+			console.warn("Auth: refreshToken request error:", message, type)
+			// No modal dialog: a server out of reach keeps the session, any other failure ends it
+			if (transportState === "Error"){
+				root.__onRefreshUnreachable();
+			}
+			else{
+				root.completeTokenRefresh(false);
+			}
 		}
 	}
 
@@ -1042,11 +1603,26 @@ QtObject {
 						});
 					}
 					else {
-						// Refresh token login failed, clear stored token
-						root.clearRefreshToken();
+						// The remembered refresh token expired or was revoked
+						root.__finishRestoreWithoutSession(true);
 					}
 				}
 			}
+		}
+
+		onFinished: {
+			// A failed request: the remembered token is kept when the server could not be reached
+			if (status < 0){
+				root.__finishRestoreWithoutSession(root.refreshTokenForLoginGqlSender.state !== "Error");
+			}
+		}
+
+		function onAuthorizationLost() {
+			root.__finishRestoreWithoutSession(true);
+		}
+
+		function onError(message, type, transportState) {
+			root.__finishRestoreWithoutSession(transportState !== "Error")
 		}
 	}
 
@@ -1060,6 +1636,21 @@ QtObject {
 			SelectTenantPayload {
 				onFinished: {
 					if (m_ok && m_userSession){
+						root.__syncLoginSettings()
+						if (!root.__checkSharedSession())
+							return
+						if (m_userSession.m_userId !== root.userTokenProvider.userId ||
+								(m_userSession.m_tenantId || "") !== root.selectTenantInput.m_tenantId) {
+							root.logoutForce(qsTr("The signed-in session has changed. Please sign in again."))
+							return
+						}
+						root.__sessionGeneration++
+						root.__permissionsRefreshCallbacks = []
+						root.__permissionsInFlight = false
+						root.__permissionsRetried = false
+						root.__switchAwaitingPermissions = true
+						root.__dropPendingRequests()
+						root.userTokenProvider.permissions = []
 						root.__tenantRemovalSwitchInProgress = false
 						root.userTokenProvider.accessToken = m_userSession.m_accessToken;
 						root.userTokenProvider.refreshToken = m_userSession.m_refreshToken;
@@ -1073,11 +1664,9 @@ QtObject {
 						if (Qt.platform.os === "web"){
 							XMLHttpRequest.QMLAuthToken = m_userSession.m_accessToken
 							XMLHttpRequest.QMLAuthRefreshToken = m_userSession.m_refreshToken
-							root.saveDataToStorage()
 						}
 						// The refusals so far were for the closed token
 						root.__authFailedDuringSwitch = false
-						root.__retryPendingRequests()
 						// The subscriptions still hold the closed session and the previous organization
 						Events.sendEvent("AccessTokenRefreshed", {})
 
@@ -1089,15 +1678,8 @@ QtObject {
 					}
 					else{
 						if (root.__tenantRemovalSwitchInProgress && root.selectTenantInput.m_tenantId === "") {
-							root.__tenantRemovalSwitchInProgress = false
-							root.currentTenantId = ""
-							root.currentTenantName = ""
-							if (Qt.platform.os === "web")
-								root.saveDataToStorage()
-							root.refreshPermissions(function(){
-								root.tenantSelected("")
-								root.__completeTenantSwitch()
-							})
+							// The server did not issue an unscoped session.
+							root.logoutForce(qsTr("The current organization was removed. Please sign in again."))
 							return
 						}
 
@@ -1113,6 +1695,10 @@ QtObject {
 			root.__tenantRemovalSwitchInProgress = false
 			root.__reportTenantSelectionFailure(message || "")
 			root.__completeTenantSwitch()
+		}
+
+		function onAuthorizationLost() {
+			root.selectTenantGqlSender.onError(qsTr("The organization selection was refused."), "")
 		}
 	}
 

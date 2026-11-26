@@ -40,7 +40,7 @@
                                 <Value>Name</Value>
                                 <Value>Description</Value>
                                 <Value>Parent</Value>
-                                <Value>Role</Value>
+                                <Value>My role</Value>
                                 <Value>Active</Value>
                                 <Value>Created</Value>
                                 <Value>Updated</Value>
@@ -152,6 +152,13 @@
         <Element Id="TenantCollectionChangeNotifier" PackageId="ImtServerGqlPck" ComponentId="ObjectCollectionChangeNotifier">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>/OrganizationManagement/View</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -203,9 +210,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="HeadersProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="CollectionHeadersProvider"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="InvitationManager" Type="Reference" ExportId="InvitationManager">
-                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>

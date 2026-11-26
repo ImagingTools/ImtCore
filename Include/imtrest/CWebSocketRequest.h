@@ -18,7 +18,7 @@ namespace imtrest
 {
 
 
-class IRequestEventHandler: public istd::IPolymorphic
+class IRequestEventHandler: virtual public istd::IPolymorphic
 {
 public:
 	virtual void OnRequestDestroyed(IRequest* request) = 0;
@@ -64,6 +64,8 @@ public:
 	QByteArray GetQueryId() const;
 	void RegisterRequestEventHandler(IRequestEventHandler* requestEventHandler);
 	void SetCommandId(const QByteArray& commandId);
+	QByteArray GetConnectionId() const;
+	void SetConnectionId(const QByteArray& connectionId);
 
 	// reimplemented (IRequest)
 	virtual RequestState GetState() const override;
@@ -102,6 +104,7 @@ private:
 	QByteArray m_lastHeader;
 	QList<IRequestEventHandler*> m_requestEventHandlers;
 	QByteArray m_requestId;
+	QByteArray m_connectionId;
 };
 
 

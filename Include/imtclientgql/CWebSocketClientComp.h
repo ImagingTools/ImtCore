@@ -6,6 +6,8 @@
 #include <QtWebSockets/QWebSocket>
 #include <QtCore/QTimer>
 #include <QtCore/QReadWriteLock>
+#include <QtCore/QUrl>
+#include <QtNetwork/QSslConfiguration>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -88,6 +90,7 @@ public:
 		I_ASSIGN(m_clientIdAttrPtr, "ClientId", "ID of the client that needs to be identified on the server", false, "");
 		I_ASSIGN(m_clientIdCompPtr, "ClientIdParam", "Parameter providing the client-ID that needs to be identified on the server", false, "ClientIdParam");
 		I_ASSIGN(m_productId, "ProductId", "Product-ID used with corresponded GraphQl requests", false, "");
+		I_ASSIGN(m_silenceTimeoutAttrPtr, "SilenceTimeout", "Seconds without any message from the server after which the connection is taken as lost and opened again (the server sends a keep-alive every 5 s; not shorter than a request may wait), 0 turns the check off", true, 30);
 	I_END_COMPONENT;
 
 	CWebSocketClientComp();
@@ -95,7 +98,7 @@ public:
 	// reimplemented (imtclientgql::IGqlClient)
 	// Not thread-safe: call only from the component thread.
 	// NOTE: SendRequest() runs a nested event loop while waiting.
-	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr = nullptr) const override;
+	virtual GqlResult SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr = nullptr) const override;
 	virtual bool SendRequestNoWait(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr = nullptr) const override;
 
 	// reimplemented (imtrest::ITransport)
@@ -134,6 +137,8 @@ Q_SIGNALS:
 
 private:
 	void OnTimeout();
+	void OnSilenceTimeout();
+	void RestartSilenceTimer();
 	void OnWebSocketConnected();
 	void OnWebSocketDisconnected();
 	void OnWebSocketError(QAbstractSocket::SocketError error);
@@ -156,10 +161,32 @@ protected:
 		ST_SHUTDOWN
 	};
 
+	/**
+		The settings that the connection is opened with: the address of the server and the encryption.
+	*/
+	struct SConnectionSettings
+	{
+		QUrl url;
+		bool isSecure = false;
+		QSslConfiguration sslConfiguration;
+
+		bool operator==(const SConnectionSettings& other) const
+		{
+			return (url == other.url) && (isSecure == other.isSecure) && (sslConfiguration == other.sslConfiguration);
+		}
+	};
+
+	SConnectionSettings GetConnectionSettings() const;
+
 	void SetState(State state);
 	void OpenConnection();
 	void ProcessConnectRequest();
 	void ProcessDisconnectRequest();
+
+	/**
+		Open the connection again if its settings are changed. A notification of the same settings (loaded again, or another part of the
+		settings is changed) keeps the connection.
+	*/
 	void ProcessSettingsChanged();
 
 	enum ModelId
@@ -213,10 +240,19 @@ private:
 	I_ATTR(QByteArray, m_serverPasswordAttrPtr);
 	I_ATTR(QByteArray, m_clientIdAttrPtr);
 	I_ATTR(QByteArray, m_productId);
+	I_ATTR(int, m_silenceTimeoutAttrPtr);
 
 	mutable QWebSocket m_webSocket;
 	QTimer m_refreshTimer;
+	// TCP does not notice a peer that went away silently, a server keep-alive restarts it
+	QTimer m_silenceTimer;
 	State m_state = ST_IDLE;
+	// A connection attempt failed: the retries are not logged until the client connects or the settings change
+	bool m_isRetrying = false;
+	// The settings of the last opened connection
+	SConnectionSettings m_connectionSettings;
+	// Identifies the current socket connection in the requests it delivers (publishers key the subscriptions by it)
+	QByteArray m_connectionId;
 	mutable QMap<QString, QByteArray> m_queryDataMap;
 	istd::TPointerVector<imtrest::IRequest> m_startQueries;
 	istd::TPointerVector<imtrest::IRequest> m_cacheQueries;
@@ -228,5 +264,4 @@ private:
 
 
 } // namespace imtclientgql
-
 

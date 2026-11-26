@@ -551,7 +551,6 @@ TestCase {
 			{tag: "empty body", status: 200, body: '', result: -1, message: "Network error", type: ""},
 			{tag: "server error", status: 500, body: '{"data":{"GetFileSystemEntries":' + entries + '}}', result: -1, message: "Network error", type: ""},
 			{tag: "not found", status: 404, body: '', result: -1, message: "Network error", type: ""},
-			{tag: "unauthorized", status: 401, body: '', result: -1, message: "", type: ""},
 			{tag: "forbidden", status: 403, body: '', result: -1, message: "", type: ""}
 		]
 	}
@@ -568,5 +567,22 @@ TestCase {
 
 		compare(fileSystemSender.errorMessage, data.message)
 		compare(fileSystemSender.errorType, data.type)
+	}
+
+	// A 401 is not the end: the authorization sends it again after the refresh, or ends it failed once
+	function test_unauthorizedEndsWhenTheAuthorizationDecides(){
+		GqlTestTransport.responseStatus = 401
+		fileSystemSender.errorMessage = ""
+
+		startSending(fileSystemSender)
+		fileSystemSender.send(fileSystemInput)
+		tryCompare(fileSystemSender, "state", "Unauthorized", 3000)
+		wait(200)
+		compare(finishedSpy.count, 0, "Not ended by the refusal")
+
+		fileSystemSender.onAuthorizationLost()
+
+		waitFinished(-1)
+		compare(fileSystemSender.errorMessage, "", "No error message: the sign-in tells why")
 	}
 }

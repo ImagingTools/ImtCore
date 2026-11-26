@@ -46,12 +46,8 @@ public:
 };
 
 
-const IHttpRequestBodyPolicy& GetDefaultBodyPolicy()
-{
-	static const CDefaultBodyPolicy policy;
-
-	return policy;
-}
+// At file scope: socket threads create the first requests at once, and local statics are built with /Zc:threadSafeInit-
+const CDefaultBodyPolicy s_defaultBodyPolicy;
 
 
 } // namespace
@@ -78,7 +74,7 @@ CHttpRequest::CHttpRequest(const IRequestServlet& handler, const IProtocolEngine
 	:m_state(RS_NON_STARTED),
 	m_requestHandler(handler),
 	m_engine(engine),
-	m_bodyPolicy(GetDefaultBodyPolicy())
+	m_bodyPolicy(s_defaultBodyPolicy)
 {
 	m_requestId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 
@@ -190,6 +186,18 @@ void CHttpRequest::SetBody(const QByteArray& body)
 }
 
 
+QByteArray CHttpRequest::GetConnectionId() const
+{
+	return m_connectionId;
+}
+
+
+void CHttpRequest::SetConnectionId(const QByteArray& connectionId)
+{
+	m_connectionId = connectionId;
+}
+
+
 void CHttpRequest::SetCommandId(const QByteArray& commandId)
 {
 	m_url.setPath(commandId);
@@ -204,7 +212,7 @@ void CHttpRequest::SetBodyPolicy(const IHttpRequestBodyPolicy& policy)
 
 void CHttpRequest::ResetBodyPolicy()
 {
-	m_bodyPolicy = GetDefaultBodyPolicy();
+	m_bodyPolicy = s_defaultBodyPolicy;
 }
 
 

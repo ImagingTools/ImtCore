@@ -1,0 +1,26 @@
+schema {
+	namespace: imtlic
+	version: 1.0
+	query: Query
+	mutation: Mutation
+}
+
+import {
+	"Products.sdl"
+	"../../imtbase/1.0/CollectionDocumentService.sdl"
+	"../../imtbase/1.0/UndoManager.sdl"
+}
+
+type UpdateProductInput {
+	collectionId: ID!
+	documentId: ID!
+	productData: ProductData!
+}
+
+type Query {
+	GetProductRepresentation(input: DocumentId): ProductData!
+}
+
+type Mutation {
+	UpdateProductFromRepresentation(input: UpdateProductInput): DocumentOperationStatus!
+}

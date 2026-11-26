@@ -186,7 +186,7 @@ Lisa FeatureEditor ──generate──► <Product>Features.h ──FillProduct
 
 Без `IProductInfo` в контексте requirements не раскрываются, и пользователь получает только выданные листья. Наличие `FeatureContainer` в `AuthenticationManager` проверяется при старте сервера.
 
-**R5.3. Направление записи: «более сильное право → что оно включает»**: `Edit*` → `View*`, никогда наоборот. Удобнее всего одна запись на группе: группа `EditUser` → `ViewUsers` действует для `ChangeUser`, `RemoveUser`, `AddUser`. Так записаны деревья Lisa, ProLife и организации; NeoPro, IotPlatform, Acula — ещё в обратную сторону (13.1).
+**R5.3. Направление записи: «более сильное право → что оно включает»**: `Edit*` → `View*`, никогда наоборот. Удобнее всего одна запись на группе: группа `EditUser` → `ViewUsers` действует для `ChangeUser`, `RemoveUser`, `AddUser`. Так записаны деревья Lisa, ProLife, IotPlatform и организации; NeoPro, Acula — ещё в обратную сторону (13.1).
 
 **R5.4. Ограничения** (проверяют `FeatureEditor` и генератор `Features.h`):
 - цель — существующий узел того же продукта, записанный полным путём; внешнее требование в `LicenseEditor` помечается «from outside this product»;
@@ -324,7 +324,7 @@ Lisa FeatureEditor ──generate──► <Product>Features.h ──FillProduct
 ```
 
 - **R8.1. Права привязаны к продукту** (`IRole::GetProductId`, `IPrincipal::GetRoles(productId)`, `GetPermissions(productId)`). Продукт запроса определяет сервер по своей конфигурации, а не клиент (13.13). Роли другого продукта не открывают команды этого продукта.
-- **R8.2. Организация (tenant).** Для организации учитываются только роли, группы и права, **привязанные** к ней; для «Без организации» — только непривязанные (глобальные). Родительская роль/группа другой организации ничего не даёт. Делегированная роль (cross-org delegation) учитывается только при совпадении её продукта (`imtauthgql::AdaptUserForTenant`, `GetEffectiveUserPermissions`, `GetTenantUserPermissions`). Это правило действует и при проверке команд, в том числе в самой Puma (13.14).
+- **R8.2. Организация (tenant).** Для организации учитываются только роли, группы и права, **привязанные** к ней; для «Без организации» — только не привязанные к организации (глобальные и личные). Родительская роль/группа другой организации ничего не даёт. Делегированная роль (cross-org delegation) учитывается только при совпадении её продукта (`imtauthgql::AdaptUserForTenant`, `GetEffectiveUserPermissions`, `GetTenantUserPermissions`). Это правило действует и при проверке команд, в том числе в самой Puma (13.14).
 - **R8.3. Циклы ролей и групп запрещены:** родительская роль/группа, замыкающая цикл, отклоняется с ошибкой (`CreatesRoleCycle`, `CreatesGroupCycle`).
 - **R8.4. Запреты (`prohibitions`)** хранятся, но при вычислении прав **не применяются** (13.8). Использовать нельзя.
 - **R8.5.** Для удалённых потребителей (ProLife и др.) права, полученные из ролей, **материализуются** в сериализуемую копию пользователя (`CUserCollectionControllerComp::CreateAdaptedObjectData`), иначе PAT-пользователь без ролей даёт пустой набор.
@@ -352,12 +352,20 @@ Lisa FeatureEditor ──generate──► <Product>Features.h ──FillProduct
 - **Каскад.** Сужение scope урезает scope всех потомков (`ITenantManager::SetTenantPermissions`).
 - **Стандартный scope** корневой организации, созданной через `CreateTenant`: листья `/Administration/{Users, Roles, Groups}/{ViewPage, View, Edit/Add, Edit/Change, Edit/Remove, Revisions/View}` (`CTenantManagerComp`).
 - **Страница «Организации»** видна при наличии хотя бы одной организации или действующего приглашения, а вне организаций — ещё и держателю `/OrganizationManagement/Add`: сервер добавляет `/OrganizationManagement/{ViewPage, View}` участнику, владельцу и создателю в контексте организации, а вне организаций — участнику любой организации, приглашённому и тому, кто может создавать организации (`CAuthenticationManagerComp::HasOrganizationAccess`). На серверах продуктов (без менеджера членств) вне организаций — только держателю `Add` (13.30).
-- **Кэш.** Scope, признак владельца и доступ к организациям кэшируются на токен на `TenantDataCacheLifetime` (по умолчанию 10 с): изменения доходят до открытых сессий не позже этого срока.
+- **Кэш.** Scope, признак владельца и доступ к организациям кэшируются на токен на `TenantDataCacheLifetime` (по умолчанию 10 с): изменение модели доступа (`AccessModels`: пользователи, роли, группы, членства, организации) сбрасывает его сразу, срок ограничивает только изменения, о которых сервер не узнаёт. Сервер продукта сбрасывает свои кэши пользователей, ролей и групп сервера авторизации, когда изменение идёт через него. Сессия узнаёт об изменении своего доступа (`OnAccessChanged`) и перечитывает права.
 - Роль организации может содержать только права из этого списка (`CRoleDocumentValidatorComp`: «Permission '%1' is not allowed for tenant»).
 - Список прав организации согласован с requirements: при добавлении права редактор сам добавляет листья, которые это право включает. Иначе `ChangeUser` без `ViewUsers` дал бы изменение без просмотра.
 - `GetProductPermissions(productId, tenantId)` возвращает дерево, ограниченное правами организации; `GetUserPermissions(productId)` — права текущего пользователя (суперпользователю — всё дерево).
 - «Глобальные» права в ответе авторизации = права пользователя, не входящие ни в одну из организаций, где он состоит (`CalculateGlobalPermissions`).
 - Управление организацией использует отдельное дерево (R3.6); владелец/создатель считаются администраторами организации.
+
+**Личное пространство (данные вне организации).**
+- Вне организации тенантом своих данных является сам пользователь: созданный им документ привязывается в `TenantEntityBindings` к ID пользователя с `TenantType` = 1 (`imtbase::TT_USER`; у организаций 0). Каждый пользователь видит только свои документы, в списках и по ID; организации их тоже не видят. Тенант выбирает `imtgql::GetDataTenantId`: организация сессии, иначе пользователь; у сервера и анонимного вызова вне организации тенанта нет.
+- Сама сессия остаётся вне организации: права, как и раньше, берутся из глобальных ролей (раздел 8).
+- Суперпользователь вне организаций видит в списках всё, что не привязано к организации: свои документы, личные документы всех пользователей и непривязанные. Данные организаций видны только внутри них. Его собственные новые документы остаются личными.
+- Личное пространство не делится документами и не получает их; шаринг работает только между организациями.
+- Изоляцию включает один атрибут делегата, `UseTenantEntityBindings`: включён — коллекция изолирована и по организациям, и по пользователям; выключен — привязок нет (пользователи). Роли и группы тоже личные: вне организаций роль видна в списке только её создателю, но права даёт всем, кому назначена: вне организаций действует любая роль и группа, не привязанная к организации (`ITenantEntityBindingManager::HasOrganizationBinding`).
+- Документы, созданные до этого правила, привязки не имеют: в списках их видит только суперпользователь вне организаций, но открыть их по ID может любой (`SS_ACCESSIBLE`, как у организаций).
 
 **Personal Access Token.**
 - Scopes токена — подмножество прав **создающего**: `HasPermission(действующие права создающего, scope)`; суперпользователь может выдать любые; токен с ограниченными правами не может создать более широкий.
@@ -390,7 +398,7 @@ Lisa FeatureEditor ──generate──► <Product>Features.h ──FillProduct
 
 | № | Что обнаружено | Где | Что делать |
 |---|---|---|---|
-| 13.1 | **Механизм верный, данные и группы — нет.** Код: «держишь A ⇒ держишь requirements A» (`imtlic::CollectImpliedPermissions`, вызывается из `IGqlContext::GetImpliedPermissions()`; итог `GetPermissions(productId) ∪ GetImpliedPermissions()` в `imtservergql::GetUserPermissions`). Данные во всех продуктах записаны в обратную сторону: `View*` → группа `Edit*` (Lisa, ProLife, NeoPro, IotPlatform, Acula, `COrganizationsPermissionsProviderComp`). Если вывод работает, роль с одним `View*` получает `Edit*` на сервере. Кроме того: requirement на группу даёт сам путь группы, а не её листья; итог не ограничивается правами организации; для PAT раскрытие идёт от всех прав пользователя, а не от scopes; ограничения R5.4 не проверяются. | `imtlic/CProductInfo.cpp`, `imtgql/CGqlContext.cpp`, `imtservergql/imtservergql.h`, `*Features.h` | Исправлено в коде (раскрытие группы-цели в листья, requirements групп, граница организации, PAT от scopes, запрет зависимостей своей ветки) и в данных Lisa, ProLife и дерева организации: новые деревья (R3.4, R3.6) записаны `Edit → View`. **Открыто:** NeoPro, IotPlatform, Acula, Agentino; аудит существующих ролей. |
+| 13.1 | **Механизм верный, данные и группы — нет.** Код: «держишь A ⇒ держишь requirements A» (`imtlic::CollectImpliedPermissions`, вызывается из `IGqlContext::GetImpliedPermissions()`; итог `GetPermissions(productId) ∪ GetImpliedPermissions()` в `imtservergql::GetUserPermissions`). Данные во всех продуктах записаны в обратную сторону: `View*` → группа `Edit*` (Lisa, ProLife, NeoPro, IotPlatform, Acula, `COrganizationsPermissionsProviderComp`). Если вывод работает, роль с одним `View*` получает `Edit*` на сервере. Кроме того: requirement на группу даёт сам путь группы, а не её листья; итог не ограничивается правами организации; для PAT раскрытие идёт от всех прав пользователя, а не от scopes; ограничения R5.4 не проверяются. | `imtlic/CProductInfo.cpp`, `imtgql/CGqlContext.cpp`, `imtservergql/imtservergql.h`, `*Features.h` | Исправлено в коде (раскрытие группы-цели в листья, requirements групп, граница организации, PAT от scopes, запрет зависимостей своей ветки) и в данных Lisa, ProLife, IotPlatform и дерева организации: новые деревья (R3.4, R3.6) записаны `Edit → View`. **Открыто:** NeoPro, Acula, Agentino; аудит существующих ролей. |
 | 13.2 | Исправлено: `GetUserPermissions` берёт права продукта запроса (`GetPermissions(productId)`). | `imtservergql/imtservergql.h` | — |
 | 13.3 | Клиентский `PermissionsController.hasPermission` **не реализует проверку группы** (лист `.../EditUser/ChangeUser` есть, проверка группы `.../EditUser` → на клиенте `false`, на сервере `true`). | `ImtCore/Qml/imtauthgui/PermissionsController.qml` | Исправлено: только пути, проверка группы — «есть лист внутри». |
 | 13.4 | Ограничение PAT по scopes — **точное совпадение** (`scopeSet.contains`), а выдача scopes — через `HasPermission`. Расходятся для голых id. | `imtservergql/CAuthenticationManagerComp.cpp` | Исправлено: через `HasPermission`; голый scope ничего не покрывает. |
@@ -427,7 +435,7 @@ Lisa FeatureEditor ──generate──► <Product>Features.h ──FillProduct
 |---|---|---|---|---|---|
 | Lisa | 74 | 28 | путь, дерево R3.4 | `Edit` → `View`, ревизии → `View` — верное | `Lisa/Impl/LisaServer/LisaFeatures.h` |
 | ProLife | 139 | 43 | путь, дерево R3.4 | `Edit` → `View`, `ViewAll`/`ViewHistory` → `View`, ревизии → `View` — верное | `ProLife/Impl/ProLifeServer/ProLifeFeatures.h` |
-| IotPlatform | 89 | 7 | путь | `View*` → `Edit*` | `IotPlatform/Impl/IotPlatformServerExe/IotPlatformFeatures.h` |
+| IotPlatform | 155 | 24 | путь, дерево R3.4 | `Edit` → `View`, ревизии → `View` — верное | `IotPlatform/Impl/IotPlatformServerExe/IotPlatformFeatures.h` |
 | NeoPro | 35 | 4 | путь | `View*` → `Edit*` | `NeoPro/Impl/NeoProServer/NeoProFeatures.h` |
 | Acula | 21 | 4 | путь | `View*` → `Edit*` | `Acula/Impl/AculaServer/AculaFeatures.h` |
 | Agentino | 18 | 0 | — | — | `Agentino/Impl/AgentinoServer/AgentinoFeatures.h` |

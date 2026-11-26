@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QDataStream>
+#include <QtCore/QFileInfo>
 #include <QtCore/QRegularExpression>
 #include <QtCore/QThread>
 #include <QtCore/QUuid>
@@ -185,8 +186,37 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQueryFromFile(
 
 // reimplemented (IDatabaseServerConnectionChecker)
 
-bool CDatabaseEngineComp::CheckDatabaseConnection(QString& errorMessage) const
+IDatabaseServerConnectionChecker::DatabaseState CDatabaseEngineComp::CheckDatabaseConnection(QString& errorMessage) const
 {
+	const QByteArray driverId = GetDatabaseDriverId();
+	if (driverId.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0){
+		return QFileInfo::exists(GetDatabasePath()) ? DS_EXISTS : DS_MISSING;
+	}
+
+	if (driverId.compare(QByteArrayLiteral("QPSQL"), Qt::CaseInsensitive) != 0){
+		errorMessage = QStringLiteral("The database cannot be checked with the driver '%1'").arg(QString::fromUtf8(driverId));
+
+		return DS_NOT_CONNECTED;
+	}
+
+	QVariantMap bindValues;
+	bindValues.insert(QStringLiteral(":DatabaseName"), GetDatabaseName());
+
+	bool hasRow = false;
+	if (!QueryMaintenanceDatabase(QStringLiteral("SELECT 1 FROM pg_database WHERE datname = :DatabaseName"), bindValues, hasRow, errorMessage)){
+		return DS_NOT_CONNECTED;
+	}
+
+	return hasRow ? DS_EXISTS : DS_MISSING;
+}
+
+
+// private methods
+
+bool CDatabaseEngineComp::QueryMaintenanceDatabase(const QString& query, const QVariantMap& bindValues, bool& hasRow, QString& errorMessage) const
+{
+	hasRow = false;
+
 	// This is invoked off CSystemStatusComp's periodic health-check timer via QtConcurrent::run(), so
 	// overlapping calls from different worker-pool threads are expected (more likely to actually overlap
 	// under load, when a check takes long enough that the next timer tick fires before it finishes).
@@ -216,6 +246,21 @@ bool CDatabaseEngineComp::CheckDatabaseConnection(QString& errorMessage) const
 		if (!isConnected){
 			QSqlError sqlError = maintainanceDb.lastError();
 			errorMessage = sqlError.text();
+		}
+		else{
+			QSqlQuery sqlQuery(maintainanceDb);
+			sqlQuery.prepare(query);
+			for (QVariantMap::const_iterator it = bindValues.constBegin(); it != bindValues.constEnd(); ++it){
+				sqlQuery.bindValue(it.key(), it.value());
+			}
+
+			if (sqlQuery.exec()){
+				hasRow = sqlQuery.next();
+			}
+			else{
+				errorMessage = sqlQuery.lastError().text();
+				isConnected = false;
+			}
 		}
 
 		maintainanceDb.close();
@@ -548,7 +593,7 @@ bool CDatabaseEngineComp::EnsureDatabaseCreated() const
 		}
 
 		QString errorMessage;
-		bool isServerConnected = CheckDatabaseConnection(errorMessage);
+		const bool isServerConnected = CheckDatabaseConnection(errorMessage) != DS_NOT_CONNECTED;
 		if (isServerConnected){
 			if (*m_autoCreateDatabaseAttrPtr >= 1){
 				return CreateDatabase(DCF_ALL);

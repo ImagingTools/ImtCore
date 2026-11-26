@@ -29,7 +29,7 @@ looks light" defects.
 | `fg.default` | `#1f2328` | `textColor`, `titleColor`, `buttonTextColor`, `baseColorInverted` |
 | `fg.muted` | `#59636e` | `subtitleColor`, `tableHeaderFontColor` |
 | `fg.disabled` | `#818b98` | `inactiveTextColor`, `buttonInactiveTextColor` |
-| `accent.fg` | `#0969da` | `imaginToolsAccentColor`, `linkColor`, `firstColor`, `iconColorOnSelected`, `buttonBorderFocusColor` |
+| `accent.fg` | `#0969da` | `imagingToolsAccentColor`, `linkColor`, `firstColor`, `iconColorOnSelected`, `buttonBorderFocusColor` |
 | `accent.subtle` | `#ddf4ff` | `selectedColor`, `firstColorHighlight`, `popupInfoBackgroundColor` |
 | `success.fg` / `success.subtle` | `#1a7f37` / `#dafbe1` | `successColor` / `successSubtleColor` |
 | `attention.fg` / `attention.subtle` | `#9a6700` / `#fff8c5` | `attentionColor` / `attentionSubtleColor` |
@@ -344,7 +344,7 @@ Hex literals that survived the first pass and now read from tokens:
 | `imtgui/Application/ApplicationMain.qml` | `#bbbbbb`, `#d4edda`, `#d6eaf8`, `#666666`, `#999999` | `borderColor`, `successSubtleColor`, `popupInfoBackgroundColor`, `subtitleColor`, `inactiveTextColor` |
 | `imtauthgui/Tenant*.qml` | `#FFFFFF` | `highlightedTextColor` |
 | `imtcolgui/ItemSelectElementView.qml` | `#5b8fd6`, `#DFECF9`, `#B4D3F2` | `linkColor`, `popupInfoBackgroundColor`, `borderColor` |
-| `imtcolgui/SchemeView.qml` | `#bcd2e8`, `#1167b1` | `firstColorHighlight`, `imaginToolsAccentColor` |
+| `imtcolgui/SchemeView.qml` | `#bcd2e8`, `#1167b1` | `firstColorHighlight`, `imagingToolsAccentColor` |
 | `imtcolgui/GridCollectionViewBase.qml` | `#ffffff`, `gray` | `baseColor`, `borderColor` |
 | `imtdeskgui/TicketCreateDialog.qml` | `#FAFBFC` | `backgroundColor` |
 | `imtgeogui/AddressTreeView.qml` | `#ffffff`, `lightsteelblue` | `scrollBackgroundColor`, `selectedColor` |

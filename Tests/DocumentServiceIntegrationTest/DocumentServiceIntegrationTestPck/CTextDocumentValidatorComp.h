@@ -16,6 +16,7 @@ namespace DocumentServiceIntegrationTestPck
 /**
 	Test validator for \c iprm::ITextParam documents.
 	Validation fails if the document is not a text parameter or its text is equal to the configured invalid text.
+	When the validation parameters carry a language, the error message ends with "[<language>|<object-ID>]".
 */
 class CTextDocumentValidatorComp:
 			public icomp::CComponentBase,

@@ -346,6 +346,12 @@ DecoratorBase {
 							filterPanelDecorator.scheduleRelayout()
 						}
 
+						// A switch keeps its width: the overflow button still has
+						// to take up or drop the accent for it.
+						function onIsActiveChanged(){
+							filterPanelDecorator.scheduleRelayout()
+						}
+
 						function onHoveredChanged(){
 							filterPanelDecorator.updateValueHint(delegateLoader)
 						}
@@ -614,8 +620,11 @@ DecoratorBase {
 			else{
 				// Nothing to list inline - a date range is picked in a dialog of
 				// its own - so the row opens the filter the long way.
+				// A switch has no value to name: its row is ticked instead.
 				let row = overflowItemComp.createObject(overflowMenu)
-				row.text = filterItem.isActive ? filterItem.name + ": " + filterItem.valueText : filterItem.name
+				row.text = filterItem.isActive && !filterItem.toggleable ? filterItem.name + ": " + filterItem.valueText : filterItem.name
+				row.checkable = filterItem.toggleable
+				row.checked = filterItem.toggleable && filterItem.isActive
 				row.triggered.connect(function(){
 					filterItem.openFilter()
 				})
@@ -695,6 +704,11 @@ DecoratorBase {
 		SearchTextInput {
 			id: tfc;
 
+			// Narrower on a narrow panel, so the strip on its left keeps room for
+			// the overflow button: at a fixed width the strip went below zero and
+			// the button, pinned to its right end, slid off the left edge.
+			width: Math.max(Style.sizeHintXXXS, Math.min(Style.sizeHintXS,
+					filterPanelDecorator.width - clearAllButton.width - 3 * Style.marginM - filterPanelDecorator.overflowReserve - Style.spacingS))
 			radius: Style.radiusM;
 
 			onSearchChanged: {

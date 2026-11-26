@@ -147,18 +147,18 @@ bool CWebSocketServerComp::SendRequest(const QByteArray& requestId, ConstRequest
 
 // reimplemented (icomp::CComponentBase)
 
-void CWebSocketServerComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CWebSocketServerComp::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	Q_ASSERT_X(m_sslConfigurationCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid(), "Update server's SSL configuration", "SSL configuration or manager is not set!");
+	if (!m_isInitialized){
+		return;
+	}
 
-	if (m_startServerOnCreateAttrPtr.IsValid() && *m_startServerOnCreateAttrPtr && m_isInitialized){
-		while (m_webSocketThreadList.count() > 0){
-			imtrest::CWebSocketThread* webSocketThread = m_webSocketThreadList.back();
-			webSocketThread->disconnect();
-			m_webSocketThreadList.pop_back();
-		}
-		StopServer();
-		EnsureServerStarted();
+	// The server and its sockets are changed in their own thread: the settings can be changed in the thread of a request
+	if (modelId == MI_SERVER_CONNECTION){
+		QMetaObject::invokeMethod(this, [this](){ MoveToConfiguredPort(); }, Qt::AutoConnection);
+	}
+	else{
+		QMetaObject::invokeMethod(this, [this](){ RestartForSslConfiguration(); }, Qt::AutoConnection);
 	}
 }
 
@@ -178,10 +178,16 @@ void CWebSocketServerComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	if (m_sslConfigurationModelCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid()){
-		BaseClass2::RegisterModel(m_sslConfigurationModelCompPtr.GetPtr());
+		BaseClass2::RegisterModel(m_sslConfigurationModelCompPtr.GetPtr(), MI_SSL_CONFIGURATION);
+	}
+
+	if (m_webServerInterfaceModelCompPtr.IsValid()){
+		BaseClass2::RegisterModel(m_webServerInterfaceModelCompPtr.GetPtr(), MI_SERVER_CONNECTION);
 	}
 
 	if (m_startServerOnCreateAttrPtr.IsValid() && *m_startServerOnCreateAttrPtr){
+		m_isStartRequested = true;
+
 		EnsureServerStarted();
 	}
 
@@ -195,9 +201,16 @@ void CWebSocketServerComp::OnComponentCreated()
 
 void CWebSocketServerComp::OnComponentDestroyed()
 {
-	StopServer();
+	// First: a notification from another thread does not start the server again
+	BaseClass2::UnregisterAllModels();
+
+	// Not virtual: in the destructor of the wrapper a virtual call gets a wrong this
+	CWebSocketServerComp::StopServer();
 
 	m_timer.stop();
+
+	// The threads of the connections use the references of the component: they are stopped while it has them
+	StopConnectionThreads();
 
 	m_webSocketServerPtr.Reset();
 
@@ -217,13 +230,17 @@ imtcom::IConnectionStatusProvider::ConnectionStatus CWebSocketServerComp::GetCon
 
 bool CWebSocketServerComp::StartServer()
 {
+	m_isStartRequested = true;
+
 	return EnsureServerStarted();
 }
 
 
 bool CWebSocketServerComp::StopServer()
 {
-	m_webSocketServerPtr->close();
+	m_isStartRequested = false;
+
+	StopListening();
 
 	return true;
 }
@@ -231,7 +248,7 @@ bool CWebSocketServerComp::StopServer()
 
 IServer::ServerStatus CWebSocketServerComp::GetServerStatus() const
 {
-	if (m_webSocketServerPtr->isListening()){
+	if (m_webSocketServerPtr.IsValid() && m_webSocketServerPtr->isListening()){
 		return SS_LISTENING;
 	}
 
@@ -241,6 +258,139 @@ IServer::ServerStatus CWebSocketServerComp::GetServerStatus() const
 
 // private methods
 
+void CWebSocketServerComp::StopListening()
+{
+	// Nothing to close before the server has listened once
+	if (m_webSocketServerPtr.IsValid()){
+		m_webSocketServerPtr->close();
+	}
+}
+
+
+bool CWebSocketServerComp::GetSecureConnection(bool& isSecure, QSslConfiguration& sslConfiguration) const
+{
+	iprm::TParamsPtr<iprm::IEnableableParam> sslEnableParamPtr(m_sslConfigurationCompPtr.GetPtr(), imtcom::ISslConfigurationManager::ParamKeys::s_enableSslModeParamKey);
+
+	isSecure = sslEnableParamPtr.IsValid() && sslEnableParamPtr->IsEnabled();
+	if (!isSecure){
+		return true;
+	}
+
+	return m_sslConfigurationManagerCompPtr.IsValid() && m_sslConfigurationManagerCompPtr->CreateSslConfiguration(*m_sslConfigurationCompPtr, sslConfiguration);
+}
+
+
+bool CWebSocketServerComp::RestartServer()
+{
+	for (CWebSocketThread* webSocketThreadPtr : std::as_const(m_webSocketThreadList)){
+		QWebSocket* webSocketPtr = const_cast<QWebSocket*>(webSocketThreadPtr->GetWebSocket());
+		if (webSocketPtr != nullptr){
+			webSocketPtr->close(QWebSocketProtocol::CloseCodeGoingAway);
+		}
+	}
+
+	StopListening();
+
+	return EnsureServerStarted();
+}
+
+
+void CWebSocketServerComp::RestartForSslConfiguration()
+{
+	// The server that is stopped (StopServer) stays stopped. Checked when the queued call runs: the server can be stopped meanwhile
+	if (!m_isStartRequested){
+		return;
+	}
+
+	// The settings loaded again unchanged keep the connections, also of the server that does not listen: its port is tried again only
+	// when it is set again. A refused encryption leaves no server object, the next settings start it anew
+	bool isSecure = false;
+	QSslConfiguration sslConfiguration;
+	if (		m_webSocketServerPtr.IsValid() &&
+				GetSecureConnection(isSecure, sslConfiguration) &&
+				(isSecure == (m_webSocketServerPtr->secureMode() == QWebSocketServer::SecureMode)) &&
+				(!isSecure || (sslConfiguration == m_webSocketServerPtr->sslConfiguration()))){
+		return;
+	}
+
+	RestartServer();
+}
+
+
+void CWebSocketServerComp::MoveToConfiguredPort()
+{
+	// Checked when the queued call runs: the server can be stopped meanwhile
+	if (!m_isStartRequested || !m_webServerInterfaceCompPtr.IsValid()){
+		return;
+	}
+
+	// The notification can be of the host, of another protocol or of the same settings loaded again: only another port moves the server.
+	// The port of the system (0) would be another one each time, a protocol without a port has -1
+	const int port = m_webServerInterfaceCompPtr->GetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET);
+	if (port <= 0){
+		return;
+	}
+
+	const bool isListening = m_webSocketServerPtr.IsValid() && m_webSocketServerPtr->isListening();
+	if (isListening && (m_webSocketServerPtr->serverPort() == port)){
+		m_requestedPort = port;
+
+		return;
+	}
+
+	// The port that could not be listened on is tried again only when it is set again after another one
+	if (port == m_requestedPort){
+		return;
+	}
+
+	// Without a server object (it could not be secure as it is asked) the server is started anew, with the check of the encryption
+	if (!m_webSocketServerPtr.IsValid()){
+		EnsureServerStarted();
+
+		return;
+	}
+
+	m_requestedPort = port;
+
+	const quint16 previousPort = isListening ? m_webSocketServerPtr->serverPort() : 0;
+	if (ListenAgain(quint16(port)) || (previousPort == 0)){
+		return;
+	}
+
+	if (ListenAgain(previousPort)){
+		SendErrorMessage(0, QStringLiteral("Web socket server stays on port %1").arg(previousPort));
+	}
+	else{
+		SendErrorMessage(0, QStringLiteral("Web socket server could not return to port %1, it does not listen").arg(previousPort));
+	}
+}
+
+
+void CWebSocketServerComp::StopConnectionThreads()
+{
+	for (CWebSocketThread* webSocketThreadPtr : std::as_const(m_webSocketThreadList)){
+		webSocketThreadPtr->quit();
+		webSocketThreadPtr->wait();
+	}
+}
+
+
+bool CWebSocketServerComp::ListenAgain(quint16 port)
+{
+	m_webSocketServerPtr->close();
+
+	if (m_webSocketServerPtr->listen(QHostAddress::Any, port)){
+		SendInfoMessage(0, QStringLiteral("Web socket server successfully started on port %1").arg(port));
+
+		return true;
+	}
+
+	SendErrorMessage(0, QStringLiteral("Web socket server could not be started on port %1").arg(port));
+
+	return false;
+}
+
+
 bool CWebSocketServerComp::EnsureServerStarted()
 {
 	bool retVal = false;
@@ -248,6 +398,8 @@ bool CWebSocketServerComp::EnsureServerStarted()
 	if (m_protocolEngineCompPtr.IsValid()){
 		if (m_webServerInterfaceCompPtr.IsValid()){
 			int port = m_webServerInterfaceCompPtr->GetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET);
+
+			m_requestedPort = port;
 
 			retVal = StartListening(QHostAddress::Any, port);
 		}
@@ -267,28 +419,24 @@ bool CWebSocketServerComp::StartListening(const QHostAddress& address, quint16 p
 	}
 
 	bool isSecureConnection = false;
-	if (m_sslConfigurationCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid()){
-		QSslConfiguration sslConfiguration;
-		iprm::TParamsPtr<iprm::IEnableableParam> sslEnableParamPtr(
-					m_sslConfigurationCompPtr.GetPtr(),
-					imtcom::ISslConfigurationManager::ParamKeys::s_enableSslModeParamKey);
-		if (sslEnableParamPtr.IsValid() && sslEnableParamPtr->IsEnabled()){
-			if (m_sslConfigurationManagerCompPtr->CreateSslConfiguration(*m_sslConfigurationCompPtr, sslConfiguration)){
-				m_webSocketServerPtr.SetPtr(new QWebSocketServer("", QWebSocketServer::SecureMode, this));
-				m_webSocketServerPtr->setSslConfiguration(sslConfiguration);
+	QSslConfiguration sslConfiguration;
+	if (!GetSecureConnection(isSecureConnection, sslConfiguration)){
+		// The server that is asked to be secure must not work without the encryption: the clients would send the data as plain text.
+		// Without a server object a move to another port starts it anew, with this check
+		m_webSocketServerPtr.Reset();
 
-				SendInfoMessage(0, QStringLiteral("Secure connection (SSL) enabled on web socket server"));
+		SendErrorMessage(0, QStringLiteral("Could not enable secure connection (SSL) on web socket server, the server is not started"));
 
-				isSecureConnection = true;
-			}
-			else{
-				QString message = QStringLiteral("Could not enable secure connection (SSL) on web socket server");
-				SendErrorMessage(0, message);
-			}
-		}
+		return false;
 	}
 
-	if (!isSecureConnection){
+	if (isSecureConnection){
+		m_webSocketServerPtr.SetPtr(new QWebSocketServer("", QWebSocketServer::SecureMode, this));
+		m_webSocketServerPtr->setSslConfiguration(sslConfiguration);
+
+		SendInfoMessage(0, QStringLiteral("Secure connection (SSL) enabled on web socket server"));
+	}
+	else{
 		m_webSocketServerPtr.SetPtr(new QWebSocketServer("", QWebSocketServer::NonSecureMode, this));
 	}
 
@@ -305,12 +453,13 @@ bool CWebSocketServerComp::StartListening(const QHostAddress& address, quint16 p
 	}
 #endif
 
+	// The server that could not listen now listens later on another port (ListenAgain): it is connected already
+	connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::newConnection, this, &CWebSocketServerComp::HandleNewConnections);
+	connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::acceptError, this, &CWebSocketServerComp::OnAcceptError);
+	connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::sslErrors, this, &CWebSocketServerComp::OnSslErrors);
+
 	if (m_webSocketServerPtr->listen(address, port)){
 		SendInfoMessage(0, QStringLiteral("Web socket server successfully started on port %1").arg(port));
-
-		connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::newConnection, this, &CWebSocketServerComp::HandleNewConnections);
-		connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::acceptError, this, &CWebSocketServerComp::OnAcceptError);
-		connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::sslErrors, this, &CWebSocketServerComp::OnSslErrors);
 
 		return true;
 	}

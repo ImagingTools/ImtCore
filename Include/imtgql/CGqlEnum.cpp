@@ -26,6 +26,18 @@ CGqlEnum::operator QVariant() const
 }
 
 
+bool CGqlEnum::operator==(const CGqlEnum& other) const
+{
+	return m_value == other.m_value;
+}
+
+
+bool CGqlEnum::operator!=(const CGqlEnum& other) const
+{
+	return !operator==(other);
+}
+
+
 } // namespace imtgql
 
 

@@ -25,27 +25,10 @@ Item {
         Events.unSubscribeEvent(updateCommandsGuiEventCommandId, commandsDecoratorContainer.setCommandsModel);
     }
 
-    property int loadImages: 0
-    property TreeItemModel buttonModel;
-
-    onLoadImagesChanged: {
-        if (loadImages == 0){
-            buttonPanel.buttonModel = buttonModel;
-
-            buttonPanel.updateModel();
-
-            Events.sendEvent("CommandsGuiReady");
-         }
-    }
-
     function getCommandIdRequest(callback){
         if (callback){
             callback(commandId);
         }
-    }
-
-    function counterImage(){
-        loadImages--
     }
 
     function setCommandsModel(parameters){
@@ -54,27 +37,10 @@ Item {
 
         commandsDecoratorContainer.commandId = commId;
 
-        if (Qt.platform.os === "web"){
-            buttonModel = model;
-            for (let index = 0; index < model.getItemsCount(); index++){
-                let modelIcon = model.getData("icon",index)
-                let isEnabled = model.getData("isEnabled",index)
-                let path = modelIcon === "" ? "" : isEnabled ? Style.getIconPath(modelIcon, Icon.State.On, Icon.Mode.Normal) :
-                                                               Style.getIconPath(modelIcon, Icon.State.Off, Icon.Mode.Disabled)
-                if (path !== ""){
-                    path = "/" + context.appId + "/Views/" + path
-                    loadImages++;
+        buttonPanel.buttonModel = model;
+        buttonPanel.updateModel();
 
-                    ImageController.load(path, counterImage, counterImage);
-                }
-            }
-        }
-        else{
-            buttonPanel.buttonModel = model;
-            buttonPanel.updateModel();
-
-            Events.sendEvent("CommandsGuiReady");
-        }
+        Events.sendEvent("CommandsGuiReady");
     }
 
     function clearModel(parameters){

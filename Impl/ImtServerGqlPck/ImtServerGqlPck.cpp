@@ -26,6 +26,11 @@ I_EXPORT_COMPONENT(
 			"GraphQL WebSocket Receiver");
 
 I_EXPORT_COMPONENT(
+			ServerTokenReceiver,
+			"How this server receives the servers of other products: its tokens and what they may send",
+			"Product Server Token Receiver Policy");
+
+I_EXPORT_COMPONENT(
 			GraphQLDemultiplexer,
 			"GraphQLDemultiplexer",
 			"GraphQL Demultiplexer");
@@ -119,6 +124,11 @@ I_EXPORT_COMPONENT(
 			TableViewParamController,
 			"Table view param controller",
 			"Table View Param Controller");
+
+I_EXPORT_COMPONENT(
+			AccessChangePublisher,
+			"Channel telling a signed-in user that the own access changed, granted or taken",
+			"Access Change Publisher");
 
 I_EXPORT_COMPONENT(
 			ConnectionStatusSubscriberController,

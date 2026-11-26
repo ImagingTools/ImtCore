@@ -71,9 +71,18 @@ QJsonObject CGqlRemoteRepresentationControllerComp::CreateInternalResponse(
 	imtclientgql::IGqlClient::GqlRequestPtr requestPtr;
 	requestPtr.MoveCastedPtr(gqlRequestPtr->CloneMe());
 	if (requestPtr.IsValid()){
-		imtclientgql::IGqlClient::GqlResponsePtr responsePtr = m_apiClientCompPtr->SendRequest(requestPtr);
-		if (responsePtr.IsValid()){
+		const auto requestResult = m_apiClientCompPtr->SendRequest(requestPtr);
+		auto responsePtr = requestResult.responsePtr;
+		if (requestResult){
 			return CreateJsonObjectFromResponse(gqlRequest.GetCommandId(), *responsePtr);
+		}
+
+		// The remote server tells why it failed the request
+		if (!requestResult.errorMessage.isEmpty()){
+			errorMessage = requestResult.errorMessage;
+			SendErrorMessage(0, errorMessage, "CGqlRemoteRepresentationControllerComp");
+
+			return QJsonObject();
 		}
 	}
 

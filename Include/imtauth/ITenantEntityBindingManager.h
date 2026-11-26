@@ -51,8 +51,9 @@ public:
 
 	/**
 		Check if a binding exists.
+		\param isReadPtr [optional] False when the bindings could not be read, so false says nothing.
 	*/
-	virtual bool HasBinding(const QByteArray& tenantId, const QByteArray& entityType, const QByteArray& entityId) const = 0;
+	virtual bool HasBinding(const QByteArray& tenantId, const QByteArray& entityType, const QByteArray& entityId, bool* isReadPtr = nullptr) const = 0;
 
 	/**
 		Get all entity IDs of a given type bound to a tenant.
@@ -60,10 +61,11 @@ public:
 	virtual QByteArrayList GetEntityIds(const QByteArray& tenantId, const QByteArray& entityType) const = 0;
 
 	/**
-		Returns true if the entity has at least one binding to any tenant
-		(i.e., the entity is tenant-scoped and not global/unbound).
+		Returns true if the entity is bound to an organization, i.e. it does not belong to the space outside of organizations.
+		A binding to a user (imtbase::TT_USER) is not an organization binding.
+		\param isReadPtr [optional] False when the bindings could not be read, so false says nothing.
 	*/
-	virtual bool HasAnyTenantBinding(const QByteArray& entityType, const QByteArray& entityId) const = 0;
+	virtual bool HasOrganizationBinding(const QByteArray& entityType, const QByteArray& entityId, bool* isReadPtr = nullptr) const = 0;
 };
 
 

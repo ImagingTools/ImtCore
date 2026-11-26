@@ -20,6 +20,9 @@ public:
 		I_ASSIGN(m_requestFactCompPtr, "RequestFactory", "Factory used for creation of connection request instances", true, "RequestFactory");
 	I_END_COMPONENT
 
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+
 	virtual istd::IChangeableUniquePtr CreateObjectFromRecord(
 				const QSqlRecord& record,
 				const iprm::IParamsSet* dataConfigurationPtr = nullptr) const override;

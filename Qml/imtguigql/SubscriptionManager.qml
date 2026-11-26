@@ -41,18 +41,19 @@ WebSocket {
 
 	onStatusChanged: {
 		if (status == WebSocket.Error){
-			timer.restart()
+			container.scheduleReconnect()
 			console.error("SubscriptionManager ERROR", errorString)
 		}
 		else if (status == WebSocket.Open){
 			timer.stop()
-			
+			container.reconnectAttempts = 0
+
 			sendTextMessage("{ \"type\": \"connection_init\" }")
 
 			registerSubscriptionToServer();
 		}
 		else if (status == WebSocket.Closed){
-			timer.restart()
+			container.scheduleReconnect()
 
 			for (let index = 0; index < subscriptionModel.length; index++){
 				container.markInterrupted(index)
@@ -74,10 +75,50 @@ WebSocket {
 		}
 	}
 
+	// A lost connection is opened again at once, then after this pause while the server stays out of reach
+	property int firstReconnectInterval: 100
+	property int reconnectInterval: 4000
+	// The attempts since the connection was open last
+	property int reconnectAttempts: 0
+
+	function scheduleReconnect(){
+		if (timer.running){
+			return
+		}
+
+		timer.interval = container.reconnectAttempts === 0 ? container.firstReconnectInterval : container.reconnectInterval
+		container.reconnectAttempts++
+		timer.start()
+	}
+
 	property Timer timer: Timer{
 		interval: 4000;
 		onTriggered: {
+			// Opened again meanwhile, e.g. by a new address: the attempt under way is not broken off
+			if (container.status === WebSocket.Open || container.status === WebSocket.Connecting){
+				return
+			}
+
 			container.reconnect()
+		}
+	}
+
+	// A subscription the server could not authorize for now is sent again after this pause, doubled up to the maximum
+	property int authorizationRetryInterval: 5000
+	property int authorizationRetryMaxInterval: 60000
+	property int authorizationRetryDelay: authorizationRetryInterval
+
+	property Timer authorizationRetryTimer: Timer{
+		interval: container.authorizationRetryDelay
+		onTriggered: {
+			for (let index = 0; index < container.subscriptionModel.length; index++){
+				if (container.subscriptionModel[index]["status"] === "retrying"){
+					container.subscriptionModel[index]["status"] = "unregistered"
+				}
+			}
+
+			container.authorizationRetryDelay = Math.min(container.authorizationRetryDelay * 2, container.authorizationRetryMaxInterval)
+			container.registerSubscriptionToServer()
 		}
 	}
 
@@ -93,6 +134,13 @@ WebSocket {
 					let subscription = subscriptionModel[index]["subscription"]
 					subscriptionModel[index]["status"] = "registered"
 					subscription.state = "Registered"
+					container.authorizationRetryDelay = container.authorizationRetryInterval
+					if (container.subscriptionModel[index]["interrupted"]){
+						container.subscriptionModel[index]["interrupted"] = false
+						if (subscription && subscription.markStale !== undefined){
+							subscription.markStale()
+						}
+					}
 				}
 			}
 		}
@@ -128,19 +176,56 @@ WebSocket {
 		}
 	}
 
+	// The machine code of an error frame of the server; empty for a server that sends none
+	function getErrorCode(rawMessage){
+		let frame = JSON.parse(rawMessage)
+		let errors = frame["payload"]
+		if (!errors || errors.length === 0 || !errors[0]["extensions"]){
+			return ""
+		}
+
+		let code = errors[0]["extensions"]["code"]
+
+		return code ? code : ""
+	}
+
 	function handleSubscriptionError(subscriptionId, rawMessage) {
 		console.warn("SubscriptionManager: error for id", subscriptionId, rawMessage)
 
-		// Not "unregistered": that one is re-sent with every new registration. A refused
-		// subscription is re-submitted only by AccessTokenRefreshed or a reconnect.
+		// The code decides: an authorization unavailable for now is asked again later, changed permissions at once.
+		// Not "unregistered" for a refusal: that one is re-sent with every new registration; a refused
+		// subscription is re-submitted only by AccessTokenRefreshed or a reconnect. Unauthorized asks for a new token.
+		let code = container.getErrorCode(rawMessage)
+		let isRegistrationNeeded = false
 		for (let index = 0; index < subscriptionModel.length; index++){
 			if (subscriptionModel[index]["subscriptionId"] == subscriptionId){
 				container.markInterrupted(index)
-				subscriptionModel[index]["status"] = "rejected"
 				let subscription = subscriptionModel[index]["subscription"]
-				if (subscription)
+				if (code === "AuthorizationUnavailable"){
+					subscriptionModel[index]["status"] = "retrying"
+					container.authorizationRetryTimer.start()
+				}
+				else if (code === "PermissionsChanged"){
+					subscriptionModel[index]["status"] = "unregistered"
+					isRegistrationNeeded = true
+				}
+				else{
+					subscriptionModel[index]["status"] = "rejected"
+				}
+
+				if (subscription){
 					subscription.state = "Error"
+				}
 			}
+		}
+
+		if (isRegistrationNeeded){
+			container.registerSubscriptionToServer()
+		}
+
+		// The token expired or its session ended: only a new token helps, and no request may come to ask for it
+		if (code === "Unauthorized"){
+			Events.sendEvent("AccessTokenUnauthorized", {})
 		}
 	}
 
@@ -181,6 +266,14 @@ WebSocket {
 	}
 
 	function clear(){
+		// The connection outlives the user: its subscriptions end at the server now, not at its next check
+		for (let index = 0; index < container.subscriptionModel.length; index++){
+			let status = container.subscriptionModel[index]["status"]
+			if (status === "registered" || status === "waiting"){
+				container.unregisterSubscriptionOnServer(index)
+			}
+		}
+
 		container.subscriptionModel = []
 		// Auto-subscribe clients (e.g. PumaWsConnection) were wiped with the model;
 		// ask them to re-register so connection status keeps working after logout.
@@ -232,15 +325,6 @@ WebSocket {
 				subscriptionModel[index]["status"] = "waiting";
 
 				container.sendTextMessage(JSON.stringify(request))
-
-				// Sent before the resync request, so the server is listening again when the client re-reads its state.
-				if (subscriptionModel[index]["interrupted"]){
-					subscriptionModel[index]["interrupted"] = false
-					let subscription = subscriptionModel[index]["subscription"]
-					if (subscription && subscription.markStale !== undefined){
-						subscription.markStale()
-					}
-				}
 			}
 		}
 	}

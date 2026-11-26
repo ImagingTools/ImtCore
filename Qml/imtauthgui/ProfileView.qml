@@ -10,8 +10,8 @@ import imtauthgui 1.0
  * ProfileView
  *
  * Thin orchestrator for the user Profile. Composes a MultiPageView over the
- * profile pages (General / Organizations / Access Tokens / Roles & Permissions)
- * above an identity banner. It kicks off the initial profile / organizations
+ * profile pages (General / Access Tokens / Roles & Permissions)
+ * above an identity banner. It kicks off the initial profile
  * fetch and relays cross-cutting concerns (loading, errors, reload triggers) —
  * each page owns and reads its own slice of data directly from `apiClient`
  * rather than having it forwarded down through this container.
@@ -38,8 +38,7 @@ ViewBase {
 
 	// Guards the open-time fetch: Component.onCompleted and onApiClientChanged
 	// both fire when apiClient is injected via binding (UserPanel -> Dialog ->
-	// ProfileView). Without this flag each open issued GetProfile /
-	// GetUserOrganizations twice.
+	// ProfileView). Without this flag each open issued GetProfile twice.
 	property bool __initialLoadDone: false
 
 	readonly property string __displayName: container.__headerProfile
@@ -83,8 +82,6 @@ ViewBase {
 		if (!container.apiClient)
 			return
 		container.apiClient.getProfile()
-		if (AuthorizationController.tenantsEnabled)
-			container.apiClient.getOrganizations()
 	}
 
 	// Membership notifications update the profile only while it is shown; a hidden one reloads when shown.
@@ -122,11 +119,6 @@ ViewBase {
 			if (accessPage && accessPage.applyProfile)
 				accessPage.applyProfile(profile)
 		}
-		function onOrganizationsReceived(list) {
-			var orgPage = multiPageView.getPageById("Organizations")
-			if (orgPage && orgPage.applyOrganizations)
-				orgPage.applyOrganizations(list)
-		}
 		function onProfileSaved() {
 			// Refresh from the server's confirmed state — this is the only point
 			// where the banner (and General page) should pick up the new name /
@@ -134,18 +126,8 @@ ViewBase {
 			// notification itself is shown locally by ProfileGeneralPage.
 			container.apiClient.getProfile()
 		}
-		function onInvitationAccepted() {
-			container.apiClient.getOrganizations()
-		}
-		function onInvitationRejected() {
-			container.apiClient.getOrganizations()
-		}
-		function onLeftTenant(tenantId) {
-			container.apiClient.getOrganizations()
-		}
-		// profileOperationFailed / organizationOperationFailed / tokenOperationFailed
-		// are shown as in-dialog banners local to the page that triggered them
-		// (General / Organizations / Access Tokens respectively), not here.
+		// profileOperationFailed / tokenOperationFailed are shown as in-dialog banners
+		// local to the page that triggered them (General / Access Tokens), not here.
 	}
 
 	// Refresh when the active tenant / membership state changes (same triggers as
@@ -181,7 +163,7 @@ ViewBase {
 				width: 44
 				height: 44
 				radius: width / 2
-				color: Style.imaginToolsAccentColor
+				color: Style.imagingToolsAccentColor
 				anchors.verticalCenter: parent.verticalCenter
 
 				Text {
@@ -237,8 +219,6 @@ ViewBase {
 
 		Component.onCompleted: {
 			multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
-			if (AuthorizationController.tenantsEnabled)
-				multiPageView.addPage("Organizations", qsTr("Organizations"), organizationsPageComp, "Icons/Organizations")
 			multiPageView.addPage("AccessTokens", qsTr("Access Tokens"), tokensPageComp, "Icons/Key")
 			multiPageView.addPage("Access", qsTr("Roles & Permissions"), accessPageComp, "Icons/Role")
 			container.__addLinkedAccountsPage()
@@ -275,13 +255,6 @@ ViewBase {
 	Component {
 		id: generalPageComp
 		ProfileGeneralPage {
-			apiClient: container.apiClient
-		}
-	}
-
-	Component {
-		id: organizationsPageComp
-		ProfileOrganizationsPage {
 			apiClient: container.apiClient
 		}
 	}

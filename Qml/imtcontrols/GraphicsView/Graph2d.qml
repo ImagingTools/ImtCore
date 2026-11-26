@@ -18,7 +18,7 @@ Rectangle{
 	property string legendX: "Index"
 	property string legendY: "Value"
 
-	property string lineColor: Style.imaginToolsAccentColor;
+	property string lineColor: Style.imagingToolsAccentColor;
 
 	property real gridStepMajorX: 40
 	property real gridStepMajorY: 40

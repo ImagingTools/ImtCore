@@ -765,6 +765,8 @@ ViewBase {
 	function incompleteDetails(nodes) {
 		let details = []
 		let list = nodes || []
+		let page = multiPageView.getPageById("Subfeatures")
+		let parentNode = page ? page.currentParentNode() : null
 		for (let i = 0; i < list.length; ++i) {
 			let item = sourceItem(list[i])
 			if (!item || itemIsComplete(item))
@@ -777,7 +779,7 @@ ViewBase {
 				details.push(qsTr("%1 - Feature ID is missing").arg(item.m_featureName))
 			else if (!isValidId(item.m_featureId))
 				details.push(qsTr("%1 - Feature ID contains invalid characters").arg(item.m_featureName))
-			else if (siblingIdConflict(treeExplorer.currentParentNode(), item.m_featureId, item))
+			else if (siblingIdConflict(parentNode, item.m_featureId, item))
 				details.push(qsTr("%1 - Feature ID is duplicated").arg(item.m_featureName))
 		}
 		return details

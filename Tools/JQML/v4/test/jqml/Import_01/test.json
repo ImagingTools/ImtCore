@@ -1,0 +1,4 @@
+{
+    "desktop": false,
+    "reason": "Qt: MyButton is not a type (the directory import has Button.qml, MyButton is a name of the qmldir of the module); the engine takes the type from the qmldir"
+}

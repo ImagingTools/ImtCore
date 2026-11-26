@@ -16,6 +16,7 @@
 #include <imtbase/IOperationContextController.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
+#include <imtservergql/IObjectChangeChecker.h>
 #include <imtgql/IGqlRequestExtractor.h>
 #include <imtbase/IComplexCollectionFilter.h>
 #include <imtbase/CMimeType.h>
@@ -40,7 +41,7 @@ namespace imtservergql
 {
 
 
-class CObjectCollectionControllerAttrCompBase: 
+class CObjectCollectionControllerAttrCompBase:
 			virtual public imtgql::IGqlRequestExtractor,
 			virtual public imtbase::ISearchController,
 			public sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase
@@ -54,21 +55,28 @@ public:
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection-ID", true, "");
 		I_ASSIGN(m_collectionNameAttrPtr, "CollectionName", "Collection Name", true, "");
 		I_ASSIGN(m_documentShareManagerCompPtr, "DocumentShareManager", "Manager of the document shares; if set, documents of the collection can be shared with related organizations", false, "DocumentShareManager");
+		I_ASSIGN_MULTI_0(m_headerFilterHeaderIdsAttrPtr, "HeaderFilterHeaderIds", "Request headers that restrict a list to one value of a field (e.g. a page showing one product category)", false);
+		I_ASSIGN_MULTI_0(m_headerFilterFieldIdsAttrPtr, "HeaderFilterFieldIds", "Fields restricted by the headers of HeaderFilterHeaderIds, in the same order", false);
 	I_END_COMPONENT
 
 protected:
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 	I_ATTR(QString, m_collectionNameAttrPtr);
 	I_REF(imtauth::IDocumentShareManager, m_documentShareManagerCompPtr);
+	I_MULTIATTR(QByteArray, m_headerFilterHeaderIdsAttrPtr);
+	I_MULTIATTR(QByteArray, m_headerFilterFieldIdsAttrPtr);
 };
 
 
-class CObjectCollectionControllerCompBase: public CObjectCollectionControllerAttrCompBase
+class CObjectCollectionControllerCompBase:
+			public CObjectCollectionControllerAttrCompBase,
+			virtual public IObjectChangeChecker
 {
 public:
 	typedef CObjectCollectionControllerAttrCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CObjectCollectionControllerCompBase);
+		I_REGISTER_INTERFACE(IObjectChangeChecker);
 		I_ASSIGN_MULTI_0(m_replaceableFieldsAttrPtr, "ReplaceableFilterFields", "List of filter fields to be replaced", false);
 		I_ASSIGN_MULTI_0(m_replacementFieldsAttrPtr, "ReplacementFilterFields", "List of filter fields to replace with", false);
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
@@ -208,11 +216,32 @@ public:
 	virtual QJsonObject CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 
+	// reimplemented (IObjectChangeChecker)
+	virtual bool CheckObjectChange(
+				const imtgql::CGqlRequest& gqlRequest,
+				const QByteArray& objectId,
+				const istd::IChangeable* dataPtr,
+				QString& errorMessage) const override;
+
 	// reimplemented (imtgql::IGqlRequestExtractor)
 	virtual istd::IChangeableUniquePtr ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const override;
 
 protected:
 	void ReplaceComplexFilterFields(imtbase::IComplexCollectionFilter& filter) const;
+
+	/**
+		Restricts the request to the objects whose HeaderFilterFieldIds fields equal the values of the
+		HeaderFilterHeaderIds headers sent with it, and to the fixed filters of the collection (AddFixedFilters).
+		The restriction is AND-ed with the client's own filter.
+	*/
+	void ApplyHeaderFilters(const imtgql::CGqlRequest& gqlRequest, iprm::CParamsSet& filterParams) const;
+
+	/**
+		Adds the conditions every request of this collection is restricted to, whatever the client sends;
+		e.g. a collection showing the objects of one kind out of a repository shared with other collections.
+		The conditions are AND-ed; an OR-group goes into fixedExpression.filterExpressions.
+	*/
+	virtual void AddFixedFilters(const imtgql::CGqlRequest& gqlRequest, imtbase::IComplexCollectionFilter::FilterExpression& fixedExpression) const;
 	void UpdateFieldsInfoFromHeaders(imtbase::IComplexCollectionFilter& filter) const;
 
 	virtual bool GetOperationFromRequest(const imtgql::CGqlRequest& gqlRequest, imtgql::CGqlParamObject& gqlObject, QString& errorMessage, int& operationType) const;
@@ -332,6 +361,15 @@ protected:
 		An object is accessible if it belongs to the organization or to no organization, or if it is shared with
 		the organization. DAL_OWNER excludes the shared objects. Always succeeds if tenant filtering is disabled.
 	*/
+	/**
+		Check an object received as raw data before it is stored.
+		\param objectId ID of the object to overwrite, empty for a new object.
+	*/
+	virtual bool CheckObjectData(
+				const imtgql::CGqlRequest& gqlRequest,
+				const QByteArray& objectId,
+				const istd::IChangeable& object,
+				QString& errorMessage) const;
 	virtual bool CheckObjectAccess(
 				const imtgql::CGqlRequest& gqlRequest,
 				const QByteArrayList& objectIds,
@@ -402,11 +440,13 @@ protected:
 		as payload of the \c GetObjectData request.
 		The default implementation returns an invalid pointer, meaning the original
 		collection object is serialized unchanged.
+		\param errorMessage	Set when the object cannot be handed out; the result is invalid then.
 	*/
 	virtual istd::IChangeableUniquePtr CreateAdaptedObjectData(
 				const QByteArray& objectId,
 				const istd::IChangeable& object,
-				const imtgql::CGqlRequest& gqlRequest) const;
+				const imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const;
 
 	/**
 		Write a change history entry for a collection element attribute that is stored outside of

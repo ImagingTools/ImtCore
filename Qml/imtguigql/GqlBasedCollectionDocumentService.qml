@@ -87,7 +87,7 @@ DocumentServiceBase {
 			undoManagerSubscription.gqlCommandId = "On" + "UndoRedoChanged"
 			documentManagerSubscription.registerSubscription()
 			undoManagerSubscription.registerSubscription()
-			getOpenedDocumentList()
+			root.__restoreOpenedDocuments()
 		}
 	}
 
@@ -103,8 +103,13 @@ DocumentServiceBase {
 	}
 
 	onDocumentServiceActivated: {
-		if (root.collectionId !== ""){
-			// getOpenedDocumentList()
+		root.__restoreOpenedDocuments()
+	}
+
+	// Only a view restores the listed documents: asked once both the collection and a view are set, whichever comes last
+	function __restoreOpenedDocuments(){
+		if (root.collectionId !== "" && root.getDocumentServiceActiveView() !== null){
+			root.getOpenedDocumentList()
 		}
 	}
 
@@ -246,8 +251,11 @@ DocumentServiceBase {
 			}
 
 			if (result){
-				// Try save
-				let savedFunc = function(savedDocumentId){
+				// Try save. Both handlers disconnect each other, so both are declared before either is defined.
+				let savedFunc = null
+				let savedFailedFunc = null
+
+				savedFunc = function(savedDocumentId){
 					if (documentId === savedDocumentId){
 						documentSaved.disconnect(savedFunc)
 						saveDocumentFailed.disconnect(savedFailedFunc)
@@ -255,7 +263,7 @@ DocumentServiceBase {
 					}
 				}
 
-				let savedFailedFunc = function(savedDocumentId, message){
+				savedFailedFunc = function(savedDocumentId, message){
 					if (documentId === savedDocumentId){
 						documentSaved.disconnect(savedFunc)
 						saveDocumentFailed.disconnect(savedFailedFunc)
@@ -291,7 +299,7 @@ DocumentServiceBase {
 			}
 		}
 
-		if (documentIsDirty(documentId) && !force){
+		if (documentIsDirty(documentId) && !force && !documentIsUntouchedNew(documentId)){
 			tryCloseDirtyDocument(documentId, closeFunc)
 		}
 		else{

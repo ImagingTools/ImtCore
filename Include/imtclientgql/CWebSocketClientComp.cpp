@@ -7,6 +7,7 @@
 #include <QtCore/QUrl>
 #include <QtCore/QFile>
 #include <QtCore/QThread>
+#include <QtCore/QUuid>
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
 #include <QtWebSockets/QWebSocketHandshakeOptions>
@@ -36,6 +37,7 @@ namespace imtclientgql
 CWebSocketClientComp::CWebSocketClientComp()
 {
 	m_lastSocketError = QAbstractSocket::SocketError::UnknownSocketError;
+	m_connectionId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 }
 
 
@@ -78,12 +80,17 @@ QByteArray CWebSocketClientComp::BuildRequestEnvelope(const GqlRequestPtr& reque
 }
 
 
-IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* /*urlParamPtr*/) const
+IGqlClient::GqlResult CWebSocketClientComp::SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* /*urlParamPtr*/) const
 {
+	if (!requestPtr.IsValid()){
+		return {{}, EC_INVALID_REQUEST, QStringLiteral("Request is invalid")};
+	}
 	QString key;
 	QByteArray data = BuildRequestEnvelope(requestPtr, key);
 
-	m_webSocket.sendTextMessage(data);
+	if (m_webSocket.state() != QAbstractSocket::ConnectedState || m_webSocket.sendTextMessage(data) < 0){
+		return {{}, EC_NETWORK, QStringLiteral("WebSocket request could not be sent")};
+	}
 	NetworkOperation networkOperation(100, this);
 
 	GqlResponsePtr retVal;
@@ -105,11 +112,11 @@ IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(GqlRequestPtr reque
 
 			m_queryDataMap.remove(key);
 
-			return retVal;
+			return {retVal, EC_NONE, {}};
 		}
 	}
 
-	return retVal;
+	return {{}, EC_TIMEOUT, QStringLiteral("WebSocket request timed out")};
 }
 
 
@@ -197,7 +204,8 @@ QByteArray CWebSocketClientComp::Sign(const QByteArray& message, const QByteArra
 
 void CWebSocketClientComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	ProcessSettingsChanged();
+	// The connection is changed in the thread of the component: the settings can be loaded in another thread
+	QMetaObject::invokeMethod(this, [this](){ ProcessSettingsChanged(); }, Qt::AutoConnection);
 }
 
 
@@ -206,6 +214,7 @@ void CWebSocketClientComp::Shutdown()
 	SetState(ST_SHUTDOWN);
 
 	m_refreshTimer.stop();
+	m_silenceTimer.stop();
 
 	m_webSocket.disconnect();
 	m_webSocket.close();
@@ -238,6 +247,10 @@ void CWebSocketClientComp::OnComponentCreated()
 
 	m_refreshTimer.setSingleShot(true);
 	m_refreshTimer.setInterval(4000);
+
+	connect(&m_silenceTimer, &QTimer::timeout, this, &CWebSocketClientComp::OnSilenceTimeout);
+	m_silenceTimer.setSingleShot(true);
+	m_silenceTimer.setInterval(qMax(0, *m_silenceTimeoutAttrPtr) * 1000);
 
 	if (m_clientIdCompPtr.IsValid()){
 		QString clientId = m_clientIdCompPtr->GetText();
@@ -280,6 +293,27 @@ void CWebSocketClientComp::OnTimeout()
 }
 
 
+void CWebSocketClientComp::OnSilenceTimeout()
+{
+	if (m_state != ST_CONNECTED){
+		return;
+	}
+
+	SendWarningMessage(0, QStringLiteral("No message from the WebSocket server for %1 s, the connection is reopened").arg(m_silenceTimer.interval() / 1000), "CWebSocketClientComp");
+
+	// The disconnected() handler sets the status, schedules the reconnect and the subscriptions register again on it
+	m_webSocket.abort();
+}
+
+
+void CWebSocketClientComp::RestartSilenceTimer()
+{
+	if (m_state == ST_CONNECTED && m_silenceTimer.interval() > 0){
+		m_silenceTimer.start();
+	}
+}
+
+
 void CWebSocketClientComp::OnWebSocketConnected()
 {
 	// The signal is queued: the socket may have been aborted or closed in the meantime.
@@ -289,6 +323,9 @@ void CWebSocketClientComp::OnWebSocketConnected()
 	}
 
 	SetState(ST_CONNECTED);
+	m_isRetrying = false;
+	RestartSilenceTimer();
+	m_connectionId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	SendInfoMessage(0, "WebSocket connected", "CWebSocketClientComp");
 
@@ -316,8 +353,15 @@ void CWebSocketClientComp::OnWebSocketConnected()
 
 void CWebSocketClientComp::OnWebSocketDisconnected()
 {
-	SendInfoMessage(0, "WebSocket disconnected", "CWebSocketClientComp");
+	if (m_state != ST_CONNECTING){
+		SendInfoMessage(0, "WebSocket disconnected", "CWebSocketClientComp");
+	}
+	else if (!m_isRetrying){
+		SendInfoMessage(0, QStringLiteral("WebSocket server is unavailable, retrying every %1 s").arg(m_refreshTimer.interval() / 1000), "CWebSocketClientComp");
+		m_isRetrying = true;
+	}
 
+	m_silenceTimer.stop();
 	m_connectionStatusProvider.SetConnectionStatus(imtcom::IConnectionStatusProvider::CS_DISCONNECTED);
 	m_startQueries.Reset();
 
@@ -358,8 +402,11 @@ void CWebSocketClientComp::OnWebSocketError(QAbstractSocket::SocketError error)
 
 void CWebSocketClientComp::OnSslErrors(const QList<QSslError>& sslErrors)
 {
-	for (const QSslError& error : sslErrors){
-		SendErrorMessage(0, QStringLiteral("SSL client error: %1").arg(error.errorString()));
+	// A retry meets the same errors again
+	if (!m_isRetrying){
+		for (const QSslError& error : sslErrors){
+			SendErrorMessage(0, QStringLiteral("SSL client error: %1").arg(error.errorString()));
+		}
 	}
 
 	m_webSocket.ignoreSslErrors(sslErrors);
@@ -368,9 +415,7 @@ void CWebSocketClientComp::OnSslErrors(const QList<QSslError>& sslErrors)
 
 void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message)
 {
-	if (!message.contains("keep_alive")){
-		SendVerboseMessage(message, "OnWebSocketTextMessageReceived");
-	}
+	RestartSilenceTimer();
 
 	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
 	if (webSocketPtr == nullptr){
@@ -383,9 +428,14 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 
 	istd::TDelPtr<imtrest::CWebSocketRequest> webSocketRequest(new imtrest::CWebSocketRequest(*m_protocolEngineCompPtr.GetPtr()));
 	webSocketRequest->SetBody(message.toUtf8());
+	webSocketRequest->SetConnectionId(m_connectionId);
 
 	imtrest::ConstResponsePtr responsePtr;
 	imtrest::CWebSocketRequest::MethodType methodType = webSocketRequest->GetMethodType();
+
+	if (methodType != imtrest::CWebSocketRequest::MT_KEEP_ALIVE && methodType != imtrest::CWebSocketRequest::MT_KEEP_ALIVE_ACK){
+		SendVerboseMessage(message, "OnWebSocketTextMessageReceived");
+	}
 	if (
 			methodType == imtrest::CWebSocketRequest::MT_CONNECTION_ACK ||
 			methodType == imtrest::CWebSocketRequest::MT_KEEP_ALIVE ||
@@ -439,6 +489,7 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 				}
 				newHttpRequestPtr->SetHeader("id", webSocketRequest->GetRequestId());
 				newHttpRequestPtr->SetBody(body);
+				newHttpRequestPtr->SetConnectionId(m_connectionId);
 				newHttpRequestPtr->SetMethodType(imtrest::CHttpRequest::MT_POST);
 				newHttpRequestPtr->SetCommandId("/" + *m_productId + "/graphql");
 
@@ -469,6 +520,7 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 
 void CWebSocketClientComp::OnWebSocketBinaryMessageReceived(const QByteArray& /*message*/)
 {
+	RestartSilenceTimer();
 }
 
 
@@ -537,7 +589,9 @@ void CWebSocketClientComp::EnsureWebSocketConnection()
 		}
 	}
 
-	SendInfoMessage(0, QStringLiteral("Try connect to the WebSocket-server: Host: %1; Port: %2, Protocol: %3").arg(url.host(), QString::number(url.port()), url.scheme()));
+	if (!m_isRetrying){
+		SendInfoMessage(0, QStringLiteral("Try connect to the WebSocket-server: Host: %1; Port: %2, Protocol: %3").arg(url.host(), QString::number(url.port()), url.scheme()));
+	}
 
 #if QT_VERSION >= QT_VERSION_CHECK(6,4,0)
 	QWebSocketHandshakeOptions handshakeOptions;
@@ -566,14 +620,43 @@ void CWebSocketClientComp::SetState(State state)
 }
 
 
+CWebSocketClientComp::SConnectionSettings CWebSocketClientComp::GetConnectionSettings() const
+{
+	SConnectionSettings retVal;
+
+	if (m_serverConnectionCompPtr.IsValid()){
+		m_serverConnectionCompPtr->GetUrl(imtcom::IServerConnectionInterface::PT_WEBSOCKET, retVal.url);
+	}
+
+	if (m_sslConfigurationCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid()){
+		iprm::TParamsPtr<iprm::IEnableableParam> sslEnableParamPtr(
+					m_sslConfigurationCompPtr.GetPtr(),
+					imtcom::ISslConfigurationManager::ParamKeys::s_enableSslModeParamKey);
+
+		retVal.isSecure = sslEnableParamPtr.IsValid() && sslEnableParamPtr->IsEnabled();
+		if (retVal.isSecure){
+			m_sslConfigurationManagerCompPtr->CreateSslConfiguration(*m_sslConfigurationCompPtr, retVal.sslConfiguration);
+		}
+	}
+
+	return retVal;
+}
+
+
 void CWebSocketClientComp::OpenConnection()
 {
 	SetState(ST_CONNECTING);
+
+	m_connectionSettings = GetConnectionSettings();
 
 	EnsureWebSocketConnection();
 
 	// open() rejects an invalid URL synchronously and emits no disconnected()
 	if (m_webSocket.state() == QAbstractSocket::UnconnectedState){
+		if (!m_isRetrying){
+			SendErrorMessage(0, QStringLiteral("The address of the WebSocket server is not valid, retrying every %1 s").arg(m_refreshTimer.interval() / 1000), "CWebSocketClientComp");
+		}
+		m_isRetrying = true;
 		SetState(ST_WAITING_RETRY);
 		m_refreshTimer.start();
 	}
@@ -608,6 +691,9 @@ void CWebSocketClientComp::ProcessConnectRequest()
 
 void CWebSocketClientComp::ProcessDisconnectRequest()
 {
+	// The next connection reports its first attempt again
+	m_isRetrying = false;
+
 	switch (m_state){
 	case ST_CONNECTING:
 		SetState(ST_DISCONNECTING);
@@ -640,6 +726,13 @@ void CWebSocketClientComp::ProcessDisconnectRequest()
 void CWebSocketClientComp::ProcessSettingsChanged()
 {
 	Q_ASSERT(QThread::currentThread() == thread());
+
+	if (GetConnectionSettings() == m_connectionSettings){
+		return;
+	}
+
+	// A new server deserves its own first attempt in the log
+	m_isRetrying = false;
 
 	switch (m_state){
 	case ST_CONNECTING:

@@ -255,10 +255,10 @@ Item {
 
         onItemsInfoGqlStateChanged: {
             if (state === "Loading"){
-                ldng.visible = true;
+                ldng.start();
             }
             else{
-                ldng.visible = false;
+                ldng.stop();
             }
         }
 

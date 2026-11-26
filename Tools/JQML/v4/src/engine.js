@@ -6,11 +6,15 @@
 // and root of the enclosing components (delegates have a parent scope), and finally the globals
 // (Math, JSON, Date, console, Qt, Item, time).
 
-import { Animation, ANIMATION_TYPES, AnchorLine, BindingValue, BUILTIN_TYPES, COMPONENT_ENUM_VALUE, ComponentItem, Coordinate, createSdlObject, duringChange, FILE_DIALOG_MODES, flushDeclarativeFocus, getFocusItem, hooks, Item, ListModel, ListView, linkToOwner, Loader, MapItemView, modelCount, modelScopeData, modelVersion, Placeholder, POINTER_DEVICE, queueDeclarativeFocus, readRows, readUntracked, Repeater, resetFocus, setSceneActive, Stack, Timer, TRANSFORM_ORIGIN, TreeItemModel } from './items.js';
+import { Animation, ANIMATION_TYPES, AnchorLine, BindingValue, BUILTIN_TYPES, COMPONENT_ENUM_VALUE, ComponentItem, Coordinate, createSdlObject, duringChange, FILE_DIALOG_MODES, flushDeclarativeFocus, getFocusItem, hooks, Item, ListModel, ListView, linkToOwner, Loader, MapItemView, modelCount, modelScopeData, modelVersion, Placeholder, POINTER_DEVICE, queueDeclarativeFocus, readRows, readUntracked, Repeater, Instantiator, resetDrags, resetFocus, updateDrags, setSceneActive, Stack, TestCase, Timer, TRANSFORM_ORIGIN, TreeItemModel } from './items.js';
 import { fonts } from './fonts.js';
-import { KEY, MODIFIERS, NAMED_KEY_HANDLERS, qtKeyEvent } from './keys.js';
+import { md5 } from './md5.js';
+import { KEY, MODIFIERS, NAMED_KEY_HANDLERS, qtKeyEvent, STANDARD_KEYS } from './keys.js';
 import { QmlError, escapeSourceBreaks, tokenize, topLevelNames } from './lexer.js';
-import { callableHandler } from './parser.js';
+import { callableHandler, parseQmlDocument } from './parser.js';
+import { scriptTail } from './debugmap.js';
+import { resolveExpression } from './resolve.js';
+import { scanOf } from './project.js';
 import { basename, dirname, hslaString, joinPath, normalizePath, parseColor, resolvePath, rgbaString, SCRIPT_IMPORT_RE } from './util.js';
 
 const MAX_COMPONENT_DEPTH = 50;
@@ -129,8 +133,7 @@ const IGNORED_TYPES = new Set([
 	'AnchorChanges', 'StateChangeScript', 'ParentChange', 'StateGroup', 'Glow', 'RectangularGlow',
 	'InnerShadow', 'FastBlur', 'GaussianBlur', 'ColorOverlay', 'OpacityMask', 'LinearGradient', 'RadialGradient', 'Blend',
 	'BrightnessContrast', 'Colorize', 'Desaturate', 'DisplacementMap', 'HueSaturation', 'ShaderEffect', 'ShaderEffectSource',
-	'Translate', 'Rotation', 'Scale', 'Matrix4x4', 'DoubleValidator', 'IntValidator',
-	'RegExpValidator',
+	'Translate', 'Rotation', 'Scale', 'Matrix4x4', 'RegExpValidator',
 ]);
 
 // Enumerations whose values are not interpreted by the engine: each name stands for itself.
@@ -251,6 +254,103 @@ function formatDateTime(value, format, defaultOptions) {
 	}
 	return result;
 }
+
+// The `Locale` of Qt.locale(): the locale of the browser or the one named ("de_DE"), with its number separators. The QML methods
+// of Date take it (installLocaleDates).
+class QmlLocale {
+	constructor(name) {
+		this.name = name;
+		this.$tag = name.replace('_', '-');
+		let parts = [];
+		try {
+			parts = new Intl.NumberFormat(this.$tag).formatToParts(12345.6);
+		} catch {
+			this.$tag = undefined;
+			parts = new Intl.NumberFormat().formatToParts(12345.6);
+		}
+		const part = (type, fallback) => (parts.find((p) => p.type === type) || { value: fallback }).value;
+		this.decimalPoint = part('decimal', '.');
+		this.groupSeparator = part('group', ',');
+	}
+}
+
+// The language tag of the system (of the browser), the default locale of Qt.
+function systemLanguageTag() {
+	return typeof navigator !== 'undefined' && navigator.language ? navigator.language : 'en-US';
+}
+
+function qmlLocale(name) {
+	if (name) return new QmlLocale(String(name));
+	return new QmlLocale(systemLanguageTag().replace('-', '_'));
+}
+
+// The plural categories of CLDR in their order: the forms of a plural message of a Qt catalog come in this order in its language.
+const PLURAL_CATEGORIES = ['zero', 'one', 'two', 'few', 'many', 'other'];
+
+// The form of a plural message for the count `n` in `language`; a category without a form of its own takes the last form.
+function pluralForm(forms, n, language) {
+	let index = 0;
+	if (n >= 0) {
+		try {
+			const rules = new Intl.PluralRules(language.replace('_', '-'));
+			const categories = PLURAL_CATEGORIES.filter((category) => rules.resolvedOptions().pluralCategories.includes(category));
+			index = Math.max(0, categories.indexOf(rules.select(n)));
+		} catch {
+			index = n === 1 ? 0 : 1;
+		}
+	}
+	return forms[Math.min(index, forms.length - 1)];
+}
+
+// As in Qt: with a count (qsTr(text, disambiguation, n)) `%n` of the text is the count, `%Ln` the count written in the system locale.
+function replacePercentN(text, n) {
+	if (typeof text !== 'string' || typeof n !== 'number' || n < 0) return text;
+	return text.replace(/%(L?)n/g, (_, localized) => (localized ? n.toLocaleString(systemLanguageTag()) : String(n)));
+}
+
+// Locale.FormatType, and the styles of Intl for it: the date and the time.
+const LOCALE_FORMAT = Object.freeze({ LongFormat: 0, ShortFormat: 1, NarrowFormat: 2 });
+const LOCALE_STYLES = [{ date: 'full', time: 'long' }, { date: 'short', time: 'short' }, { date: 'short', time: 'short' }];
+
+// Date.toLocaleString(locale, format), toLocaleDateString and toLocaleTimeString of QML: with a Locale the format is a
+// Locale.FormatType (LongFormat when there is none) or a text of Qt ("dd.MM.yyyy"). Other calls are the methods of JavaScript.
+function installLocaleDates() {
+	for (const [method, parts] of [['toLocaleString', ['date', 'time']], ['toLocaleDateString', ['date']], ['toLocaleTimeString', ['time']]]) {
+		const native = Date.prototype[method];
+		if (native.$qml === true) continue;
+		const qml = function (locale, format) {
+			if (!(locale instanceof QmlLocale)) return native.apply(this, arguments);
+			if (typeof format === 'string') return formatDateTime(this, format, {});
+			const style = LOCALE_STYLES[format === undefined ? 0 : format] || LOCALE_STYLES[0];
+			const options = {};
+			if (parts.includes('date')) options.dateStyle = style.date;
+			if (parts.includes('time')) options.timeStyle = style.time;
+			return native.call(this, locale.$tag, options);
+		};
+		qml.$qml = true;
+		Object.defineProperty(Date.prototype, method, { value: qml, writable: true, configurable: true });
+	}
+}
+installLocaleDates();
+
+// Qt::BrushStyle, the second argument of `ctx.createPattern(color, mode)`.
+const BRUSH_PATTERN = Object.freeze({
+	NoBrush: 0,
+	SolidPattern: 1,
+	Dense1Pattern: 2,
+	Dense2Pattern: 3,
+	Dense3Pattern: 4,
+	Dense4Pattern: 5,
+	Dense5Pattern: 6,
+	Dense6Pattern: 7,
+	Dense7Pattern: 8,
+	HorPattern: 9,
+	VerPattern: 10,
+	CrossPattern: 11,
+	BDiagPattern: 12,
+	FDiagPattern: 13,
+	DiagCrossPattern: 14,
+});
 
 // Qt::CursorShape — numeric so MouseArea.cursorShape bindings match desktop Qt.
 const CURSOR = Object.freeze({
@@ -377,6 +477,32 @@ const REAL_TYPES = new Set(['real', 'double', 'qreal', 'float']);
 const SILENT_TYPES = new Set(['Connections', 'Binding', 'AnimatedImage', 'BorderImage', 'ScrollView', 'SystemPalette']);
 
 // Ids and the root item of one component instance (or one delegate of a Repeater/ListView).
+// Do two runs of an expression give the same value? An object that the expression makes anew each time is the same when it is of
+// the same kind and has the same keys with the same primitive values (nested ones compare as the same kind).
+function sameResult(a, b) {
+	if (Object.is(a, b) || (a !== a && b !== b)) return true;
+	if (typeof a !== typeof b || a === null || b === null || (typeof a !== 'object' && typeof a !== 'function')) return false;
+	if (typeof a === 'function') return String(a) === String(b);
+	if (Object.getPrototypeOf(a) !== Object.getPrototypeOf(b)) return false;
+	const keys = Object.keys(a);
+	if (keys.length !== Object.keys(b).length) return false;
+	for (const key of keys) {
+		let x;
+		let y;
+		try {
+			x = a[key];
+			y = b[key];
+		} catch {
+			continue;
+		}
+		if (Object.is(x, y) || (x !== x && y !== y)) continue;
+		if (typeof x !== typeof y) return false;
+		if (typeof x !== 'object' && typeof x !== 'function') return false;
+		if (x === null || y === null || Object.getPrototypeOf(x) !== Object.getPrototypeOf(y)) return false;
+	}
+	return true;
+}
+
 class Scope {
 	constructor(parent, file) {
 		this.parent = parent;
@@ -426,11 +552,34 @@ export class Engine {
 		this.usesTime = false;
 		this.errors = [];
 		this.errorSet = new Set();
+		this.creationErrors = null;
+		this.inlineDocs = new Map();
 		this.bindings = new Set();
 		// Incremental evaluation: a pass runs the bindings in `dirty` (a read property was written, the layout moved
 		// what they read, they were just created) and the `volatile` ones, which read something that is not announced.
 		// `incremental = false` runs every binding on every pass, as before; `audit` then checks the shortcut.
 		this.incremental = true;
+		// An expression is run through names that were looked up before (src/resolve.js) instead of through a `with` chain.
+		// `verifyResolution` runs both and compares what they give (side effects of the expression happen twice): a debugging aid.
+		this.resolveNames = true;
+		// The URL of the folder that the QML files of a debug build lie in (file:///...), or null: the scripts get a name and a source map.
+		this.sourceBase = null;
+		this.verifyResolution = false;
+		this.resolveStats = { resolved: 0, withChain: 0 };
+		this.resolveMismatches = [];
+		// In Node (the tests): JQML_VERIFY=1 compares the two forms and tells what differed when the process ends, JQML_NORESOLVE=1 keeps `with`.
+		if (typeof process !== 'undefined' && process.env) {
+			if (process.env.JQML_NORESOLVE === '1') this.resolveNames = false;
+			if (process.env.JQML_VERIFY === '1') {
+				this.verifyResolution = true;
+				process.on('exit', () => {
+					const kinds = new Map();
+					for (const m of this.resolveMismatches) kinds.set(m.code.slice(0, 100), (kinds.get(m.code.slice(0, 100)) || 0) + 1);
+					console.error(`[verify] expressions ${this.resolveStats.resolved} resolved, ${this.resolveStats.withChain} left to with, ${this.resolveMismatches.length} different results`);
+					for (const [code, count] of kinds) console.error(`[verify]   x${count} ${JSON.stringify(code)}`);
+				});
+			}
+		}
 		this.primed = true; // false after a full sweep: the next incremental pass has to run every binding
 		this.bindingSeq = 0;
 		this.dirty = new Set();
@@ -444,6 +593,8 @@ export class Engine {
 		this.auditMode = false;
 		this.auditMisses = new Map(); // 'Type.property file:line' -> { count, reads }
 		this.timers = new Set();
+		this.holds = new Set(); // the MouseAreas that wait for pressAndHold
+		this.shortcuts = new Set(); // the Shortcut items, in the order they were made
 		this.completed = [];
 		this.documentScope = null;
 		this.factories = new Map();
@@ -452,6 +603,7 @@ export class Engine {
 		this.onError = null;
 		this.onLog = null;
 		this.onQuit = null; // Qt.quit() from a script
+		this.pointerDriver = null; // { down, up, move, advance }: the mouse of QtTest in the comparison runner
 
 		// Lenient mode (for large real-world projects): unknown types become placeholders, unknown
 		// properties and handlers are ignored, and a failing property does not stop the load.
@@ -489,8 +641,11 @@ export class Engine {
 		// (the arrows of a tree) is requested from the server once.
 		this.imageCache = new Map();
 		this.animations = new Set();
+		this.flicks = new Set(); // the Flickables whose content runs on after the release
 		this.carets = new Set(); // editors with the focus: their text cursor blinks
 		this.fresh = []; // bindings created since they were last evaluated
+		this.freshLoading = false; // the first values of the bindings are being worked out (evaluateFresh)
+		this.freshLoaders = new Set(); // the Loaders that changed meanwhile: they load when the pass is over
 		this.subQueue = []; // bindings to re-run because a property they read was written
 		this.draining = false;
 		this.trackingPass = 0; // > 0 while every binding is already being swept; writes do not fan out
@@ -520,6 +675,32 @@ export class Engine {
 		const qt = Object.freeze({
 			...enumObject(QT_ENUMS),
 			...CURSOR,
+			...BRUSH_PATTERN,
+			// Qt::InputMethodHint: what the page's input element of an editor is made for (keyboard layout, autocapitalization).
+			ImhNone: 0,
+			ImhHiddenText: 0x1,
+			ImhSensitiveData: 0x2,
+			ImhNoAutoUppercase: 0x4,
+			ImhPreferNumbers: 0x8,
+			ImhPreferUppercase: 0x10,
+			ImhPreferLowercase: 0x20,
+			ImhNoPredictiveText: 0x40,
+			ImhDate: 0x80,
+			ImhTime: 0x100,
+			ImhMultiLine: 0x200,
+			ImhDigitsOnly: 0x10000,
+			ImhFormattedNumbersOnly: 0x20000,
+			ImhUppercaseOnly: 0x40000,
+			ImhLowercaseOnly: 0x80000,
+			ImhDialableCharactersOnly: 0x100000,
+			ImhEmailCharactersOnly: 0x200000,
+			ImhUrlCharactersOnly: 0x400000,
+			ImhLatinOnly: 0x800000,
+			// Qt::ShortcutContext.
+			WidgetShortcut: 0,
+			WindowShortcut: 1,
+			ApplicationShortcut: 2,
+			WidgetWithChildrenShortcut: 3,
 			...ALIGN,
 			// Qt::Edge.
 			TopEdge: 0x1,
@@ -548,6 +729,7 @@ export class Engine {
 			application: Object.freeze({ arguments: [], name: '', version: '' }),
 			createObject: (type, parent, props) => engine.createObject(type, parent, props),
 			createComponent: (url, second, third) => engine.createComponent(url, second, third),
+			createQmlObject: (...args) => engine.createQmlObject(...args),
 			resolvedUrl: (url) => url,
 			quit: () => {
 				if (engine.onQuit !== null) engine.onQuit();
@@ -555,10 +737,11 @@ export class Engine {
 			formatDateTime: (d, f) => { const z = (n) => String(n).padStart(2, '0'); return String(f).replace('dd', z(d.getDate())).replace('MM', z(d.getMonth() + 1)).replace('yyyy', d.getFullYear()).replace('hh', z(d.getHours())).replace('mm', z(d.getMinutes())); },
 			isQtObject: (v) => v !== null && typeof v === 'object' && v.$typeName !== undefined,
 			atob: (s) => atob(s), btoa: (s) => btoa(s),
-			locale: () => ({ decimalPoint: (1.5).toLocaleString().charAt(1), name: typeof navigator === 'undefined' ? '' : navigator.language }),
+			locale: (name) => qmlLocale(name),
 			openUrlExternally: (url) => { window.open(String(url), '_blank'); return true; },
 			point: (x, y) => ({ x, y }),
 			size: (width, height) => ({ width, height }),
+			md5: (text) => md5(text),
 			rect: (x, y, width, height) => ({ x, y, width, height }),
 			callLater: (fn, ...args) => setTimeout(() => engine.guard(() => fn(...args), 'Qt.callLater', 0), 0),
 			binding: (fn) => {
@@ -595,6 +778,8 @@ export class Engine {
 				Null: 0, Ready: 1, Loading: 2, Error: 3,
 				AlignLeft: 1, AlignRight: 2, AlignHCenter: 4, AlignJustify: 8, AlignTop: 32, AlignBottom: 64, AlignVCenter: 128, AlignCenter: 132,
 			}),
+			// `Shortcut { sequence: StandardKey.Save }`: the numbers of QKeySequence::StandardKey.
+			StandardKey: Object.freeze(Object.fromEntries(STANDARD_KEYS.map(([name, value]) => [name, value]))),
 			Flickable: enumObject(FLICKABLE_ENUMS),
 			ListView: Object.freeze({
 				Horizontal: 1, Vertical: 2,
@@ -609,16 +794,17 @@ export class Engine {
 			Canvas: CANVAS,
 			Gradient: enumObject(['Vertical', 'Horizontal']),
 			FileDialog: Object.freeze(Object.fromEntries(FILE_DIALOG_MODES.map((name, index) => [name, index]))),
+			Locale: LOCALE_FORMAT,
 			XMLHttpRequest: typeof XMLHttpRequest === 'undefined' ? class XMLHttpRequest { open() {} send() {} setRequestHeader() {} } : XMLHttpRequest,
 			Animation: Object.freeze({ Infinite: -1, Forward: 'Forward', Backward: 'Backward' }),
-			Easing: enumObject(['Linear', 'InQuad', 'OutQuad', 'InOutQuad', 'OutInQuad', 'InCubic', 'OutCubic', 'InOutCubic', 'OutInCubic', 'InQuart', 'OutQuart', 'InOutQuart', 'InQuint', 'OutQuint', 'InOutQuint', 'InSine', 'OutSine', 'InOutSine', 'InExpo', 'OutExpo', 'InOutExpo', 'InCirc', 'OutCirc', 'InOutCirc', 'InElastic', 'OutElastic', 'InOutElastic', 'InBack', 'OutBack', 'InOutBack', 'InBounce', 'OutBounce', 'InOutBounce', 'BezierSpline']),
+			Easing: Object.freeze(Object.fromEntries(['Linear', 'InQuad', 'OutQuad', 'InOutQuad', 'OutInQuad', 'InCubic', 'OutCubic', 'InOutCubic', 'OutInCubic', 'InQuart', 'OutQuart', 'InOutQuart', 'OutInQuart', 'InQuint', 'OutQuint', 'InOutQuint', 'OutInQuint', 'InSine', 'OutSine', 'InOutSine', 'OutInSine', 'InExpo', 'OutExpo', 'InOutExpo', 'OutInExpo', 'InCirc', 'OutCirc', 'InOutCirc', 'OutInCirc', 'InElastic', 'OutElastic', 'InOutElastic', 'OutInElastic', 'InBack', 'OutBack', 'InOutBack', 'OutInBack', 'InBounce', 'OutBounce', 'InOutBounce', 'OutInBounce', 'InCurve', 'OutCurve', 'SineCurve', 'CosineCurve', 'BezierSpline'].map((name, number) => [name, number]))), // the numbers of QEasingCurve::Type
 			// Qt Quick Test's mouseMove fails the same way under offscreen qml: the call throws and the test catches it.
 			mouseMove() {
 				throw new Error('QtQuickTest::fail');
 			},
-			qsTr: (text) => engine.translate(text),
-			qsTrId: (text) => engine.translate(text),
-			qsTranslate: (context, text) => engine.translate(text),
+			qsTr: (text, disambiguation, n) => engine.translate(text, n),
+			qsTrId: (text, n) => engine.translate(text, n),
+			qsTranslate: (context, text, disambiguation, n) => engine.translate(text, n),
 			QT_TR_NOOP: (text) => text,
 			console: {
 				log: (...args) => {
@@ -669,7 +855,12 @@ export class Engine {
 		hooks.notify = (item, name) => this.notify(item, name);
 		hooks.dirty = (item, name) => this.markReaders(item, name);
 		hooks.geometry = (item) => this.geoDirty.add(item);
-		hooks.reloadLoader = (loader) => this.updateLoader(loader);
+		// While the first values of bindings are worked out, a Loader waits: as in Qt, it loads when the object is complete, after every
+		// property of it has its first value (the handler of a property that comes after `sourceComponent` must see no item).
+		hooks.reloadLoader = (loader) => {
+			if (this.freshLoading) this.freshLoaders.add(loader);
+			else this.updateLoader(loader);
+		};
 		hooks.clipboardWrite = (text, html) => {
 			this.clipboard = { text, html };
 			if (this.onClipboardWrite !== null) this.onClipboardWrite(text, html);
@@ -680,6 +871,9 @@ export class Engine {
 		hooks.defer = () => false;
 		hooks.syncModel = (model) => this.syncModelNow(model);
 		hooks.syncRepeater = (repeater) => this.syncRepeaterNow(repeater);
+		hooks.watchHold = (area) => this.holds.add(area);
+		hooks.watchFlick = (flickable) => this.flicks.add(flickable);
+		hooks.now = () => this.time;
 		hooks.syncBinding = (item) => this.syncBindingItems(item);
 		hooks.syncConnection = (item) => this.syncConnections(item);
 		hooks.completing = () => this.completing > 0;
@@ -713,19 +907,22 @@ export class Engine {
 		this.context.language = value;
 	}
 
-	// The translation of `text` in the current language: `de_DE` falls back to `de`, a missing entry to the text.
-	translate(text) {
-		if (typeof text !== 'string' || !this.language) return text;
+	// The translation of `text` in the current language: `de_DE` falls back to `de`, a missing entry to the text. A plural message
+	// (a list of forms in the catalog) takes the form of the count `n`; `%n` of the result is the count.
+	translate(text, n = -1) {
+		if (typeof text !== 'string' || !this.language) return replacePercentN(text, n);
 		const languages = [this.language, this.language.replace('-', '_'), this.language.split(/[-_]/)[0]];
 		for (const language of languages) {
 			const catalog = this.translations[language];
-			if (catalog && typeof catalog[text] === 'string' && catalog[text] !== '') return catalog[text];
+			const entry = catalog ? catalog[text] : undefined;
+			const translation = Array.isArray(entry) ? pluralForm(entry, n, language) : entry;
+			if (typeof translation === 'string' && translation !== '') return replacePercentN(translation, n);
 		}
-		return text;
+		return replacePercentN(text, n);
 	}
 
 	get isAnimated() {
-		if (this.usesTime) return true;
+		if (this.usesTime || this.flicks.size > 0) return true;
 		// PauseAnimation only waits: ticking it must not force a full scene redraw every frame
 		// (CustomTooltip's open delay would flicker the gallery while the pointer rests/moves).
 		// An animation of a hidden item (e.g. an indeterminate ProgressBar on another page) keeps running
@@ -746,6 +943,8 @@ export class Engine {
 		this.inPass = false;
 		this.cursor = 0;
 		this.timers.clear();
+		this.holds.clear();
+		resetDrags();
 		this.changeHandlers = [];
 		this.loaders.clear();
 		this.repeaters.clear();
@@ -753,6 +952,7 @@ export class Engine {
 		this.qmlBindings.clear();
 		this.pendingImages.clear();
 		this.animations.clear();
+		this.flicks.clear();
 		this.carets.clear();
 		this.fresh = [];
 		this.subQueue = [];
@@ -772,6 +972,7 @@ export class Engine {
 		this.ambiguousSingletons.clear();
 		this.errors = [];
 		this.errorSet.clear();
+		this.inlineDocs.clear();
 		this.completed = [];
 		this.modules.clear();
 		this.usesTime = false;
@@ -784,6 +985,7 @@ export class Engine {
 
 	// Reports a script or evaluation problem; the same message is only stored once.
 	report(where, error, line) {
+		if (this.creationErrors !== null && /^(Cannot assign to non-existent property|Unknown type)/.test(describe(error))) this.creationErrors.push({ error, line });
 		const lineText = line ? `: line ${line}` : '';
 		const text = `${where}${lineText}: ${describe(error)}`;
 		if (this.errorSet.has(text) || this.errors.length >= this.maxErrors) return;
@@ -818,7 +1020,7 @@ export class Engine {
 	setupTypeEnums() {
 		for (const [path, doc] of this.project.docs) {
 			// A document is parsed when the engine asks for its tree: only the ones that declare an enum are asked here.
-			if (typeof doc.source !== 'string' || !/^\s*enum\s+[A-Z]/m.test(doc.source)) continue;
+			if (!scanOf(doc).enums) continue;
 			if (doc.def === undefined || doc.def === null || !doc.def.enums || doc.def.enums.length === 0) continue;
 			const file = path.slice(path.lastIndexOf('/') + 1);
 			if (!file.endsWith('.qml')) continue;
@@ -956,10 +1158,12 @@ export class Engine {
 						for (const name of declared.keys()) singletons.set(name, this.project.moduleSingletonPath(imp.name, name, imp.version));
 					}
 				}
-				if (singletons.size === 0) continue;
+				// The alias of a module also gives the enumerations of the engine: `Platform.FileDialog.OpenFiles`.
+				const moduleAlias = imp.kind === 'module' && imp.alias !== '';
+				if (singletons.size === 0 && !moduleAlias) continue;
 				if (layer === null) layer = Object.create(null);
 				if (imp.alias) {
-					if (!Object.prototype.hasOwnProperty.call(layer, imp.alias)) layer[imp.alias] = Object.create(null);
+					if (!Object.prototype.hasOwnProperty.call(layer, imp.alias)) layer[imp.alias] = Object.create(moduleAlias ? this.globals : null);
 					for (const [name, path] of singletons) define(layer[imp.alias], name, path);
 				} else {
 					for (const [name, path] of singletons) if (this.ambiguousSingletons.has(name)) define(layer, name, path);
@@ -1030,15 +1234,24 @@ export class Engine {
 
 	// Compiles script text into a function. kind: 'expr' (the function returns the expression) or
 	// 'body' (the function runs statements). The function is called with the item as `this`.
-	compile(kind, code, params, scope, self) {
+	// `line`: the line of the QML file on which `code` starts; with it a debug build (`sourceBase`) tags the script for the debugger.
+	compile(kind, code, params, scope, self, line = 0) {
 		const levels = [];
 		for (let s = scope; s !== null; s = s.parent) levels.push(s);
 		const depth = levels.length;
 		// The levels that are delegates have a context (roles) that is looked up after the objects of the level.
 		let contexts = '';
 		for (const level of levels) contexts += level.data !== null ? '1' : '0';
-		const key = `${depth}\n${contexts}\n${kind}\n${params}\n${code}`;
-		let factory = this.factories.get(key);
+		// The factories of a script: by the code first (the same string each time a binding is made, which keeps its hash; a key
+		// made of the whole text had to be hashed again at every call), then by the shape of the scope, the kind and the parameters.
+		const debugging = this.sourceBase !== null && line > 0 && typeof scope.file === 'string' && scope.file !== '';
+		const shape = `${depth}\n${contexts}\n${kind}\n${params}${debugging ? `\n${scope.file}:${line}` : ''}`;
+		let shapes = this.factories.get(code);
+		if (shapes === undefined) {
+			shapes = new Map();
+			this.factories.set(code, shapes);
+		}
+		let factory = shapes.get(shape);
 		if (factory === undefined) {
 			const names = ['__g'];
 			let open = 'with (__g) {';
@@ -1063,9 +1276,14 @@ export class Engine {
 			names.push('__self');
 			const js = escapeSourceBreaks(code);
 			const body = kind === 'expr' ? `return (${js}\n);` : js;
-			const source = `${open} return function (${params}) {\n${body}\n}; ${'}'.repeat(closing)}`;
-			factory = new Function(...names, source);
-			this.factories.set(key, factory);
+			let source = `${open} return function (${params}) {\n${body}\n}; ${'}'.repeat(closing)}`;
+			// A debug build runs the text of the script as it is (the resolved form is another text), tagged with the QML file.
+			const resolved = !debugging && kind === 'expr' && this.resolveNames ? resolveExpression(code, params, depth, contexts) : null;
+			if (debugging) source += scriptTail(`${this.sourceBase}/${encodeURI(scope.file)}`, scope.file, line, source.split('\n').length);
+			if (kind === 'expr') this.resolveStats[resolved !== null ? 'resolved' : 'withChain']++;
+			factory = new Function(...names, resolved !== null ? resolved : source);
+			if (resolved !== null && this.verifyResolution) factory.plain = new Function(...names, source);
+			shapes.set(shape, factory);
 		}
 		const args = [this.globals];
 		for (const scopeLevel of levels) {
@@ -1073,7 +1291,34 @@ export class Engine {
 			args.push(scopeLevel.root === null ? EMPTY : scopeLevel.root, scopeLevel.ids);
 		}
 		args.push(self);
+		if (factory.plain !== undefined) return this.verified(factory(...args), factory.plain(...args), code);
 		return factory(...args);
+	}
+
+	// Both forms of an expression, run one after the other: what they give must be the same (see `verifyResolution`).
+	verified(resolved, plain, code) {
+		return (...a) => {
+			let expected;
+			let failure = null;
+			try {
+				expected = plain.apply(this, a);
+			} catch (error) {
+				failure = error;
+			}
+			let value;
+			let thrown = null;
+			try {
+				value = resolved.apply(this, a);
+			} catch (error) {
+				thrown = error;
+			}
+			const same = failure !== null || thrown !== null ? failure !== null && thrown !== null && String(failure.constructor) === String(thrown.constructor) : sameResult(value, expected);
+			if (!same && this.resolveMismatches.length < 100) {
+				this.resolveMismatches.push({ code, resolved: thrown !== null ? `threw ${thrown}` : String(value), plain: failure !== null ? `threw ${failure}` : String(expected) });
+			}
+			if (failure !== null) throw failure;
+			return expected;
+		};
 	}
 
 	// ----- bindings -----
@@ -1417,14 +1662,32 @@ export class Engine {
 		const list = this.fresh;
 		this.fresh = [];
 		this.trackingPass++;
+		const outer = this.freshLoading;
+		this.freshLoading = true;
 		try {
 			for (let pass = 0; pass < 2; pass++) {
 				for (const binding of list) this.evaluateOne(binding, true);
+				this.loadFreshLoaders();
 			}
 		} finally {
+			this.freshLoading = outer;
 			this.trackingPass--;
 		}
 		if (this.connections.size > 0) this.syncConnections();
+	}
+
+	// The Loaders that changed while the first values were worked out load now, one after the other, outside of that work.
+	loadFreshLoaders() {
+		if (this.freshLoaders.size === 0) return;
+		const loaders = [...this.freshLoaders];
+		this.freshLoaders.clear();
+		const outer = this.freshLoading;
+		this.freshLoading = false;
+		try {
+			for (const loader of loaders) this.updateLoader(loader);
+		} finally {
+			this.freshLoading = outer;
+		}
 	}
 
 	// (Re)creates the delegates of every Repeater whose model changed.
@@ -1846,7 +2109,7 @@ export class Engine {
 			handler.hasLast = true;
 			handler.last = value;
 			// An object (a Component, a model...) bound from the outside is a change from the null default.
-			if (typeof value === 'object' && value !== null) this.runNotified(handler);
+			if (typeof value === 'object' && value !== null && handler.property !== 'children') this.runNotified(handler);
 		} else if (value !== handler.last && (value === value || handler.last === handler.last)) {
 			handler.last = value;
 			this.runNotified(handler);
@@ -1855,7 +2118,8 @@ export class Engine {
 
 	// (Re)creates the content of every Loader whose source changed.
 	updateLoaders() {
-		for (const loader of [...this.loaders]) this.updateLoader(loader);
+		// a full pass of the bindings follows (evaluateBindings), so the Loaders do not settle them one by one
+		for (const loader of [...this.loaders]) this.updateLoader(loader, false);
 	}
 
 	// What the loader should show now. An inactive loader shows nothing; the last assigned source wins.
@@ -1866,7 +2130,10 @@ export class Engine {
 	}
 
 	// One Loader. The loaded item's onCompleted runs before itemChanged, statusChanged and loaded.
-	updateLoader(loader) {
+	// `settle`: read again the bindings that the Loader told (see below). A Loader that is made with the document does not:
+	// the objects after it do not exist yet, so a pass now would count the failures of the bindings that read them (a binding
+	// that fails 30 times is dropped), and the pass of the whole document follows anyway.
+	updateLoader(loader, settle = true) {
 		if (loader.$destroyed) {
 			this.loaders.delete(loader);
 			return;
@@ -1888,12 +2155,19 @@ export class Engine {
 		loader.$wanted = key;
 		let ok = false;
 		try {
-			for (const child of [...loader.$children]) {
-				this.releaseSubtree(child);
-				loader.$removeChild(child);
+			// What was loaded goes; what is declared in the Loader (a Connections, a Timer) stays, as in Qt.
+			const previous = loader.$loadedItem();
+			if (previous !== null) {
+				this.releaseSubtree(previous);
+				loader.$removeChild(previous);
 			}
+			loader.$loaded = null;
 			loader.$failed = false;
+			const before = new Set(loader.$children);
 			if (key !== '' && key !== null) {
+				// The properties of the Loader take their first values before it loads, as in Qt: the handlers of their change see
+				// no item yet (a dialog moves its Loader by the size of the window only when it has an item).
+				this.evaluateFresh();
 				const mark = this.completed.length;
 				this.guard(() => {
 					let created = null;
@@ -1914,14 +2188,20 @@ export class Engine {
 						throw new QmlError('Cannot load sourceComponent');
 					}
 					ok = created !== null && created !== undefined;
+					if (ok) loader.$loaded = created;
 				}, `Loader '${typeof key === 'string' ? key : 'sourceComponent'}'`, 0);
 				if (!ok) {
 					loader.$failed = true;
+					// A failed load can have left the item it made in the middle: what the Loader got after the load began goes.
 					for (const child of [...loader.$children]) {
+						if (before.has(child)) continue;
 						this.releaseSubtree(child);
 						loader.$removeChild(child);
 					}
 				} else {
+					// The size of the Loader is the size of its item, which it did not have while the item was made: the layouts that its
+					// onCompleted handlers asked for ran with a Loader of size 0 and left nothing queued, so the Loader asks for one more.
+					loader.$update();
 					// A loaded item with no onCompleted still has bindings (anchors.fill: parent) that must run before geometry is read.
 					// The Loader sizes its item after the bindings of the item have run, as in Qt: a size that it wrote while they ran
 					// (its own `height` binding is one of them) would be written over by the binding of the item that comes after.
@@ -1941,8 +2221,11 @@ export class Engine {
 		}
 		loader.$emit('itemChanged');
 		this.emitLoaderStatus(loader);
+		// The bindings that read the item, the size or the status of the Loader (those of the item among them, which read 0 and null while
+		// it was made) are told by the signals above: they read again before `loaded` and before a layout reads what they set, as in Qt.
+		if (ok && settle) this.runBindingPass();
 		if (ok) loader.$emit('loaded');
-		if (this.loaderKey(loader) !== loader.$wanted) this.updateLoader(loader);
+		if (this.loaderKey(loader) !== loader.$wanted) this.updateLoader(loader, settle);
 	}
 
 	applyInitialProps(item, props) {
@@ -1969,12 +2252,51 @@ export class Engine {
 		if (def === null || def.children.length !== 1) throw new QmlError('A Component must have exactly one root item');
 		const scope = new Scope(component.$defScope, component.$defScope.file);
 		const mark = this.completed.length;
-		const item = this.createItem(def.children[0], scope, parent || null, [], undefined, 0);
+		const item = this.createItem(def.children[0], scope, parent || null, [], undefined, 0, true);
 		if (item !== null && props !== undefined && props !== null) {
 			for (const key of Object.keys(props)) this.guard(() => this.assign(item, key.split('.'), props[key]), `property '${key}'`, 0);
 		}
 		this.runCompletedFrom(mark);
+		// Qt (measured): the change handlers of the new object run for the values of its bindings while it is created, before the script
+		// that called createObject goes on (it may point a Binding at the object: that Binding then comes last, over what the handlers wrote).
+		if (item !== null) this.settleNewObject(item);
 		return item;
+	}
+
+	// The bindings of a new object and of what it holds are evaluated until they agree (a binding that read an item that was made after
+	// it reads it again), then its change handlers run for those values (see instantiateComponent).
+	settleNewObject(item) {
+		const items = [];
+		const collect = (node) => {
+			items.push(node);
+			for (const child of node.$children) collect(child);
+			if (node.$owned !== undefined) for (const owned of node.$owned) collect(owned);
+		};
+		collect(item);
+		for (let round = 0; round < 3; round++) {
+			for (const node of items) {
+				if (node.$bindings === null || node.$bindings === undefined) continue;
+				for (const binding of [...node.$bindings]) {
+					if (binding.failed || binding.evaluating) continue;
+					this.evaluateOne(binding, false);
+				}
+			}
+		}
+		this.runNewObjectHandlers(item);
+	}
+
+	// The change handlers of an object and of what it holds, polled once now (see instantiateComponent).
+	runNewObjectHandlers(item) {
+		if (item.$chg !== undefined) {
+			for (const list of [...item.$chg.values()]) {
+				for (const handler of [...list]) {
+					if (handler.failed || handler.immediate === true) continue;
+					this.runChangeHandler(handler);
+				}
+			}
+		}
+		for (const child of item.$children) this.runNewObjectHandlers(child);
+		if (item.$owned !== undefined) for (const owned of item.$owned) this.runNewObjectHandlers(owned);
 	}
 
 	assign(item, path, value) {
@@ -1982,10 +2304,10 @@ export class Engine {
 		for (let i = 0; i < path.length - 1; i++) {
 			const next = target[path[i]];
 			if (next === undefined || next === null || typeof next !== 'object' || !('$owner' in next || '$typeName' in next)) {
-				// `icon.width: 18` where `icon` is bound by a base type (`icon: buttonIcon`): written once the object exists.
-				const bound = item.$bindings !== null && item.$bindings.some((b) => b.key === path[0]);
-				const aliased = item.$aliases !== undefined && item.$aliases.has(path[0]);
-				if (this.lenient && i === 0 && item.$constructing && (next === undefined || next === null) && (bound || aliased)) {
+				// `icon.width: 18` where `icon` is bound by a base type (`icon: buttonIcon`): written once the object exists. So is
+				// `defaultFieldFilter.m_fieldId: "Status"` where the base type declares `property FieldFilter defaultFieldFilter: FieldFilter {}`:
+				// the use site's properties are applied before the base type has made the object of its default.
+				if (this.lenient && i === 0 && item.$constructing && (next === undefined || next === null)) {
 					if (item.$pendingGroupWrites === undefined) item.$pendingGroupWrites = [];
 					item.$pendingGroupWrites.push([path, value]);
 					return;
@@ -2035,9 +2357,35 @@ export class Engine {
 	// Delivers a key event (a DOM KeyboardEvent or alike) to the item with the active focus and up its parents. Each item
 	// offers it to its `Keys` handlers, then to its own key handling (an editor), then to its `KeyNavigation`.
 	// Returns true if the event was accepted.
-	dispatchKey(domEvent, pressed) {
+	// The Shortcut a key press activates, before the item that has the focus gets the key: the focused text editor that keeps the key for
+	// editing (see $shortcutOverride) comes first. One enabled shortcut of the sequence activates; several give `activatedAmbiguously` to
+	// the one that was made last. Returns true when a shortcut took the key.
+	activateShortcut(event) {
+		if (this.shortcuts.size === 0) return false;
+		const modifiers = event.modifiers & (MODIFIERS.ShiftModifier | MODIFIERS.ControlModifier | MODIFIERS.AltModifier | MODIFIERS.MetaModifier);
+		const focus = getFocusItem();
+		if (focus !== null && focus !== undefined && typeof focus.$shortcutOverride === 'function' && focus.$shortcutOverride(event)) return false;
+		const hits = [];
+		for (const shortcut of this.shortcuts) {
+			if (shortcut.$enabled && !shortcut.$destroyed && shortcut.$matches(event.key, modifiers)) hits.push(shortcut);
+		}
+		if (hits.length === 0) return false;
+		if (hits.length > 1) {
+			const last = hits[hits.length - 1];
+			this.guard(() => last.$emit('activatedAmbiguously'), 'Shortcut.onActivatedAmbiguously', 0);
+		} else if (!event.isAutoRepeat || hits[0].$autoRepeat) {
+			this.guard(() => hits[0].$emit('activated'), 'Shortcut.onActivated', 0);
+		}
+		return true;
+	}
+
+	// `native`: the key is edited by an input element of the page (src/textproxy.js), the focused editor does not edit with it; its Keys
+	// handlers and the items around it get the key as usual.
+	dispatchKey(domEvent, pressed, native = false) {
 		const event = qtKeyEvent(domEvent);
+		const editor = native ? getFocusItem() : null;
 		const shift = (event.modifiers & MODIFIERS.ShiftModifier) !== 0;
+		if (pressed && this.activateShortcut(event)) return true;
 		for (let item = getFocusItem(); item !== null && item !== undefined; item = item.$parent) {
 			const keys = item.$keys;
 			if (keys !== undefined) {
@@ -2051,7 +2399,7 @@ export class Engine {
 				}
 			}
 			if (!pressed) continue;
-			if (item.$keyPressed !== undefined && this.guard(() => item.$keyPressed(event), `key ${item.$typeName}`, 0) === true) return true;
+			if (item !== editor && item.$keyPressed !== undefined && this.guard(() => item.$keyPressed(event), `key ${item.$typeName}`, 0) === true) return true;
 			const target = keyNavigationTarget(item, event.key, shift);
 			if (target !== null) {
 				target.forceActiveFocus();
@@ -2073,6 +2421,8 @@ export class Engine {
 
 	setTime(seconds) {
 		this.time = seconds;
+		// the areas under a dragged item hear of its moves once, not for every write of x and y (Qt: after the script)
+		updateDrags();
 		this.flushQuiet(seconds);
 		if (this.animations.size > 0) {
 			for (const animation of [...this.animations]) {
@@ -2091,6 +2441,16 @@ export class Engine {
 			for (const item of [...this.carets]) {
 				if (item.$destroyed === true || !item.$active) this.carets.delete(item);
 				else item.$blink(seconds);
+			}
+		}
+		for (const flickable of [...this.flicks]) {
+			if (flickable.$destroyed === true || !flickable.$flickTick(seconds)) this.flicks.delete(flickable);
+		}
+		for (const area of [...this.holds]) {
+			if (area.$destroyed === true || !area.$pressed || area.$holdDeadline === 0) this.holds.delete(area);
+			else if (seconds >= area.$holdDeadline) {
+				this.holds.delete(area);
+				area.$fireHold();
 			}
 		}
 		if (this.timers.size === 0) return;
@@ -2205,10 +2565,22 @@ export class Engine {
 		}
 	}
 
+	// `Platform.FileDialog` of `import Qt.labs.platform 1.1 as Platform`: a type under the alias of a module that has no file for
+	// it is a type of the engine, as without the alias.
+	moduleTypeName(type, file) {
+		const dot = type.indexOf('.');
+		if (dot < 0 || this.project === null) return type;
+		const doc = this.project.docs.get(file);
+		const alias = type.slice(0, dot);
+		if (doc === undefined || !this.project.fileImports(doc).some((imp) => imp.kind === 'module' && imp.alias === alias)) return type;
+		return this.project.resolveType(type, file) === null ? type.slice(dot + 1) : type;
+	}
+
 	// Creates the item of an object definition below `parent`. `overlays` are the definitions (use
 	// sites of a component) that are applied on top of `def`.
-	createItem(def, scope, parent, overlays, index, depth) {
-		const type = def.type;
+	// `fromScript`: the parent was given by a script (`createObject(parent)`), not by the nesting of the QML source.
+	createItem(def, scope, parent, overlays, index, depth, fromScript = false) {
+		const type = this.moduleTypeName(def.type, scope.file);
 		if (this.lenient && IGNORED_TYPES.has(type)) return null;
 		let item;
 		const builtin = BUILTIN_TYPES.get(type);
@@ -2221,8 +2593,8 @@ export class Engine {
 			item = new TreeItemModel();
 		} else if (this.lenient && type === 'ListModel') {
 			item = new ListModel();
-		} else if (this.lenient && (type === 'Repeater' || type === 'MapItemView')) {
-			item = type === 'MapItemView' ? new MapItemView() : new Repeater();
+		} else if (this.lenient && (type === 'Repeater' || type === 'MapItemView' || type === 'Instantiator')) {
+			item = type === 'MapItemView' ? new MapItemView() : type === 'Instantiator' ? new Instantiator() : new Repeater();
 			this.repeaters.add(item);
 		} else if (this.lenient && ANIMATION_TYPES.has(type)) {
 			item = new Animation(this, type);
@@ -2234,7 +2606,7 @@ export class Engine {
 		} else if (this.lenient && SILENT_TYPES.has(type)) {
 			item = new Placeholder(type);
 		} else if (builtin !== undefined) {
-			item = type === 'Timer' ? new Timer(this) : new builtin();
+			item = type === 'Timer' ? new Timer(this) : type === 'TestCase' ? new TestCase(this) : new builtin();
 		} else if (type === 'Component' && this.lenient) {
 			item = new ComponentItem();
 			item.$def = def;
@@ -2258,7 +2630,7 @@ export class Engine {
 					}
 				}
 				const componentScope = this.newScope(modelScope, doc.path);
-				return this.createItem(doc.def, componentScope, parent, [{ def, scope }, ...overlays], index, depth + 1);
+				return this.createItem(doc.def, componentScope, parent, [{ def, scope }, ...overlays], index, depth + 1, fromScript);
 			}
 			this.unknownTypes.set(type, (this.unknownTypes.get(type) || 0) + 1);
 			item = this.lenient ? createSdlObject(type) : new Placeholder(type);
@@ -2266,6 +2638,8 @@ export class Engine {
 		if (this.lenient) item.$open = true;
 		item.$scope = scope;
 		const chain = [{ def, scope }, ...overlays];
+		// The name the type has where the item is used (`ImtButton` of a component whose root is a Rectangle): the tests look items up by it.
+		if (chain.length > 1) item.$qmlType = chain[chain.length - 1].def.type;
 		item.$constructing = true;
 		for (const link of chain) {
 			if (link.scope.root === null) link.scope.root = item;
@@ -2275,13 +2649,14 @@ export class Engine {
 			item.$constructing = false;
 			return item;
 		}
-		if (parent !== null) parent.$adopt(item);
+		if (parent !== null) parent.$adopt(item, fromScript);
 		if (parent === null || type === 'FocusScope' || type === 'Window') item.$isFocusScope = true;
 		if (index !== undefined) {
 			item.$defineCustom('index', index);
 			if (this.indexTrack !== null) this.indexTrack.push(item);
 		}
 		if (type === 'Timer') this.timers.add(item);
+		if (type === 'Shortcut') this.shortcuts.add(item);
 		if (this.lenient && type === 'Connections') {
 			item.$conn = { handlers: [], target: undefined, links: [] };
 			this.connections.add(item);
@@ -2398,7 +2773,7 @@ export class Engine {
 			}
 		}
 		for (const handler of completedHandlers) this.completed.push(handler);
-		if (item instanceof Loader) this.updateLoader(item);
+		if (item instanceof Loader) this.updateLoader(item, false);
 		return item;
 	}
 
@@ -2412,7 +2787,7 @@ export class Engine {
 				if (prop.isHandler || prop.isDeclaration || prop.text === null) continue;
 				let value = this.constantValue(prop.text);
 				if (value === NOT_CONSTANT) {
-					value = this.guard(() => this.compile('expr', prop.text, '', link.scope, element).call(element), `ListElement '${prop.name}' (${link.scope.file})`, prop.line);
+					value = this.guard(() => this.compile('expr', prop.text, '', link.scope, element, prop.line).call(element), `ListElement '${prop.name}' (${link.scope.file})`, prop.line);
 				}
 				element.$row[prop.name] = value;
 			}
@@ -2583,7 +2958,7 @@ export class Engine {
 		if (modelProp === undefined) throw new QmlError("Repeater needs a numeric 'model'", def.line, def.col);
 		let count;
 		try {
-			count = this.compile('expr', modelProp.text, '', scope, parent).call(parent);
+			count = this.compile('expr', modelProp.text, '', scope, parent, modelProp.line).call(parent);
 		} catch (error) {
 			throw new QmlError(describe(error), modelProp.line, modelProp.col);
 		}
@@ -2611,13 +2986,15 @@ export class Engine {
 	defineFunction(item, fn, scope) {
 		let compiled;
 		try {
-			compiled = this.compile('body', fn.body, fn.params, scope, item);
+			compiled = this.compile('body', fn.body, fn.params, scope, item, fn.line);
 		} catch (error) {
 			throw new QmlError(describe(error), fn.line, fn.col);
 		}
 		const bound = compiled.bind(item);
 		bound.$owner = item;
 		Object.defineProperty(item, fn.name, { value: bound, enumerable: true, configurable: true, writable: true });
+		if (item.$fnNames === undefined) item.$fnNames = [];
+		item.$fnNames.push(fn.name);
 	}
 
 	// ----- properties -----
@@ -2631,7 +3008,7 @@ export class Engine {
 			} else if (this.lenient && /^[A-Z]/.test(prop.name)) {
 				// `Layout.preferredWidth` and the rest of the attached layout spec. Other attached
 				// properties (Keys.enabled, ...) stay unsupported.
-				if (prop.name.startsWith('Layout.') || prop.name.startsWith('KeyNavigation.')) this.setValue(item, prop.name.split('.'), prop.text, scope, prop);
+				if (prop.name.startsWith('Layout.') || prop.name.startsWith('KeyNavigation.') || prop.name.startsWith('Drag.')) this.setValue(item, prop.name.split('.'), prop.text, scope, prop);
 				else this.noteIgnored(item, prop.name.split('.'));
 			} else {
 				this.setValue(item, prop.name.split('.'), prop.text, scope, prop, capture);
@@ -2701,7 +3078,7 @@ export class Engine {
 
 	setValue(item, path, text, scope, prop, capture = null) {
 		if (prop.isReturnBlock) {
-			const block = this.compile('body', text, '', scope, item);
+			const block = this.compile('body', text, '', scope, item, prop.line);
 			this.dropGroupBinding(item, path);
 			this.addBinding(item, path, () => block.call(item), prop.line, scope.file);
 			return;
@@ -2720,7 +3097,7 @@ export class Engine {
 			this.assign(item, path, text.includes('[') ? [] : {});
 			return;
 		}
-		const fn = this.compile('expr', text, '', scope, item);
+		const fn = this.compile('expr', text, '', scope, item, prop.line);
 		this.dropGroupBinding(item, path);
 		this.addBinding(item, path, () => fn.call(item), prop.line, scope.file);
 	}
@@ -2846,6 +3223,7 @@ export class Engine {
 			this.defineAlias(item, prop, scope);
 			return;
 		}
+		if (prop.isRequired && prop.text === null && this.defineRequired(item, prop.name, scope)) return;
 		// `property string` always holds a string.
 		if (prop.typeName === 'string') item.$defineCustom(prop.name, '', toQmlString, prop.isReadonly === true);
 		else if (INT_TYPES.has(prop.typeName)) item.$defineCustom(prop.name, 0, toQmlInt, prop.isReadonly === true);
@@ -2859,13 +3237,36 @@ export class Engine {
 		if (prop.text !== null) this.setValue(item, [prop.name], prop.text, scope, prop);
 	}
 
+	// `required property var modelData` of a delegate: Qt sets it from the row, as `index`, `model` and the roles. The property
+	// reads the variable of the row (it follows the row when the delegate is reused); `index` is the one the delegate has. False
+	// for an item that is not made for a row (it has no `index`): the property is an ordinary one, set by createObject() or the
+	// use site.
+	defineRequired(item, name, scope) {
+		if (item.$custom === null || !('index' in item.$custom)) return false;
+		if (name === 'index') return true;
+		let delegateScope = scope;
+		while (delegateScope !== null && delegateScope.data === null) delegateScope = delegateScope.parent;
+		if (delegateScope === null) return false;
+		const context = delegateScope.context;
+		Object.defineProperty(item, name, {
+			get: () => context[name],
+			set: (value) => {
+				const variable = Object.getOwnPropertyDescriptor(context, name);
+				if (variable !== undefined && variable.set !== undefined) context[name] = value;
+			},
+			enumerable: true,
+			configurable: true,
+		});
+		return true;
+	}
+
 	// `property alias name: target.property`: reads and writes are forwarded to the target.
 	defineAlias(item, prop, scope) {
 		const match = ALIAS_RE.exec(prop.text === null ? '' : prop.text);
 		if (match === null) throw new QmlError(`Invalid alias target '${prop.text}'`, prop.line, prop.col);
 		const parts = match[1].split('.').map((s) => s.trim());
 		const last = parts[parts.length - 1];
-		const targetFn = this.compile('expr', parts.length > 1 ? parts.slice(0, -1).join('.') : last, '', scope, item);
+		const targetFn = this.compile('expr', parts.length > 1 ? parts.slice(0, -1).join('.') : last, '', scope, item, prop.line);
 		const whole = parts.length === 1;
 		const name = prop.name;
 		const first = parts[0];
@@ -2914,6 +3315,16 @@ export class Engine {
 		});
 	}
 
+	// The function of a handler: its statements, or the arrow or function expression that is the whole handler
+	// (`Keys.onPressed: function(event) {...}`), not a statement that builds and drops it. Called with the item as `this`.
+	compileHandler(body, params, scope, item, line) {
+		if (!callableHandler(body)) return this.compile('body', body, params, scope, item, line);
+		const produce = this.compile('expr', body, '', scope, item, line);
+		return function (...args) {
+			return produce.call(this).apply(this, args);
+		};
+	}
+
 	connectHandler(item, prop, scope, completedOut) {
 		const name = prop.name;
 		const body = prop.text === null ? '' : prop.text;
@@ -2922,22 +3333,22 @@ export class Engine {
 			return;
 		}
 		if (name === 'Component.onCompleted') {
-			completedOut.push({ fn: this.compile('body', body, '', scope, item), item, line: prop.line, file: scope.file });
+			completedOut.push({ fn: this.compileHandler(body, '', scope, item, prop.line), item, line: prop.line, file: scope.file });
 			return;
 		}
 		if (name === 'ListView.onPooled' || name === 'ListView.onReused') {
 			const key = name === 'ListView.onPooled' ? '$pooledFns' : '$reusedFns';
 			if (item[key] === undefined) item[key] = [];
-			item[key].push({ fn: this.compile('body', body, '', scope, item), file: scope.file, line: prop.line });
+			item[key].push({ fn: this.compileHandler(body, '', scope, item, prop.line), file: scope.file, line: prop.line });
 			return;
 		}
 		if (name === 'Component.onDestruction') {
 			if (item.$destruction === undefined) item.$destruction = [];
-			item.$destruction.push({ fn: this.compile('body', body, '', scope, item), file: scope.file, line: prop.line });
+			item.$destruction.push({ fn: this.compileHandler(body, '', scope, item, prop.line), file: scope.file, line: prop.line });
 			return;
 		}
 		if (name === 'Keys.onPressed' || name === 'Keys.onReleased' || NAMED_KEY_HANDLERS.has(name)) {
-			const fn = this.compile('body', body, 'event', scope, item);
+			const fn = this.compileHandler(body, 'event', scope, item, prop.line);
 			if (item.$keys === undefined) item.$keys = { pressed: [], released: [], byKey: new Map() };
 			if (name === 'Keys.onPressed') item.$keys.pressed.push(fn);
 			else if (name === 'Keys.onReleased') item.$keys.released.push(fn);
@@ -2960,7 +3371,7 @@ export class Engine {
 			if (name.length > 9 && name.endsWith('Changed')) {
 				// A property change handler: the property is polled once per evaluation pass.
 				const property = decapitalize(name.slice(2, -7));
-				const fn = this.compile('body', body, '', scope, item);
+				const fn = this.compileHandler(body, '', scope, item, prop.line);
 				// The handler starts from the value the property has now, so the first assigned or bound value is a change (as in Qt).
 				// An alias whose target does not exist yet has no value to start from: its first value is the initial one.
 				let initial;
@@ -2970,20 +3381,14 @@ export class Engine {
 					initial = undefined;
 				}
 				const lateAlias = initial === undefined && item.$aliases !== undefined && item.$aliases.has(property);
-				this.addChangeHandler({ item, property, name, fn, line: prop.line, file: scope.file, last: initial, hasLast: !lateAlias, failed: false });
+				// The children that the item is made with are not a change: Qt tells of the ones that come or go afterwards.
+				this.addChangeHandler({ item, property, name, fn, line: prop.line, file: scope.file, last: initial, hasLast: !lateAlias && property !== 'children', failed: false });
 			} else {
 				this.noteIgnored(item, [name]);
 			}
 			return;
 		}
-		let fn;
-		if (callableHandler(body)) {
-			// The arrow or function expression is the handler, not a statement that builds and drops it.
-			const produce = this.compile('expr', body, '', scope, item);
-			fn = (...args) => produce.call(item).apply(item, args);
-		} else {
-			fn = this.compile('body', body, signal.params.join(', '), scope, item);
-		}
+		const fn = this.compileHandler(body, signal.params.join(', '), scope, item, prop.line);
 		item.$connect(signalName, (...args) => this.guard(() => fn.apply(item, args), `handler '${name}' (${scope.file})`, prop.line));
 	}
 
@@ -3030,7 +3435,11 @@ export class Engine {
 				if (current === null || current === undefined) return true;
 				current = current[part];
 			}
-			return !sameValue(current, state.value);
+			if (sameValue(current, state.value)) return false;
+			// A script that wrote the target after us took the binding of the target away (items.js scriptWrite) and wins, as in Qt:
+			// the Binding writes again when its own value changes (the first check above), not when something else changed the target.
+			if (!property.includes('.') && (target.$bindings === null || !target.$bindings.some((entry) => entry.key === property))) return false;
+			return true;
 		} catch {
 			return true;
 		}
@@ -3087,7 +3496,7 @@ export class Engine {
 		if (handler.fn !== null) {
 			call = handler.fn;
 		} else {
-			const fn = this.compile('body', handler.body, signal === undefined ? '' : signal.params.join(', '), handler.scope, conn);
+			const fn = this.compileHandler(handler.body, signal === undefined ? '' : signal.params.join(', '), handler.scope, conn, handler.line);
 			call = (...args) => fn.apply(conn, args);
 		}
 		const run = (...args) => {
@@ -3117,7 +3526,7 @@ export class Engine {
 	// An object of a type that has no QML file of its own, or none that is used (BaseModel); the parent may be null.
 	instantiateType(type, parent) {
 		const mark = this.completed.length;
-		const item = this.createItem(emptyDef(type), this.documentScope === null ? this.newScope(null, '') : this.documentScope, parent, [], undefined, 0);
+		const item = this.createItem(emptyDef(type), this.documentScope === null ? this.newScope(null, '') : this.documentScope, parent, [], undefined, 0, true);
 		this.runCompletedFrom(mark);
 		return item;
 	}
@@ -3133,7 +3542,7 @@ export class Engine {
 		if (typeof type !== 'string') throw new QmlError('Qt.createObject needs the name of a type');
 		if (!(parent instanceof Item)) throw new QmlError('Qt.createObject needs a parent item');
 		const mark = this.completed.length;
-		const item = this.createItem(emptyDef(type), this.documentScope, parent, [], undefined, 0);
+		const item = this.createItem(emptyDef(type), this.documentScope, parent, [], undefined, 0, true);
 		if (props !== undefined && props !== null) {
 			for (const key of Object.keys(props)) this.assign(item, key.split('.'), props[key]);
 		}
@@ -3193,6 +3602,68 @@ export class Engine {
 			(error) => fail(`${component.$url}: ${describe(error)}`),
 		);
 		return component;
+	}
+
+	// `Qt.createQmlObject(qml, parent[, url])`: the object of the QML text, a child of `parent` whose context it sees (the ids of the
+	// document of `parent` are names in its bindings). The text is a document of its own: it has its imports and one root. `url` is
+	// what the errors name and where the relative types and imports are looked up; it is `inline` in the directory of the document of
+	// `parent` by default. Like in Qt an empty text gives null, a text that does not parse, a type or a property that does not exist
+	// throws an Error and no object stays, and an error of a binding while it runs is only logged. The types come from the modules and
+	// directories the project has loaded.
+	createQmlObject(code, parent, url) {
+		const header = 'Qt.createQmlObject(): ';
+		if (arguments.length < 2) throw new Error(`${header}Insufficient arguments`);
+		if (parent === null || typeof parent !== 'object' || parent.$typeName === undefined) throw new Error(`${header}Missing parent object`);
+		if (this.project === null) throw new Error(`${header}no project`);
+		const text = String(code);
+		if (text.trim() === '') return null;
+		const file = parent.$scope === null || parent.$scope === undefined ? this.project.mainPath : parent.$scope.file;
+		const where = url === undefined ? joinPath(dirname(file), 'inline') : String(url);
+		const failure = (error, line, column) => new Error(`${header}failed to create object: 
+    ${where}:${line}:${column}: ${describe(error)}`);
+		const path = url === undefined ? where : this.documentPath(where);
+		let byText = this.inlineDocs.get(path);
+				if (byText === undefined) {
+					byText = new Map();
+					this.inlineDocs.set(path, byText);
+				}
+				let kept = byText.get(text);
+		if (kept === undefined) {
+			kept = { path: `${path}#${byText.size}`, source: text, def: null, error: null };
+			try {
+				kept.def = parseQmlDocument(text, !this.project.trusted);
+			} catch (error) {
+				if (!(error instanceof QmlError)) throw error;
+				throw failure(error, error.line, error.column);
+			}
+			this.project.docs.set(kept.path, kept);
+			byText.set(text, kept);
+		}
+		const scope = this.newScope(parent.$scope === undefined ? null : parent.$scope, kept.path);
+		const mark = this.completed.length;
+		const outer = this.creationErrors;
+		const errors = [];
+		this.creationErrors = errors;
+		let item = null;
+		const known = parent instanceof Item ? new Set(parent.$children) : null;
+		try {
+			item = this.createItem(kept.def, scope, parent instanceof Item ? parent : null, [], undefined, 0, true);
+		} catch (error) {
+			errors.push({ error, line: error instanceof QmlError ? error.line : 0 });
+		} finally {
+			this.creationErrors = outer;
+		}
+		if (errors.length > 0) {
+			// What was made before the error: the object, or the one that a failure inside of it left as a child of the parent.
+			if (item !== null && item !== undefined && typeof item.destroy === 'function') item.destroy();
+			if (known !== null) for (const child of [...parent.$children]) if (!known.has(child)) child.destroy();
+			const first = errors[0];
+			throw failure(first.error, first.line || kept.def.line, first.error instanceof QmlError && first.error.column ? first.error.column : kept.def.col);
+		}
+		// The values of the bindings are there when the call returns, also for an object without a Component.onCompleted.
+		this.evaluateFresh();
+		this.runCompletedFrom(mark);
+		return item;
 	}
 
 	// The path of `url` relative to the main document; `qrc:` and `file:` prefixes are dropped.
@@ -3294,18 +3765,26 @@ export class Engine {
 	releaseItem(item, dead) {
 		if (item.$released) return;
 		item.$released = true;
-		if (item.$destruction !== undefined) {
-			const list = item.$destruction;
-			item.$destruction = undefined;
-			for (const entry of list) this.guard(() => entry.fn.call(item), `handler 'Component.onDestruction' (${entry.file})`, entry.line);
-		}
-		if (item.$component !== undefined) {
-			this.guard(() => item.$component.$emit('destruction'), 'signal \'Component.destruction\'', 0);
-		}
 		if (item.$links !== undefined) {
 			const links = item.$links;
 			item.$links = undefined;
-			for (const undo of links) undo();
+			for (const undo of links) {
+				undo();
+				if (undo.$source !== undefined && undo.$source.$linksIn !== undefined) undo.$source.$linksIn.delete(undo);
+			}
+		}
+		if (item.$linksIn !== undefined) {
+			// The connections to a signal of this item: the objects that made them let go of them.
+			const incoming = item.$linksIn;
+			item.$linksIn = undefined;
+			for (const undo of incoming) {
+				undo();
+				const links = undo.$owner.$links;
+				if (links !== undefined) {
+					const at = links.indexOf(undo);
+					if (at >= 0) links.splice(at, 1);
+				}
+			}
 		}
 		if (item.$chg !== undefined) {
 			for (const list of item.$chg.values()) {
@@ -3334,6 +3813,7 @@ export class Engine {
 		}
 		item.$subs = undefined;
 		if (item.$typeName === 'Timer') this.timers.delete(item);
+		if (item.$typeName === 'Shortcut') this.shortcuts.delete(item);
 		if (item instanceof Repeater) {
 			if (item.$model instanceof ListModel) item.$model.$syncWatchers = Math.max(0, item.$model.$syncWatchers - 1);
 			this.repeaters.delete(item);
@@ -3342,12 +3822,22 @@ export class Engine {
 			item.$running = false;
 			this.animations.delete(item);
 		}
-		for (const child of item.$children) this.releaseItem(child, dead);
+		// Qt (measured): Component.onDestruction of an item runs after those of what it owns: the objects of its properties (the last
+		// declared first), then its children (each of them after its own), the item itself last.
 		if (item.$owned !== undefined) {
-			for (const owned of item.$owned) this.releaseItem(owned, dead);
+			for (const owned of [...item.$owned].reverse()) this.releaseItem(owned, dead);
 		}
+		for (const child of item.$children) this.releaseItem(child, dead);
 		if (item instanceof ListView) {
 			for (const pooled of item.$pool) this.releaseItem(pooled, dead);
+		}
+		if (item.$destruction !== undefined) {
+			const list = item.$destruction;
+			item.$destruction = undefined;
+			for (const entry of list) this.guard(() => entry.fn.call(item), `handler 'Component.onDestruction' (${entry.file})`, entry.line);
+		}
+		if (item.$component !== undefined) {
+			this.guard(() => item.$component.$emit('destruction'), 'signal \'Component.destruction\'', 0);
 		}
 	}
 

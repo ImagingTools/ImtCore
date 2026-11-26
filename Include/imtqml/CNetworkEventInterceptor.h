@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QPointer>
+#include <QtCore/QVariantMap>
 #include <QtNetwork/QNetworkReply>
 
 
@@ -28,8 +29,9 @@ public Q_SLOTS:
 	void OnReplyFinished();
 
 signals:
-	void unauthorized(QString requestBody, QObject* request);
-	void forbidden(QString requestBody, QObject* request);
+	/// \param requestHeaders The headers its sender gave the request, without those of the session; it is sent again with them.
+	void unauthorized(QString requestBody, QObject* request, QVariantMap requestHeaders, bool credentialsChanged);
+	void forbidden(QString requestBody, QObject* request, bool credentialsChanged);
 
 private:
 	QHash<QNetworkReply*, QPointer<QObject>> m_replyOwners;

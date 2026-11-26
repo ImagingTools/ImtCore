@@ -47,6 +47,9 @@ private Q_SLOTS:
 	// Requirements in the context of a request
 	void testImpliedPermissionsAreLimitedByTenant();
 	void testImpliedPermissionsComeFromProductOfRequest();
+	void testRequirementsBeforeTokenIntersection();
+	void testTokenBoundaryCannotExpand();
+	void testPrincipalAndBoundaryCopyReset();
 
 	// Matching of held and requested paths
 	void testBareIdIsNeverHeld();
@@ -62,5 +65,4 @@ private Q_SLOTS:
 	// Feature data itself
 	void testIsPermissionSurvivesCopy();
 };
-
 

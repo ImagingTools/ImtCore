@@ -41,7 +41,7 @@ public:
 	const QWebSocket* GetWebSocket() const;
 	void SetSocketStatus(Status socketStatus);
 	Status GetSocketStatus();
-	QByteArray GetRequestId();
+	QByteArray GetConnectionId() const;
 	// imtrest::IRequestServlet* GetRequestServlet();
 
 	[[nodiscard]] bool IsSecureConnection() const;
@@ -75,11 +75,18 @@ private:
 	// (e.g. synchronous auth I/O) cannot recurse back into message processing.
 	void ProcessTextMessage(const QString& textMessage);
 
+	/**
+		Release the requests of the subscriptions of the connection, in the thread of the connection: they were created there.
+	*/
+	void ReleaseRequests();
+
 	CWebSocketServerComp* m_server;
 	imtrest::IProtocolEngine* m_enginePtr;
 	mutable QMutex m_socketDescriptorMutex;
 	mutable QMutex m_statusMutex;
 	Status m_status;
+	// The socket is set and read in the thread of the server, forgotten in this thread
+	mutable QMutex m_socketMutex;
 	QPointer<QWebSocket> m_socket;
 	bool m_isSecureConnection;
 	QList<CWebSocketRequest*> m_requestList;
@@ -89,7 +96,7 @@ private:
 	imtrest::IRequestServlet* m_requestClientHandlerPtr;
 	QByteArray m_productId;
 
-	QByteArray m_requestId;
+	QByteArray m_connectionId;
 	QObject m_receiver;
 
 	// Re-entrancy guard for OnWebSocketTextMessage(). A message handler may

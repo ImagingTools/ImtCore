@@ -141,6 +141,8 @@ when the filter or sort changes.
 Implements the same domain interface by forwarding `GetFileSystemEntries` through
 `IGqlClient` (`ApiClient`). Optional `UrlParam` is passed to `SendRequest`.
 Response parsing uses generated SDL types.
+The synchronous request returns `IGqlClient::GqlResult`; failures propagate its error
+message instead of reporting every transport refusal as an unreachable service.
 
 ## Server controller (`imtservergql`)
 
@@ -182,6 +184,13 @@ request parameters (`nameFilter` / `sortBy` / `sortAscending`).
 At the virtual drives root ("This PC") the two right-hand columns switch from
 `Date modified` / `Size` — meaningless for a volume — to `Free space` /
 `Total size`, rather than standing empty (and sort those capacity columns).
+
+Optional behaviour (both `false` by default):
+
+| Property | Meaning |
+|---|---|
+| `restrictToStartFolder` | Up (button, Backspace) stops at the folder the dialog opens in — the first folder loaded, i.e. the folder holding `startPath` (`"C:/Versions/"` opens inside `C:/Versions`). Nothing above it can be opened; a listing the server resolves outside it (a link pointing elsewhere) is refused like a failed load, keeping the previous folder. |
+| `showOnlyFolders` | Files are not listed, only containers (folders, links, drives). Filtered on the client; since the server lists containers above files whatever the sort, paging stops at the first file and the item counter shows the listed folders. Without it files are listed and `pathKind` only decides what is pickable. |
 
 ## Configuration examples
 

@@ -127,7 +127,7 @@ PermissionsProvider {
                         root.lastError = m_errorMessage
                         root.requestFailed(m_errorMessage, root.__pendingOrgTenantId)
                     } else {
-                        root.__storeOrganizationPermissions(m_groups, m_memberPermissions, root.__pendingOrgTenantId)
+                        root.__storeOrganizationPermissions(m_groups, m_memberPermissions, m_administratorPermissions, root.__pendingOrgTenantId)
                     }
                 }
             }
@@ -144,43 +144,8 @@ PermissionsProvider {
         root.__orgRequestSender.send(root.__orgRequestInput)
     }
 
-    function __parseGroups(groupsList) {
-        var result = []
-        if (!groupsList)
-            return result
-        for (var gi = 0; gi < groupsList.count; ++gi) {
-            var group = groupsList.get(gi).item
-            if (!group)
-                continue
-
-            var groupObj = {
-                "groupId": group.m_groupId || "",
-                "groupName": group.m_groupName || "",
-                "entries": []
-            }
-
-            var entries = group.m_entries
-            if (entries) {
-                for (var ei = 0; ei < entries.count; ++ei) {
-                    var entry = entries.get(ei).item
-                    if (!entry)
-                        continue
-                    // [ID] maps to a plain JS array.
-                    groupObj.entries.push({
-                        "permissionId": entry.m_permissionId || "",
-                        "displayName": entry.m_displayName || "",
-                        "description": entry.m_description || "",
-                        "requirements": Array.isArray(entry.m_requirements) ? entry.m_requirements : []
-                    })
-                }
-            }
-            result.push(groupObj)
-        }
-        return result
-    }
-
     function __storePermissions(groupsList, tenantId) {
-        var parsedPermissions = root.__parseGroups(groupsList)
+        var parsedPermissions = PermissionGroups.toFlatArray(groupsList)
         root.permissions = parsedPermissions
         root.permissionsReceived(parsedPermissions, tenantId)
 
@@ -195,20 +160,21 @@ PermissionsProvider {
     }
 
     function __storeUserPermissions(groupsList) {
-        var parsedPermissions = root.__parseGroups(groupsList)
+        var parsedPermissions = PermissionGroups.toFlatArray(groupsList)
         root.permissions = parsedPermissions
         root.userPermissions = parsedPermissions
         root.userPermissionsReceived()
     }
 
-    function __storeOrganizationPermissions(groupsList, memberPermsList, tenantId) {
-        var parsed = root.__parseGroups(groupsList)
+    function __storeOrganizationPermissions(groupsList, memberPermsList, administratorPermsList, tenantId) {
+        var parsed = PermissionGroups.toFlatArray(groupsList)
         root.organizationPermissions = parsed
 
         // m_memberPermissions is a plain JS array ([ID] maps to var [])
         root.memberOrganizationPermissions = Array.isArray(memberPermsList)
             ? memberPermsList.filter(function(s) { return s && s.length > 0 })
             : []
+        root.administratorOrganizationPermissions = Array.isArray(administratorPermsList) ? administratorPermsList : []
 
         root.organizationPermissionsReceived()
     }

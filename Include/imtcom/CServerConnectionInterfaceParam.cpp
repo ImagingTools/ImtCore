@@ -159,6 +159,8 @@ bool CServerConnectionInterfaceParam::GetUrl(ProtocolType protocol, QUrl& url) c
 
 bool CServerConnectionInterfaceParam::Serialize(iser::IArchive& archive)
 {
+	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
+
 	bool retVal = true;
 
 	static iser::CArchiveTag hostTag("Host", "Name of the host");

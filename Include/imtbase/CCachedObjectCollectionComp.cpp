@@ -54,8 +54,15 @@ void CCachedObjectCollectionComp::OnComponentDestroyed()
 
 // reimplemented (imod::CMultiModelDispatcherBase)
 
-void CCachedObjectCollectionComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CCachedObjectCollectionComp::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
 {
+	if (modelId == 0 && changeSet.Contains(CF_SOURCE_UNWATCHED)){
+		m_isSourceUnwatched = true;
+	}
+	else if (modelId == 0 && changeSet.Contains(CF_SOURCE_WATCHED)){
+		m_isSourceUnwatched = false;
+	}
+
 	InvalidateCache();
 }
 
@@ -108,10 +115,6 @@ ICollectionInfo::Id CCachedObjectCollectionComp::InsertNewObject(
 	changeSet.SetChangeInfo(CN_ELEMENT_INSERTED, id);
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
-	QWriteLocker locker(&m_lock);
-	m_cachedCollections.clear();
-	locker.unlock();
-
 	QByteArray retVal = m_objectCollectionCompPtr->InsertNewObject(
 				typeId,
 				name,
@@ -123,6 +126,11 @@ ICollectionInfo::Id CCachedObjectCollectionComp::InsertNewObject(
 				operationContextPtr);
 	if (retVal.isEmpty()){
 		changeNotifier.Abort();
+	}
+	else{
+		QWriteLocker locker(&m_lock);
+		ClearFilteredCacheLocked();
+		m_cacheItems.remove(retVal);
 	}
 
 	return retVal;
@@ -145,7 +153,7 @@ bool CCachedObjectCollectionComp::RemoveElements(const Ids& elementIds, const IO
 	bool retVal = m_objectCollectionCompPtr->RemoveElements(elementIds, operationContextPtr);
 	if (retVal){
 		QWriteLocker locker(&m_lock);
-		m_cachedCollections.clear();
+		ClearFilteredCacheLocked();
 		for (int i = 0; i < elementIds.size(); ++i){
 			m_cacheItems.remove(elementIds[i]);
 		}
@@ -192,17 +200,21 @@ const istd::IChangeable* CCachedObjectCollectionComp::GetObjectPtr(const Id& obj
 }
 
 
-bool CCachedObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* /*dataConfigurationPtr*/) const
+bool CCachedObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* dataConfigurationPtr) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return false;
 	}
 
+	quint64 generation;
+	bool cacheable;
 	{
 		QReadLocker locker(&m_lock);
+		generation = m_cacheGeneration;
+		cacheable = !m_isSourceUnwatched && dataConfigurationPtr == nullptr;
 
 		CacheItemMap::const_iterator it = m_cacheItems.constFind(objectId);
-		if (it != m_cacheItems.constEnd() && it.value().dataPtr.IsValid()){
+		if (cacheable && it != m_cacheItems.constEnd() && it.value().dataPtr.IsValid()){
 			// Callers modify the returned object in place, so the cached instance is never handed out.
 			istd::IChangeableUniquePtr clonePtr = it.value().dataPtr->CloneMe();
 			if (clonePtr.IsValid()){
@@ -213,22 +225,25 @@ bool CCachedObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dat
 		}
 	}
 
-	bool retVal = m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr);
-	if (retVal && dataPtr.IsValid()){
-		istd::IChangeableUniquePtr cachedCopyPtr = dataPtr->CloneMe();
-		if (cachedCopyPtr.IsValid()){
-			DataPtr cachedDataPtr;
-			cachedDataPtr.FromUnique(std::move(cachedCopyPtr));
-
-			QWriteLocker locker(&m_lock);
-			if (m_cacheItems.size() >= *m_objectCacheLimitAttrPtr){
-				RemoveOldestObjectFromCache();
-			}
-			m_cacheItems.insert(objectId, {cachedDataPtr, QDateTime::currentMSecsSinceEpoch()});
-		}
+	DataPtr loaded;
+	if (!m_objectCollectionCompPtr->GetObjectData(objectId, loaded, dataConfigurationPtr) || !loaded.IsValid()){
+		return false;
+	}
+	DataPtr cachedDataPtr;
+	if (cacheable && *m_objectCacheLimitAttrPtr > 0){
+		cachedDataPtr.FromUnique(loaded->CloneMe());
 	}
 
-	return retVal;
+	QWriteLocker locker(&m_lock);
+	if (generation == m_cacheGeneration && cachedDataPtr.IsValid() && !m_isSourceUnwatched){
+		if (m_cacheItems.size() >= *m_objectCacheLimitAttrPtr){
+			RemoveOldestObjectFromCache();
+		}
+		m_cacheItems.insert(objectId, {cachedDataPtr, QDateTime::currentMSecsSinceEpoch()});
+	}
+	dataPtr = loaded;
+
+	return true;
 }
 
 
@@ -246,12 +261,12 @@ bool CCachedObjectCollectionComp::SetObjectData(
 	changeSet.SetChangeInfo(CN_OBJECT_DATA_CHANGED, objectId);
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
-	QWriteLocker locker(&m_lock);
-	m_cachedCollections.clear();
-	m_cacheItems.remove(objectId);
-	locker.unlock();
-
 	bool retVal = m_objectCollectionCompPtr->SetObjectData(objectId, object, mode, operationContextPtr);
+	{
+		QWriteLocker locker(&m_lock);
+		ClearFilteredCacheLocked();
+		m_cacheItems.remove(objectId);
+	}
 	if (!retVal){
 		changeNotifier.Abort();
 	}
@@ -262,6 +277,10 @@ bool CCachedObjectCollectionComp::SetObjectData(
 
 IObjectCollectionUniquePtr CCachedObjectCollectionComp::CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr) const
 {
+	if (m_isSourceUnwatched && m_objectCollectionCompPtr.IsValid()){
+		return m_objectCollectionCompPtr->CreateSubCollection(offset, count, selectionParamsPtr);
+	}
+
 	FilteredCollectionPtr collectionCacheItemPtr = GetFilteredCollection(offset, count, selectionParamsPtr);
 	if (collectionCacheItemPtr != nullptr){
 		return collectionCacheItemPtr->cachePtr->CreateSubCollection(0, -1, nullptr);
@@ -277,7 +296,8 @@ imtbase::IObjectCollectionIterator* CCachedObjectCollectionComp::CreateObjectCol
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
 {
-	FilteredCollectionPtr collectionCacheItemPtr = GetFilteredCollection(offset, count, selectionParamsPtr);
+	// The iterator can refer to its collection; do not create it from a temporary snapshot.
+	FilteredCollectionPtr collectionCacheItemPtr = GetFilteredCollection(offset, count, selectionParamsPtr, false);
 	if (collectionCacheItemPtr != nullptr){
 		return collectionCacheItemPtr->cachePtr->CreateObjectCollectionIterator(objectId, 0, -1, nullptr);
 	}
@@ -314,6 +334,10 @@ QByteArray CCachedObjectCollectionComp::GetObjectTypeId(const Id& objectId) cons
 
 idoc::MetaInfoPtr CCachedObjectCollectionComp::GetDataMetaInfo(const Id& objectId) const
 {
+	if (m_isSourceUnwatched && m_objectCollectionCompPtr.IsValid()){
+		return m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
+	}
+
 	QReadLocker locker(&m_lock);
 
 	for (int index = 0; index < m_cachedCollections.size(); index++){
@@ -343,13 +367,18 @@ ICollectionInfo::Ids CCachedObjectCollectionComp::GetElementIds(
 			const iprm::IParamsSet* selectionParamsPtr,
 			ilog::IMessageConsumer* logPtr) const
 {
+	if (m_isSourceUnwatched && m_objectCollectionCompPtr.IsValid()){
+		return m_objectCollectionCompPtr->GetElementIds(offset, count, selectionParamsPtr, logPtr);
+	}
+
 	FilteredCollectionPtr collectionCacheItemPtr = GetFilteredCollection(offset, count, selectionParamsPtr);
 	if (collectionCacheItemPtr != nullptr){
 		return collectionCacheItemPtr->cachePtr->GetElementIds(0, -1, nullptr, logPtr);
 	}
 
+	// The source was not read: the caller must not take the empty list for an empty selection
 	if (logPtr != nullptr){
-		logPtr->AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, QStringLiteral("Unable to read the collection elements"), "CCachedObjectCollectionComp")));
+		logPtr->AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, QStringLiteral("The source collection could not be read."), QStringLiteral("CCachedObjectCollectionComp"))));
 	}
 
 	return ICollectionInfo::Ids();
@@ -369,6 +398,10 @@ bool CCachedObjectCollectionComp::GetSubsetInfo(
 
 QVariant CCachedObjectCollectionComp::GetElementInfo(const Id& elementId, int infoType, ilog::IMessageConsumer* logPtr) const
 {
+	if (m_isSourceUnwatched && m_objectCollectionCompPtr.IsValid()){
+		return m_objectCollectionCompPtr->GetElementInfo(elementId, infoType, logPtr);
+	}
+
 	QReadLocker locker(&m_lock);
 
 	for (int index = 0; index < m_cachedCollections.size(); index++){
@@ -384,6 +417,10 @@ QVariant CCachedObjectCollectionComp::GetElementInfo(const Id& elementId, int in
 
 idoc::MetaInfoPtr CCachedObjectCollectionComp::GetElementMetaInfo(const Id& elementId, ilog::IMessageConsumer* logPtr) const
 {
+	if (m_isSourceUnwatched && m_objectCollectionCompPtr.IsValid()){
+		return m_objectCollectionCompPtr->GetElementMetaInfo(elementId, logPtr);
+	}
+
 	QReadLocker locker(&m_lock);
 
 	for (int index = 0; index < m_cachedCollections.size(); index++){
@@ -403,15 +440,15 @@ bool CCachedObjectCollectionComp::SetElementName(const Id& elementId, const QStr
 		return false;
 	}
 
-	QWriteLocker locker(&m_lock);
-	m_cachedCollections.clear();
-	locker.unlock();
-
 	istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_RENAMED);
 	changeSet.SetChangeInfo(CN_ELEMENT_RENAMED, elementId);
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	bool retVal = m_objectCollectionCompPtr->SetElementName(elementId, name);
+	{
+		QWriteLocker locker(&m_lock);
+		ClearFilteredCacheLocked();
+	}
 	if (!retVal){
 		changeNotifier.Abort();
 	}
@@ -426,15 +463,15 @@ bool CCachedObjectCollectionComp::SetElementDescription(const Id& elementId, con
 		return false;
 	}
 
-	QWriteLocker locker(&m_lock);
-	m_cachedCollections.clear();
-	locker.unlock();
-
 	istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_DESCRIPTION_CHANGED);
 	changeSet.SetChangeInfo(CN_ELEMENT_DESCRIPTION_CHANGED, elementId);
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	bool retVal = m_objectCollectionCompPtr->SetElementDescription(elementId, description, logPtr);
+	{
+		QWriteLocker locker(&m_lock);
+		ClearFilteredCacheLocked();
+	}
 	if (!retVal){
 		changeNotifier.Abort();
 	}
@@ -449,15 +486,15 @@ bool CCachedObjectCollectionComp::SetElementEnabled(const Id& elementId, bool is
 		return false;
 	}
 
-	QWriteLocker locker(&m_lock);
-	m_cachedCollections.clear();
-	locker.unlock();
-
 	istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_STATE);
 	changeSet.SetChangeInfo(CN_ELEMENT_STATE, elementId);
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	bool retVal = m_objectCollectionCompPtr->SetElementEnabled(elementId, isEnabled);
+	{
+		QWriteLocker locker(&m_lock);
+		ClearFilteredCacheLocked();
+	}
 	if (!retVal){
 		changeNotifier.Abort();
 	}
@@ -469,9 +506,10 @@ bool CCachedObjectCollectionComp::SetElementEnabled(const Id& elementId, bool is
 CCachedObjectCollectionComp::FilteredCollectionPtr CCachedObjectCollectionComp::GetFilteredCollection(
 			int offset,
 			int count,
-			const iprm::IParamsSet* selectionParamsPtr) const
+			const iprm::IParamsSet* selectionParamsPtr,
+			bool allowUncachedSnapshot) const
 {
-	if (!m_objectCollectionCompPtr.IsValid()){
+	if (!m_objectCollectionCompPtr.IsValid() || m_isSourceUnwatched){
 		return nullptr;
 	}
 
@@ -485,8 +523,13 @@ CCachedObjectCollectionComp::FilteredCollectionPtr CCachedObjectCollectionComp::
 
 	QByteArray data((char*)archive.GetBuffer(), archive.GetBufferSize());
 
+	quint64 generation;
 	{
 		QReadLocker locker(&m_lock);
+		generation = m_cacheGeneration;
+		if (m_isSourceUnwatched){
+			return nullptr;
+		}
 
 		for (int index = 0; index < m_cachedCollections.size(); index++){
 			const FilteredCollectionPtr& collectionCacheItemPtr = m_cachedCollections.at(index);
@@ -504,7 +547,11 @@ CCachedObjectCollectionComp::FilteredCollectionPtr CCachedObjectCollectionComp::
 		return nullptr;
 	}
 
+	auto item = std::make_shared<FilteredCollection>(offset, count, data, std::move(subCollectionPtr));
 	QWriteLocker locker(&m_lock);
+	if (generation != m_cacheGeneration || m_isSourceUnwatched || *m_metaInfoCacheLimitAttrPtr <= 0){
+		return allowUncachedSnapshot ? item : nullptr;
+	}
 
 	// Re-check cache after acquiring write lock to avoid duplicates
 	for (int index = 0; index < m_cachedCollections.size(); index++){
@@ -521,7 +568,7 @@ CCachedObjectCollectionComp::FilteredCollectionPtr CCachedObjectCollectionComp::
 		m_cachedCollections.removeFirst();
 	}
 
-	m_cachedCollections.append(std::make_shared<FilteredCollection>(offset, count, data, std::move(subCollectionPtr)));
+	m_cachedCollections.append(item);
 
 	return m_cachedCollections.last();
 }
@@ -531,9 +578,15 @@ void CCachedObjectCollectionComp::ClearCache()
 {
 	QWriteLocker locker(&m_lock);
 
-	m_cachedCollections.clear();
-
+	ClearFilteredCacheLocked();
 	m_cacheItems.clear();
+}
+
+
+void CCachedObjectCollectionComp::ClearFilteredCacheLocked()
+{
+	++m_cacheGeneration;
+	m_cachedCollections.clear();
 }
 
 
@@ -544,6 +597,12 @@ void CCachedObjectCollectionComp::InvalidateCache()
 	istd::CChangeNotifier changeNotifier(this);
 
 	ClearCache();
+}
+
+
+const IObjectCollection* CCachedObjectCollectionComp::GetSourceCollection() const
+{
+	return m_objectCollectionCompPtr.IsValid() ? m_objectCollectionCompPtr.GetPtr() : nullptr;
 }
 
 
@@ -566,5 +625,3 @@ void CCachedObjectCollectionComp::RemoveOldestObjectFromCache() const
 
 
 } // namespace imtbase
-
-

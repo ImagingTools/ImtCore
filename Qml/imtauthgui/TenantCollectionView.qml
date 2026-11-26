@@ -25,14 +25,12 @@ RemoteCollectionView {
 	additionalFieldIds: [
 		TenantItemDataTypeMetaInfo.s_id,
 		TenantItemDataTypeMetaInfo.s_name,
-		TenantItemDataTypeMetaInfo.s_tenantRelationScope,
-		TenantItemDataTypeMetaInfo.s_invitationId,
-		TenantItemDataTypeMetaInfo.s_invitedByName
+		TenantItemDataTypeMetaInfo.s_tenantRelationScope
 	]
 
 	Component.onCompleted: {
 		table.setSortingInfo(TenantItemDataTypeMetaInfo.s_createdAt, "DESC")
-		table.nonSortableColumns = [TenantItemDataTypeMetaInfo.s_parentTenantName, TenantItemDataTypeMetaInfo.s_ownerId,TenantItemDataTypeMetaInfo.s_isActive, TenantItemDataTypeMetaInfo.s_membersCount, TenantItemDataTypeMetaInfo.s_tenantRelationScope, TenantItemDataTypeMetaInfo.s_invitationId, TenantItemDataTypeMetaInfo.s_invitedByName]
+		table.nonSortableColumns = [TenantItemDataTypeMetaInfo.s_parentTenantName, TenantItemDataTypeMetaInfo.s_ownerId,TenantItemDataTypeMetaInfo.s_isActive, TenantItemDataTypeMetaInfo.s_membersCount, TenantItemDataTypeMetaInfo.s_tenantRelationScope]
 		registerFieldFilterDelegate("isActiveFilter", isActiveDelegateFilterComp)
 		registerFieldFilterDelegate("tenantRelationFilter", tenantRelationDelegateFilterComp)
 	}
@@ -41,8 +39,6 @@ RemoteCollectionView {
 		if (commandId === "Switch") {
 			let indexes = table.getSelectedIndexes()
 			if (indexes.length === 1) {
-				let scope = table.elements.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, indexes[0])
-				if (scope === "Invited") return
 				let tenantId = table.elements.getData("id", indexes[0])
 				if (!container.tenantIsActive(indexes[0])) {
 					let tenantName = table.elements.getData("name", indexes[0])
@@ -77,18 +73,12 @@ RemoteCollectionView {
 		}
 	}
 
-	// --- Real-time invitation notifications (handled by tenantManagementApiClient) ---
+	// --- Notifications that change the organizations of the user (handled by tenantManagementApiClient) ---
 	property GqlBasedTenantManagementApiClient tenantManagementApiClient: GqlBasedTenantManagementApiClient {}
 
 	Connections {
 		target: container.tenantManagementApiClient
-		function onSubscriptionInvitationReceived(tenantId, tenantName, role) {
-			container.doUpdateGui()
-		}
 		function onSubscriptionInvitationAccepted(tenantId, membershipId) {
-			container.doUpdateGui()
-		}
-		function onSubscriptionInvitationRejected(tenantId, membershipId) {
 			container.doUpdateGui()
 		}
 		function onSubscriptionOwnershipTransferred(tenantId) {
@@ -109,105 +99,17 @@ RemoteCollectionView {
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_parentTenantName, parentTenantNameCellDelegateComp)
 	}
 
-	function acceptInvitation(invitationId) {
-		acceptInvitationInput.m_invitationId = invitationId
-		// Capture the tenantId of the accepted invitation so we can broadcast
-		// it locally on success (the server doesn't re-notify the local actor
-		// via subscription, so any open TenantEditor for that tenant has to
-		// be refreshed explicitly here).
-		container.__pendingAcceptTenantId = ""
-		var rows = container.table ? container.table.elementsCount : 0
-		for (var r = 0; r < rows; r++) {
-			if (container.table.elements.getData(TenantItemDataTypeMetaInfo.s_invitationId, r) === invitationId) {
-				container.__pendingAcceptTenantId = container.table.elements.getData("id", r) || ""
-				break
-			}
-		}
-		acceptInvitationSender.send(acceptInvitationInput)
-	}
-
-	function rejectInvitation(invitationId) {
-		rejectInvitationInput.m_invitationId = invitationId
-		container.__pendingRejectTenantId = ""
-		var rows = container.table ? container.table.elementsCount : 0
-		for (var r = 0; r < rows; r++) {
-			if (container.table.elements.getData(TenantItemDataTypeMetaInfo.s_invitationId, r) === invitationId) {
-				container.__pendingRejectTenantId = container.table.elements.getData("id", r) || ""
-				break
-			}
-		}
-		rejectInvitationSender.send(rejectInvitationInput)
-	}
-
-	property string __pendingAcceptTenantId: ""
-	property string __pendingRejectTenantId: ""
-
-	property AcceptTenantInvitationInput acceptInvitationInput: AcceptTenantInvitationInput {}
-	property GqlSdlRequestSender acceptInvitationSender: GqlSdlRequestSender {
-		permissionPath: container.permissionPath
-		requestType: 1
-		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_acceptTenantInvitation
-		sdlObjectComp: Component {
-			AcceptTenantInvitationPayload {
-				onFinished: {
-					if (m_success) {
-						container.doUpdateGui()
-						// Fan out so any TenantEditor open on this tenant reloads.
-						AuthorizationController.tenantInvitationAccepted(container.__pendingAcceptTenantId, "")
-					} else if (m_errorMessage && m_errorMessage !== "") {
-						PopupManager.addErrorMessage(m_errorMessage, true)
-					}
-				}
-			}
-		}
-
-		function onError(message, type) {
-			PopupManager.addErrorMessage(message, true)
-		}
-	}
-
-	property RejectTenantInvitationInput rejectInvitationInput: RejectTenantInvitationInput {}
-	property GqlSdlRequestSender rejectInvitationSender: GqlSdlRequestSender {
-		permissionPath: container.permissionPath
-		requestType: 1
-		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_rejectTenantInvitation
-		sdlObjectComp: Component {
-			RejectTenantInvitationPayload {
-				onFinished: {
-					if (m_success) {
-						container.doUpdateGui()
-						AuthorizationController.tenantInvitationRejected(container.__pendingRejectTenantId, "")
-					} else if (m_errorMessage && m_errorMessage !== "") {
-						PopupManager.addErrorMessage(m_errorMessage, true)
-					}
-				}
-			}
-		}
-
-		function onError(message, type) {
-			PopupManager.addErrorMessage(message, true)
-		}
-	}
-
 	Component {
 		id: tenantRelationScopeCellDelegateComp
 		TableCellDelegateBase {
 			id: tenantRelationScopeDelegate
 
 			property string scopeValue: ""
-			property string invitationIdValue: ""
-			property string invitedByNameValue: ""
 
 			onReused: {
 				if (rowIndex >= 0 && tenantRelationScopeDelegate && tenantRelationScopeDelegate.rowDelegate && tenantRelationScopeDelegate.rowDelegate.tableItem){
 					let scope = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, rowIndex);
 					scopeValue = scope ? scope : ""
-
-					let invitationId = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_invitationId, rowIndex);
-					invitationIdValue = invitationId ? invitationId : ""
-
-					let invitedByName = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_invitedByName, rowIndex);
-					invitedByNameValue = invitedByName ? invitedByName : ""
 				}
 			}
 
@@ -221,9 +123,6 @@ RemoteCollectionView {
 				if (scope === "Member"){
 					return qsTr("Member")
 				}
-				if (scope === "Invited"){
-					return qsTr("Invited")
-				}
 				if (scope === "Delegated"){
 					return qsTr("Delegated")
 				}
@@ -232,122 +131,12 @@ RemoteCollectionView {
 			}
 
 			Text {
-				id: scopeLabel
 				anchors.verticalCenter: parent.verticalCenter
 				anchors.left: parent.left
 				anchors.leftMargin: Style.marginM
 				font.pixelSize: Style.fontSizeM
-				color: tenantRelationScopeDelegate.scopeValue === "Invited" ? Style.imaginToolsAccentColor : Style.textColor
+				color: Style.textColor
 				text: tenantRelationScopeDelegate.scopeText(tenantRelationScopeDelegate.scopeValue)
-				font.underline: tenantRelationScopeDelegate.scopeValue === "Invited"
-
-				MouseArea {
-					id: scopeMouseArea
-					anchors.fill: parent
-					hoverEnabled: tenantRelationScopeDelegate.scopeValue === "Invited"
-					cursorShape: tenantRelationScopeDelegate.scopeValue === "Invited" ? Qt.PointingHandCursor : Qt.ArrowCursor
-					onEntered: {
-						if (tenantRelationScopeDelegate.scopeValue === "Invited") {
-							var point = tenantRelationScopeDelegate.mapToItem(null, 0, tenantRelationScopeDelegate.height)
-							ModalDialogManager.openDialog(invitationPopupComp, {
-								"x": point.x,
-								"y": point.y
-							})
-						}
-					}
-				}
-			}
-
-			Component {
-				id: invitationPopupComp
-			// TEMPORARY: PopupView-based solution (replaces QtQuick.Controls Popup)
-			PopupView {
-				id: invitationPopup
-				x: scopeLabel.x
-				y: scopeLabel.y + scopeLabel.height + Style.spacingS
-				z: tenantRelationScopeDelegate.z + 1
-				width: invitationPopupContent.width + 2 * Style.marginL
-				height: invitationPopupContent.height + 2 * Style.marginL
-				forceFocus: true
-
-				Rectangle {
-					anchors.fill: parent
-					color: Style.baseColor
-					border.color: Style.borderColor
-					border.width: 1
-					radius: Style.radiusM
-				}
-
-				Column {
-					id: invitationPopupContent
-					anchors.centerIn: parent
-					spacing: Style.spacingM
-
-					Text {
-						text: qsTr("Invited by: %1").arg(tenantRelationScopeDelegate.invitedByNameValue || qsTr("Unknown"))
-						font.pixelSize: Style.fontSizeM
-						color: Style.textColor
-					}
-
-					Row {
-						spacing: Style.spacingM
-						anchors.horizontalCenter: parent.horizontalCenter
-
-						Rectangle {
-							width: acceptBtnLabel.contentWidth + 2 * Style.marginL
-							height: Style.controlHeightS
-							radius: Style.radiusM
-							color: Style.successColor
-
-							Text {
-								id: acceptBtnLabel
-								anchors.centerIn: parent
-								text: qsTr("Accept")
-								font.pixelSize: Style.fontSizeS
-								color: Style.highlightedTextColor
-							}
-
-							MouseArea {
-								anchors.fill: parent
-								cursorShape: Qt.PointingHandCursor
-								onClicked: {
-									if (tenantRelationScopeDelegate.invitationIdValue !== "") {
-										container.acceptInvitation(tenantRelationScopeDelegate.invitationIdValue)
-										invitationPopup.visible = false
-									}
-								}
-							}
-						}
-
-						Rectangle {
-							width: rejectBtnLabel.contentWidth + 2 * Style.marginL
-							height: Style.controlHeightS
-							radius: Style.radiusM
-							color: Style.dangerColor
-
-							Text {
-								id: rejectBtnLabel
-								anchors.centerIn: parent
-								text: qsTr("Reject")
-								font.pixelSize: Style.fontSizeS
-								color: Style.highlightedTextColor
-							}
-
-							MouseArea {
-								anchors.fill: parent
-								cursorShape: Qt.PointingHandCursor
-								onClicked: {
-									if (tenantRelationScopeDelegate.invitationIdValue !== "") {
-										container.rejectInvitation(tenantRelationScopeDelegate.invitationIdValue)
-										invitationPopup.visible = false
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-			// END TEMPORARY: PopupView-based solution
 			}
 		}
 	}
@@ -493,10 +282,8 @@ RemoteCollectionView {
 			Component.onCompleted: {
 				createAndAddOption("owner", qsTr("I am owner"), "", true)
 				createAndAddOption("member", qsTr("I am member"), "", true)
-				createAndAddOption("invited", qsTr("I am invited"), "", true)
 				setFieldFilterForOption("owner", ownerFieldFilterComp.createObject(this))
 				setFieldFilterForOption("member", memberFieldFilterComp.createObject(this))
-				setFieldFilterForOption("invited", invitedFieldFilterComp.createObject(this))
 			}
 
 			Component {
@@ -519,15 +306,6 @@ RemoteCollectionView {
 				}
 			}
 
-			Component {
-				id: invitedFieldFilterComp
-				FieldFilter {
-					m_fieldId: "TenantRelationScope"
-					m_filterValueType: "String"
-					m_filterOperations: ["Equal"]
-					m_filterValue: "Invited"
-				}
-			}
 		}
 	}
 
@@ -571,7 +349,8 @@ RemoteCollectionView {
 			return
 		}
 
-		ModalDialogManager.openDialog(switchToEditDialogComp, {"tenantId": tenantId, "tenantName": tenantName || tenantId})
+		// Opening an organization is working in it: the switch needs no question
+		container.switchToTenantAndNavigate(tenantId, ["Tenant", tenantId], {})
 	}
 
 	function tenantIsActive(index) {
@@ -623,22 +402,6 @@ RemoteCollectionView {
 	function switchToTenantAndNavigate(tenantId, rest, params) {
 		NavigationController.setPending(container.collectionId, rest, params)
 		container.switchToTenant(tenantId)
-	}
-
-	Component {
-		id: switchToEditDialogComp
-		MessageDialog {
-			property string tenantId: ""
-			property string tenantName: ""
-			width: Style.sizeHintM
-			title: qsTr("Switch organization")
-			message: qsTr("An organization can be edited only while you work in it. Switch to \"%1\" and open it?").arg(tenantName)
-			onFinished: {
-				if (buttonId == Enums.yes) {
-					container.switchToTenantAndNavigate(tenantId, ["Tenant", tenantId], {})
-				}
-			}
-		}
 	}
 
 	function closeTenantEditorsForSwitch(activeTenantId) {
@@ -813,10 +576,6 @@ RemoteCollectionView {
 						continue
 					}
 
-					let scope = container.tenantRelationScope(elementsModel, index)
-					if (scope === "Invited") {
-						continue
-					}
 
 					let tenantId = elementsModel.getData("id", index)
 					let tenantName = elementsModel.containsKey("name", index)
@@ -848,10 +607,6 @@ RemoteCollectionView {
 					let tenantId = elementsModel.getData("id", index)
 					let typeId = elementsModel.getData("typeId", index)
 
-					let scope = elementsModel.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, index)
-					if (scope === "Invited") {
-						continue
-					}
 
 					documentManager.openDocument(typeId, tenantId)
 				}

@@ -1,4 +1,4 @@
-import QtQuick 2.12
+import QtQuick 2.15
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
@@ -99,6 +99,19 @@ ViewBase {
 		permissionPageInstance.bottomItem.rebuildFromFlatArray(perms)
 		if (container.roleData)
 			container.doUpdateGuiPermissions()
+	}
+
+	// Asked by the document decorator before saving: a role without a name and ID is not sent.
+	function acceptsSave(){
+		var generalPageInstance = multiPageView.getPageByIndex(0)
+		if (!generalPageInstance || generalPageInstance.inputsAcceptable()){
+			return true
+		}
+
+		multiPageView.currentIndex = 0
+		generalPageInstance.revealValidationErrors()
+		PopupManager.addErrorMessage(qsTr("Correct the highlighted fields before saving"), true)
+		return false
 	}
 
 	function updateGui(){
@@ -319,6 +332,15 @@ ViewBase {
 				generalGroup.updateModel();
 			}
 
+			function inputsAcceptable(){
+				// The Role-ID is made from the name, also from a name not committed yet
+				return roleNameInput.acceptableInput;
+			}
+
+			function revealValidationErrors(){
+				roleNameInput.revealError();
+			}
+
 			CustomScrollbar {
 				id: scrollbar;
 				z: parent.z + 1;
@@ -359,7 +381,12 @@ ViewBase {
 					GroupElementView {
 						id: generalGroup;
 						width: parent.width;
-						
+
+						RegularExpressionValidator {
+							id: notEmptyRegexp;
+							regularExpression: /^(?!\s*$).+/;
+						}
+
 						TextInputElementView {
 							id: roleNameInput;
 
@@ -371,7 +398,12 @@ ViewBase {
 
 							name: qsTr("Role Name");
 							placeHolderText: qsTr("Enter the role name");
-							
+							isRequired: true;
+							showErrorWhenInvalid: true;
+							deferErrorUntilEdited: true;
+							errorText: qsTr("Please enter the role name, the Role-ID is made from it");
+							textInputValidator: notEmptyRegexp;
+
 							onEditingFinished: {
 								if (!container.roleData){
 									return
@@ -394,6 +426,7 @@ ViewBase {
 							objectName: "RoleIdInput";
 
 							readOnly: true;
+							isRequired: true;
 
 							name: qsTr("Role-ID");
 							
@@ -433,6 +466,11 @@ ViewBase {
 						function updateModel(){
 							if (!container.roleData){
 								return
+							}
+
+							// A save right after typing the name comes before its editingFinished
+							if (roleNameInput.text !== container.roleData.m_name){
+								roleIdInput.text = roleNameInput.text.replace(/\s+/g, '');
 							}
 
 							container.roleData.m_roleId = roleIdInput.text;
@@ -559,13 +597,7 @@ ViewBase {
 						: []
 					visible: false
 
-					// The role list is scoped by product, as a header and as an input field.
-					function getHeaders(){
-						let headers = {}
-						headers["productId"] = container.productId
-						return headers
-					}
-
+					// The role list is scoped by product. The header of the product comes from the application.
 					function setCustomInputParams(inputParams){
 						if (container.productId){
 							inputParams.InsertField(RoleItemInputTypeMetaInfo.s_productId, container.productId)

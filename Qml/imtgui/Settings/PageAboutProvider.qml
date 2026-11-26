@@ -28,16 +28,11 @@ ParamsSetController {
 	}
 
 	onServerVersionChanged: {
-		serverVersionText.m_text = root.serverVersion
 		createRepresentation()
 	}
 
 	onDependenciesChanged: {
 		createRepresentation()
-	}
-
-	property TextParam serverVersionText: TextParam {
-		m_text: root.serverVersion
 	}
 
 	// Tree of the server and its dependencies, m_version holds the formatted version, see ServiceDependencyView
@@ -70,6 +65,7 @@ ParamsSetController {
 			let child = node.createDependenciesArrayElement()
 			child.m_serviceId = dependency.m_serviceId ? String(dependency.m_serviceId) : ""
 			child.m_status = dependency.m_status ? String(dependency.m_status) : "UNKNOWN"
+			child.m_credentialStatus = dependency.m_credentialStatus ? String(dependency.m_credentialStatus) : "NOT_USED"
 			child.m_applicationName = dependency.m_applicationName ? String(dependency.m_applicationName) : ""
 			child.m_version = formatVersion(dependency.m_version, dependency.m_versionKind, dependency.m_buildTime)
 
@@ -84,13 +80,17 @@ ParamsSetController {
 	function createRepresentation(){
 		clearParamsSet()
 
-		addParam(ParamTypeIdsTypeMetaInfo.s_textView, "ServerVersion", qsTr("Server Version"), "", serverVersionText.toJson())
-
-		if (root.dependencies && root.dependencies.getItemsCount() > 0){
+		// The server is the root of the tree, so its version is shown once, a server without dependencies is a single row
+		if (root.serverName !== "" || root.serverVersion !== ""){
 			root.serviceTree.m_applicationName = root.serverName
 			root.serviceTree.m_status = "CONNECTED"
 			root.serviceTree.m_version = root.serverVersion
-			addDependencies(root.serviceTree, root.dependencies)
+			if (root.dependencies && root.dependencies.getItemsCount() > 0){
+				addDependencies(root.serviceTree, root.dependencies)
+			}
+			else{
+				root.serviceTree.emplaceDependencies()
+			}
 
 			addParam("ServiceDependency", "Services", qsTr("Services"), "", root.serviceTree.toJson())
 		}

@@ -31,7 +31,6 @@ ProfileView 1.0 ProfileView.qml
 ProfileApiClient 1.0 ProfileApiClient.qml
 GqlBasedProfileApiClient 1.0 GqlBasedProfileApiClient.qml
 ProfileGeneralPage 1.0 ProfileGeneralPage.qml
-ProfileOrganizationsPage 1.0 ProfileOrganizationsPage.qml
 ProfileTokensPage 1.0 ProfileTokensPage.qml
 ProfileAccessPage 1.0 ProfileAccessPage.qml
 PermissionDetailsPanel 1.0 PermissionDetailsPanel.qml
@@ -40,6 +39,10 @@ ProfileLinkedAccountsPage 1.0 ProfileLinkedAccountsPage.qml
 ExternalLoginButton 1.0 ExternalLoginButton.qml
 ProfileNoticeBanner 1.0 ProfileNoticeBanner.qml
 RoleCollectionView 1.0 RoleCollectionView.qml
+ServerTokenApiClient 1.0 ServerTokenApiClient.qml
+ServerTokenPermissionsView 1.0 ServerTokenPermissionsView.qml
+ConnectedProductView 1.0 ConnectedProductView.qml
+ConnectedProductTokensPage 1.0 ConnectedProductTokensPage.qml
 UserCollectionView 1.0 UserCollectionView.qml
 UserGroupCollectionView 1.0 UserGroupCollectionView.qml
 ChangePasswordDialog 1.0 ChangePasswordDialog.qml
@@ -64,15 +67,13 @@ TenantPermissionsPage 1.0 TenantPermissionsPage.qml
 TenantCrossOrgGrantsPage 1.0 TenantCrossOrgGrantsPage.qml
 TenantContractsPage 1.0 TenantContractsPage.qml
 TenantConnectionCodePage 1.0 TenantConnectionCodePage.qml
-TenantConnectOrganizationPage 1.0 TenantConnectOrganizationPage.qml
-TenantMyConnectionsPage 1.0 TenantMyConnectionsPage.qml
-TenantRelationshipProposalsPage 1.0 TenantRelationshipProposalsPage.qml
+TenantPartnersPage 1.0 TenantPartnersPage.qml
+PartnerTermsDialog 1.0 PartnerTermsDialog.qml
 TenantMessagesPage 1.0 TenantMessagesPage.qml
 CrossOrgGrantView 1.0 CrossOrgGrantView.qml
 ShareDocumentDialog 1.0 ShareDocumentDialog.qml
 TenantDocumentSharesPage 1.0 TenantDocumentSharesPage.qml
 ContractView 1.0 ContractView.qml
-RelationshipView 1.0 RelationshipView.qml
 MessageView 1.0 MessageView.qml
 StatusBadge 1.0 StatusBadge.qml
 TenantCollectionListView 1.0 TenantCollectionListView.qml

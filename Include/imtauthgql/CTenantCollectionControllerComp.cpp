@@ -12,7 +12,6 @@
 
 // ImtCore includes
 #include <imtauth/ITenantInfo.h>
-#include <imtauth/ITenantInvitation.h>
 #include <imtauth/imtauth.h>
 #include <imtgql/IGqlContext.h>
 #include <imtgql/CGqlParamObject.h>
@@ -104,32 +103,10 @@ bool CTenantCollectionControllerComp::CreateRepresentationFromObject(
 		representationObject.membersCount = activeMembersCount;
 	}
 
-	QString tenantRelationScope;
 	if (requestInfo.items.isTenantRelationScopeRequested){
 		QVariant scope = objectCollectionIterator.GetElementInfo("TenantRelationScope");
 		if (scope.isValid() && !scope.isNull()){
-			tenantRelationScope = scope.toString();
-			representationObject.tenantRelationScope = tenantRelationScope;
-		}
-	}
-
-	if ((requestInfo.items.isInvitationIdRequested || requestInfo.items.isInvitedByNameRequested) &&
-				tenantRelationScope== "Invited" &&
-				m_invitationManagerCompPtr.IsValid()){
-		const imtgql::IGqlContext* gqlContextPtr = getTenantListRequest.GetRequestContext();
-		if (gqlContextPtr != nullptr){
-			QByteArray userId = gqlContextPtr->GetUserId();
-			if (!userId.isEmpty()){
-				imtauth::ITenantInvitationUniquePtr invitationPtr = m_invitationManagerCompPtr->FindPendingInvitation(userId, objectId);
-				if (invitationPtr.IsValid()){
-					if (requestInfo.items.isInvitationIdRequested){
-						representationObject.invitationId = invitationPtr->GetInvitationId();
-					}
-					if (requestInfo.items.isInvitedByNameRequested && m_userCollectionCompPtr.IsValid()){
-						representationObject.invitedByName = imtauth::GetUserName(*m_userCollectionCompPtr, invitationPtr->GetInvitedByUserId());
-					}
-				}
-			}
+			representationObject.tenantRelationScope = scope.toString();
 		}
 	}
 
@@ -215,6 +192,14 @@ bool CTenantCollectionControllerComp::OnBeforeRemoveElements(const QByteArrayLis
 	// RemoveElementSet selects by the filter of the request without the access check of RemoveElements
 	if (!CheckObjectAccess(gqlRequest, elementIds, imtauth::IDocumentShareInfo::DAL_OWNER, errorMessage)){
 		return false;
+	}
+
+	for (const QByteArray& tenantId : elementIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		const imtauth::ITenantInfo* tenantPtr = m_objectCollectionCompPtr->GetObjectData(tenantId, dataPtr) ? dynamic_cast<const imtauth::ITenantInfo*>(dataPtr.GetPtr()) : nullptr;
+		if (!CheckTenantRemovalAccess(gqlRequest.GetRequestContext(), tenantPtr, errorMessage)){
+			return false;
+		}
 	}
 
 	if (m_objectCollectionCompPtr.IsValid() && !CheckTenantRemoval(*m_objectCollectionCompPtr, elementIds, errorMessage)){

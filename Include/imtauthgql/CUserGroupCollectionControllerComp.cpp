@@ -4,6 +4,9 @@
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 
 
+// STL includes
+#include <vector>
+
 // Qt includes
 #include <QtCore/QMutexLocker>
 #include <QtCore/QUuid>
@@ -19,6 +22,7 @@
 #include <imtauth/IUserInfoProvider.h>
 #include <imtauth/imtauth.h>
 #include <imtauthgql/CAssignmentCollector.h>
+#include <imtauthgql/imtauthgql.h>
 #include <imtbase/imtbase.h>
 #include <imtbase/IIdentifiable.h>
 #include <imtbase/IObjectCollectionIterator.h>
@@ -150,40 +154,54 @@ sdl::V1_0::imtbase::CDuplicateElementsPayload CUserGroupCollectionControllerComp
 
 	response.success = false;
 
-	istd::CChangeGroup changeGroup(m_objectCollectionCompPtr.GetPtr());
+	struct Duplicate
+	{
+		QByteArray id;
+		QByteArray typeId;
+		QString name;
+		istd::IChangeableUniquePtr objectPtr;
+	};
+	std::vector<Duplicate> duplicates;
 
-	int count = imtbase::narrow_cast<int>(elementIds.size());
+	// Validate every renamed copy as a new object before inserting any of them.
 	for (const QByteArray& elementId : elementIds){
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_objectCollectionCompPtr->GetObjectData(elementId, dataPtr)){
-			istd::IChangeableUniquePtr clonedObjectPtr = dataPtr->CloneMe();
-			if (clonedObjectPtr.IsValid()){
-				// The duplicate is a new group: it gets a new identity and belongs to the internal system.
-				QByteArray duplicateId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-				imtbase::SetObjectUuid(clonedObjectPtr.GetPtr(), duplicateId);
+		if (!m_objectCollectionCompPtr->GetObjectData(elementId, dataPtr) || !dataPtr.IsValid()){
+			errorMessage = QStringLiteral("Unable to read group to duplicate");
+			return response;
+		}
 
-				auto clonedGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(clonedObjectPtr.GetPtr());
-				if (clonedGroupInfoPtr != nullptr){
-					clonedGroupInfoPtr->SetId(duplicateId);
-					ResetToInternalSystem(*clonedGroupInfoPtr);
-				}
+		Duplicate duplicate;
+		duplicate.objectPtr = dataPtr->CloneMe();
+		if (!duplicate.objectPtr.IsValid()){
+			errorMessage = QStringLiteral("Unable to clone group to duplicate");
+			return response;
+		}
 
-				QString duplicateName;
-				QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(elementId);
+		duplicate.id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+		duplicate.typeId = m_objectCollectionCompPtr->GetObjectTypeId(elementId);
+		duplicate.name = elementIds.size() == 1 ? name :
+					m_objectCollectionCompPtr->GetElementInfo(elementId, imtbase::ICollectionInfo::EIT_NAME).toString() + QStringLiteral(" Copy");
+		imtbase::SetObjectUuid(duplicate.objectPtr.GetPtr(), duplicate.id);
 
-				if (count == 1){
-					duplicateName = name;
-				}
-				else{
-					QString elementName = m_objectCollectionCompPtr->GetElementInfo(elementId, imtbase::ICollectionInfo::EIT_NAME).toString();
-					duplicateName = elementName + " Copy";
-				}
+		auto clonedGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(duplicate.objectPtr.GetPtr());
+		if (clonedGroupInfoPtr != nullptr){
+			clonedGroupInfoPtr->SetId(duplicate.id);
+			clonedGroupInfoPtr->SetName(duplicate.name);
+			ResetToInternalSystem(*clonedGroupInfoPtr);
+		}
 
-				if (clonedGroupInfoPtr != nullptr){
-					clonedGroupInfoPtr->SetName(duplicateName);
-				}
-				m_objectCollectionCompPtr->InsertNewObject(typeId, duplicateName, "", clonedObjectPtr.GetPtr(), duplicateId);
-			}
+		if (!CheckObjectData(gqlRequest, QByteArray(), *duplicate.objectPtr.GetPtr(), errorMessage)){
+			return response;
+		}
+		duplicates.push_back(std::move(duplicate));
+	}
+
+	istd::CChangeGroup changeGroup(m_objectCollectionCompPtr.GetPtr());
+	for (const Duplicate& duplicate : duplicates){
+		if (m_objectCollectionCompPtr->InsertNewObject(duplicate.typeId, duplicate.name, QString(), duplicate.objectPtr.GetPtr(), duplicate.id).isEmpty()){
+			errorMessage = QStringLiteral("Unable to insert duplicated group");
+			return response;
 		}
 	}
 
@@ -508,6 +526,18 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 		productId = *arguments.input->productId;
 	}
 
+	// An empty product collects the roles of all products: only a superuser sees them, anybody else the product of the request
+	const imtgql::IGqlContext* gqlContextPtr = groupItemRequest.GetRequestContext();
+	const imtauth::IUserInfo* contextUserPtr = gqlContextPtr != nullptr ? gqlContextPtr->GetUserInfo() : nullptr;
+	if (productId.isEmpty() && (contextUserPtr == nullptr || !contextUserPtr->IsAdmin())){
+		productId = gqlContextPtr != nullptr ? gqlContextPtr->GetProductId() : QByteArray();
+		if (productId.isEmpty()){
+			errorMessage = QStringLiteral("The product of the request is not known");
+
+			return false;
+		}
+	}
+
 	representationPayload.id = QByteArray(userGroupInfoPtr->GetObjectUuid());
 	representationPayload.name = QString(userGroupInfoPtr->GetName());
 	representationPayload.description = QString(userGroupInfoPtr->GetDescription());
@@ -563,6 +593,8 @@ bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 
 	QByteArray objectId = userGroupInfoPtr->GetObjectUuid();
 
+	const istd::IChangeableUniquePtr previousPtr = userGroupInfoPtr->CloneMe();
+
 	QByteArrayList groupIds = userGroupInfoPtr->GetParentGroups();
 	for (const QByteArray& groupId : groupIds){
 		userGroupInfoPtr->RemoveParentGroup(groupId);
@@ -574,6 +606,10 @@ bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 	}
 
 	if (!FillObjectFromRepresentation(representation, object, objectId, errorMessage)){
+		return false;
+	}
+
+	if (!CheckGroupGrants(rawGqlRequest, dynamic_cast<const imtauth::IUserGroupInfo*>(previousPtr.GetPtr()), *userGroupInfoPtr, errorMessage)){
 		return false;
 	}
 
@@ -596,7 +632,31 @@ istd::IChangeableUniquePtr CUserGroupCollectionControllerComp::CreateObjectFromR
 		return nullptr;
 	}
 
+	if (!CheckGroupGrants(gqlRequest, nullptr, *userGroupInfoPtr, errorMessage)){
+		return nullptr;
+	}
+
 	return objectPtr;
+}
+
+
+bool CUserGroupCollectionControllerComp::CheckObjectData(const imtgql::CGqlRequest& gqlRequest, const QByteArray& objectId, const istd::IChangeable& object, QString& errorMessage) const
+{
+	const imtauth::IUserGroupInfo* groupPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(&object);
+	if (groupPtr == nullptr){
+		errorMessage = QStringLiteral("Invalid group data");
+
+		return false;
+	}
+
+	imtbase::IObjectCollection::DataPtr storedDataPtr;
+	const imtauth::IUserGroupInfo* storedGroupPtr = nullptr;
+	if (!objectId.isEmpty() && m_objectCollectionCompPtr->GetObjectData(objectId, storedDataPtr)){
+		storedGroupPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(storedDataPtr.GetPtr());
+	}
+
+	return CheckGroupGrants(gqlRequest, storedGroupPtr, *groupPtr, errorMessage)
+				&& ValidateGroupForTenant(gqlRequest, *groupPtr, objectId, errorMessage);
 }
 
 
@@ -638,6 +698,10 @@ QJsonObject CUserGroupCollectionControllerComp::CreateInternalResponse(const imt
 
 bool CUserGroupCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
+	if (!CheckAdministeredProducts(gqlRequest, errorMessage)){
+		return false;
+	}
+
 	QByteArrayList availableGroupIds;
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
@@ -683,6 +747,33 @@ bool CUserGroupCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequ
 
 // private methods
 
+bool CUserGroupCollectionControllerComp::CheckGroupGrants(
+			const imtgql::CGqlRequest& gqlRequest,
+			const imtauth::IUserGroupInfo* previousPtr,
+			const imtauth::IUserGroupInfo& group,
+			QString& errorMessage) const
+{
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	const imtauth::IRoleInfoProvider* roleProviderPtr = m_roleInfoProviderCompPtr.IsValid() ? m_roleInfoProviderCompPtr.GetPtr() : group.GetRoleProvider();
+	if (!CheckOtherProductsUnchanged(gqlContextPtr, previousPtr, group, errorMessage)
+				|| !CheckAddedRolesOfProducts(roleProviderPtr, previousPtr, group, errorMessage)){
+		return false;
+	}
+
+	const QByteArray productId = gqlContextPtr != nullptr ? gqlContextPtr->GetProductId() : QByteArray();
+	const bool hasNewUsers = HasNewGroupMembers(previousPtr != nullptr ? previousPtr->GetUsers() : QByteArrayList(), group.GetUsers());
+
+	if (hasNewUsers && !CheckGroupGrantsInOtherProducts(gqlContextPtr, group, errorMessage)){
+		return false;
+	}
+
+	// New members get all permissions of the group, the others only what the change adds
+	const QByteArrayList previousPermissions = (previousPtr != nullptr && !hasNewUsers) ? previousPtr->GetPermissions(productId) : QByteArrayList();
+
+	return CheckGrantedPermissions(gqlContextPtr, previousPermissions, group.GetPermissions(productId), errorMessage);
+}
+
+
 bool CUserGroupCollectionControllerComp::ValidateGroupForTenant(
 			const imtgql::CGqlRequest& gqlRequest,
 			const imtauth::IUserGroupInfo& userGroup,
@@ -690,21 +781,21 @@ bool CUserGroupCollectionControllerComp::ValidateGroupForTenant(
 			QString& errorMessage) const
 {
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	const QByteArray tenantId = gqlContextPtr != nullptr ? gqlContextPtr->GetTenantId() : QByteArray();
+	imtbase::TenantType tenantType = imtbase::TT_ORGANIZATION;
+	const QByteArray tenantId = gqlContextPtr != nullptr ? imtgql::GetDataTenantId(*gqlContextPtr, tenantType) : QByteArray();
 
 	if (!imtauth::CUserGroupDocumentValidatorComp::CheckGroupNameUnique(
 				*m_objectCollectionCompPtr,
 				objectId,
 				userGroup.GetName(),
 				tenantId,
+				tenantType,
 				errorMessage)){
 		return false;
 	}
 
-	return imtauth::CUserGroupDocumentValidatorComp::CheckParentGroupsInTenant(*m_objectCollectionCompPtr, userGroup.GetParentGroups(), tenantId, errorMessage);
+	return imtauth::CUserGroupDocumentValidatorComp::CheckParentGroupsInTenant(*m_objectCollectionCompPtr, userGroup.GetParentGroups(), tenantId, tenantType, errorMessage);
 }
 
 
 } // namespace imtauth
-
-

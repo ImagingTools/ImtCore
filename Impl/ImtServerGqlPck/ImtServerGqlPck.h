@@ -18,6 +18,7 @@
 #include <imtservergql/CGqlContextControllerComp.h>
 #include <imtservergql/CObjectProviderComp.h>
 #include <imtservergql/CWebSocketServletComp.h>
+#include <imtservergql/CServerTokenReceiverComp.h>
 #include <imtservergql/CCollectionObjectProviderComp.h>
 #include <imtservergql/COperationContextControllerComp.h>
 #include <imtservergql/CObjectCollectionChangeNotifierComp.h>
@@ -30,6 +31,7 @@
 #include <imtservergql/CGqlSearchControllerComp.h>
 #include <imtservergql/CTableViewParamControllerComp.h>
 #include <imtservergql/CConnectionStatusSubscriberControllerComp.h>
+#include <imtservergql/CAccessChangePublisherComp.h>
 #include <imtservergql/CHeadersDataProviderComp.h>
 #include <imtservergql/CDocumentRevisionControllerComp.h>
 #include <imtservergql/CCommandsControllerComp.h>
@@ -59,6 +61,7 @@ namespace ImtServerGqlPck
 
 typedef imtservergql::CHttpGraphQLServletComp GraphQLServlet;
 typedef imtservergql::CWebSocketServletComp WebSocketServlet;
+typedef imtservergql::CServerTokenReceiverComp ServerTokenReceiver;
 typedef imtservergql::CGqlDemultiplexerComp GraphQLDemultiplexer;
 typedef imtservergql::CGqlRepresentationDataControllerComp GqlRepresentationDataController;
 typedef imtservergql::CUserSettingsControllerComp UserSettingsController;
@@ -79,6 +82,7 @@ typedef imtservergql::CSlaveSubscriberControllerComp SlaveSubscriberController;
 typedef imtservergql::CGqlSearchControllerComp GqlSearchController;
 typedef imtservergql::CTableViewParamControllerComp TableViewParamController;
 typedef imtservergql::CConnectionStatusSubscriberControllerComp ConnectionStatusSubscriberController;
+typedef imtservergql::CAccessChangePublisherComp AccessChangePublisher;
 typedef imtservergql::CHeadersDataProviderComp HeadersDataProvider;
 typedef imtservergql::CDocumentRevisionControllerComp DocumentRevisionController;
 typedef imtservergql::CCommandsControllerComp CommandsController;

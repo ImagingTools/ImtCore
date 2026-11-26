@@ -1,0 +1,83 @@
+{
+  "date": "2026-11-20T19:38:24.823Z",
+  "results": [
+    {
+      "kind": "ImtCore",
+      "rows": 1000,
+      "columns": 6,
+      "create": 63.59450006484985,
+      "scrollSteps": 0.574233333269755,
+      "scrollJumps": 1.129128125309944,
+      "edit": 0.003913750648498535,
+      "insert": 0.6041499972343445,
+      "heapTable": 5647776,
+      "heapAfter": 8194336,
+      "items": 821
+    },
+    {
+      "kind": "TableView",
+      "rows": 1000,
+      "columns": 6,
+      "create": 18.05808401107788,
+      "scrollSteps": 0.6954652730623881,
+      "scrollJumps": 2.2900353997945784,
+      "edit": 0.02507416009902954,
+      "insert": 0.9901041507720947,
+      "heapTable": 1432896,
+      "heapAfter": 3452824,
+      "items": 221
+    },
+    {
+      "kind": "ImtCore",
+      "rows": 10000,
+      "columns": 6,
+      "create": 96.81604194641113,
+      "scrollSteps": 0.6019833334287008,
+      "scrollJumps": 1.241745826601982,
+      "edit": 0.004037920236587524,
+      "insert": 0.6300937473773957,
+      "heapTable": 7627440,
+      "heapAfter": 10465144,
+      "items": 821
+    },
+    {
+      "kind": "TableView",
+      "rows": 10000,
+      "columns": 6,
+      "create": 40.48362493515015,
+      "scrollSteps": 0.6872638932863872,
+      "scrollJumps": 2.3137718766927717,
+      "edit": 0.024908750057220458,
+      "insert": 1.0155957996845246,
+      "heapTable": 4601184,
+      "heapAfter": 6655312,
+      "items": 221
+    },
+    {
+      "kind": "ImtCore",
+      "rows": 100000,
+      "columns": 6,
+      "create": 344.17404198646545,
+      "scrollSteps": 0.5652672266960144,
+      "scrollJumps": 1.141127073764801,
+      "edit": 0.003936660289764404,
+      "insert": 0.7140895545482635,
+      "heapTable": 34627104,
+      "heapAfter": 37180528,
+      "items": 821
+    },
+    {
+      "kind": "TableView",
+      "rows": 100000,
+      "columns": 6,
+      "create": 269.7956659793854,
+      "scrollSteps": 0.7011888933181762,
+      "scrollJumps": 2.3584885478019713,
+      "edit": 0.02666000008583069,
+      "insert": 1.0912625014781951,
+      "heapTable": 40488648,
+      "heapAfter": 43126240,
+      "items": 221
+    }
+  ]
+}

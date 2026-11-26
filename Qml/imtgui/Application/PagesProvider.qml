@@ -34,6 +34,9 @@ QtObject {
             queryFields.InsertField("icon");
             queryFields.InsertField("source");
             queryFields.InsertField("startItem");
+            queryFields.InsertField("groupId");
+            queryFields.InsertField("groupName");
+            queryFields.InsertField("groupIcon");
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();

@@ -20,6 +20,7 @@ FilterPanelDecorator 1.0 Panels/FilterPanelDecorator.qml
 MenuPanel 1.0 Panels/MenuPanel.qml
 MenuPanelButton 1.0 Panels/MenuPanelButton.qml
 MenuPanelButtonDecorator 1.0 Panels/MenuPanelButtonDecorator.qml
+MenuPanelGroupHeader 1.0 Panels/MenuPanelGroupHeader.qml
 SubMenuPanelButtonDecorator 1.0 Panels/SubMenuPanelButtonDecorator.qml
 TabDelegate 1.0 Panels/TabDelegate.qml
 TabPanel 1.0 Panels/TabPanel.qml

@@ -45,6 +45,8 @@ FocusScope {
 	property string emptyText: qsTr("This folder is empty")
 	property string filteredEmptyText: qsTr("No matching items")
 	property string emptyDescription: qsTr("Create an item to start this level")
+	// Extra command of the empty level, e.g. creating what the level is filled from; hidden when empty.
+	property string emptyActionText: ""
 	// Short warning shown next to the path, e.g. "2 incomplete", with the list
 	// behind it: hovering the chip spells out which rows are at fault.
 	property string levelStatusText: ""
@@ -132,6 +134,7 @@ FocusScope {
 	property real rowRightInset: (root.rowEditingEnabled ? 2 * Style.iconSizeM + 3 * Style.marginM : Style.marginL) + root.rowActionExtensionWidth
 
 	signal createRequested(var parentNode)
+	signal emptyActionRequested()
 	signal removeNodesRequested(var nodes, var parentNode)
 	signal renameRequested(var node, string newName)
 	signal moveRequested(var node, var oldParentNode, var newParentNode)
@@ -1201,218 +1204,224 @@ FocusScope {
 						: entryRow.hovered ? Style.hover
 						: index % 2 === 1 ? Style.backgroundColor2 : "transparent"
 
-					// Declared first so it sits under the row content: display cells
-					// are plain text and let the click through, the text fields of a
-					// row in edit mode keep it for themselves.
+					// The row content lies inside: the hover of an area in a cell, e.g. a tooltip, is the
+					// hover of its ancestors too, so the row loses the pointer when it leaves the row.
+					// Display cells are plain text and let the click through, the text fields of a row
+					// in edit mode keep it for themselves.
 					MouseArea {
 						id: rowHoverArea
 						objectName: "MouseArea"
 						anchors.fill: parent
 						hoverEnabled: true
-						enabled: root.renamingNode !== entryRow.treeNode
 						cursorShape: Qt.PointingHandCursor
 						onClicked: {
+							// The name being renamed keeps its clicks
+							if (root.renamingNode === entryRow.treeNode)
+								return
 							root.forceActiveFocus()
 							// Not while the row is open: changing the selection would
 							// take the editor's subject away from under it.
 							if (!entryRow.rowEditing)
 								root.selectOnly(entryRow.treeNode)
 						}
-						onDoubleClicked: root.navigateInto(entryRow.treeNode)
-					}
-
-					// Marks the row that is open for editing.
-					Rectangle {
-						anchors.fill: parent
-						visible: entryRow.rowEditing
-						radius: Style.radiusM
-						color: "transparent"
-						border.color: Style.titleColor
-						border.width: 1
-					}
-
-					Rectangle {
-						anchors.left: parent.left
-						anchors.top: parent.top
-						anchors.topMargin: Style.marginXS
-						anchors.bottom: parent.bottom
-						anchors.bottomMargin: Style.marginXS
-						width: entryRow.rowEditing ? Style.spacingXS : 0
-						radius: width / 2
-						color: Style.titleColor
-					}
-
-					// The box is what builds a selection of more than one row. Its hit
-					// area is a sibling rather than a child of the box: a ControlBase
-					// builds its visuals from a decorator, and parenting anything into
-					// it left the tick no longer following checkState.
-					CheckBox {
-						id: rowCheck
-						objectName: "RowCheckBox"
-						anchors.left: parent.left
-						anchors.leftMargin: Style.marginL
-						anchors.verticalCenter: parent.verticalCenter
-						visible: entryRow.hasCheck
-						isActive: root.editable
-						checkState: entryRow.rowChecked ? Qt.Checked : Qt.Unchecked
-						mouseArea.enabled: false
-					}
-
-					MouseArea {
-						id: rowCheckHit
-						objectName: "RowCheckBoxHit"
-
-						anchors.left: parent.left
-						anchors.top: parent.top
-						anchors.bottom: parent.bottom
-
-						width: rowCheck.visible ? Style.marginL + rowCheck.width + Style.marginS : 0
-						z: 1
-						visible: rowCheck.visible
-						cursorShape: Qt.PointingHandCursor
-
-						onClicked: {
-							root.forceActiveFocus()
-							if (!entryRow.rowEditing)
-								root.toggleChecked(entryRow.treeNode)
+						onDoubleClicked: {
+							if (root.renamingNode !== entryRow.treeNode)
+								root.navigateInto(entryRow.treeNode)
 						}
-					}
 
+						// Marks the row that is open for editing.
+						Rectangle {
+							anchors.fill: parent
+							visible: entryRow.rowEditing
+							radius: Style.radiusM
+							color: "transparent"
+							border.color: Style.titleColor
+							border.width: 1
+						}
 
-					Image {
-						id: entryIcon
-						anchors.left: entryRow.hasCheck ? rowCheck.right : parent.left
-						anchors.leftMargin: entryRow.hasCheck ? Style.marginM : Style.marginL
-						anchors.verticalCenter: parent.verticalCenter
-						width: Style.iconSizeS
-						height: width
-						visible: root.rowIconVisible
-						source: "qrc:/" + Style.getIconPath(root.nodeIcon(entryRow.treeNode), Icon.State.On, Icon.Mode.Normal)
-						sourceSize.width: width
-						sourceSize.height: height
-					}
-
-					Item {
-						id: contentArea
-						anchors.left: parent.left
-						anchors.leftMargin: root.rowLeftInset
-						anchors.right: parent.right
-						anchors.rightMargin: root.rowRightInset
-						anchors.verticalCenter: parent.verticalCenter
-						height: parent.height
-
-						Column {
-							id: defaultContent
+						Rectangle {
 							anchors.left: parent.left
-							anchors.right: secondaryText.left
-							anchors.rightMargin: Style.marginL
-							anchors.verticalCenter: parent.verticalCenter
-							spacing: Style.spacingXXS
-							visible: root.rowContentComponent === null
+							anchors.top: parent.top
+							anchors.topMargin: Style.marginXS
+							anchors.bottom: parent.bottom
+							anchors.bottomMargin: Style.marginXS
+							width: entryRow.rowEditing ? Style.spacingXS : 0
+							radius: width / 2
+							color: Style.titleColor
+						}
 
-							BaseText {
-								width: parent.width
-								text: root.nodeText(entryRow.treeNode)
-								font.family: Style.fontFamilyBold
-								color: Style.textColor
-								elide: Text.ElideRight
-								visible: root.renamingNode !== entryRow.treeNode
-							}
-							CustomTextField {
-								id: renameInput
-								objectName: "RenameInput"
-								width: parent.width
-								height: Style.controlHeightM
-								visible: root.renamingNode === entryRow.treeNode
-								text: visible ? root.nodeText(entryRow.treeNode) : ""
-								autoEditingFinished: false
-								onVisibleChanged: {
-									if (visible)
-										forceActiveFocus()
-								}
-								onAccepted: root.finishRename(entryRow.treeNode, text)
-								onEditingFinished: root.finishRename(entryRow.treeNode, text)
-								onCancelled: root.renamingNode = null
-							}
-							BaseText {
-								width: parent.width
-								text: root.nodeDescription(entryRow.treeNode)
-								font.pixelSize: Style.fontSizeS
-								color: Style.subtitleColor
-								elide: Text.ElideRight
-								visible: text !== "" && root.renamingNode !== entryRow.treeNode
+						// The box is what builds a selection of more than one row. Its hit
+						// area is a sibling rather than a child of the box: a ControlBase
+						// builds its visuals from a decorator, and parenting anything into
+						// it left the tick no longer following checkState.
+						CheckBox {
+							id: rowCheck
+							objectName: "RowCheckBox"
+							anchors.left: parent.left
+							anchors.leftMargin: Style.marginL
+							anchors.verticalCenter: parent.verticalCenter
+							visible: entryRow.hasCheck
+							isActive: root.editable
+							checkState: entryRow.rowChecked ? Qt.Checked : Qt.Unchecked
+							mouseArea.enabled: false
+						}
+
+						MouseArea {
+							id: rowCheckHit
+							objectName: "RowCheckBoxHit"
+
+							anchors.left: parent.left
+							anchors.top: parent.top
+							anchors.bottom: parent.bottom
+
+							width: rowCheck.visible ? Style.marginL + rowCheck.width + Style.marginS : 0
+							z: 1
+							visible: rowCheck.visible
+							cursorShape: Qt.PointingHandCursor
+
+							onClicked: {
+								root.forceActiveFocus()
+								if (!entryRow.rowEditing)
+									root.toggleChecked(entryRow.treeNode)
 							}
 						}
 
-						BaseText {
-							id: secondaryText
-							anchors.right: parent.right
+
+						Image {
+							id: entryIcon
+							anchors.left: entryRow.hasCheck ? rowCheck.right : parent.left
+							anchors.leftMargin: entryRow.hasCheck ? Style.marginM : Style.marginL
 							anchors.verticalCenter: parent.verticalCenter
-							width: text === "" ? 0 : Math.min(Style.sizeHintXXS, entryRow.width * 0.28)
-							visible: root.rowContentComponent === null
-							text: root.nodeSecondaryText(entryRow.treeNode)
-							color: Style.subtitleColor
-							horizontalAlignment: Text.AlignRight
-							elide: Text.ElideRight
+							width: Style.iconSizeS
+							height: width
+							visible: root.rowIconVisible
+							source: "qrc:/" + Style.getIconPath(root.nodeIcon(entryRow.treeNode), Icon.State.On, Icon.Mode.Normal)
+							sourceSize.width: width
+							sourceSize.height: height
+						}
+
+						Item {
+							id: contentArea
+							anchors.left: parent.left
+							anchors.leftMargin: root.rowLeftInset
+							anchors.right: parent.right
+							anchors.rightMargin: root.rowRightInset
+							anchors.verticalCenter: parent.verticalCenter
+							height: parent.height
+
+							Column {
+								id: defaultContent
+								anchors.left: parent.left
+								anchors.right: secondaryText.left
+								anchors.rightMargin: Style.marginL
+								anchors.verticalCenter: parent.verticalCenter
+								spacing: Style.spacingXXS
+								visible: root.rowContentComponent === null
+
+								BaseText {
+									width: parent.width
+									text: root.nodeText(entryRow.treeNode)
+									font.family: Style.fontFamilyBold
+									color: Style.textColor
+									elide: Text.ElideRight
+									visible: root.renamingNode !== entryRow.treeNode
+								}
+								CustomTextField {
+									id: renameInput
+									objectName: "RenameInput"
+									width: parent.width
+									height: Style.controlHeightM
+									visible: root.renamingNode === entryRow.treeNode
+									text: visible ? root.nodeText(entryRow.treeNode) : ""
+									autoEditingFinished: false
+									onVisibleChanged: {
+										if (visible)
+											forceActiveFocus()
+									}
+									onAccepted: root.finishRename(entryRow.treeNode, text)
+									onEditingFinished: root.finishRename(entryRow.treeNode, text)
+									onCancelled: root.renamingNode = null
+								}
+								BaseText {
+									width: parent.width
+									text: root.nodeDescription(entryRow.treeNode)
+									font.pixelSize: Style.fontSizeS
+									color: Style.subtitleColor
+									elide: Text.ElideRight
+									visible: text !== "" && root.renamingNode !== entryRow.treeNode
+								}
+							}
+
+							BaseText {
+								id: secondaryText
+								anchors.right: parent.right
+								anchors.verticalCenter: parent.verticalCenter
+								width: text === "" ? 0 : Math.min(Style.sizeHintXXS, entryRow.width * 0.28)
+								visible: root.rowContentComponent === null
+								text: root.nodeSecondaryText(entryRow.treeNode)
+								color: Style.subtitleColor
+								horizontalAlignment: Text.AlignRight
+								elide: Text.ElideRight
+							}
+
+							Loader {
+								id: rowContentLoader
+								anchors.fill: parent
+								active: root.rowContentComponent !== null
+								sourceComponent: root.rowContentComponent
+								property var node: entryRow.treeNode
+								property bool editing: entryRow.rowEditing
+								// The row reads these to know which cell to open on and
+								// when to write its drafts back.
+								property int editColumn: root.editColumn
+								property int commitRequest: root.commitRequest
+							}
+						}
+
+						// Per-row edit affordance: a pencil that fades in with the pointer
+						// or the selection, and turns into a tick while the row is open.
+						ToolButton {
+							id: cancelButton
+							objectName: "RowCancelButton"
+							anchors.right: parent.right
+							anchors.rightMargin: Style.marginM
+							anchors.verticalCenter: parent.verticalCenter
+							width: Style.iconSizeM
+							height: Style.iconSizeM
+							visible: entryRow.rowEditing
+							iconSource: "qrc:/" + Style.getIconPath("Icons/Cancel", Icon.State.On, Icon.Mode.Normal)
+							onClicked: root.cancelEditRow()
+						}
+
+						// Tick and cross of the row itself, so a row can be finished or
+						// abandoned without going back up to the toolbar.
+						ToolButton {
+							id: editButton
+							objectName: "RowEditButton"
+							anchors.right: cancelButton.visible ? cancelButton.left : parent.right
+							anchors.rightMargin: Style.marginM
+							anchors.verticalCenter: parent.verticalCenter
+							width: Style.iconSizeM
+							height: Style.iconSizeM
+							visible: root.rowEditingEnabled
+							opacity: entryRow.selected || entryRow.rowEditing || editButton.hovered
+								? 1 : Style.opacityLow
+							iconSource: "qrc:/" + Style.getIconPath(entryRow.rowEditing ? "Icons/Ok" : "Icons/Edit",
+								Icon.State.On, Icon.Mode.Normal)
+							onClicked: root.toggleEditRow(entryRow.treeNode)
 						}
 
 						Loader {
-							id: rowContentLoader
-							anchors.fill: parent
-							active: root.rowContentComponent !== null
-							sourceComponent: root.rowContentComponent
+							id: actionExtensionLoader
+							anchors.right: editButton.visible ? editButton.left : (cancelButton.visible ? cancelButton.left : parent.right)
+							anchors.rightMargin: Style.marginS
+							anchors.verticalCenter: parent.verticalCenter
+							active: root.rowActionExtensionComponent !== null
+							sourceComponent: root.rowActionExtensionComponent
 							property var node: entryRow.treeNode
 							property bool editing: entryRow.rowEditing
-							// The row reads these to know which cell to open on and
-							// when to write its drafts back.
-							property int editColumn: root.editColumn
-							property int commitRequest: root.commitRequest
+							property bool selected: entryRow.selected
 						}
-					}
-
-					// Per-row edit affordance: a pencil that fades in with the pointer
-					// or the selection, and turns into a tick while the row is open.
-					ToolButton {
-						id: cancelButton
-						objectName: "RowCancelButton"
-						anchors.right: parent.right
-						anchors.rightMargin: Style.marginM
-						anchors.verticalCenter: parent.verticalCenter
-						width: Style.iconSizeM
-						height: Style.iconSizeM
-						visible: entryRow.rowEditing
-						iconSource: "qrc:/" + Style.getIconPath("Icons/Cancel", Icon.State.On, Icon.Mode.Normal)
-						onClicked: root.cancelEditRow()
-					}
-
-					// Tick and cross of the row itself, so a row can be finished or
-					// abandoned without going back up to the toolbar.
-					ToolButton {
-						id: editButton
-						objectName: "RowEditButton"
-						anchors.right: cancelButton.visible ? cancelButton.left : parent.right
-						anchors.rightMargin: Style.marginM
-						anchors.verticalCenter: parent.verticalCenter
-						width: Style.iconSizeM
-						height: Style.iconSizeM
-						visible: root.rowEditingEnabled
-						opacity: entryRow.selected || entryRow.rowEditing || editButton.hovered
-							? 1 : Style.opacityLow
-						iconSource: "qrc:/" + Style.getIconPath(entryRow.rowEditing ? "Icons/Ok" : "Icons/Edit",
-							Icon.State.On, Icon.Mode.Normal)
-						onClicked: root.toggleEditRow(entryRow.treeNode)
-					}
-
-					Loader {
-						id: actionExtensionLoader
-						anchors.right: editButton.visible ? editButton.left : (cancelButton.visible ? cancelButton.left : parent.right)
-						anchors.rightMargin: Style.marginS
-						anchors.verticalCenter: parent.verticalCenter
-						active: root.rowActionExtensionComponent !== null
-						sourceComponent: root.rowActionExtensionComponent
-						property var node: entryRow.treeNode
-						property bool editing: entryRow.rowEditing
-						property bool selected: entryRow.selected
 					}
 				}
 			}
@@ -1459,6 +1468,14 @@ FocusScope {
 					text: root.filterText === "" ? root.emptyDescription : qsTr("Try a different search")
 					color: Style.subtitleColor
 					wrapMode: Text.WordWrap
+				}
+				ToolbarButton {
+					objectName: "EmptyActionButton"
+					anchors.horizontalCenter: parent.horizontalCenter
+					visible: root.emptyActionText !== "" && root.filterText === ""
+					active: root.editable
+					text: root.emptyActionText
+					onClicked: root.emptyActionRequested()
 				}
 			}
 		}

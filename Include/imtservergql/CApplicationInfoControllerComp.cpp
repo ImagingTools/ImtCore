@@ -198,7 +198,7 @@ void CApplicationInfoControllerComp::FillSuperuserStatus(ApplicationInfo& applic
 
 	if (m_databaseConnectionCheckerCompPtr.IsValid()){
 		QString connectionMessage;
-		if (!m_databaseConnectionCheckerCompPtr->CheckDatabaseConnection(connectionMessage)){
+		if (m_databaseConnectionCheckerCompPtr->CheckDatabaseConnection(connectionMessage) == imtdb::IDatabaseServerConnectionChecker::DS_NOT_CONNECTED){
 			superuser.status = sdl::V1_0::imtapp::SuperuserExistsStatus::UNKNOWN;
 			superuser.message = connectionMessage;
 
@@ -279,6 +279,24 @@ imtsdl::TElementList<sdl::V1_0::imtapp::CServiceInfo> CApplicationInfoController
 			break;
 		default:
 			dependencyData.status = sdl::V1_0::imtapp::ServiceStatus::UNKNOWN;
+			break;
+		}
+
+		switch (dependency.credentialStatus){
+		case imtcom::IServiceInfoProvider::CRS_VALID:
+			dependencyData.credentialStatus = sdl::V1_0::imtapp::ServerCredentialStatus::VALID;
+			break;
+		case imtcom::IServiceInfoProvider::CRS_MISSING:
+			dependencyData.credentialStatus = sdl::V1_0::imtapp::ServerCredentialStatus::MISSING;
+			break;
+		case imtcom::IServiceInfoProvider::CRS_REJECTED:
+			dependencyData.credentialStatus = sdl::V1_0::imtapp::ServerCredentialStatus::REJECTED;
+			break;
+		case imtcom::IServiceInfoProvider::CRS_UNAVAILABLE:
+			dependencyData.credentialStatus = sdl::V1_0::imtapp::ServerCredentialStatus::UNAVAILABLE;
+			break;
+		default:
+			dependencyData.credentialStatus = sdl::V1_0::imtapp::ServerCredentialStatus::NOT_USED;
 			break;
 		}
 

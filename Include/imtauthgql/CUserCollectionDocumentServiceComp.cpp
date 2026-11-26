@@ -111,6 +111,7 @@ sdl::V1_0::imtauth::CUserData CUserCollectionDocumentServiceComp::OnGetUserRepre
 	// Delegated roles added by the tenant adaptation are not direct, so they do not round-trip.
 	const imtauth::IPrincipal::RoleIds directRoles = userPtr->GetRoles(currentProductId);
 	CAssignmentCollector collector;
+	collector.SetTenantScope(bindingPtr, currentTenantId);
 	collector.CollectUser(*effectiveUserPtr, effectiveUserPtr->GetRoles(currentProductId), directRoles, currentProductId);
 	collector.FillUser(response);
 
@@ -197,6 +198,15 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 	sdl::V1_0::imtauth::CUserData userData;
 	if (arguments.input->user){
 		userData = *arguments.input->user;
+	}
+
+	const QByteArray contextProductId = gqlRequest.GetRequestContext() != nullptr ? gqlRequest.GetRequestContext()->GetProductId() : QByteArray();
+	const QByteArrayList previousPermissions = userPtr->GetPermissions(contextProductId);
+	const istd::IChangeableUniquePtr previousPtr = userPtr->CloneMe();
+	const imtauth::IUserInfo* previousUserPtr = dynamic_cast<const imtauth::IUserInfo*>(previousPtr.GetPtr());
+	if (previousUserPtr == nullptr){
+		errorMessage = QStringLiteral("Unable to copy the user");
+		return response;
 	}
 
 	// A stored user keeps its UUID: the editor sends the ID of its own representation.
@@ -323,6 +333,9 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 		if (userData.productId){
 			productId = *userData.productId;
 		}
+		if (!CheckAdministeredProduct(gqlRequest.GetRequestContext(), productId, errorMessage)){
+			return response;
+		}
 		imtauth::IPrincipal::RoleIds incomingRoles;
 		for (const QByteArray& rid : CAssignmentCollector::GetDirectIds(userData.roles)){
 			if (shouldKeepForTenant(rolesEntity, rid)){
@@ -346,6 +359,22 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 		userPtr->SetRoles(productId, finalRoles);
 	}
 
+	if (!CheckAddedRolesOfProducts(userPtr->GetRoleProvider(), previousUserPtr, *userPtr, errorMessage)){
+		return response;
+	}
+
+	if (!CheckGrantedPermissions(gqlRequest.GetRequestContext(), previousPermissions, userPtr->GetPermissions(contextProductId), errorMessage)){
+		return response;
+	}
+
+	// An unsaved new user has no other products yet, so the checks below only bind stored accounts
+	if (!CheckUserAccountChange(gqlRequest.GetRequestContext(), userPtr->GetObjectUuid(), *previousUserPtr, *userPtr, errorMessage)){
+		return response;
+	}
+
+	if (!CheckJoinedUserGroups(gqlRequest.GetRequestContext(), userPtr->GetUserGroupProvider(), previousUserPtr->GetGroups(), userPtr->GetGroups(), errorMessage)){
+		return response;
+	}
 
 	if (m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr) != imtdoc::IDocumentService::OS_OK){
 		errorMessage = QStringLiteral("Unable to update document data. Error: SetDocumentData failed");

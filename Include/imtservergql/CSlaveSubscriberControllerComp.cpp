@@ -5,6 +5,9 @@
 // Qt includes
 #include <QtCore/QMutexLocker>
 
+// ImtCore includes
+#include <imtrest/CWebSocketRequest.h>
+
 
 namespace imtservergql
 {
@@ -27,6 +30,19 @@ bool CSlaveSubscriberControllerComp::IsRequestSupported(const imtgql::CGqlReques
 }
 
 
+bool CSlaveSubscriberControllerComp::IsOpenFor(SubscriberKind subscriberKind, const imtgql::CGqlRequest& gqlRequest) const
+{
+	for (int index = 0; index < m_subscriberControllerListCompPtr.GetCount(); index++){
+		imtgql::IGqlSubscriberController* publisherPtr = m_subscriberControllerListCompPtr[index];
+		if (publisherPtr != nullptr && publisherPtr->IsRequestSupported(gqlRequest)){
+			return publisherPtr->IsOpenFor(subscriberKind, gqlRequest);
+		}
+	}
+
+	return false;
+}
+
+
 bool CSlaveSubscriberControllerComp::RegisterSubscription(
 			const QByteArray& subscriptionId,
 			const imtgql::CGqlRequest& gqlRequest,
@@ -37,9 +53,13 @@ bool CSlaveSubscriberControllerComp::RegisterSubscription(
 	// rebind the publisher: reporting success while leaving the previous binding in place kept
 	// the subscription attached to a request that can no longer deliver anything.
 	imtgql::IGqlSubscriberController* stalePublisherPtr = nullptr;
+	const imtrest::CWebSocketRequest* webSocketRequestPtr = dynamic_cast<const imtrest::CWebSocketRequest*>(&networkRequest);
+	const QByteArray connectionId = webSocketRequestPtr != nullptr ? webSocketRequestPtr->GetConnectionId() : QByteArray();
+	Q_ASSERT(!connectionId.isEmpty());
+	const PublisherKey key(connectionId, subscriptionId);
 	{
 		QMutexLocker lock(&m_publisherMapMutex);
-		auto iter = m_publisherMap.find(subscriptionId);
+		auto iter = m_publisherMap.find(key);
 		if (iter != m_publisherMap.end()){
 			stalePublisherPtr = iter.value();
 			m_publisherMap.erase(iter);
@@ -48,7 +68,7 @@ bool CSlaveSubscriberControllerComp::RegisterSubscription(
 
 	// Outside the lock — publishers may block or re-enter Unregister.
 	if (stalePublisherPtr != nullptr){
-		stalePublisherPtr->UnregisterSubscription(subscriptionId);
+		stalePublisherPtr->UnregisterSubscription(key.first, subscriptionId);
 	}
 
 	for (int index = 0; index < m_subscriberControllerListCompPtr.GetCount(); index++){
@@ -69,8 +89,8 @@ bool CSlaveSubscriberControllerComp::RegisterSubscription(
 		{
 			QMutexLocker lock(&m_publisherMapMutex);
 			// Another connection may have raced the same id (unlikely UUID) — keep first.
-			if (!m_publisherMap.contains(subscriptionId)){
-				m_publisherMap.insert(subscriptionId, publisherPtr);
+			if (!m_publisherMap.contains(key)){
+				m_publisherMap.insert(key, publisherPtr);
 			}
 		}
 		return true;
@@ -80,12 +100,13 @@ bool CSlaveSubscriberControllerComp::RegisterSubscription(
 }
 
 
-bool CSlaveSubscriberControllerComp::UnregisterSubscription(const QByteArray& subscriptionId)
+bool CSlaveSubscriberControllerComp::UnregisterSubscription(const QByteArray& connectionId, const QByteArray& subscriptionId)
 {
+	const PublisherKey key(connectionId, subscriptionId);
 	imtgql::IGqlSubscriberController* publisherPtr = nullptr;
 	{
 		QMutexLocker lock(&m_publisherMapMutex);
-		auto iter = m_publisherMap.find(subscriptionId);
+		auto iter = m_publisherMap.find(key);
 		if (iter == m_publisherMap.end()){
 			return false;
 		}
@@ -97,10 +118,10 @@ bool CSlaveSubscriberControllerComp::UnregisterSubscription(const QByteArray& su
 		return false;
 	}
 
-	const bool res = publisherPtr->UnregisterSubscription(subscriptionId);
+	const bool res = publisherPtr->UnregisterSubscription(connectionId, subscriptionId);
 	if (res){
 		QMutexLocker lock(&m_publisherMapMutex);
-		m_publisherMap.remove(subscriptionId);
+		m_publisherMap.remove(key);
 	}
 	return res;
 }

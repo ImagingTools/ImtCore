@@ -32,6 +32,7 @@ private slots:
 	void ParseComplexTest();
 	void ParseQueryWithVariables();
 	void ParseQueryWithOperationName();
+	void ParseQueryWithLeadingWhitespace();
 	void ParseStartPatchMeasurement();
 	void ParseStartPatchMeasurementComplex();
 	void TestVariableObjectList();
@@ -41,6 +42,20 @@ private slots:
 	void ParseArraysWithNullElements();
 	void ParseStringWithEscapeSequences();
 	void BenchmarkIsNullArrayElementMillionValues();
+
+	void IsEqualSameAndEmpty();
+	void IsEqualDifferentHeader();
+	void IsEqualParamsAndFields();
+	void IsEqualParsedQueries();
+	void IsEqualNonRequestObject();
+
+	void ParamObjectIsEqualSimple();
+	void ParamObjectIsEqualNested();
+	void ParamObjectIsEqualObjectList();
+	void ParamObjectIsEqualNullAndType();
+	void FieldObjectIsEqualSimple();
+	void FieldObjectIsEqualNested();
+	void FieldObjectIsEqualType();
 
 	void cleanupTestCase();
 

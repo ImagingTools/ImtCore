@@ -782,7 +782,7 @@ DocumentViewBase {
 		// as "#aarrggbb" - a yellow border.
 		readonly property string cardBorderColorFaded: Style.inputBorderColor
 		readonly property string pageBgColor: Style.backgroundColor2
-		readonly property string accentColor: Style.imaginToolsAccentColor
+		readonly property string accentColor: Style.imagingToolsAccentColor
 		readonly property string labelColor: Style.textColor
 		readonly property real avatarSize: 36
 		readonly property real accentDividerHeight: 2
@@ -1404,7 +1404,7 @@ DocumentViewBase {
 										model: ticketEditor.pendingAssignees
 										delegate: Rectangle {
 											objectName: "AssigneeChip_" + index
-											width: Math.min(assigneeChipText.contentWidth + assigneeChipRemove.width + Style.paddingS * 3, assigneesFlow.chipMaxWidth)
+											width: Math.min(assigneeChipText.implicitWidth + assigneeChipRemove.width + Style.paddingS * 3, assigneesFlow.chipMaxWidth)
 											height: assigneesFlow.chipHeight
 											radius: Style.radiusM
 											color: editView.accentBgLight
@@ -1626,7 +1626,7 @@ DocumentViewBase {
 										model: ticketEditor.pendingEntityRefs
 										delegate: Rectangle {
 											objectName: "ContextChip_" + index
-											width: Math.min(refLabelText.contentWidth + refRemoveBtn.width + Style.paddingS * 3, contextFlow.chipMaxWidth)
+											width: Math.min(refLabelText.implicitWidth + refRemoveBtn.width + Style.paddingS * 3, contextFlow.chipMaxWidth)
 											height: contextFlow.chipHeight
 											radius: Style.radiusM
 											color: editView.accentBgLight

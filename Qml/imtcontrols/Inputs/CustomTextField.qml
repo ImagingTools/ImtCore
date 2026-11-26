@@ -103,6 +103,11 @@ FocusScope {
 	function setFocus(value){
 		textField.focus = value;
 	}
+
+	// Gives the keyboard to the input itself, as a click does
+	function forceInputFocus(){
+		textField.forceActiveFocus();
+	}
 	
 	function ensureVisible(pos){
 		textField.ensureVisible(pos);
@@ -220,8 +225,9 @@ FocusScope {
 		clip: true;
 		
 		activeFocusOnPress: !containerTextField.readOnly;
-		activeFocusOnTab: !containerTextField.readOnly;
-		
+		// Qt refuses to clear activeFocusOnTab on the focused item (a field turning read-only while edited): keep it until the focus leaves
+		activeFocusOnTab: !containerTextField.readOnly || textField.activeFocus;
+
 		onAccepted: {
 			containerTextField.accepted();
 		}

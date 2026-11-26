@@ -1,0 +1,83 @@
+{
+  "date": "2026-11-20T19:39:02.445Z",
+  "results": [
+    {
+      "kind": "ImtCore",
+      "nodes": 100,
+      "total": 1100,
+      "columns": 4,
+      "create": 69.220458984375,
+      "expandAll": 44.09474992752075,
+      "collapseAll": 39.207374930381775,
+      "toggle": 8.190470823645592,
+      "scroll": 7.456116250753403,
+      "heapCollapsed": 9500824,
+      "heapExpanded": 7770024
+    },
+    {
+      "kind": "TreeView",
+      "nodes": 100,
+      "total": 1100,
+      "columns": 4,
+      "create": 30.15970802307129,
+      "expandAll": 16.386624932289124,
+      "collapseAll": 6.33916699886322,
+      "toggle": 1.231268748641014,
+      "scroll": 1.0094774997234344,
+      "heapCollapsed": 2624832,
+      "heapExpanded": 4686048
+    },
+    {
+      "kind": "ImtCore",
+      "nodes": 1000,
+      "total": 11000,
+      "columns": 4,
+      "create": 114.5934590101242,
+      "expandAll": 56.27704203128815,
+      "collapseAll": 42.62391698360443,
+      "toggle": 8.271817702054978,
+      "scroll": 7.658976670503616,
+      "heapCollapsed": 15487624,
+      "heapExpanded": 15826048
+    },
+    {
+      "kind": "TreeView",
+      "nodes": 1000,
+      "total": 11000,
+      "columns": 4,
+      "create": 84.42900002002716,
+      "expandAll": 39.22699999809265,
+      "collapseAll": 22.672165989875793,
+      "toggle": 1.2477781236171723,
+      "scroll": 1.0186625003814698,
+      "heapCollapsed": 6381296,
+      "heapExpanded": 10874600
+    },
+    {
+      "kind": "ImtCore",
+      "nodes": 10000,
+      "total": 110000,
+      "columns": 4,
+      "create": 434.6397500038147,
+      "expandAll": 185.64916610717773,
+      "collapseAll": 77.38808310031891,
+      "toggle": 9.42640207707882,
+      "scroll": 7.60204666018486,
+      "heapCollapsed": 73055536,
+      "heapExpanded": 91514128
+    },
+    {
+      "kind": "TreeView",
+      "nodes": 10000,
+      "total": 110000,
+      "columns": 4,
+      "create": 550.3559999465942,
+      "expandAll": 270.42004203796387,
+      "collapseAll": 546.0991249084473,
+      "toggle": 1.2431843757629395,
+      "scroll": 0.9899404191970825,
+      "heapCollapsed": 43680576,
+      "heapExpanded": 70721488
+    }
+  ]
+}

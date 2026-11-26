@@ -98,6 +98,7 @@ QtObject {
 
 	property var organizationPermissions: root.__permissionsProvider ? root.__permissionsProvider.organizationPermissions : []
 	property var memberOrganizationPermissions: root.__permissionsProvider ? root.__permissionsProvider.memberOrganizationPermissions : []
+	property var administratorOrganizationPermissions: root.__permissionsProvider ? root.__permissionsProvider.administratorOrganizationPermissions : []
 	signal organizationPermissionsReceived()
 
 	function setRolePermissionsTenantId(tenantId) {

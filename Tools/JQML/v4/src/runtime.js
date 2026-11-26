@@ -4,17 +4,23 @@
 //
 // spec: {
 //   name, root, main, lenient, maxErrors, language, incremental,
-//   files: { path: text },        QML documents, JavaScript files, qmldir files
+//   files: { path: text },        JavaScript files, qmldir files, and the QML documents of a debug build
+//   docs: { path: text },         the QML documents of a compiled application, as packed trees (src/packed.js)
+//   scans: { path: { f, t, q, e } }  what the text of a packed document names (see createProject)
+//   docsDeflate: base64,           --compress-docs of the compiler: docs and scans deflated (raw) together, in their place
+//   debug: true                   the text of the documents is there, and window.qmlWeb gives the engine
 //   binaries: { path: base64 },   fonts
 //   modules: { name: [dir] },     module name -> directories with a qmldir
-//   translations: { language: { source: translation } },
+//   translations: { language: { source: translation or [plural forms] } },
 // }
 
 import { Engine } from './engine.js';
 import { attachCanvas } from './host.js';
 import { MapFS, Project } from './project.js';
+import { Flickable, ListView } from './items.js';
 import { Renderer } from './renderer.js';
 import { Scene } from './scene.js';
+import { createTestApi, trackNetwork } from './testapi.js';
 
 export function decodeBase64(text) {
 	if (typeof atob === 'function') {
@@ -38,11 +44,42 @@ export function resourceRoot(root, location) {
 	return result.endsWith('/') ? result : `${result}/`;
 }
 
-// A project over the embedded files; load() parses them again in the browser.
+// The documents of a compiled application are packed trees, without their text (compiler/compiler.js); a scan lists the font
+// files `f`, the types made by createObject `t` and the QML files `q` a document names, and `e` when it declares an enum.
+function addCompiledDocuments(project, docs, scans) {
+	for (const [path, record] of Object.entries(docs || {})) {
+		const scan = (scans || {})[path] || {};
+		project.addCompiled(path, record, { fonts: scan.f || [], types: scan.t || [], files: scan.q || [], enums: scan.e === 1 });
+	}
+}
+
+// `spec.docsDeflate` (--compress-docs of the compiler): `{ docs, scans }` deflated (raw) and base64-encoded, one block instead of
+// the usual plain JSON of `spec.docs`/`spec.scans`. DecompressionStream is a browser/Node API (not in every very old browser); a
+// build made with the flag needs it, and says so rather than silently doing nothing.
+async function inflateDocs(base64) {
+	if (typeof DecompressionStream !== 'function') {
+		throw new Error('This browser has no DecompressionStream; it cannot start a build made with --compress-docs.');
+	}
+	const stream = new Blob([decodeBase64(base64)]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+	return JSON.parse(await new Response(stream).text());
+}
+
+// A project over the embedded files; load() parses them again in the browser. The documents of a build made with
+// --compress-docs are not there yet (they are still deflated): addDeflatedDocs adds them, and createApplication's
+// start() calls it before the project loads its main document.
 export function createProject(spec) {
 	const files = new Map(Object.entries(spec.files || {}));
 	for (const [path, base64] of Object.entries(spec.binaries || {})) files.set(path, decodeBase64(base64));
-	return new Project(new MapFS(files), { modules: spec.modules || {} });
+	const project = new Project(new MapFS(files), { modules: spec.modules || {}, trusted: spec.trusted === true });
+	addCompiledDocuments(project, spec.docs, spec.scans);
+	return project;
+}
+
+// Inflates spec.docsDeflate (if there is one) and adds its documents to `project`; a no-op otherwise.
+export async function addDeflatedDocs(project, spec) {
+	if (!spec.docsDeflate) return;
+	const { docs, scans } = await inflateDocs(spec.docsDeflate);
+	addCompiledDocuments(project, docs, scans);
 }
 
 function pickLanguage(spec) {
@@ -57,7 +94,17 @@ export function createApplication(spec, canvas, location = null) {
 	const renderer = new Renderer(canvas);
 	const engine = new Engine();
 	engine.lenient = spec.lenient !== false;
+	// The scripts of the QML files get a name and a source map, so the debugger stops in the .qml file. A debug build does it always, any
+	// other one with `?qmlsource=1` in the address: it costs time at the start (every script is compiled on its own, and the expressions
+	// run as written, without src/resolve.js).
+	const wantsSources = spec.debug === true || (location && typeof location.search === 'string' && /[?&]qmlsource=1/.test(location.search));
+	if (typeof spec.sourceBase === 'string' && wantsSources) engine.sourceBase = spec.sourceBase;
 	engine.incremental = spec.incremental !== false;
+	// A debug build: `?noresolve=1` runs the expressions through `with` as before, `?verify=1` runs both forms and compares them.
+	if (spec.debug === true && location && typeof location.search === 'string') {
+		if (/[?&]noresolve=1/.test(location.search)) engine.resolveNames = false;
+		if (/[?&]verify=1/.test(location.search)) engine.verifyResolution = true;
+	}
 	if (spec.maxErrors) engine.maxErrors = spec.maxErrors;
 	engine.translations = spec.translations || {};
 	engine.language = pickLanguage(spec);
@@ -69,6 +116,7 @@ export function createApplication(spec, canvas, location = null) {
 	};
 	const project = createProject(spec);
 	const start = async () => {
+		await addDeflatedDocs(project, spec);
 		await project.load(spec.main);
 		await project.loadEmbedded();
 		return engine.load(project, scene.root);
@@ -89,7 +137,8 @@ function showFatal(error) {
 // Creates a canvas filling the page and starts the application once the page is loaded.
 // `window.qmlWebApplication` exposes the specification and the factories before that (devtools, tests).
 export function bootstrap(spec) {
-	if (typeof window !== 'undefined') window.qmlWebApplication = { spec, createApplication, createProject };
+	// The engine, the project and the documents are reached through these only in a debug build.
+	if (typeof window !== 'undefined' && spec.debug === true) window.qmlWebApplication = { spec, createApplication, createProject };
 	if (typeof document === 'undefined') return;
 	const run = () => {
 		const style = document.createElement('style');
@@ -100,8 +149,11 @@ export function bootstrap(spec) {
 		document.body.append(canvas);
 		const application = createApplication(spec, canvas, window.location);
 		attachCanvas(canvas, application.scene, application.engine);
-		window.qmlWeb = application;
-		application.start().catch(showFatal);
+		if (spec.debug === true) window.qmlWeb = application;
+		// Every build has it, release ones too: the tests find and drive the items through it (see testapi.js).
+		const testApi = createTestApi({ engine: application.engine, scene: application.scene, canvas, network: trackNetwork(window), classes: { Flickable, ListView } });
+		window.qmlTest = testApi;
+		application.start().then(() => testApi.markStarted(), showFatal);
 	};
 	if (document.readyState === 'complete') run();
 	else window.addEventListener('load', run);

@@ -17,10 +17,19 @@ import imtbaseFileSystemSdl 1.0
     Selection: single by default. With multiSelect the rows carry checkboxes and
     support Ctrl-click (toggle), Shift-click (range) and a select-all header box.
     On confirm both pathSelected(path) and pathsSelected(paths) are emitted.
+
+    Options (both off by default):
+    - restrictToStartFolder: Up stops at the folder the dialog opens in; nothing
+      above it can be opened.
+    - showOnlyFolders: the files of a folder are not listed, only folders (links,
+      drives). Without it files are listed and pathKind decides what is pickable.
 */
 
 Dialog {
 	id: root
+
+	// The keyboard drives the listing from the start; without it the keys reach the page under the dialog
+	forceFocus: true
 
 	property string permissionPath: ""
 	title: root.computeTitle()
@@ -44,6 +53,14 @@ Dialog {
 	// folders always listed for navigation. Sent verbatim to the server.
 	property string extensionFilter: ""
 	readonly property bool hasExtensionFilter: root.extensionFilter !== ""
+	// Going up above the folder the dialog opens in (the first folder loaded - the
+	// folder that holds startPath) is not offered. Default false: the whole file
+	// system the server exposes can be browsed.
+	property bool restrictToStartFolder: false
+	// Only containers (folders, links, drives) are listed; the files of a folder are
+	// not shown at all. Default false: files are listed too (pickable only when
+	// pathKind allows files).
+	property bool showOnlyFolders: false
 
 	property string currentPath: ""
 	// Whether a parent exists, kept apart from parentPath: an EMPTY parentPath is
@@ -51,6 +68,15 @@ Dialog {
 	// can no longer mean "nowhere to go up to".
 	property bool hasParent: false
 	property string parentPath: ""
+	// The folder the dialog opened in (server-resolved path of the first successful
+	// listing): the upper bound of restrictToStartFolder. Kept apart from its
+	// emptiness, since "" is a real address (the virtual drives root).
+	property string startFolder: ""
+	property bool startFolderKnown: false
+	// Up is available: there is a parent, and it is not above the start folder
+	// when restrictToStartFolder is set. atDrivesRoot backstops hasParent - see browseUp().
+	readonly property bool canGoUp: root.hasParent && !root.atDrivesRoot
+		&& !(root.restrictToStartFolder && root.startFolderKnown && root.isSamePath(root.currentPath, root.startFolder))
 	// The virtual drives root ("This PC"), served only by a whole-file-system
 	// provider. It has no real path, so Date/Size are meaningless there and the
 	// columns switch to volume capacity instead.
@@ -97,6 +123,8 @@ Dialog {
 	// True while the name filter field has focus — suppresses Enter→activate so
 	// typing a filter does not open the highlighted row.
 	property bool filterFieldFocused: false
+	// The filter field lives in contentComp, whose ids are not visible here
+	property Item filterFieldItem: null
 	// Set when the filter changes while a request is in flight; applied after load.
 	property bool __pendingFilterRefresh: false
 	// Set for a same-folder reload (sort / filter / refresh): keep the current
@@ -143,9 +171,10 @@ Dialog {
 		return (root.pathKind & Enums.pathKindFile) !== 0
 	}
 
-	// In directory-only pick mode plain files are hidden (only navigable entries).
+	// With showOnlyFolders plain files are hidden (only navigable entries); otherwise
+	// everything is listed and pathKind only decides what may be picked.
 	function isListableEntry(entryType){
-		if ((root.pathKind & Enums.pathKindFile) !== 0)
+		if (!root.showOnlyFolders)
 			return true
 		return root.isDirectoryEntry(entryType)
 	}
@@ -209,6 +238,41 @@ Dialog {
 	// Normalize separators; browse/reveal compare against server forward-slash paths.
 	function normalizePath(path){
 		return path ? String(path).replace(/\\/g, "/") : ""
+	}
+
+	// Whether a normalized path is a Windows one (case-insensitive): a drive path
+	// ("C:/...") or a UNC path ("//server/share/..." - "\\server\share" normalized;
+	// Qt reports UNC paths in this form too). A canonical POSIX path never starts
+	// with "//".
+	function isWindowsPath(normalizedPath){
+		return /^[A-Za-z]:/.test(normalizedPath) || /^\/\/[^\/]/.test(normalizedPath)
+	}
+
+	// Path for comparisons: forward slashes, no trailing slash (except a root such
+	// as "/" or "C:/"), lower case for a Windows path (case-insensitive there).
+	function comparablePath(path){
+		var norm = root.normalizePath(path)
+		while (norm.length > 1 && norm.endsWith("/") && !/^[A-Za-z]:\/$/.test(norm))
+			norm = norm.slice(0, -1)
+		if (root.isWindowsPath(norm))
+			norm = norm.toLowerCase()
+		return norm
+	}
+
+	function isSamePath(path1, path2){
+		return root.comparablePath(path1) === root.comparablePath(path2)
+	}
+
+	// Whether the path is the folder or lies inside it. Everything lies inside the
+	// virtual drives root ("").
+	function isPathWithin(path, folder){
+		var base = root.comparablePath(folder)
+		if (base === "")
+			return true
+		var target = root.comparablePath(path)
+		if (target === base)
+			return true
+		return target.indexOf(base.endsWith("/") ? base : base + "/") === 0
 	}
 
 	// Parent directory of a path, keeping drive roots valid ("C:/foo" -> "C:/").
@@ -282,6 +346,19 @@ Dialog {
 	function setSingleSelection(path){
 		root.selectedPath = path
 		root.selectedPaths = (path === "" ? [] : [path])
+	}
+
+	function clearInvalidSelections(){
+		var validPaths = []
+		for (var i = 0; i < root.selectedPaths.length; i++){
+			var path = root.selectedPaths[i]
+			var entry = root.findEntryByPath(path)
+			if (!entry || root.isSelectableEntry(entry.entryType))
+				validPaths.push(path)
+		}
+		root.selectedPaths = validPaths
+		if (validPaths.indexOf(root.selectedPath) < 0)
+			root.selectedPath = validPaths.length > 0 ? validPaths[validPaths.length - 1] : ""
 	}
 
 	function toggleSelection(path){
@@ -521,6 +598,10 @@ Dialog {
 		if (root.isLoading)
 			return
 
+		// Nothing above the start folder is opened (restrictToStartFolder).
+		if (root.restrictToStartFolder && root.startFolderKnown && !root.isPathWithin(path, root.startFolder))
+			return
+
 		root.__appending = append === true
 		// Fresh navigation into a different folder: clear the name filter.
 		// Sort preference is kept across folders (Explorer-like).
@@ -571,11 +652,12 @@ Dialog {
 	// Going up keeps the folder we are leaving selected, so Enter-into / Backspace-out
 	// returns the cursor to where it was (Explorer behaviour).
 	function browseUp(){
-		// atDrivesRoot is a second, independent guard alongside hasParent: the
-		// server always resolves the virtual drives root to an empty currentPath,
-		// so this catches it even if hasParent's presence-tracking (has_value on
-		// an omitted parentPath) does not survive the web build faithfully.
-		if (root.isLoading || !root.hasParent || root.atDrivesRoot)
+		// canGoUp checks atDrivesRoot as a second, independent guard alongside
+		// hasParent: the server always resolves the virtual drives root to an empty
+		// currentPath, so this catches it even if hasParent's presence-tracking
+		// (has_value on an omitted parentPath) does not survive the web build
+		// faithfully. It also stops at the start folder (restrictToStartFolder).
+		if (root.isLoading || !root.canGoUp)
 			return
 		root.__revealTarget = root.normalizePath(root.currentPath)
 		root.browse(root.parentPath, false)
@@ -591,6 +673,14 @@ Dialog {
 	}
 
 	function applyPayload(payload){
+		// browse() checks the requested path only; a link inside the start folder may
+		// still resolve to a location outside it on the server. Such a listing is
+		// refused like a failed load: the previous folder and listing are kept.
+		if (root.restrictToStartFolder && root.startFolderKnown && !root.isPathWithin(payload.m_path, root.startFolder)){
+			root.onLoadFailed(qsTr("This location is outside the start folder"))
+			return
+		}
+
 		root.isLoading = false
 		root.errorText = ""
 		root.__hasLoaded = true
@@ -599,6 +689,11 @@ Dialog {
 		var freshLoad = !root.__appending
 
 		root.currentPath = payload.m_path
+		// The first folder opened is the start folder (the upper bound of restrictToStartFolder).
+		if (!root.startFolderKnown){
+			root.startFolder = payload.m_path
+			root.startFolderKnown = true
+		}
 		// Presence, not emptiness: an empty parentPath still addresses the virtual
 		// drives root, so hasParent is what decides whether Up is available.
 		// At the drives root the server omits parentPath entirely → Up disabled.
@@ -611,6 +706,8 @@ Dialog {
 		// Replace the listing only once the response arrives, so a failed
 		// navigation leaves the previous directory visible.
 		if (freshLoad){
+			if (root.__preserveSelection)
+				root.clearInvalidSelections()
 			entriesModel.clear()
 			root.loadedCount = 0
 			root.__anchorIndex = -1
@@ -618,10 +715,13 @@ Dialog {
 
 		if (payload.hasEntries() && payload.m_entries){
 			var count = payload.m_entries.getItemsCount()
+			var fileSkipped = false
 			for (var i = 0; i < count; i++){
 				var entryType = payload.m_entries.getData("m_entryType", i)
-				if (!root.isListableEntry(entryType))
+				if (!root.isListableEntry(entryType)){
+					fileSkipped = true
 					continue
+				}
 				var name = payload.m_entries.getData("m_name", i)
 				var path = payload.m_entries.getData("m_path", i)
 				var sizeValue = payload.m_entries.getData("m_size", i)
@@ -645,6 +745,12 @@ Dialog {
 			// Advance the page offset by the raw server count (not the filtered
 			// view) so the next page starts after the full server slice.
 			root.loadedCount += count
+
+			// The server lists containers above files whatever the sort
+			// (CFileSystemStructureProviderComp), so past the first hidden file
+			// there is no folder left: the next pages would be files only.
+			if (fileSkipped)
+				root.hasMore = false
 		}
 
 		if (freshLoad)
@@ -781,7 +887,24 @@ Dialog {
 
 	// Keyboard model mirrors BasicTreeView: arrows move, Enter opens/confirms,
 	// Backspace goes up, Home/End jump, Space toggles in multi-select.
+	function focusFilterField(){
+		if (root.filterFieldItem){
+			root.filterFieldItem.forceInputFocus()
+		}
+	}
+
 	function handleKey(event){
+		// Tab moves between the listing and the filter and never leaves the dialog
+		if (event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab){
+			if (root.filterFieldFocused){
+				root.forceActiveFocus()
+			}
+			else{
+				root.focusFilterField()
+			}
+
+			return true
+		}
 		if (root.filterFieldFocused){
 			// Leave typing keys to the filter field; only Backspace for "up" is
 			// suppressed while the field is empty (field uses Backspace itself).
@@ -830,6 +953,13 @@ Dialog {
 	// Explorer-style "N items" for the whole filtered/sorted folder (not just the
 	// page loaded so far - loaded-vs-total is a paging detail nobody needs to see).
 	function itemCountLabel(){
+		// totalCount counts the hidden files too: with showOnlyFolders the listed folders
+		// are counted instead ("+" while more of them may follow).
+		if (root.showOnlyFolders){
+			if (!root.hasMore && entriesModel.count === 1)
+				return qsTr("1 item")
+			return qsTr("%1 items").arg(root.hasMore ? entriesModel.count + "+" : entriesModel.count)
+		}
 		return root.totalCount === 1 ? qsTr("1 item") : qsTr("%1 items").arg(root.totalCount)
 	}
 
@@ -878,16 +1008,12 @@ Dialog {
 			return qsTr("Loading…")
 		if (root.filterText !== "" && entriesModel.count === 0)
 			return qsTr("No items match \"%1\"").arg(root.filterText)
-		if (root.hasExtensionFilter && entriesModel.count === 0 && root.filterText === "")
-			return root.extensionFilterHint()
 		if (root.selectedPaths.length > 0 && !root.selectionIsValid())
 			return root.selectionKindHint()
 		if (root.multiSelect && root.selectedPaths.length > 1)
 			return qsTr("%1 items selected").arg(root.selectedPaths.length)
 		if (root.selectedPath !== "")
 			return root.selectedPath
-		if (root.hasExtensionFilter)
-			return root.extensionFilterHint()
 		return qsTr("Nothing selected")
 	}
 
@@ -986,7 +1112,7 @@ Dialog {
 	Shortcut {
 		sequence: "Ctrl+F"
 		context: Qt.ApplicationShortcut
-		onActivated: filterField.forceActiveFocus()
+		onActivated: root.focusFilterField()
 	}
 
 	onFinished: {
@@ -1016,8 +1142,11 @@ Dialog {
 				target: root
 
 				function onRevealIndexChanged(){
-					if (root.revealIndex >= 0)
+					if (root.revealIndex >= 0){
+						// The rows of a listing loaded in this pass are not laid out yet
+						entriesView.forceLayout()
 						entriesView.positionViewAtIndex(root.revealIndex, ListView.Center)
+					}
 				}
 			}
 
@@ -1042,8 +1171,8 @@ Dialog {
 					Button {
 						id: upButton
 						widthFromDecorator: true
-						// atDrivesRoot backstops hasParent - see browseUp()'s comment.
-						enabled: root.hasParent && !root.isLoading && !root.atDrivesRoot
+						// canGoUp: a parent below the start folder bound - see browseUp()'s comment.
+						enabled: root.canGoUp && !root.isLoading
 						iconSource: "../../../" + Style.getIconPath("Icons/Up", Icon.State.On,
 							enabled ? Icon.Mode.Normal : Icon.Mode.Disabled)
 						decorator: Component {
@@ -1113,6 +1242,10 @@ Dialog {
 					color: Style.baseColor
 					borderWidth: filterField.textInputActiveFocus ? 1 : 0
 					placeHolderText: qsTr("Search %1").arg(root.currentFolderName())
+
+					Component.onCompleted: {
+						root.filterFieldItem = filterField
+					}
 
 					// Debounced re-query so each keystroke does not hit the agent.
 					onSearchChanged: {
@@ -1429,7 +1562,7 @@ Dialog {
 										width: Math.max(0, parent.width - entryIcon.width - parent.spacing)
 										anchors.verticalCenter: parent.verticalCenter
 										text: model.name
-										color: rowRoot.rowSelected ? Style.textSelectedColor : Style.textColor
+										color: Style.textColor
 										font.pixelSize: Style.fontSizeM
 										font.bold: model.isDir
 										elide: Text.ElideRight
@@ -1446,7 +1579,7 @@ Dialog {
 								horizontalAlignment: root.atDrivesRoot ? Text.AlignRight : Text.AlignLeft
 								verticalAlignment: Text.AlignVCenter
 								text: root.atDrivesRoot ? model.freeText : model.dateText
-								color: rowRoot.rowSelected ? Style.textSelectedColor : Style.textColor
+								color: Style.textColor
 								opacity: 0.75
 								font.pixelSize: Style.fontSizeS
 								elide: Text.ElideRight
@@ -1459,7 +1592,7 @@ Dialog {
 								horizontalAlignment: Text.AlignRight
 								verticalAlignment: Text.AlignVCenter
 								text: root.atDrivesRoot ? model.totalText : model.sizeText
-								color: rowRoot.rowSelected ? Style.textSelectedColor : Style.textColor
+								color: Style.textColor
 								opacity: 0.75
 								font.pixelSize: Style.fontSizeS
 							}
@@ -1531,10 +1664,13 @@ Dialog {
 					readonly property bool nameFilterEmpty: !emptyState.loadFailed
 						&& entriesModel.count === 0 && root.filterText !== "" && root.errorText === ""
 					// Folder has no allowed files (and no navigable dirs to show) under extensionFilter.
+					// Not in folders-only mode: extensions never filter folders, so an empty
+					// listing there means no subfolders, not a file-type mismatch.
 					readonly property bool extensionEmpty: !emptyState.loadFailed
 						&& !emptyState.nameFilterEmpty
 						&& entriesModel.count === 0
 						&& root.hasExtensionFilter
+						&& !root.showOnlyFolders
 						&& root.errorText === ""
 					readonly property bool filterEmpty: emptyState.nameFilterEmpty
 
@@ -1549,7 +1685,7 @@ Dialog {
 						text: emptyState.loadFailed ? qsTr("Can't load this location")
 							: (emptyState.nameFilterEmpty ? qsTr("No matching items")
 								: (emptyState.extensionEmpty ? qsTr("No files of the allowed types")
-									: qsTr("This folder is empty")))
+									: (root.showOnlyFolders ? qsTr("This folder has no subfolders") : qsTr("This folder is empty"))))
 						color: Style.textColor
 						font.pixelSize: Style.fontSizeL
 						opacity: 0.8
@@ -1566,7 +1702,7 @@ Dialog {
 								? qsTr("Try a different filter, or clear it to see all items")
 								: (emptyState.extensionEmpty
 									? root.extensionFilterHint()
-									: ((root.hasParent && !root.atDrivesRoot) ? qsTr("Go up or pick another location") : qsTr("Pick another location"))))
+									: (root.canGoUp ? qsTr("Go up or pick another location") : qsTr("Pick another location"))))
 						color: Style.textColor
 						font.pixelSize: Style.fontSizeS
 						opacity: 0.5
@@ -1634,7 +1770,7 @@ Dialog {
 					anchors.verticalCenter: parent.verticalCenter
 					radius: width / 2
 					color: root.errorText !== "" ? Style.errorColor
-						: (root.isLoading ? Style.highlightColor : Style.imaginToolsAccentColor)
+						: (root.isLoading ? Style.highlightColor : Style.imagingToolsAccentColor)
 				}
 
 				Text {

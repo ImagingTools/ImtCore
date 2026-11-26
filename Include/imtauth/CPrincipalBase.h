@@ -17,6 +17,11 @@ class CPrincipalBase: virtual public IPrincipal
 public:
 	CPrincipalBase();
 
+	/// Bind the roles and groups to other providers: a check reads them where it decides.
+	void SetRoleProvider(const imtauth::IRoleInfoProvider* roleProviderPtr);
+	void SetUserGroupProvider(const imtauth::IUserGroupInfoProvider* userGroupProviderPtr);
+	bool HasLocalPermissions(const QByteArray& productId) const;
+
 	// reimplemented (IPrincipal)
 	virtual const imtlic::IFeatureInfoProvider* GetPermissionProvider() const override;
 	virtual const imtauth::IRoleInfoProvider* GetRoleProvider() const override;
@@ -69,6 +74,5 @@ protected:
 
 
 } // namespace imtauth
-
 
 

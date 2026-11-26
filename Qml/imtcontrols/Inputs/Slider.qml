@@ -16,7 +16,7 @@ ControlBase {
 	property real _backgroundWidth: mainSize - controlWidth;
 	property int backgroundHeight: 6;
 	property string backgroundColor: Style.backgroundColor//Style.selectedColor
-	property string controlColor:  Style.imaginToolsAccentColor
+	property string controlColor:  Style.imagingToolsAccentColor
 
 	property real backgroundOpacity: 1.;
 

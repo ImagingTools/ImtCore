@@ -46,7 +46,7 @@ void CStructureSubscriberControllerComp::OnUpdate(const istd::IChangeable::Chang
 	QString data = QStringLiteral("{\"NodeId\": \"%1\"}").arg(info.parentNodeId);
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
-			const imtrest::IRequest* networkRequest = requestNetworks.networkRequests[id];
+			for (const imtrest::IRequest* networkRequest : requestNetworks.networkRequests[id]){
 			QByteArray body = QStringLiteral(R"({"type": "data","id": "%1","payload": {"data": %2}})")
 								  .arg(id)
 								  .arg(data).toUtf8();
@@ -56,6 +56,7 @@ void CStructureSubscriberControllerComp::OnUpdate(const istd::IChangeable::Chang
 			imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(*networkRequest, imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId).PopInterfacePtr());
 			if (responsePtr.IsValid()){
 				m_requestManagerCompPtr->SendResponse(networkRequest->GetRequestId(), responsePtr);
+			}
 			}
 		}
 	}

@@ -36,7 +36,7 @@ Item {
 		color: topButtonDecorator.baseButton.down || topButtonDecorator.baseButton.checked ? Style.buttonPressedColor : topButtonDecorator.baseButton.hovered ?  Style.buttonHoverColor : "transparent"
 
         border.width: Style.buttonBorderWidth
-		border.color: topButtonDecorator.baseButton.focus ? Style.imaginToolsAccentColor : "transparent"
+		border.color: topButtonDecorator.baseButton.focus ? Style.imagingToolsAccentColor : "transparent"
 
         Image {
             id: image;

@@ -89,6 +89,7 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imtdb::IDatabaseEngine" ComponentId="PgSqlDatabaseEngine"/>
+        <Interface InterfaceId="imtdb::IDatabaseServerConnectionChecker" ComponentId="PgSqlDatabaseEngine"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="PgSqlDatabaseEngine"/>
     </ExportedInterfaces>
     <ExportedComponents>

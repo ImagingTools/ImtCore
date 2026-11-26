@@ -61,6 +61,8 @@ public:
 	void SetMethodType(const MethodType& methodType);
 	void SetBody(const QByteArray& body);
 	void SetCommandId(const QByteArray& commandId);
+	QByteArray GetConnectionId() const;
+	void SetConnectionId(const QByteArray& connectionId);
 
 	/**
 		Set the policy that decides about the body after the headers are received (see IHttpRequestBodyPolicy). Without a policy
@@ -190,6 +192,7 @@ protected:
 	QUrl m_url;
 	RequestState m_state;
 	QByteArray m_body;
+	QByteArray m_connectionId;
 	QByteArray m_data;
 
 	const IRequestServlet& m_requestHandler;

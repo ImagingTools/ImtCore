@@ -8,7 +8,7 @@ Rectangle {
 	objectName: "ChatNotificationBanner"
 	visible: false
 	height: visible ? Style.buttonHeightS : 0
-	color: Style.imaginToolsAccentColor
+	color: Style.imagingToolsAccentColor
 	radius: Style.radiusS
 
 	property string senderName: ""

@@ -7,7 +7,8 @@
 
 import { CanvasContext, commandsExceed, replayCommands } from './canvas.js';
 import { fonts } from './fonts.js';
-import { KEY, MODIFIERS } from './keys.js';
+import { layoutRichText, linkAtPoint, mightBeRichText, paintRichText, parseRichText } from './richtext.js';
+import { KEY, MODIFIERS, parseKeySequence, qtKeyToDom, STANDARD_KEYS } from './keys.js';
 import { QmlError } from './lexer.js';
 import { colorToString, parseColor, toColor, toFloat } from './util.js';
 
@@ -35,6 +36,11 @@ export const hooks = {
 	syncModel: null,
 	// (repeater) => void: its delegate component was replaced and the items must exist before the next line.
 	syncRepeater: null,
+	// (area) => void: a MouseArea waits for pressAndHold; () => seconds: the time of the engine.
+	watchHold: null,
+	// (flickable) => void: a Flickable runs on after the release (the engine calls its $flickTick with every frame).
+	watchFlick: null,
+	now: () => 0,
 	// (item) => void: a Binding or Connections item changed and must apply before the next statement.
 	syncBinding: null,
 	syncConnection: null,
@@ -108,6 +114,20 @@ export function setDestroyObserver(callback) {
 	destroyObserver = callback;
 }
 
+// The destroyed items wait for the end of the running script, then let go of what they hold (Item.$sever).
+let severQueue = null;
+function severLater(item) {
+	if (severQueue === null) {
+		severQueue = [];
+		queueMicrotask(() => {
+			const list = severQueue;
+			severQueue = null;
+			for (const dead of list) dead.$sever();
+		});
+	}
+	severQueue.push(item);
+}
+
 // ----- Keyboard focus -----
 
 // One focused child per focus scope. The root (and every FocusScope) is a scope.
@@ -120,6 +140,19 @@ let activeSet = new Set();
 
 export function getFocusItem() {
 	return activeLeaf !== null ? activeLeaf : chainLeaf;
+}
+
+// Non-zero while the pointer press or click of the user is handled: forceActiveFocus() there is what the user asked for (a click on a row
+// of a list that is not active gives the row the active focus, so the keys go to it).
+let userGesture = 0;
+
+export function userGestureScope(fn) {
+	userGesture++;
+	try {
+		return fn();
+	} finally {
+		userGesture--;
+	}
 }
 
 export function resetFocus() {
@@ -441,12 +474,19 @@ function notifyViews(model) {
 	}
 }
 
-// A function of a QML object connected to a signal of another object is disconnected when its object is destroyed.
+// A function of a QML object connected to a signal of another object is disconnected when its object is destroyed, and when the
+// object with the signal is destroyed (Qt drops the connection with either end). Both objects know the link: the owner to undo it,
+// the source to let the owner forget it. Without the second, an object that stays holds the undo function of a connection to an item of
+// a closed page, and the undo function holds that item.
 export function linkToOwner(source, fn, undo) {
 	const owner = fn.$owner;
 	if (owner === undefined || owner === source) return;
+	undo.$owner = owner;
+	undo.$source = source;
 	if (owner.$links === undefined) owner.$links = [];
 	owner.$links.push(undo);
+	if (source.$linksIn === undefined) source.$linksIn = new Set();
+	source.$linksIn.add(undo);
 }
 
 // Script assignment replaces a binding on these Item properties (Qt). `visible` must be
@@ -816,6 +856,31 @@ export class Item {
 		if (this.$owned !== undefined) for (const owned of this.$owned) owned.$destroy();
 		this.$destroyed = true;
 		if (destroyObserver !== null) destroyObserver(this);
+		severLater(this);
+	}
+
+	// What is left of a destroyed item holds nothing of the tree around it. In Qt a reference to a deleted object reads as null and the
+	// object is freed; here a script variable (a `property var` or `property Item` of an item that stays) can keep the husk alive, and
+	// through its parent, its scope and its properties the whole page it was in. It runs after the script that called destroy() has
+	// returned (QObject::deleteLater), so that script can still read the item.
+	$sever() {
+		const parent = this.$parent;
+		if (parent !== null) {
+			if (this.$queued && parent.$dirtyKids !== null) {
+				const index = parent.$dirtyKids.indexOf(this);
+				if (index >= 0) parent.$dirtyKids.splice(index, 1);
+			}
+			this.$parent = null;
+		}
+		this.$children = [];
+		this.$dirtyKids = null;
+		this.$scope = null;
+		this.$anchors = null;
+		if (this.$fnNames !== undefined) for (const name of this.$fnNames) this[name] = undefined; // the functions of the item hold its scope; a script that still has the item tests `item.fn !== undefined` (CustomTooltip.hide), and null would pass that test and then fail to be called
+		if (this.$sigs !== null) for (const signal of this.$sigs.values()) signal.handlers = [];
+		this.$owned = undefined;
+		if (this.$defScope !== undefined) this.$defScope = null; // a Component: the scope it was written in
+		if (this.$custom !== null) for (const name in this.$custom) this.$custom[name] = null;
 	}
 
 	// Requests a new layout and repaint. This item needs a pass over its children, and so does its parent (it has to
@@ -1372,6 +1437,7 @@ export class Item {
 		// still-inactive view — that would activate the row when the dialog/popup takes focus.
 		const list = enclosingListView(this);
 		const scopedListCurrent =
+			userGesture === 0 &&
 			list !== null && list.$scopeFocus === this && !list.$focus && (activeLeaf === null || !focusHostOwnsList(list, activeLeaf));
 		if (!scopedListCurrent) {
 			let parent = this.$parent;
@@ -1504,6 +1570,9 @@ export class Item {
 
 // Types whose own size follows their children: a change below them changes how their parent places them.
 Item.prototype.$contentSized = false;
+
+// The type name of an item where it is used, when it is a component (see Engine.createItem); the tests look items up by it.
+Item.prototype.$qmlType = '';
 
 Object.defineProperty(Item.prototype, Symbol.unscopables, {
 	value: Object.fromEntries(OBJECT_NAMES_UNSCOPABLE.map((name) => [name, true])),
@@ -1747,7 +1816,14 @@ defineProp(
 	Item.prototype,
 	'children',
 	function () {
-		return this.$children.some((child) => child.$nonVisual) ? this.$children.filter((child) => !child.$nonVisual) : this.$children;
+		if (!this.$children.some((child) => child.$nonVisual)) return this.$children;
+		// The list without the non-visual children (a Timer) is the same list while the children are the same: `onChildrenChanged` is
+		// polled by comparing what `children` gives, and a new list on every read made it run on every pass.
+		const list = this.$children.filter((child) => !child.$nonVisual);
+		const last = this.$visibleChildren;
+		if (last !== undefined && last.length === list.length && last.every((child, i) => child === list[i])) return last;
+		this.$visibleChildren = list;
+		return list;
 	},
 	function (list) {
 		const items = Array.from(list || []).filter((item) => item instanceof Item && item !== this);
@@ -1804,7 +1880,7 @@ defineProp(
 			old.$update();
 		}
 		this.$parent = null;
-		if (target !== null) target.$adopt(this);
+		if (target !== null) target.$adopt(this, true);
 		this.$update();
 	},
 	true,
@@ -2156,7 +2232,10 @@ function textWidth(info, text) {
 	return width;
 }
 
-function wrapParagraphLines(info, para, limit) {
+// The lines of a paragraph in a width, broken as in Qt (measured) by the kind of wrapMode (wrapKind): 'word' at the spaces only, a word
+// wider than the line goes out of it; 'boundary' at the spaces, and a word wider than the line from a line of its own between its
+// characters; 'anywhere' every line is filled up to the width, between the characters of a word too. The space of a break is in no line.
+function wrapParagraphLines(info, para, limit, mode = 'word') {
 	if (para === '') return [''];
 	const space = info.advance(' ');
 	const words = para.split(' ');
@@ -2165,18 +2244,37 @@ function wrapParagraphLines(info, para, limit) {
 	let line = 0;
 	for (const word of words) {
 		const wordWidth = textWidth(info, word);
-		if (current === '') {
+		if (current !== '' && line + space + wordWidth <= limit) {
+			current += ` ${word}`;
+			line += space + wordWidth;
+			continue;
+		}
+		if (mode === 'word' || (mode === 'boundary' && wordWidth <= limit)) {
+			if (current !== '') lines.push(current);
 			current = word;
 			line = wordWidth;
 			continue;
 		}
-		if (line + space + wordWidth > limit) {
+		// The word is broken between its characters: on the same line after the space (anywhere) or from the next line (boundary)
+		let gap = current !== '' && mode === 'anywhere';
+		if (current !== '' && !gap) {
 			lines.push(current);
-			current = word;
-			line = wordWidth;
-		} else {
-			current += ` ${word}`;
-			line += space + wordWidth;
+			current = '';
+			line = 0;
+		}
+		for (const ch of word) {
+			const width = info.advance(ch);
+			if (current !== '' && line + (gap ? space : 0) + width > limit) {
+				lines.push(current);
+				current = '';
+				line = 0;
+			} else if (gap) {
+				current += ' ';
+				line += space;
+			}
+			gap = false;
+			current += ch;
+			line += width;
 		}
 	}
 	if (current !== '' || lines.length === 0) lines.push(current);
@@ -2187,12 +2285,13 @@ function wrapParagraph(info, para, limit) {
 	return wrapParagraphLines(info, para, limit).map((line) => textWidth(info, line));
 }
 
+// wrap: the kind of wrapMode (wrapKind)
 function blockLines(info, text, wrap, limit) {
 	const paras = text.split('\n');
 	const lines = [];
 	for (const para of paras) {
-		if (!wrap) lines.push(para);
-		else lines.push(...wrapParagraphLines(info, para, limit));
+		if (wrap === 'none') lines.push(para);
+		else lines.push(...wrapParagraphLines(info, para, limit, wrap));
 	}
 	return lines.length > 0 ? lines : [''];
 }
@@ -2253,6 +2352,13 @@ function elidedText(info, text, limit, mode) {
 function wraps(mode) {
 	if (typeof mode === 'number') return mode === 1 || mode === 3 || mode === 4;
 	return mode === 'WordWrap' || mode === 'Wrap' || mode === 'WrapAnywhere' || mode === 'WrapAtWordBoundaryOrAnywhere';
+}
+
+// How a wrapMode breaks the lines of a plain text: 'none', 'word' (WordWrap), 'anywhere' (WrapAnywhere) or 'boundary' (Wrap).
+function wrapKind(mode) {
+	if (!wraps(mode)) return 'none';
+	if (mode === 1 || mode === 'WordWrap') return 'word';
+	return mode === 3 || mode === 'WrapAnywhere' ? 'anywhere' : 'boundary';
 }
 
 class FontGroup {
@@ -2327,7 +2433,7 @@ export class DropShadow extends Item {
 			fillRounded(r, r.pack(color, opacity * alpha), x, y, this.$aw + 2 * grow, this.$ah + 2 * grow, Math.max(corner + grow, 0), aa);
 		}
 		// The effect shows its source over the shadow: the inside of the outline is the source, not the shadow. A source that
-		// covers the same box (`anchors.fill: source`) is painted again here.
+		// covers the same box (`anchors.fill: source`) is painted again here, with what is inside of it (a button of a panel).
 		if (
 			source instanceof Rectangle &&
 			source.$parent === this.$parent &&
@@ -2336,7 +2442,7 @@ export class DropShadow extends Item {
 			Math.abs(source.$aw - this.$aw) < 0.5 &&
 			Math.abs(source.$ah - this.$ah) < 0.5
 		) {
-			source.$paint(r, opacity * source.$opacity);
+			source.$renderContent(r, opacity * source.$opacity);
 		}
 	}
 }
@@ -2390,26 +2496,50 @@ export class Text extends Item {
 		this.$wrap = 0;
 		this.$elide = 3;
 		this.$hAlign = 1;
+		this.$vAlign = 0x20; // AlignTop
 		this.$format = 'PlainText';
 		this.$lineHeight = 1;
 		this.$font = null;
 		this.$lay = null;
+		this.$linkColor = colorToString(toColor('#0000ff'));
+		this.$hoveredLink = '';
+		this.$pressedLink = '';
+		this.$richState = { docKey: null, doc: null, key: null, layout: null };
+		// `padding` and the padding of each side; a side without its own (null) has `padding`
+		this.$pad = 0;
+		this.$padL = null;
+		this.$padR = null;
+		this.$padT = null;
+		this.$padB = null;
+		this.$declareSignal('linkActivated', ['link']);
+		this.$declareSignal('linkHovered', ['link']);
 	}
 
 	get font() {
 		return this.$font !== null ? this.$font : (this.$font = new FontGroup(this));
 	}
 
+	$padding(field) {
+		const own = this[field];
+		return own === null ? this.$pad : own;
+	}
+
+	// The width the text is laid out in: the width of the item without its left and right padding (0: none).
+	$layoutWidth() {
+		const width = this.$w > 0 ? this.$w : this.$aw > 0 ? this.$aw : 0;
+		return width > 0 ? Math.max(0, width - this.$padding('$padL') - this.$padding('$padR')) : 0;
+	}
+
 	// Measured text: the font, the lines and their widths. Honours wrapMode once a width is known.
 	$measure() {
 		let lay = this.$lay;
 		const family = this.$family !== '' ? this.$family : fonts.defaultFamily();
-		const rich = this.$format === 'RichText' || this.$format === 'StyledText';
-		const source = rich ? richPlain(this.$text) : this.$text;
-		const explicit = this.$w > 0 ? this.$w : this.$aw > 0 ? this.$aw : 0;
-		const wrap = explicit > 0 && wraps(this.$wrap);
-		const limit = wrap ? explicit : Infinity;
-		const elideLimit = !rich && !wrap && (this.$elide === 0 || this.$elide === 1 || this.$elide === 2) ? explicit : 0;
+		const rich = false;
+		const source = this.$text;
+		const explicit = this.$layoutWidth();
+		const wrap = explicit > 0 ? wrapKind(this.$wrap) : 'none';
+		const limit = wrap !== 'none' ? explicit : Infinity;
+		const elideLimit = !rich && wrap === 'none' && (this.$elide === 0 || this.$elide === 1 || this.$elide === 2) ? explicit : 0;
 		if (
 			lay !== null &&
 			lay.version === fonts.version &&
@@ -2438,22 +2568,134 @@ export class Text extends Item {
 		return lay;
 	}
 
+	// How the text is read: 'plain', 'rich' (RichText: the HTML of QTextDocument) or 'styled' (StyledText, and AutoText that found markup).
+	$kind() {
+		let format = this.$format;
+		if (typeof format === 'number' || /^\d+$/.test(String(format))) format = ['PlainText', 'RichText', 'AutoText', 'MarkdownText', 'StyledText'][Number(format)] ?? 'PlainText';
+		if (format === 'RichText') return 'rich';
+		if (format === 'StyledText') return 'styled';
+		if (format === 'AutoText') return mightBeRichText(this.$text) ? 'styled' : 'plain';
+		return 'plain';
+	}
+
+	// The layout of the marked up text for a width (0: none), kept while nothing it depends on changes.
+	$richLayout(width) {
+		const kind = this.$kind();
+		const family = this.$family !== '' ? this.$family : fonts.defaultFamily();
+		const size = this.$pixelSize > 0 ? this.$pixelSize : 12;
+		const wrap = !wraps(this.$wrap) ? 'none' : this.$wrap === 1 || this.$wrap === 'WordWrap' ? 'word' : 'anywhere';
+		const key = [kind, family, size, this.$bold, this.$italic, width, wrap, this.$lineHeight, this.$hAlign, fonts.version].join('|');
+		const state = this.$richState;
+		const docKey = `${kind}\n${this.$text}`;
+		if (state.key === key && state.docKey === docKey) return state.layout;
+		if (state.docKey !== docKey) {
+			state.doc = parseRichText(this.$text, kind === 'styled');
+			state.docKey = docKey;
+		}
+		const layout = layoutRichText(state.doc, { fonts, family, size, bold: this.$bold, italic: this.$italic, width, wrap, styled: kind === 'styled', lineHeightFactor: this.$lineHeight, align: this.$hAlign });
+		state.key = key;
+		state.layout = layout;
+		return layout;
+	}
+
+	$richMetrics() {
+		const kind = this.$kind();
+		const explicit = this.$layoutWidth();
+		const lay = this.$richLayout(explicit);
+		const factor = this.$lineHeight > 0 ? this.$lineHeight : 1;
+		const contentWidth = kind === 'rich' && explicit > 0 ? Math.max(explicit, lay.contentWidth) : lay.contentWidth;
+		const implicitHeight = kind === 'rich' && explicit > 0 && factor !== 1 ? lay.implicitHeight - Math.floor(this.$pixelSize * (factor - 1)) : lay.implicitHeight;
+		return { implicitWidth: lay.naturalWidth, implicitHeight, contentWidth, contentHeight: lay.contentHeight };
+	}
+
+	$paintRich(r, opacity) {
+		const layout = this.$richLayout(this.$layoutWidth());
+		const family = this.$family !== '' ? this.$family : fonts.defaultFamily();
+		paintRichText(r, layout, {
+			fonts,
+			family,
+			size: this.$pixelSize > 0 ? this.$pixelSize : 12,
+			bold: this.$bold,
+			italic: this.$italic,
+			width: this.$layoutWidth(),
+			pack: (color) => r.pack(toColor(color), opacity),
+			baseColor: layout.baseColor !== null ? r.pack(toColor(layout.baseColor), opacity) : r.pack(this.$color, opacity),
+			linkColor: r.pack(toColor(this.$linkColor), opacity),
+		});
+	}
+
+	// The link at a point of the text, or ''.
+	linkAt(x, y) {
+		if (this.$text === '' || this.$kind() === 'plain') return '';
+		return linkAtPoint(this.$richLayout(this.$layoutWidth()), toFloat(x) - this.$padding('$padL'), toFloat(y) - this.$padding('$padT'));
+	}
+
+	// A text with links takes the pointer over a link only: the hand, the hovered link, and `linkActivated` for a click on it.
+	$itemAt(px, py, wheel = false, button = -1) {
+		if (wheel || !this.$visible || this.$text === '' || this.$kind() === 'plain' || !this.$text.includes('href')) return super.$itemAt(px, py, wheel, button);
+		if (button > 0 || this.$rotation !== 0 || this.$scale !== 1) return null;
+		const layout = this.$richLayout(this.$layoutWidth());
+		if (layout.links.length === 0) return null;
+		return this.$linkAtScene(px, py) !== '' ? this : null;
+	}
+
+	$linkAtScene(x, y) {
+		return linkAtPoint(this.$richLayout(this.$layoutWidth()), x - this.$sx - this.$padding('$padL'), y - this.$sy - this.$padding('$padT'));
+	}
+
+	$setHoveredLink(link) {
+		if (this.$hoveredLink === link) return;
+		this.$hoveredLink = link;
+		markReaders(this, 'hoveredLink');
+		this.$emit('linkHovered', [link]);
+	}
+
+	$mouseMoveAt(sceneX, sceneY) {
+		this.$setHoveredLink(this.$linkAtScene(sceneX, sceneY));
+	}
+
+	$hoverChanged(hovered) {
+		if (!hovered) this.$setHoveredLink('');
+	}
+
+	$mousePressAt(sceneX, sceneY) {
+		this.$pressedLink = this.$linkAtScene(sceneX, sceneY);
+	}
+
+	$mouseClicked() {
+		const link = this.$pressedLink;
+		this.$pressedLink = '';
+		if (link !== '') this.$emit('linkActivated', [link]);
+	}
+
+	get $cursorShape() {
+		return this.$hoveredLink !== '' ? 13 : 0; // Qt.PointingHandCursor
+	}
+
 	$fontInfo() {
 		const family = this.$family !== '' ? this.$family : fonts.defaultFamily();
 		return fonts.get(family, this.$pixelSize > 0 ? this.$pixelSize : 12, this.$bold, this.$italic);
 	}
 
-	// Laid-out size. Plain text uses the font height; rich text uses the wider line spacing.
-	// An explicit width makes rich text report that width, and a lineHeight other than 1 shortens the implicit height by the extra leading.
+	// Laid-out size: the implicit size has the padding, the content size does not. Plain text uses the font height; rich text uses the
+	// wider line spacing.
 	$metrics() {
+		const metrics = this.$text !== '' && this.$kind() !== 'plain' ? this.$richMetrics() : this.$plainMetrics();
+		metrics.implicitWidth += this.$padding('$padL') + this.$padding('$padR');
+		metrics.implicitHeight += this.$padding('$padT') + this.$padding('$padB');
+		return metrics;
+	}
+
+	// An explicit width makes rich text report that width, and a lineHeight other than 1 shortens the implicit height by the extra leading.
+	$plainMetrics() {
 		const info = this.$fontInfo();
-		const rich = this.$format === 'RichText' || this.$format === 'StyledText';
-		const source = rich ? richPlain(this.$text) : this.$text;
+		const rich = false;
+		const source = this.$text;
 		// The width that the anchors give (`anchors.left` and `anchors.right`) wraps the text like a `width` does.
-		const explicit = this.$w > 0 ? this.$w : this.$aw > 0 ? this.$aw : 0;
+		const explicit = this.$layoutWidth();
 		const wrap = explicit > 0 && wraps(this.$wrap);
-		const natural = blockMetrics(info, source, false, Infinity);
-		const laid = wrap ? blockMetrics(info, source, true, explicit) : natural;
+		const natural = blockMetrics(info, source, 'none', Infinity);
+		const laid = wrap ? blockMetrics(info, source, wrapKind(this.$wrap), explicit) : natural;
 		let contentWidth = laid.max;
 		if (!rich && !wrap && this.$elide !== 3 && this.$elide !== 'ElideNone' && explicit > 0 && natural.max > explicit + ELIDE_SLACK) contentWidth = textWidth(info, elidedText(info, source, explicit, this.$elide));
 		if (rich && explicit > 0) contentWidth = Math.max(explicit, laid.max);
@@ -2472,12 +2714,31 @@ export class Text extends Item {
 		return this.$metrics().implicitHeight;
 	}
 
+	// The text is painted inside the padding.
 	$paint(r, opacity) {
 		if (this.$text.length === 0 || this.$pixelSize <= 0) return;
+		const left = this.$padding('$padL');
+		const top = this.$padding('$padT') + this.$verticalShift();
+		r.translate(left, top);
+		if (this.$kind() !== 'plain') this.$paintRich(r, opacity);
+		else this.$paintPlain(r, opacity);
+		r.translate(-left, -top);
+	}
+
+	// How far verticalAlignment moves the text down from the top padding: the room that the height leaves under the text, all of it
+	// (AlignBottom) or half of it, half rounded up (AlignVCenter). The room is negative for a text higher than the item (measured in Qt).
+	$verticalShift() {
+		const align = this.$vAlign;
+		if ((align & 0xc0) === 0) return 0;
+		const free = this.$ah - this.$padding('$padT') - this.$padding('$padB') - this.$metrics().contentHeight;
+		return (align & 0x40) !== 0 ? free : Math.floor(free / 2 + 0.5);
+	}
+
+	$paintPlain(r, opacity) {
 		const lay = this.$measure();
 		const info = lay.info;
 		const color = r.pack(this.$color, opacity);
-		const box = this.$aw > 0 ? this.$aw : lay.width;
+		const box = this.$aw > 0 ? Math.max(0, this.$aw - this.$padding('$padL') - this.$padding('$padR')) : lay.width;
 		const align = this.$hAlign;
 		for (let li = 0; li < lay.lines.length; li++) {
 			const baseline = li * info.lineHeight + info.ascent;
@@ -2543,10 +2804,55 @@ const toElideMode = (value) => {
 defineField(Text.prototype, 'wrapMode', '$wrap', toWrapMode);
 defineField(Text.prototype, 'elide', '$elide', toElideMode);
 defineField(Text.prototype, 'horizontalAlignment', '$hAlign', toFloat);
+// Qt::Alignment: AlignTop 0x20, AlignBottom 0x40, AlignVCenter 0x80
+const toVerticalAlign = (value) => {
+	if (value === 'AlignBottom') return 0x40;
+	if (value === 'AlignVCenter') return 0x80;
+	if (value === 'AlignTop' || value === undefined || value === null) return 0x20;
+	return toFloat(value);
+};
+defineField(Text.prototype, 'verticalAlignment', '$vAlign', toVerticalAlign);
 defineField(Text.prototype, 'textFormat', '$format', (value) => (value === undefined || value === null ? 'PlainText' : String(value)));
 defineField(Text.prototype, 'lineHeight', '$lineHeight', toFloat);
+const TEXT_PADDING = [['leftPadding', '$padL'], ['rightPadding', '$padR'], ['topPadding', '$padT'], ['bottomPadding', '$padB']];
+// `padding` is the padding of every side that has none of its own
+defineProp(
+	Text.prototype,
+	'padding',
+	function () {
+		return this.$pad;
+	},
+	function (value) {
+		const v = toFloat(value);
+		if (same(this.$pad, v)) return;
+		this.$pad = v;
+		for (const [name, field] of TEXT_PADDING) {
+			if (this[field] === null) markReaders(this, name);
+		}
+		this.$update();
+	},
+	true,
+);
+// The padding of a side; undefined gives it `padding` again (Qt's reset)
+for (const [name, field] of TEXT_PADDING) {
+	defineProp(
+		Text.prototype,
+		name,
+		function () {
+			return this.$padding(field);
+		},
+		function (value) {
+			const v = value === undefined || value === null ? null : toFloat(value);
+			if (same(this[field], v)) return;
+			this[field] = v;
+			this.$update();
+		},
+		true,
+	);
+}
 // True when an elide mode cut the text (a text that does not fit and does not wrap).
 defineReadOnly(Text.prototype, 'truncated', function () {
+	if (this.$text !== '' && this.$kind() !== 'plain') return false;
 	const lay = this.$measure();
 	return lay.elideLimit > 0 && lay.lines.length === 1 && lay.lines[0] !== lay.source;
 });
@@ -2557,8 +2863,18 @@ defineReadOnly(Text.prototype, 'contentHeight', function () {
 	return this.$metrics().contentHeight;
 });
 defineReadOnly(Text.prototype, 'lineCount', function () {
+	const kind = this.$text === '' ? 'plain' : this.$kind();
+	if (kind === 'rich') return 1; // Qt does not count the lines of a document
+	if (kind === 'styled') {
+		const lines = this.$richLayout(this.$layoutWidth()).lines;
+		return Math.max(1, lines.filter((line) => !line.trailingSynthetic && !line.spacer).length);
+	}
 	return this.$measure().lines.length;
 });
+defineField(Text.prototype, 'linkColor', '$linkColor', (value) => colorToString(toColor(value === undefined || value === null ? '#0000ff' : value)));
+defineReadOnly(Text.prototype, 'hoveredLink', function () {
+	return this.$hoveredLink;
+}, undefined, true);
 
 // ----- Canvas -----
 
@@ -2581,20 +2897,46 @@ export class Canvas extends Item {
 	}
 
 	// The first paint happens while the image is still loading, then imageLoaded is delivered. That is the order Qt logs.
+	// The picture is kept for `createPattern(url, ...)`; the engine finds it from the address like the one of an Image.
 	loadImage(src) {
 		const url = toStr(src);
-		if (this.$images === undefined) this.$images = new Map();
+		if (this.$images === undefined) {
+			this.$images = new Map();
+			this.$pictures = new Map();
+		}
 		const state = this.$images.get(url);
 		if (state === 'ready' || state === 'loading') return;
 		this.$images.set(url, 'loading');
 		this.$painted = false;
 		this.$ensurePainted();
-		this.$images.set(url, 'ready');
-		this.$emit('imageLoaded');
+		const canvas = this;
+		hooks.loadImage(
+			{
+				$source: url,
+				$directory: canvas.$directory,
+				get $destroyed() {
+					return canvas.$destroyed === true;
+				},
+				$setImage(picture, status) {
+					if (canvas.$images.get(url) !== 'loading') return;
+					if (status === 3) {
+						canvas.$images.set(url, 'error');
+						return;
+					}
+					if (picture !== null) canvas.$pictures.set(url, picture);
+					canvas.$images.set(url, 'ready');
+					canvas.$emit('imageLoaded');
+				},
+			},
+			url,
+		);
 	}
 
 	unloadImage(src) {
-		if (this.$images !== undefined) this.$images.delete(toStr(src));
+		if (this.$images !== undefined) {
+			this.$images.delete(toStr(src));
+			this.$pictures.delete(toStr(src));
+		}
 	}
 
 	isImageLoaded(src) {
@@ -2623,10 +2965,12 @@ export class Canvas extends Item {
 		this.$painted = true;
 		this.$paintedWidth = this.$aw;
 		this.$paintedHeight = this.$ah;
+		// The textures of the pictures that putImageData drew are not needed any more.
+		for (const old of this.$cmds) if (old.k === 'bitmap' && old.page !== null) (this.$stalePages ??= []).push(old.page);
 		this.$cmds = [];
 		const signal = this.$sigs.get('paint');
 		if (signal.handlers.length > 0) {
-			this.$context = new CanvasContext(this.$aw, this.$ah, this.$cmds);
+			this.$context = new CanvasContext(this.$aw, this.$ah, this.$cmds, this.$pictures === undefined ? null : this.$pictures);
 			try {
 				this.$emit('paint');
 			} finally {
@@ -2638,6 +2982,10 @@ export class Canvas extends Item {
 
 	$paint(r, opacity) {
 		this.$ensurePainted();
+		if (this.$stalePages !== undefined) {
+			for (const page of this.$stalePages) r.dropPage(page);
+			this.$stalePages = undefined;
+		}
 		if (this.$cmds.length === 0) return;
 		if (this.$cmdsChecked !== this.$cmds) {
 			this.$cmdsChecked = this.$cmds;
@@ -2690,6 +3038,14 @@ export class MouseArea extends Item {
 		this.$mouseY = 0;
 		this.$sceneX = NaN;
 		this.$sceneY = NaN;
+		this.$mouseDrag = new MouseDrag(this);
+		this.$dragFrom = null; // where the button went down, while it is down
+		this.$dragStart = null; // where the target was when the drag began
+		this.$dragRef = null; // where the pointer was when it went farther than the threshold
+		this.$dragged = false;
+		this.$holdInterval = 800;
+		this.$holdDeadline = 0; // seconds of the engine time at which pressAndHold is sent; 0 when it is not awaited
+		this.$held = false;
 		this.$declareSignal('clicked', ['mouse']);
 		this.$declareSignal('pressed', ['mouse']);
 		this.$declareSignal('released', ['mouse']);
@@ -2698,11 +3054,13 @@ export class MouseArea extends Item {
 		this.$declareSignal('entered', []);
 		this.$declareSignal('exited', []);
 		this.$declareSignal('wheel', ['wheel']);
+		this.$declareSignal('pressAndHold', ['mouse']);
+		this.$declareSignal('canceled', []);
 	}
 
 	$mouseEvent() {
 		const button = this.$pressButton === 2 ? 'RightButton' : 'LeftButton';
-		return { x: this.$mouseX, y: this.$mouseY, button, buttons: button, modifiers: 0, accepted: true, wasHeld: false, isClick: true };
+		return { x: this.$mouseX, y: this.$mouseY, button, buttons: button, modifiers: 0, accepted: true, wasHeld: this.$held, isClick: true };
 	}
 
 	get $acceptsMouse() {
@@ -2715,12 +3073,109 @@ export class MouseArea extends Item {
 
 	$mousePressAt(sceneX, sceneY) {
 		this.$trackMouse(sceneX, sceneY, false);
+		this.$dragFrom = { x: sceneX, y: sceneY };
+		this.$dragStart = null;
+		this.$dragRef = null;
+		this.$dragged = false;
+		this.$held = false;
+		this.$holdDeadline = 0;
 		this.$emit('pressed', [this.$mouseEvent()]);
+		// As in Qt the wait for a hold starts only when something listens to pressAndHold (and then a hold is no click).
+		const hold = this.$sigs === null ? undefined : this.$sigs.get('pressAndHold');
+		if (hold !== undefined && hold.handlers.length > 0 && this.$pressed && hooks.watchHold !== null) {
+			this.$holdDeadline = hooks.now() + this.$holdInterval / 1000;
+			hooks.watchHold(this);
+		}
+	}
+
+	// The engine calls it when the button has been held for pressAndHoldInterval.
+	// Qt (measured): the time runs while the button is down wherever the pointer goes; the hold is sent only if the pointer is in the area then.
+	$fireHold() {
+		if (!this.$pressed || this.$holdDeadline === 0) return;
+		this.$holdDeadline = 0;
+		if (this.$mouseX < 0 || this.$mouseY < 0 || this.$mouseX >= this.$aw || this.$mouseY >= this.$ah) return;
+		this.$held = true;
+		this.$emit('pressAndHold', [this.$mouseEvent()]);
+	}
+
+	// True when the press can no longer go on: the area or one of its parents was hidden while the button is down. A disabled area keeps the
+	// press and gets its release and click (measured in Qt with QtTest).
+	$pressLost() {
+		if (!this.$pressed) return false;
+		for (let item = this; item !== null; item = item.$parent) {
+			if (!item.$visible) return true;
+		}
+		return false;
+	}
+
+	// An area that moves a target by the drag keeps the drag of the pointer: a Flickable below it does not take it (Qt, measured).
+	get $dragsTarget() {
+		return this.$mouseDrag.$target !== null;
+	}
+
+	// The press is taken away (the area was hidden, another item took the drag): `canceled`, and no `released` or `clicked` follow.
+	$cancelPress() {
+		if (!this.$pressed) return;
+		this.$pressed = false;
+		this.$held = false;
+		this.$holdDeadline = 0;
+		this.$dragEnd();
+		markReaders(this, 'pressed');
+		markReaders(this, 'containsPress');
+		if (!this.$hoverEnabled && this.$containsMouse) {
+			this.$containsMouse = false;
+			markReaders(this, 'containsMouse');
+			this.$emit('exited', []);
+		}
+		this.$update();
+		this.$emit('canceled', []);
 	}
 
 	$mouseMoveAt(sceneX, sceneY) {
 		// Without hoverEnabled, Qt only reports moves while a button is held.
 		this.$trackMouse(sceneX, sceneY, this.$pressed || this.$hoverEnabled);
+		if (this.$pressed) this.$dragTo(sceneX, sceneY);
+	}
+
+	// The target of `drag.target` follows the pointer after it has moved the threshold along an axis that is allowed.
+	$dragTo(sceneX, sceneY) {
+		const drag = this.$mouseDrag;
+		const target = drag.$target;
+		if (this.$dragFrom === null || target === null) return;
+		if (!drag.$active) {
+			// Qt (measured): the move that goes farther than the threshold from the press only takes the pointer as the reference; the drag
+			// starts with the next move, and the target follows the pointer from the reference.
+			if (this.$dragRef === null) {
+				const dx = sceneX - this.$dragFrom.x;
+				const dy = sceneY - this.$dragFrom.y;
+				const over = ((drag.$axis & 1) !== 0 && Math.abs(dx) > drag.$threshold) || ((drag.$axis & 2) !== 0 && Math.abs(dy) > drag.$threshold);
+				if (over) {
+					this.$dragRef = { x: sceneX, y: sceneY };
+					this.$dragged = true; // the grab is taken: a release now is no click, though the drag has not started
+				}
+				return;
+			}
+			this.$dragStart = { x: target.$x, y: target.$y };
+			this.$dragged = true;
+			drag.$active = true;
+			markReaders(this, 'drag.active');
+			noteWrite(this, 'drag.active');
+		}
+		if (this.$dragStart === null || this.$dragRef === null) return;
+		const dx = sceneX - this.$dragRef.x;
+		const dy = sceneY - this.$dragRef.y;
+		if ((drag.$axis & 1) !== 0) target.x = Math.min(Math.max(this.$dragStart.x + dx, drag.$minX), drag.$maxX);
+		if ((drag.$axis & 2) !== 0) target.y = Math.min(Math.max(this.$dragStart.y + dy, drag.$minY), drag.$maxY);
+	}
+
+	$dragEnd() {
+		this.$dragFrom = null;
+		this.$dragRef = null;
+		this.$dragStart = null;
+		if (!this.$mouseDrag.$active) return;
+		this.$mouseDrag.$active = false;
+		markReaders(this, 'drag.active');
+		noteWrite(this, 'drag.active');
 	}
 
 	$trackMouse(sceneX, sceneY, notify) {
@@ -2765,11 +3220,22 @@ export class MouseArea extends Item {
 				this.$emit(pressed ? 'entered' : 'exited', []);
 			}
 			this.$update();
-			if (!pressed) this.$emit('released', [this.$mouseEvent()]);
+			if (!pressed) {
+				this.$holdDeadline = 0;
+				this.$emit('released', [this.$mouseEvent()]);
+				// the drag ends after `released`: its handler may still drop the item (`onReleased: tile.Drag.drop()`)
+				this.$dragEnd();
+			}
 		}
 	}
 
 	$mouseClicked() {
+		// a press that was held, or that dragged the target, is no click
+		if (this.$held || this.$dragged) {
+			this.$held = false;
+			this.$dragged = false;
+			return;
+		}
 		this.$emit('clicked', [this.$mouseEvent()]);
 	}
 
@@ -2791,6 +3257,19 @@ defineReadOnly(MouseArea.prototype, 'containsPress', function () {
 }, undefined, true);
 defineField(MouseArea.prototype, 'hoverEnabled', '$hoverEnabled', toBool);
 defineField(MouseArea.prototype, 'preventStealing', '$preventStealing', toBool);
+defineReadOnly(
+	MouseArea.prototype,
+	'drag',
+	function () {
+		return this.$mouseDrag;
+	},
+	undefined,
+	true,
+);
+defineField(MouseArea.prototype, 'pressAndHoldInterval', '$holdInterval', (value) => {
+	const interval = Number(value);
+	return Number.isFinite(interval) && interval >= 0 ? interval : 800;
+});
 // `Qt.LeftButton | Qt.RightButton` is 0 here (the enumerations are names), which stands for every button.
 defineProp(
 	MouseArea.prototype,
@@ -2812,6 +3291,366 @@ defineReadOnly(MouseArea.prototype, 'mouseX', function () {
 defineReadOnly(MouseArea.prototype, 'mouseY', function () {
 	return this.$mouseY;
 });
+
+// ----- Drag, DropArea and MouseArea.drag -----
+
+// The drags that are going on (an item with `Drag.active`): what the DropAreas below them are told of, once for every frame and when the drag
+// starts, ends or drops.
+const activeDrags = new Set();
+
+export function resetDrags() {
+	activeDrags.clear();
+}
+
+function topOf(item) {
+	let top = item;
+	while (top.$parent !== null) top = top.$parent;
+	return top;
+}
+
+// The hot spot of a drag in the scene. A move that the layout has not caught up with yet is taken from the position of the parent.
+function dragPoint(drag) {
+	const item = drag.$owner;
+	const parent = item.$parent;
+	const pending = parent !== null && topOf(item).$updateRequested === true;
+	const x = pending ? parent.$sx + item.$x : item.$sx;
+	const y = pending ? parent.$sy + item.$y : item.$sy;
+	return { x: x + drag.$hotSpot.$x, y: y + drag.$hotSpot.$y };
+}
+
+function dropAreaAt(item, x, y, drag, skip) {
+	if (item === skip || !item.$visible) return null;
+	for (let i = item.$children.length - 1; i >= 0; i--) {
+		const hit = dropAreaAt(item.$children[i], x, y, drag, skip);
+		if (hit !== null) return hit;
+	}
+	if (item.$isDropArea === true && item.$enabled !== false && x >= item.$sx && y >= item.$sy && x < item.$sx + item.$aw && y < item.$sy + item.$ah && item.$takes(drag.$keys)) return item;
+	return null;
+}
+
+function dragEvent(drag, area, point, accepted) {
+	const keys = drag.$keys.slice();
+	return {
+		x: point.x - area.$sx,
+		y: point.y - area.$sy,
+		source: drag.source,
+		keys,
+		formats: keys,
+		supportedActions: drag.$supportedActions,
+		proposedAction: drag.$proposedAction,
+		action: drag.$proposedAction,
+		accepted,
+		hasText: false,
+		hasHtml: false,
+		hasUrls: false,
+		hasColor: false,
+		text: '',
+		html: '',
+		urls: [],
+		accept() {
+			this.accepted = true;
+		},
+		acceptProposedAction() {
+			this.accepted = true;
+		},
+		getDataAsString() {
+			return '';
+		},
+	};
+}
+
+// Tells the areas what the drag did since the last time: it came over one, left it or moved inside it.
+function evaluateDrag(drag) {
+	const point = dragPoint(drag);
+	const area = dropAreaAt(topOf(drag.$owner), point.x, point.y, drag, drag.$owner);
+	if (area !== drag.$target) {
+		const old = drag.$target;
+		drag.$target = area;
+		drag.$last = point;
+		if (old !== null) old.$leave();
+		if (area !== null) area.$enter(dragEvent(drag, area, point, true));
+		noteWrite(drag.$owner, 'Drag.target');
+		return;
+	}
+	if (area !== null && (drag.$last.x !== point.x || drag.$last.y !== point.y)) {
+		drag.$last = point;
+		area.$move(dragEvent(drag, area, point, true));
+	}
+	drag.$last = point;
+}
+
+// One step for every drag that is going on; the scene calls it after the layout of a frame.
+export function updateDrags() {
+	for (const drag of [...activeDrags]) evaluateDrag(drag);
+}
+
+// The hot spot of a drag: `Drag.hotSpot.x`, `Drag.hotSpot.y`.
+class DragHotSpot {
+	constructor(owner) {
+		this.$owner = owner;
+		this.$x = 0;
+		this.$y = 0;
+	}
+}
+DragHotSpot.prototype.$group = 'Drag.hotSpot';
+for (const [name, field] of [['x', '$x'], ['y', '$y']]) {
+	defineGroupProp(
+		DragHotSpot.prototype,
+		'Drag.hotSpot',
+		name,
+		function () {
+			return this[field];
+		},
+		function (value) {
+			this[field] = toFloat(value);
+		},
+	);
+}
+
+// `Drag` attached to an item. `active` starts a drag sequence (the areas under the hot spot are told: entered, positionChanged, exited) and
+// ends it, which is a cancel: no drop is sent. `drop()` sends the drop to the area under the hot spot and ends the sequence.
+export class DragAttached {
+	constructor(item) {
+		this.$owner = item;
+		this.$active = false;
+		this.$hotSpot = new DragHotSpot(item);
+		this.$keys = [];
+		this.$dragType = 2; // Drag.Internal in Qt is the default of Drag.dragType only for a script; Automatic needs the system
+		this.$source = null;
+		this.$target = null;
+		this.$last = { x: NaN, y: NaN };
+		this.$supportedActions = 7; // Qt::CopyAction | MoveAction | LinkAction
+		this.$proposedAction = 2; // Qt::MoveAction
+		this.$mimeData = {};
+	}
+
+	get hotSpot() {
+		return this.$hotSpot;
+	}
+
+	get target() {
+		noteRead(this.$owner, 'Drag.target', true);
+		return this.$target;
+	}
+
+	$begin() {
+		if (this.$active) return;
+		this.$active = true;
+		activeDrags.add(this);
+		markReaders(this.$owner, 'Drag.active');
+		noteWrite(this.$owner, 'Drag.active');
+		evaluateDrag(this);
+	}
+
+	// The drag ends without a drop: the area under it is told that it left.
+	cancel() {
+		if (!this.$active) return;
+		this.$active = false;
+		activeDrags.delete(this);
+		const area = this.$target;
+		this.$target = null;
+		if (area !== null) area.$leave();
+		markReaders(this.$owner, 'Drag.active');
+		noteWrite(this.$owner, 'Drag.active');
+		noteWrite(this.$owner, 'Drag.target');
+	}
+
+	// Sends the drop to the area under the hot spot and ends the drag; answers the action that the area accepted (Qt.IgnoreAction, 0, when none).
+	drop() {
+		if (!this.$active) return 0;
+		evaluateDrag(this);
+		const area = this.$target;
+		let action = 0;
+		this.$active = false;
+		activeDrags.delete(this);
+		this.$target = null;
+		if (area !== null) {
+			const event = dragEvent(this, area, this.$last, false);
+			area.$drop(event);
+			if (event.accepted) action = event.action;
+		}
+		markReaders(this.$owner, 'Drag.active');
+		noteWrite(this.$owner, 'Drag.active');
+		noteWrite(this.$owner, 'Drag.target');
+		return action;
+	}
+
+	start() {
+		this.$begin();
+	}
+}
+DragAttached.prototype.$group = 'Drag';
+for (const [name, value] of [['None', 0], ['Automatic', 1], ['Internal', 2], ['XAxis', 1], ['YAxis', 2], ['XAndYAxis', 3]]) {
+	Object.defineProperty(DragAttached.prototype, name, { value, enumerable: false });
+}
+defineGroupProp(
+	DragAttached.prototype,
+	'Drag',
+	'active',
+	function () {
+		return this.$active;
+	},
+	function (value) {
+		if (toBool(value)) this.$begin();
+		else this.cancel();
+	},
+);
+for (const [name, field, coerce] of [
+	['dragType', '$dragType', (value) => (typeof value === 'number' ? value : 2)],
+	['supportedActions', '$supportedActions', toFloat],
+	['proposedAction', '$proposedAction', toFloat],
+	['keys', '$keys', (value) => (Array.isArray(value) ? value.map(String) : [])],
+	['mimeData', '$mimeData', (value) => value],
+	['source', '$source', (value) => value],
+]) {
+	defineGroupProp(
+		DragAttached.prototype,
+		'Drag',
+		name,
+		function () {
+			return name === 'source' && this.$source === null ? this.$owner : this[field];
+		},
+		function (value) {
+			this[field] = coerce(value);
+		},
+	);
+}
+Object.defineProperty(Item.prototype, 'Drag', {
+	get() {
+		if (this.$drag === undefined) this.$drag = new DragAttached(this);
+		return this.$drag;
+	},
+	enumerable: true,
+	configurable: true,
+});
+
+// `DropArea`: takes the items that are dragged over it (an item with `Drag.active`, or the target of a MouseArea.drag that has it). An area with
+// `keys` takes the drags that have one of them, an area with no keys takes every drag.
+export class DropArea extends Item {
+	constructor() {
+		super();
+		this.$typeName = 'DropArea';
+		this.$isDropArea = true;
+		this.$keys = [];
+		this.$containsDrag = false;
+		this.$dragInfo = { source: null, x: 0, y: 0 };
+		this.$declareSignal('entered', ['drag']);
+		this.$declareSignal('exited', []);
+		this.$declareSignal('dropped', ['drop']);
+		this.$declareSignal('positionChanged', ['drag']);
+	}
+
+	$takes(keys) {
+		if (this.$keys.length === 0) return true;
+		return keys.some((key) => this.$keys.includes(key));
+	}
+
+	$setContains(value) {
+		if (this.$containsDrag === value) return;
+		this.$containsDrag = value;
+		markReaders(this, 'containsDrag');
+		this.$update();
+	}
+
+	$info(event) {
+		this.$dragInfo = { source: event.source, x: event.x, y: event.y };
+		markReaders(this, 'drag');
+	}
+
+	$enter(event) {
+		this.$setContains(true);
+		this.$info(event);
+		this.$emit('entered', [event]);
+	}
+
+	$move(event) {
+		this.$info(event);
+		this.$emit('positionChanged', [event]);
+	}
+
+	$leave() {
+		this.$setContains(false);
+		this.$emit('exited', []);
+	}
+
+	$drop(event) {
+		this.$info(event);
+		this.$setContains(false);
+		this.$emit('dropped', [event]);
+	}
+}
+defineField(DropArea.prototype, 'keys', '$keys', (value) => (Array.isArray(value) ? value.map(String) : []));
+defineReadOnly(
+	DropArea.prototype,
+	'containsDrag',
+	function () {
+		return this.$containsDrag;
+	},
+	undefined,
+	true,
+);
+defineReadOnly(
+	DropArea.prototype,
+	'drag',
+	function () {
+		return this.$dragInfo;
+	},
+	undefined,
+	true,
+);
+
+// `MouseArea.drag`: `drag.target` follows the pointer once it has moved `drag.threshold` along an allowed `drag.axis`, between the minimum and the
+// maximum of each axis; `drag.active` tells that it does.
+class MouseDrag {
+	constructor(owner) {
+		this.$owner = owner;
+		this.$target = null;
+		this.$axis = 3;
+		this.$active = false;
+		this.$threshold = 10;
+		this.$minX = -3.4028234663852886e38; // FLT_MAX, as Qt answers
+		this.$maxX = 3.4028234663852886e38;
+		this.$minY = -3.4028234663852886e38;
+		this.$maxY = 3.4028234663852886e38;
+		this.$filterChildren = false;
+		this.$smoothed = true;
+	}
+}
+MouseDrag.prototype.$group = 'drag';
+for (const [name, field, coerce] of [
+	['target', '$target', (value) => (value !== null && typeof value === 'object' ? value : null)],
+	['axis', '$axis', (value) => (typeof value === 'number' ? value : 3)],
+	['threshold', '$threshold', toFloat],
+	['minimumX', '$minX', toFloat],
+	['maximumX', '$maxX', toFloat],
+	['minimumY', '$minY', toFloat],
+	['maximumY', '$maxY', toFloat],
+	['filterChildren', '$filterChildren', toBool],
+	['smoothed', '$smoothed', toBool],
+]) {
+	defineGroupProp(
+		MouseDrag.prototype,
+		'drag',
+		name,
+		function () {
+			return this[field];
+		},
+		function (value) {
+			this[field] = coerce(value);
+		},
+	);
+}
+defineGroupProp(
+	MouseDrag.prototype,
+	'drag',
+	'active',
+	function () {
+		return this.$active;
+	},
+	function () {
+		throw new QmlError("Cannot assign to read-only property 'active'");
+	},
+);
 
 // ----- Qt Quick Layouts -----
 
@@ -3243,7 +4082,357 @@ function sizeUnresolved(item) {
 	return false;
 }
 
-export class ListView extends Item {
+// ----- Flickable -----
+
+// Qt (measured): the pointer goes farther than this (px) before a drag starts; the content is thrown only above this velocity (px/s),
+// and not when the pointer rested for FLICK_IDLE seconds before the release.
+const FLICK_DRAG_THRESHOLD = 10;
+const FLICK_MIN_VELOCITY = 75;
+const FLICK_IDLE = 0.1;
+
+// A viewport onto its children: they are shifted by (-contentX, -contentY). Scrolls with the wheel and by
+// dragging an empty part of the viewport (a child that accepts the mouse keeps its own presses); no kinetic flick.
+class FlickableContentItem extends Item {
+	constructor(view) {
+		super();
+		this.$flickable = view;
+	}
+
+	// The content item moves against the scroll position (read-only here: the Flickable moves it).
+	get x() {
+		return -this.$flickable.contentX;
+	}
+
+	set x(value) {}
+
+	get y() {
+		return -this.$flickable.contentY;
+	}
+
+	set y(value) {}
+
+
+	get $implicitWidth() {
+		return this.$flickable.$aw;
+	}
+
+	get $implicitHeight() {
+		return this.$flickable.$ah;
+	}
+}
+
+export class Flickable extends Item {
+	constructor() {
+		super();
+		this.$typeName = 'Flickable';
+		this.$contentX = 0;
+		this.$contentY = 0;
+		this.$contentW = 0;
+		this.$contentH = 0;
+		this.$dragFrom = null;
+		this.$initFlick();
+		this.$initContent();
+	}
+
+	// As in Qt the visual children live in contentItem, which is the only entry of `children`. A view (ListView, GridView) keeps
+	// its delegates in itself and has no content item of this kind.
+	$initContent() {
+		this.$content = new FlickableContentItem(this);
+		super.$adopt(this.$content);
+	}
+
+	// The state of the drag and the flick; a Flickable and the views (ListView, GridView) share it.
+	$initFlick() {
+		this.$interactive = true;
+		this.$flickDeceleration = 1500;
+		this.$maximumFlickVelocity = 2500;
+		// the press that may become a drag: { x, y, cx, cy, ax, ay, samples, exceeded: [x, y], started: [x, y] }
+		this.$press = null;
+		// the flick of an axis after the release: null, or { start, from, v (signed, px/s), dur, bound }
+		this.$flickAxis = [null, null];
+		this.$flags = { dragging: false, flicking: false, moving: false };
+		this.$velocity = [0, 0];
+		this.$declareSignal('movementStarted', []);
+		this.$declareSignal('movementEnded', []);
+		this.$declareSignal('flickStarted', []);
+		this.$declareSignal('flickEnded', []);
+		this.$declareSignal('dragStarted', []);
+		this.$declareSignal('dragEnded', []);
+	}
+
+	// The scroll range of the axes that the user can drag: [x, y].
+	$flickRange() {
+		return [this.$maxContentX, this.$maxContentY];
+	}
+
+	// The scroll views below the pointer that may take its drag (see Scene.pointerDown).
+	get $isFlickView() {
+		return true;
+	}
+
+	// Sets moving, dragging or flicking and tells those who wait for it.
+	$setFlag(name, value) {
+		if (this.$flags[name] === value) return;
+		this.$flags[name] = value;
+		noteWrite(this, name);
+		const signal = name + 'Changed';
+		if (this.$sigs !== null && this.$sigs.has(signal)) this.$emit(signal, []);
+	}
+
+	// Qt (measured with QtTest): `moving` is set by the start of a drag and ends with the drag when nothing flicks on, otherwise with the flick.
+	$beginMovement() {
+		if (this.$flags.moving) return;
+		this.$setFlag('moving', true);
+		this.$emit('movementStarted', []);
+	}
+
+	$endMovement() {
+		if (!this.$flags.moving) return;
+		this.$setFlag('moving', false);
+		this.$emit('movementEnded', []);
+	}
+
+	$setVelocity(x, y) {
+		if (this.$velocity[0] !== x) {
+			this.$velocity[0] = x;
+			noteWrite(this, 'horizontalVelocity');
+		}
+		if (this.$velocity[1] !== y) {
+			this.$velocity[1] = y;
+			noteWrite(this, 'verticalVelocity');
+		}
+	}
+
+	get contentItem() {
+		return this.$content;
+	}
+
+	// The items declared in a Flickable (and a Repeater, a visual item in Qt, whose delegates share its parent) go to the content item.
+	// An item that gets the Flickable as its parent from a script (`parent = flick`, `createObject(flick)`) stays a child of the Flickable.
+	$adopt(child, fromScript = false) {
+		if (fromScript || child === this.$content || (child.$nonVisual && !(child instanceof Repeater))) super.$adopt(child);
+		else this.$content.$adopt(child);
+	}
+
+	get $maxContentX() {
+		return Math.max(0, this.$contentW - this.$aw);
+	}
+
+	get $maxContentY() {
+		return Math.max(0, this.$contentH - this.$ah);
+	}
+
+	get $ox() {
+		return this.$contentX;
+	}
+
+	get $oy() {
+		return this.$contentY;
+	}
+
+	$renderContent(r, opacity) {
+		this.$paint(r, opacity);
+		let clipToken = null;
+		if (this.$clip) {
+			clipToken = r.beginClip(this.$aw, this.$ah);
+			if (clipToken === null) return;
+		}
+		const a = r.ma, b = r.mb, c = r.mc, d = r.md, e = r.me, f = r.mf;
+		r.translate(-this.$contentX, -this.$contentY);
+		const children = this.$hasZOrder() ? this.$childrenByZ() : this.$children;
+		for (let i = 0; i < children.length; i++) children[i].$render(r, opacity);
+		r.setMatrix(a, b, c, d, e, f);
+		this.$paintOverlay(r, opacity);
+		if (clipToken !== null) r.endClip(clipToken);
+	}
+
+	get $acceptsMouse() {
+		return this.$interactive && (this.$maxContentX > 0 || this.$maxContentY > 0);
+	}
+
+	get $acceptsWheel() {
+		return this.$interactive;
+	}
+
+	$mouseWheel(notches, x, y, horizontalNotches = 0) {
+		if (!this.$interactive) return false;
+		const vertical = wheelAxis(this, 'contentY', this.$contentY, this.$maxContentY, notches);
+		const horizontal = wheelAxis(this, 'contentX', this.$contentX, this.$maxContentX, horizontalNotches);
+		return vertical || horizontal;
+	}
+
+	// True when the press stopped a flick that was running: Qt (measured) keeps that press for the Flickable, the item below does not get it.
+	$mousePressAt(sceneX, sceneY) {
+		this.$dragFrom = { x: sceneX, y: sceneY, cx: this.$contentX, cy: this.$contentY };
+		if (!this.$interactive) return false;
+		const stopped = this.$flags.flicking;
+		if (stopped) {
+			// the content stops, the movement goes on until the release
+			this.$flickAxis = [null, null];
+			this.$setVelocity(0, 0);
+			this.$setFlag('flicking', false);
+			this.$emit('flickEnded', []);
+		}
+		this.$press = { x: sceneX, y: sceneY, cx: this.$contentX, cy: this.$contentY, ax: sceneX, ay: sceneY, samples: [], exceeded: [false, false], started: [false, false] };
+		return stopped;
+	}
+
+	// Qt (measured with QtTest): the drag of an axis starts at the first move after the one that went farther than 10 px from the press;
+	// the content follows the pointer from the place of that move.
+	$mouseMoveAt(sceneX, sceneY) {
+		const press = this.$press;
+		if (press === null || !this.$interactive) return;
+		const now = performance.now() / 1000;
+		press.samples.push({ t: now, x: sceneX, y: sceneY });
+		if (press.samples.length > 12) press.samples.shift();
+		const range = this.$flickRange();
+		const pointer = [sceneX, sceneY];
+		const origin = [press.x, press.y];
+		for (let axis = 0; axis < 2; axis++) {
+			if (range[axis] <= 0 || press.started[axis]) continue;
+			if (press.exceeded[axis]) {
+				press.started[axis] = true;
+				if (axis === 0) {
+					press.ax = sceneX;
+					press.cx = this.$contentX;
+				} else {
+					press.ay = sceneY;
+					press.cy = this.$contentY;
+				}
+				const first = !this.$flags.dragging;
+				this.$setFlag('dragging', true);
+				this.$beginMovement();
+				if (first) this.$emit('dragStarted', []);
+			} else if (Math.abs(pointer[axis] - origin[axis]) > FLICK_DRAG_THRESHOLD) {
+				press.exceeded[axis] = true;
+			}
+		}
+		if (press.started[0]) this.contentX = clamp(press.cx - (sceneX - press.ax), 0, range[0]);
+		if (press.started[1]) this.contentY = clamp(press.cy - (sceneY - press.ay), 0, range[1]);
+	}
+
+	$pressChanged(pressed) {
+		if (pressed) return;
+		this.$dragFrom = null;
+		const press = this.$press;
+		this.$press = null;
+		if (press === null) return;
+		if (!this.$flags.dragging) {
+			// a press that only stopped a flick: the movement ends with the release
+			if (this.$flags.moving && !this.$flags.flicking) this.$endMovement();
+			return;
+		}
+		const now = performance.now() / 1000;
+		this.$setFlag('dragging', false);
+		this.$emit('dragEnded', []);
+		const velocity = [0, 0];
+		const samples = press.samples;
+		// the pointer that rested for 100 ms or more does not throw the content
+		if (samples.length > 1 && now - samples[samples.length - 1].t < FLICK_IDLE) {
+			for (let axis = 0; axis < 2; axis++) {
+				if (!press.started[axis]) continue;
+				let sum = 0;
+				let weights = 0;
+				for (let i = 1; i < samples.length; i++) {
+					const dt = samples[i].t - samples[i - 1].t;
+					if (dt <= 0 || samples[samples.length - 1].t - samples[i].t >= FLICK_IDLE) continue;
+					const delta = axis === 0 ? samples[i].x - samples[i - 1].x : samples[i].y - samples[i - 1].y;
+					sum += i * clamp(-delta / dt, -this.$maximumFlickVelocity, this.$maximumFlickVelocity);
+					weights += i;
+				}
+				velocity[axis] = weights > 0 ? sum / weights : 0;
+			}
+		}
+		if (!this.$startFlick(velocity[0], velocity[1])) this.$endMovement();
+	}
+
+	// Starts the flick of the axes whose velocity (px/s of the content) is above 75; true if one runs.
+	$startFlick(vx, vy) {
+		const velocity = [vx, vy];
+		const position = [this.$contentX, this.$contentY];
+		const range = this.$flickRange();
+		const start = hooks.now();
+		let any = false;
+		for (let axis = 0; axis < 2; axis++) {
+			this.$flickAxis[axis] = null;
+			const v = clamp(velocity[axis], -this.$maximumFlickVelocity, this.$maximumFlickVelocity);
+			if (Math.abs(v) <= FLICK_MIN_VELOCITY || range[axis] <= 0 || this.$flickDeceleration <= 0) continue;
+			const room = v > 0 ? range[axis] - position[axis] : position[axis];
+			if (room <= 0) continue;
+			// the content stops at its end exactly: Qt keeps the velocity and takes the deceleration that the distance needs
+			const free = (v * v) / (2 * this.$flickDeceleration);
+			const bound = free > room;
+			const dur = bound ? (2 * room) / Math.abs(v) : Math.abs(v) / this.$flickDeceleration;
+			this.$flickAxis[axis] = { start, from: position[axis], v, dur, bound };
+			any = true;
+		}
+		if (!any) return false;
+		this.$beginMovement();
+		this.$setFlag('flicking', true);
+		this.$emit('flickStarted', []);
+		if (hooks.watchFlick !== null) hooks.watchFlick(this);
+		this.$update();
+		return true;
+	}
+
+	// The engine calls it with every frame while the content runs on; false when it came to rest.
+	$flickTick(seconds) {
+		let running = false;
+		const velocity = [0, 0];
+		for (let axis = 0; axis < 2; axis++) {
+			const state = this.$flickAxis[axis];
+			if (state === null) continue;
+			const t = clamp(seconds - state.start, 0, state.dur);
+			const speed = Math.abs(state.v);
+			const sign = state.v > 0 ? 1 : -1;
+			const decel = state.bound ? speed / state.dur : this.$flickDeceleration;
+			const travelled = speed * t - (decel * t * t) / 2;
+			const target = clamp(state.from + sign * travelled, 0, this.$flickRange()[axis]);
+			if (axis === 0) this.contentX = target;
+			else this.contentY = target;
+			if (t >= state.dur) {
+				this.$flickAxis[axis] = null;
+			} else {
+				running = true;
+				velocity[axis] = sign * (speed - decel * t);
+			}
+		}
+		this.$setVelocity(velocity[0], velocity[1]);
+		if (running) return true;
+		this.$finishFlick();
+		return false;
+	}
+
+	$finishFlick() {
+		this.$flickAxis = [null, null];
+		this.$setVelocity(0, 0);
+		if (!this.$flags.flicking) return;
+		this.$setFlag('flicking', false);
+		this.$emit('flickEnded', []);
+		this.$endMovement();
+	}
+
+	// Qt: the arguments are the velocity of the content (a positive one scrolls towards the start)
+	flick(xVelocity, yVelocity) {
+		if (this.$flags.flicking) this.cancelFlick();
+		this.$startFlick(-toFloat(xVelocity), -toFloat(yVelocity));
+	}
+
+	cancelFlick() {
+		if (this.$flags.flicking) this.$finishFlick();
+	}
+
+	returnToBounds() {
+		this.contentX = clamp(this.$contentX, 0, this.$maxContentX);
+		this.contentY = clamp(this.$contentY, 0, this.$maxContentY);
+	}
+}
+
+const POSITION_MODES = ['Beginning', 'Center', 'End', 'Visible', 'Contain'];
+
+// Qt: ListView and GridView are Flickables (QQuickItemView is a QQuickFlickable): the drag, the flick, their signals and properties are
+// those of Flickable. The view keeps its delegates in itself and scrolls them by its own layout (contentX, contentY, $arrange).
+export class ListView extends Flickable {
 	// The delegates are the children of the view itself.
 	get contentItem() {
 		return this.$viewContent !== undefined ? this.$viewContent : (this.$viewContent = new ViewContent(this));
@@ -3424,6 +4613,87 @@ export class ListView extends Item {
 
 	get $acceptsWheel() {
 		return true;
+	}
+
+	// The delegates are the children of the view, a content item does not exist.
+	$initContent() {}
+
+	$adopt(child, fromScript = false) {
+		Item.prototype.$adopt.call(this, child, fromScript);
+	}
+
+	// The layout of the view moves the delegates; nothing is shifted when drawing.
+	get $ox() {
+		return 0;
+	}
+
+	get $oy() {
+		return 0;
+	}
+
+	$renderContent(r, opacity) {
+		Item.prototype.$renderContent.call(this, r, opacity);
+	}
+
+	// A list is dragged along its own axis only.
+	$flickRange() {
+		return this.$horizontal ? [this.$maxContentX, 0] : [0, this.$maxContentY];
+	}
+
+	get $isFlickView() {
+		return true;
+	}
+
+	get $acceptsMouse() {
+		if (!this.$interactive || !itemEnabled(this)) return false;
+		const range = this.$flickRange();
+		return range[0] > 0 || range[1] > 0;
+	}
+
+	// The place of a row along the main axis: { pos, size }.
+	$indexSpan(index) {
+		const spacing = Math.max(0, this.$spacing);
+		if (this.$oddExtents === 0) {
+			const base = this.$rowHeight > 0 ? this.$rowHeight : 40;
+			return { pos: index * (base + spacing), size: base };
+		}
+		let pos = 0;
+		for (let i = 0; i < index; i++) pos += this.$extentAt(i) + spacing;
+		return { pos, size: this.$extentAt(index) };
+	}
+
+	// ListView.Beginning, Center, End, Visible, Contain (Qt, measured): the view moves so that the row is there; Visible and Contain
+	// move it as little as possible (Visible only when no part of the row shows); the position stays inside the content.
+	positionViewAtIndex(index, mode) {
+		// the enum of the engine is the name of the value (ListView.Contain is 'Contain'), Qt's is its number
+		if (typeof mode === 'string') mode = POSITION_MODES.indexOf(mode);
+		index = toFloat(index);
+		if (!(index >= 0 && index < this.$rowCount)) return;
+		const { pos, size } = this.$indexSpan(Math.floor(index));
+		const horizontal = this.$horizontal;
+		const view = horizontal ? this.$aw : this.$ah;
+		const current = horizontal ? this.$contentX : this.$contentY;
+		const max = horizontal ? this.$maxContentX : this.$maxContentY;
+		let target = current;
+		if (mode === 0) target = pos;
+		else if (mode === 1) target = pos + size / 2 - view / 2;
+		else if (mode === 2) target = pos + size - view;
+		else if (mode === 3 && (pos + size <= current || pos >= current + view)) target = pos < current ? pos : pos + size - view;
+		else if (mode === 4) target = pos < current ? pos : pos + size > current + view ? pos + size - view : current;
+		this.$scrollTo(clamp(target, 0, max));
+	}
+
+	positionViewAtBeginning() {
+		this.$scrollTo(0);
+	}
+
+	positionViewAtEnd() {
+		this.$scrollTo(this.$horizontal ? this.$maxContentX : this.$maxContentY);
+	}
+
+	$scrollTo(value) {
+		if (this.$horizontal) this.contentX = value;
+		else this.contentY = value;
 	}
 
 	// A list scrolls along its own axis only: a vertical wheel does not move a horizontal list (Qt).
@@ -3877,14 +5147,28 @@ defineReadOnly(ListView.prototype, 'originX', function () {
 defineReadOnly(ListView.prototype, 'originY', function () {
 	return 0;
 });
-for (const name of ['positionViewAtIndex', 'positionViewAtBeginning', 'positionViewAtEnd']) {
-	ListView.prototype[name] = function () {};
-}
 ListView.prototype.forceLayout = function () {
 	this.$arrange();
 };
 
 // Cells in row-major order. `columns` is how many cell widths fit in the view.
+// As for a Flickable in Qt, the visual children of a view live in its contentItem, which is the only entry of `children`: the delegate of
+// row i is `view.children[0].children[i]` (InputView of ImtCore sets the parameters of a row that way). The engine keeps the delegates in
+// the view itself, ViewContent stands in for the contentItem.
+const itemChildren = Object.getOwnPropertyDescriptor(Item.prototype, 'children');
+defineProp(
+	ListView.prototype,
+	'children',
+	function () {
+		if (this.$childrenList === undefined) this.$childrenList = [this.contentItem];
+		return this.$childrenList;
+	},
+	function (list) {
+		itemChildren.set.call(this, list);
+	},
+	true,
+);
+
 export class GridView extends ListView {
 	constructor() {
 		super();
@@ -4063,8 +5347,9 @@ export class GridView extends ListView {
 		}
 	}
 
-	positionViewAtBeginning() {
-		this.contentY = 0;
+	// A grid places a cell by the row that holds it.
+	$indexSpan(index) {
+		return { pos: Math.floor(index / this.$columns()) * this.$cellHeight, size: this.$cellHeight };
 	}
 }
 
@@ -4232,7 +5517,7 @@ export class ImageItem extends Item {
 		this.$status = 0;
 		this.$page = null;
 		this.$pageKey = '';
-		this.sourceSize = { width: 0, height: 0 };
+		this.$sourceSize = new SourceSize(this);
 	}
 
 	$setImage(img, status) {
@@ -4240,15 +5525,63 @@ export class ImageItem extends Item {
 		this.$status = status;
 		this.$page = null;
 		this.$pageKey = '';
+		// what a picture of the size it has makes of `sourceSize` and of the implicit size
+		markReaders(this, 'sourceSize.width');
+		markReaders(this, 'sourceSize.height');
 		this.$update();
 	}
 
-	get $naturalWidth() {
+	// The size of the picture as it was loaded.
+	get $rawWidth() {
 		return this.$img === null ? 0 : this.$img.naturalWidth || this.$img.width || 0;
 	}
 
-	get $naturalHeight() {
+	get $rawHeight() {
 		return this.$img === null ? 0 : this.$img.naturalHeight || this.$img.height || 0;
+	}
+
+	// The size Qt loads the picture at for `sourceSize` (measured in Qt 6.11, test/qt-measure/image). Both sides of the request unset: the size of the picture.
+	// A picture made of pixels is only made smaller: one side asked for keeps the proportions, both sides fit the picture into the box, with
+	// PreserveAspectFit or PreserveAspectCrop the picture covers the box (and may be made larger). A vector picture (.svg) is made to the size asked for:
+	// both sides are exactly the box, one side keeps the proportions.
+	$loadedSize() {
+		const nw = this.$rawWidth;
+		const nh = this.$rawHeight;
+		const rw = this.$sourceSize.$w;
+		const rh = this.$sourceSize.$h;
+		if (nw <= 0 || nh <= 0 || (rw <= 0 && rh <= 0)) return { w: nw, h: nh };
+		const vector = /\.svgz?(?:[?#]|$)/i.test(this.$source);
+		const cover = this.$fillMode === 1 || this.$fillMode === 2;
+		let w;
+		let h;
+		if (rw > 0 && rh > 0) {
+			if (cover) {
+				const scale = Math.max(rw / nw, rh / nh);
+				w = nw * scale;
+				h = nh * scale;
+			} else if (vector) {
+				w = rw;
+				h = rh;
+			} else {
+				const scale = Math.min(rw / nw, rh / nh, 1);
+				w = nw * scale;
+				h = nh * scale;
+			}
+		} else {
+			let scale = rw > 0 ? rw / nw : rh / nh;
+			if (!vector) scale = Math.min(scale, 1);
+			w = nw * scale;
+			h = nh * scale;
+		}
+		return { w: Math.max(1, Math.round(w)), h: Math.max(1, Math.round(h)) };
+	}
+
+	get $naturalWidth() {
+		return this.$loadedSize().w;
+	}
+
+	get $naturalHeight() {
+		return this.$loadedSize().h;
 	}
 
 	get $implicitWidth() {
@@ -4306,8 +5639,8 @@ export class ImageItem extends Item {
 		const full = { w: fit.w / (fit.u1 - fit.u0), h: fit.h / (fit.v1 - fit.v0) };
 		const pw = Math.min(2048, Math.max(1, Math.round(full.w * k)));
 		const ph = Math.min(2048, Math.max(1, Math.round(full.h * k)));
-		const nw = this.$naturalWidth;
-		const nh = this.$naturalHeight;
+		const nw = this.$rawWidth;
+		const nh = this.$rawHeight;
 		// Integer (or near-1:1) scales keep bitmap icons crisp; fractional scales need smoothing.
 		const sx = nw > 0 ? pw / nw : 0;
 		const sy = nh > 0 ? ph / nh : 0;
@@ -4374,6 +5707,67 @@ defineProp(
 		}
 	},
 );
+// `sourceSize` of an Image: the size the picture is read at (`sourceSize.width: 20`, `sourceSize: Qt.size(16, 8)`). The width and height read back as
+// written; when neither is set they are the size of the loaded picture (Qt). The implicit size of the image follows them (see $loadedSize).
+class SourceSize {
+	constructor(owner) {
+		this.$owner = owner;
+		this.$w = 0;
+		this.$h = 0;
+		this.$asked = false; // written at least once: what it holds is read back as it is, even 0 and 0 (Qt)
+	}
+
+	// A size is a value in Qt: after a change the item holds a new one, which is what the handlers of sourceSizeChanged compare.
+	$changed() {
+		const next = new SourceSize(this.$owner);
+		next.$w = this.$w;
+		next.$h = this.$h;
+		next.$asked = true;
+		this.$owner.$sourceSize = next;
+		markReaders(this.$owner, 'sourceSize.width');
+		markReaders(this.$owner, 'sourceSize.height');
+		reportHandlerChange(this.$owner, 'sourceSize');
+		this.$owner.$update(); // the implicit size follows
+	}
+
+	$set(width, height) {
+		if (this.$w === width && this.$h === height && this.$asked) return;
+		this.$w = width;
+		this.$h = height;
+		this.$changed();
+	}
+}
+SourceSize.prototype.$group = 'sourceSize';
+for (const [name, field] of [['width', '$w'], ['height', '$h']]) {
+	defineGroupProp(
+		SourceSize.prototype,
+		'sourceSize',
+		name,
+		function () {
+			// neither side asked for: the size of the picture that is loaded
+			if (!this.$asked) return name === 'width' ? this.$owner.$rawWidth : this.$owner.$rawHeight;
+			return this[field];
+		},
+		function (value) {
+			const size = Math.max(0, toFloat(value));
+			if (this[field] === size && this.$asked) return;
+			this[field] = size;
+			this.$changed();
+		},
+	);
+}
+defineProp(
+	ImageItem.prototype,
+	'sourceSize',
+	function () {
+		return this.$sourceSize;
+	},
+	function (value) {
+		if (value === null || typeof value !== 'object') return;
+		this.$sourceSize.$set(Math.max(0, toFloat(value.width)), Math.max(0, toFloat(value.height)));
+	},
+	true,
+);
 defineField(ImageItem.prototype, 'horizontalAlignment', '$hAlign', toFloat);
 defineField(ImageItem.prototype, 'verticalAlignment', '$vAlign', toFloat);
 defineReadOnly(ImageItem.prototype, 'status', function () {
@@ -4389,121 +5783,24 @@ defineReadOnly(ImageItem.prototype, 'paintedHeight', function () {
 	return this.$fit().h;
 });
 
-// ----- Flickable -----
-
-// A viewport onto its children: they are shifted by (-contentX, -contentY). Scrolls with the wheel and by
-// dragging an empty part of the viewport (a child that accepts the mouse keeps its own presses); no kinetic flick.
-class FlickableContentItem extends Item {
-	constructor(view) {
-		super();
-		this.$flickable = view;
-	}
-
-	get $implicitWidth() {
-		return this.$flickable.$aw;
-	}
-
-	get $implicitHeight() {
-		return this.$flickable.$ah;
-	}
-}
-
-export class Flickable extends Item {
-	constructor() {
-		super();
-		this.$typeName = 'Flickable';
-		this.$contentX = 0;
-		this.$contentY = 0;
-		this.$contentW = 0;
-		this.$contentH = 0;
-		this.$interactive = true;
-		this.$dragFrom = null;
-		// As in Qt the visual children live in contentItem, which is the only entry of `children`.
-		this.$content = new FlickableContentItem(this);
-		super.$adopt(this.$content);
-	}
-
-	get contentItem() {
-		return this.$content;
-	}
-
-	// A Repeater is a visual item in Qt: its delegates share its parent, the content item.
-	$adopt(child) {
-		if (child === this.$content || (child.$nonVisual && !(child instanceof Repeater))) super.$adopt(child);
-		else this.$content.$adopt(child);
-	}
-
-	get $maxContentX() {
-		return Math.max(0, this.$contentW - this.$aw);
-	}
-
-	get $maxContentY() {
-		return Math.max(0, this.$contentH - this.$ah);
-	}
-
-	get $ox() {
-		return this.$contentX;
-	}
-
-	get $oy() {
-		return this.$contentY;
-	}
-
-	$renderContent(r, opacity) {
-		this.$paint(r, opacity);
-		let clipToken = null;
-		if (this.$clip) {
-			clipToken = r.beginClip(this.$aw, this.$ah);
-			if (clipToken === null) return;
-		}
-		const a = r.ma, b = r.mb, c = r.mc, d = r.md, e = r.me, f = r.mf;
-		r.translate(-this.$contentX, -this.$contentY);
-		const children = this.$hasZOrder() ? this.$childrenByZ() : this.$children;
-		for (let i = 0; i < children.length; i++) children[i].$render(r, opacity);
-		r.setMatrix(a, b, c, d, e, f);
-		this.$paintOverlay(r, opacity);
-		if (clipToken !== null) r.endClip(clipToken);
-	}
-
-	get $acceptsMouse() {
-		return this.$interactive && (this.$maxContentX > 0 || this.$maxContentY > 0);
-	}
-
-	get $acceptsWheel() {
-		return this.$interactive;
-	}
-
-	$mouseWheel(notches, x, y, horizontalNotches = 0) {
-		if (!this.$interactive) return false;
-		const vertical = wheelAxis(this, 'contentY', this.$contentY, this.$maxContentY, notches);
-		const horizontal = wheelAxis(this, 'contentX', this.$contentX, this.$maxContentX, horizontalNotches);
-		return vertical || horizontal;
-	}
-
-	$mousePressAt(sceneX, sceneY) {
-		this.$dragFrom = { x: sceneX, y: sceneY, cx: this.$contentX, cy: this.$contentY };
-	}
-
-	$mouseMoveAt(sceneX, sceneY) {
-		const from = this.$dragFrom;
-		if (from === null || !this.$interactive) return;
-		this.contentX = clamp(from.cx - (sceneX - from.x), 0, this.$maxContentX);
-		this.contentY = clamp(from.cy - (sceneY - from.y), 0, this.$maxContentY);
-	}
-
-	$pressChanged(pressed) {
-		if (!pressed) this.$dragFrom = null;
-	}
-
-	flick() {}
-
-	cancelFlick() {}
-
-	returnToBounds() {
-		this.contentX = clamp(this.$contentX, 0, this.$maxContentX);
-		this.contentY = clamp(this.$contentY, 0, this.$maxContentY);
-	}
-}
+// The drag and the flick of the views are those of a Flickable (Qt: a ListView and a GridView are Flickables).
+defineReadOnly(Flickable.prototype, 'moving', function () {
+	return this.$flags.moving;
+});
+defineReadOnly(Flickable.prototype, 'dragging', function () {
+	return this.$flags.dragging;
+});
+defineReadOnly(Flickable.prototype, 'flicking', function () {
+	return this.$flags.flicking;
+});
+defineReadOnly(Flickable.prototype, 'horizontalVelocity', function () {
+	return this.$velocity[0];
+});
+defineReadOnly(Flickable.prototype, 'verticalVelocity', function () {
+	return this.$velocity[1];
+});
+defineField(Flickable.prototype, 'flickDeceleration', '$flickDeceleration', toFloat);
+defineField(Flickable.prototype, 'maximumFlickVelocity', '$maximumFlickVelocity', toFloat);
 
 function defineContent(name, field, sizeField = null) {
 	defineProp(
@@ -4662,12 +5959,17 @@ function wrapRanges(info, text, start, stop, limit, anywhere, out) {
 	out.push({ start: lineStart, end: stop });
 }
 
+// The text editors of the scene (src/textproxy.js keeps an input element of the page for some of them).
+export const textEditors = new Set();
+
 // The editing core of TextInput (one line) and TextEdit (many lines). The cursor and the other end of the selection
 // (`$anchor`) are indexes into `$text`; undo steps are snapshots taken before a change.
 class TextEditor extends Item {
 	constructor(multiline) {
 		super();
+		textEditors.add(this);
 		this.$multi = multiline;
+		this.$hints = 0; // Qt.InputMethodHints
 		this.$text = '';
 		this.$color = BLACK;
 		this.$pixelSize = 12;
@@ -4737,7 +6039,7 @@ class TextEditor extends Item {
 		for (const name of LAYOUT_DEPENDENT) noteWrite(this, name);
 	}
 
-	// Rich text is shown as plain text and cannot be edited or selected by the mouse.
+	// Rich text is laid out and painted like the rich text of a Text (colors, backgrounds); it cannot be edited or selected by the mouse.
 	get $rich() {
 		return this.$multi && this.$format === 'RichText';
 	}
@@ -4785,7 +6087,8 @@ class TextEditor extends Item {
 			if (w > 0) limit = w;
 		}
 		const cached = this.$cache;
-		if (cached !== null && cached.info === info && cached.version === fonts.version && cached.shown === shown && cached.limit === limit) return cached;
+		const source = this.$rich ? this.$text : '';
+		if (cached !== null && cached.info === info && cached.version === fonts.version && cached.shown === shown && cached.limit === limit && cached.source === source) return cached;
 		const step = this.$multi && shown !== '' ? info.lineSpacing : info.lineHeight;
 		const lines = this.$multi ? textRanges(info, shown, limit, this.$wrap === 3 || this.$wrap === 4) : [{ start: 0, end: shown.length }];
 		let width = 0;
@@ -4793,9 +6096,35 @@ class TextEditor extends Item {
 			line.width = textWidth(info, shown.slice(line.start, line.end));
 			width = Math.max(width, line.width);
 		}
-		const lay = { info, version: fonts.version, shown, limit, step, lines, width, height: lines.length * step, natural: -1 };
+		const lay = { info, version: fonts.version, shown, limit, step, lines, width, height: lines.length * step, natural: -1, source, rich: null };
+		if (this.$rich) {
+			// the size is that of the marked up text
+			const rich = this.$richLayout(limit, family);
+			lay.rich = rich;
+			lay.width = rich.contentWidth;
+			lay.height = rich.contentHeight;
+			lay.natural = rich.naturalWidth;
+		}
 		this.$cache = lay;
 		return lay;
+	}
+
+	// The layout of the marked up text for a width (Infinity: none), kept while nothing it depends on changes.
+	$richLayout(limit, family) {
+		const size = this.$pixelSize > 0 ? this.$pixelSize : 12;
+		const wrap = limit === Infinity ? 'none' : this.$wrap === 1 || this.$wrap === 'WordWrap' ? 'word' : 'anywhere';
+		const width = limit === Infinity ? 0 : limit;
+		const key = [family, size, this.$bold, this.$italic, width, wrap, this.$hAlign, fonts.version].join('|');
+		let state = this.$richState;
+		if (state === undefined) state = this.$richState = { docKey: null, doc: null, key: null, layout: null };
+		if (state.key === key && state.docKey === this.$text) return state.layout;
+		if (state.docKey !== this.$text) {
+			state.doc = parseRichText(this.$text, false);
+			state.docKey = this.$text;
+		}
+		state.layout = layoutRichText(state.doc, { fonts, family, size, bold: this.$bold, italic: this.$italic, width, wrap, styled: false, lineHeightFactor: 1, align: this.$hAlign });
+		state.key = key;
+		return state.layout;
 	}
 
 	// The widest line without wrapping.
@@ -5028,6 +6357,42 @@ class TextEditor extends Item {
 		this.$touched();
 	}
 
+	// What the input element of the page mirrors: the text and the selection.
+	$domState() {
+		return { text: this.$text, start: this.$lo, end: this.$hi, backward: this.$cursor < this.$anchor };
+	}
+
+	// The input element of the page changed (typing, a virtual keyboard, a composition, a paste, the autofill of the browser): the model
+	// follows. `start` and `end` are the selection of the element. The change is found as what is between the common head and tail of the
+	// old and the new text, so the undo history, the cursor and `textEdited` work as for a typed key. Returns whether the text changed.
+	$fromDom(value, start, end, backward) {
+		if (!this.$editable) return false;
+		const next = this.$multi ? String(value) : String(value).replace(/[\r\n]/g, ' ');
+		const old = this.$text;
+		let changed = false;
+		if (next !== old) {
+			const shortest = Math.min(old.length, next.length);
+			let head = 0;
+			while (head < shortest && old.charCodeAt(head) === next.charCodeAt(head)) head++;
+			if (head > 0 && head < shortest && isHighSurrogate(old.charCodeAt(head - 1))) head--;
+			let tail = 0;
+			while (tail < shortest - head && old.charCodeAt(old.length - 1 - tail) === next.charCodeAt(next.length - 1 - tail)) tail++;
+			if (tail > 0 && isLowSurrogate(old.charCodeAt(old.length - tail))) tail--;
+			const inserted = next.slice(head, next.length - tail);
+			changed = this.$splice(head, old.length - tail, inserted, inserted === '' ? 'delete' : 'type', false);
+			this.$emit('textEdited', []);
+		}
+		if (this.$text === next) {
+			const n = next.length;
+			const lo = clampIndex(start, n);
+			const hi = clampIndex(end, n);
+			this.$cursor = backward ? lo : hi;
+			this.$anchor = backward ? hi : lo;
+			this.$touched();
+		}
+		return changed;
+	}
+
 	// ----- the API of the QML types -----
 
 	select(start, end) {
@@ -5159,6 +6524,61 @@ class TextEditor extends Item {
 
 	// ----- keys -----
 
+	// Whether the editor keeps a key for itself, so that a Shortcut does not get it (QQuickTextInput and QQuickTextEdit accept the
+	// ShortcutOverride of Qt): the keys that edit or move in the text, and what the standard keys of editing are. A read-only editor
+	// keeps none; a TextEdit keeps Return, Up, Down and Tab as well. What an editor does not keep goes to a Shortcut first
+	// (Escape, F2, Ctrl+S).
+	$shortcutOverride(event) {
+		if (this.$readOnly) return false;
+		const key = event.key;
+		const modifiers = event.modifiers & (MODIFIERS.ShiftModifier | MODIFIERS.ControlModifier | MODIFIERS.AltModifier | MODIFIERS.MetaModifier);
+		if (modifiers === 0 || modifiers === MODIFIERS.ShiftModifier) {
+			// a character (the key codes of Qt below Key_Escape are characters)
+			if (key < KEY.Key_Escape) return true;
+			switch (key) {
+				case KEY.Key_Delete:
+				case KEY.Key_Home:
+				case KEY.Key_End:
+				case KEY.Key_Backspace:
+				case KEY.Key_Left:
+				case KEY.Key_Right:
+					return true;
+				case KEY.Key_Return:
+				case KEY.Key_Enter:
+				case KEY.Key_Up:
+				case KEY.Key_Down:
+				case KEY.Key_Tab:
+					return this.$multi;
+				default:
+					break;
+			}
+		}
+		const ctrl = modifiers === MODIFIERS.ControlModifier;
+		const ctrlShift = modifiers === (MODIFIERS.ControlModifier | MODIFIERS.ShiftModifier);
+		switch (key) {
+			// copy, paste, cut, undo, redo, select all
+			case KEY.Key_C:
+			case KEY.Key_V:
+			case KEY.Key_X:
+			case KEY.Key_Z:
+			case KEY.Key_Y:
+			case KEY.Key_A:
+				return ctrl || (key === KEY.Key_Z && ctrlShift);
+			case KEY.Key_Insert:
+				return ctrl || modifiers === MODIFIERS.ShiftModifier;
+			case KEY.Key_Left:
+			case KEY.Key_Right:
+			case KEY.Key_Home:
+			case KEY.Key_End:
+			case KEY.Key_Delete:
+			case KEY.Key_Backspace:
+				// by words and to the ends, with the selection, deleting by words
+				return ctrl || ctrlShift || modifiers === MODIFIERS.ShiftModifier;
+			default:
+				return key === KEY.Key_Backspace && modifiers === MODIFIERS.AltModifier;
+		}
+	}
+
 	$keyPressed(event) {
 		const mods = event.modifiers;
 		const handled = this.$handleKey(event.key, (mods & MODIFIERS.ControlModifier) !== 0, (mods & MODIFIERS.ShiftModifier) !== 0, (mods & MODIFIERS.AltModifier) !== 0, event.text);
@@ -5219,6 +6639,9 @@ class TextEditor extends Item {
 			case KEY.Key_Return:
 			case KEY.Key_Enter:
 				return this.$enter();
+			case KEY.Key_Tab:
+				// a TextEdit types a tab, Shift+Tab as well, and the focus stays (Qt); a TextInput leaves it to the focus chain
+				return this.$multi && !ctrl && !alt && this.$type('	');
 			default:
 				break;
 		}
@@ -5295,6 +6718,11 @@ class TextEditor extends Item {
 	}
 
 	// ----- focus and the text cursor -----
+
+	$destroy() {
+		textEditors.delete(this);
+		super.$destroy();
+	}
 
 	$focusEdge() {
 		const now = this.$active;
@@ -5391,7 +6819,22 @@ class TextEditor extends Item {
 		const selectionBack = r.pack(this.$selColor, opacity);
 		const selectionText = r.pack(this.$selTextColor, opacity);
 		const y0 = this.$originY(lay);
-		for (let row = 0; row < lay.lines.length; row++) {
+		if (lay.rich !== null) {
+			r.translate(this.$padL, y0);
+			paintRichText(r, lay.rich, {
+				fonts,
+				family: this.$family !== '' ? this.$family : fonts.defaultFamily(),
+				size: this.$pixelSize > 0 ? this.$pixelSize : 12,
+				bold: this.$bold,
+				italic: this.$italic,
+				width: lay.limit === Infinity ? 0 : lay.limit,
+				pack: (value) => r.pack(toColor(value), opacity),
+				baseColor: lay.rich.baseColor !== null ? r.pack(toColor(lay.rich.baseColor), opacity) : color,
+				linkColor: r.pack(toColor('#0000ff'), opacity),
+			});
+			r.translate(-this.$padL, -y0);
+		}
+		for (let row = 0; lay.rich === null && row < lay.lines.length; row++) {
 			const line = lay.lines[row];
 			const top = y0 + row * lay.step;
 			const x0 = this.$originX(lay, line);
@@ -5518,6 +6961,7 @@ for (const [name, field, coerce] of [
 	['bottomPadding', '$padB', toFloat],
 	['wrapMode', '$wrap', toWrapMode],
 	['echoMode', '$echo', toEcho],
+	['inputMethodHints', '$hints', toFloat],
 	['textFormat', '$format', (value) => (value === undefined || value === null ? 'PlainText' : String(value))],
 ]) {
 	defineProp(
@@ -5608,14 +7052,202 @@ readOnlyProp('canPaste', function () {
 	return !this.$readOnly && hooks.clipboardRead().text !== '';
 });
 
+// `Shortcut`: a key sequence that works wherever the focus is (the engine looks for it in dispatchKey, before the item that has the
+// focus gets the key; a text editor keeps the keys of editing for itself). `sequence` is a text ("Ctrl+Z", "Esc") or a StandardKey,
+// `sequences` a list of them; a sequence that is not valid never activates. Two enabled shortcuts of the same sequence activate none
+// of them: the one that was made last gets `activatedAmbiguously`. The visibility of the parent does not matter, and `context` is
+// not looked at (there is one window).
 export class Shortcut extends Item {
 	constructor() {
 		super();
 		this.$typeName = 'Shortcut';
 		this.$nonVisual = true;
+		this.$sequence = '';
+		this.$sequences = [];
+		this.$sequencesSet = false;
+		this.$enabled = true;
+		this.$context = 1; // Qt.WindowShortcut
+		this.$autoRepeat = true;
+		this.$parsed = null;
 		this.$declareSignal('activated', []);
+		this.$declareSignal('activatedAmbiguously', []);
+	}
+
+	// The valid sequences it listens to: [{ key, modifiers }, ...] of the first step of each, and the text of the first one.
+	$sequenceList() {
+		if (this.$parsed !== null) return this.$parsed;
+		const values = this.$sequencesSet ? this.$sequences.concat(this.$sequence === '' ? [] : [this.$sequence]) : [this.$sequence];
+		const combos = [];
+		let text = '';
+		for (const value of values) {
+			const parsed = parseKeySequence(typeof value === 'number' ? (STANDARD_KEYS.find((entry) => entry[1] === value) || [])[2] : value);
+			if (parsed === null) continue;
+			// a sequence of several steps waits for all of them; only its first step is known here, and it never activates
+			if (parsed.steps.length === 1) combos.push(parsed.steps[0]);
+			if (text === '') text = parsed.text;
+		}
+		this.$parsed = { combos, text };
+		return this.$parsed;
+	}
+
+	$matches(key, modifiers) {
+		for (const combo of this.$sequenceList().combos) if (combo.key === key && combo.modifiers === modifiers) return true;
+		return false;
 	}
 }
+
+defineProp(
+	Shortcut.prototype,
+	'sequence',
+	function () {
+		// with `sequences` set, Qt has no `sequence`
+		return this.$sequencesSet && this.$sequence === '' ? undefined : this.$sequence;
+	},
+	function (value) {
+		this.$sequence = typeof value === 'number' ? value : toStr(value);
+		this.$parsed = null;
+	},
+	true,
+);
+defineProp(
+	Shortcut.prototype,
+	'sequences',
+	function () {
+		return this.$sequences;
+	},
+	function (value) {
+		this.$sequences = Array.from(value || []);
+		this.$sequencesSet = true;
+		this.$parsed = null;
+	},
+	true,
+);
+defineField(Shortcut.prototype, 'enabled', '$enabled', toBool);
+defineField(Shortcut.prototype, 'autoRepeat', '$autoRepeat', toBool);
+defineField(Shortcut.prototype, 'context', '$context', toFloat);
+defineReadOnly(Shortcut.prototype, 'nativeText', function () {
+	return this.$sequenceList().text;
+});
+defineReadOnly(Shortcut.prototype, 'portableText', function () {
+	return this.$sequenceList().text;
+});
+
+// `TestCase` of QtTest, as far as the tests of the keyboard need it: keyPress, keyRelease and keyClick send the keys to the item that
+// has the focus the way the keyboard of a window does (a modifier is a key of its own, pressed before the key and released after it).
+export class TestCase extends Item {
+	constructor(engine) {
+		super();
+		this.$typeName = 'TestCase';
+		this.$nonVisual = true;
+		this.$engine = engine;
+		this.$name = '';
+		this.$when = true;
+	}
+
+	$send(key, modifiers, down) {
+		const modifierKeys = [
+			[MODIFIERS.ShiftModifier, KEY.Key_Shift],
+			[MODIFIERS.ControlModifier, KEY.Key_Control],
+			[MODIFIERS.AltModifier, KEY.Key_Alt],
+			[MODIFIERS.MetaModifier, KEY.Key_Meta],
+		].filter(([bit]) => (modifiers & bit) !== 0);
+		const withModifiers = (extra) => qtKeyToDom(extra, modifiers);
+		if (down) {
+			for (const [, modifierKey] of modifierKeys) this.$engine.dispatchKey(withModifiers(modifierKey), true);
+			this.$engine.dispatchKey(withModifiers(key), true);
+		} else {
+			this.$engine.dispatchKey(withModifiers(key), false);
+			for (const [, modifierKey] of modifierKeys.reverse()) this.$engine.dispatchKey(withModifiers(modifierKey), false);
+		}
+	}
+
+	keyPress(key, modifiers = 0) {
+		this.$send(toFloat(key), toFloat(modifiers), true);
+	}
+
+	keyRelease(key, modifiers = 0) {
+		this.$send(toFloat(key), toFloat(modifiers), false);
+	}
+
+	keyClick(key, modifiers = 0) {
+		this.$send(toFloat(key), toFloat(modifiers), true);
+		this.$send(toFloat(key), toFloat(modifiers), false);
+	}
+
+	// The mouse of a test: the pointer of a window that the comparison runner provides (`engine.pointerDriver`), the positions are in the
+	// coordinates of `item`, a delay (ms) lets the time of the window pass before the event, and `wait` lets it pass.
+	$pointer() {
+		const driver = this.$engine.pointerDriver;
+		if (driver === null || driver === undefined) // without a window the mouse of QtTest fails as it does under offscreen qml (see the `mouseMove` of the globals)
+			throw new Error('QtQuickTest::fail');
+		return driver;
+	}
+
+	$pointerAt(item, x, y) {
+		this.$pointer().sync();
+		return [item.$sx + toFloat(x), item.$sy + toFloat(y)];
+	}
+
+	// Qt.LeftButton is the name 'LeftButton' in the engine, 1 in Qt: the number of Qt (1 left, 2 right, 4 middle) goes on.
+	$buttonNumber(button) {
+		if (typeof button === 'string') return { LeftButton: 1, RightButton: 2, MiddleButton: 4 }[button] || 1;
+		return toFloat(button);
+	}
+
+	mousePress(item, x = 0, y = 0, button = 1, modifiers = 0, delay = -1) {
+		const driver = this.$pointer();
+		if (delay > 0) driver.advance(delay);
+		const [px, py] = this.$pointerAt(item, x, y);
+		driver.down(px, py, this.$buttonNumber(button));
+	}
+
+	mouseRelease(item, x = 0, y = 0, button = 1, modifiers = 0, delay = -1) {
+		const driver = this.$pointer();
+		if (delay > 0) driver.advance(delay);
+		const [px, py] = this.$pointerAt(item, x, y);
+		driver.up(px, py, this.$buttonNumber(button));
+	}
+
+	mouseMove(item, x = 0, y = 0, delay = -1, buttons = 0) {
+		const driver = this.$pointer();
+		if (delay > 0) driver.advance(delay);
+		const [px, py] = this.$pointerAt(item, x, y);
+		driver.move(px, py);
+	}
+
+	mouseClick(item, x = 0, y = 0, button = 1, modifiers = 0, delay = -1) {
+		this.mousePress(item, x, y, button, modifiers, delay);
+		this.mouseRelease(item, x, y, button, modifiers, delay);
+	}
+
+	wait(ms = 0) {
+		this.$pointer().advance(toFloat(ms));
+	}
+}
+defineProp(
+	TestCase.prototype,
+	'name',
+	function () {
+		return this.$name;
+	},
+	function (value) {
+		this.$name = toStr(value);
+	},
+	true,
+);
+defineProp(
+	TestCase.prototype,
+	'when',
+	function () {
+		return this.$when;
+	},
+	function (value) {
+		this.$when = toBool(value);
+	},
+	true,
+);
+defineReadOnly(TestCase.prototype, 'windowShown', () => true, undefined, true);
+defineReadOnly(TestCase.prototype, 'running', () => true, undefined, true);
 
 // ----- Timer -----
 
@@ -5741,6 +7373,134 @@ export const ANIMATION_TYPES = new Set([
 // All animation types. A leaf animation moves `property` of `target` linearly from `from` to `to` in
 // `duration` ms (an easing curve is not applied); a Sequential/ParallelAnimation runs its child animations;
 // a PauseAnimation only waits. The engine ticks the running animations with its clock.
+// The curves of QEasingCurve (qeasingcurve.cpp): the progress 0..1 of the time as a progress of the value. `type` is the number of Easing.*;
+// the curves that are no function of the time (InCurve ...) and the spline are linear.
+const EASING_FAMILIES = [null, 'Quad', 'Cubic', 'Quart', 'Quint', 'Sine', 'Expo', 'Circ', 'Elastic', 'Back', 'Bounce'];
+const EASING_IN = {
+	Quad: (t) => t * t,
+	Cubic: (t) => t * t * t,
+	Quart: (t) => t * t * t * t,
+	Quint: (t) => t * t * t * t * t,
+	Sine: (t) => -Math.cos((t * Math.PI) / 2) + 1,
+	Expo: (t) => (t === 0 ? 0 : 2 ** (10 * (t - 1)) - 0.001),
+	Circ: (t) => -(Math.sqrt(1 - t * t) - 1),
+};
+const EASING_OUT = {
+	Quad: (t) => -t * (t - 2),
+	Cubic: (t) => (t - 1) ** 3 + 1,
+	Quart: (t) => -((t - 1) ** 4 - 1),
+	Quint: (t) => (t - 1) ** 5 + 1,
+	Sine: (t) => Math.sin((t * Math.PI) / 2),
+	Expo: (t) => (t === 1 ? 1 : 1.001 * (-(2 ** (-10 * t)) + 1)),
+	Circ: (t) => Math.sqrt(1 - (t - 1) * (t - 1)),
+};
+function elasticParameters(amplitude, period, fallback) {
+	const p = period > 0 ? period : fallback;
+	let a = amplitude;
+	let s;
+	if (a < 1) {
+		a = 1;
+		s = p / 4;
+	} else {
+		s = (p / (2 * Math.PI)) * Math.asin(1 / a);
+	}
+	return { a, s, p };
+}
+function bounceOut(t) {
+	if (t < 1 / 2.75) return 7.5625 * t * t;
+	if (t < 2 / 2.75) {
+		t -= 1.5 / 2.75;
+		return 7.5625 * t * t + 0.75;
+	}
+	if (t < 2.5 / 2.75) {
+		t -= 2.25 / 2.75;
+		return 7.5625 * t * t + 0.9375;
+	}
+	t -= 2.625 / 2.75;
+	return 7.5625 * t * t + 0.984375;
+}
+function easingIn(family, t, amplitude, overshoot, period) {
+	if (family === 'Elastic') {
+		if (t === 0) return 0;
+		if (t === 1) return 1;
+		const { a, s, p } = elasticParameters(amplitude, period, 0.3);
+		t -= 1;
+		return -(a * 2 ** (10 * t) * Math.sin(((t - s) * 2 * Math.PI) / p));
+	}
+	if (family === 'Back') return t * t * ((overshoot + 1) * t - overshoot);
+	if (family === 'Bounce') return 1 - bounceOut(1 - t);
+	return EASING_IN[family](t);
+}
+function easingOut(family, t, amplitude, overshoot, period) {
+	if (family === 'Elastic') {
+		if (t === 0) return 0;
+		if (t === 1) return 1;
+		const { a, s, p } = elasticParameters(amplitude, period, 0.3);
+		return a * 2 ** (-10 * t) * Math.sin(((t - s) * 2 * Math.PI) / p) + 1;
+	}
+	if (family === 'Back') {
+		t -= 1;
+		return t * t * ((overshoot + 1) * t + overshoot) + 1;
+	}
+	if (family === 'Bounce') return bounceOut(t);
+	return EASING_OUT[family](t);
+}
+export function easingValue(type, t, amplitude = 1, overshoot = 1.70158, period = 0.3) {
+	if (!(type >= 1 && type <= 40) || t <= 0 || t >= 1) return t < 0 ? 0 : t > 1 ? 1 : t;
+	const family = EASING_FAMILIES[Math.floor((type - 1) / 4) + 1];
+	const kind = (type - 1) % 4; // 0 in, 1 out, 2 in-out, 3 out-in
+	if (kind === 0) return easingIn(family, t, amplitude, overshoot, period);
+	if (kind === 1) return easingOut(family, t, amplitude, overshoot, period);
+	if (kind === 2) {
+		if (family === 'Elastic') {
+			const { a, s, p } = elasticParameters(amplitude, period, 0.3 * 1.5);
+			t *= 2;
+			if (t < 1) {
+				t -= 1;
+				return -0.5 * (a * 2 ** (10 * t) * Math.sin(((t - s) * 2 * Math.PI) / p));
+			}
+			t -= 1;
+			return a * 2 ** (-10 * t) * Math.sin(((t - s) * 2 * Math.PI) / p) * 0.5 + 1;
+		}
+		if (family === 'Back') {
+			const s = overshoot * 1.525;
+			t *= 2;
+			if (t < 1) return 0.5 * (t * t * ((s + 1) * t - s));
+			t -= 2;
+			return 0.5 * (t * t * ((s + 1) * t + s) + 2);
+		}
+		return t < 0.5 ? 0.5 * easingIn(family, 2 * t, amplitude, overshoot, period) : 0.5 + 0.5 * easingOut(family, 2 * t - 1, amplitude, overshoot, period);
+	}
+	// OutInElastic follows the samples of Qt (6.11) with the amplitude doubled
+	if (family === 'Elastic') amplitude *= 2;
+	return t < 0.5 ? 0.5 * easingOut(family, 2 * t, amplitude, overshoot, period) : 0.5 + 0.5 * easingIn(family, 2 * t - 1, amplitude, overshoot, period);
+}
+
+// `easing.type`, `easing.amplitude`, `easing.overshoot`, `easing.period` of an animation.
+class EasingGroup {
+	constructor(owner) {
+		this.$owner = owner;
+		this.$type = 0;
+		this.$amplitude = 1;
+		this.$overshoot = 1.70158;
+		this.$period = 0.3;
+	}
+}
+EasingGroup.prototype.$group = 'easing';
+for (const [name, field] of [['type', '$type'], ['amplitude', '$amplitude'], ['overshoot', '$overshoot'], ['period', '$period']]) {
+	defineGroupProp(
+		EasingGroup.prototype,
+		'easing',
+		name,
+		function () {
+			return this[field];
+		},
+		function (value) {
+			this[field] = toFloat(value);
+		},
+	);
+}
+
 export class Animation extends Item {
 	constructor(engine, kind) {
 		super();
@@ -5760,6 +7520,7 @@ export class Animation extends Item {
 		this.$began = 0;
 		this.$pausedAt = 0;
 		this.$captured = null;
+		this.$easing = new EasingGroup(this);
 		this.$declareSignal('started', []);
 		this.$declareSignal('stopped', []);
 		this.$declareSignal('finished', []);
@@ -5836,7 +7597,9 @@ export class Animation extends Item {
 		const target = this.$resolveTarget();
 		if (target === null || target === undefined || this.$to === undefined) return;
 		if (intermediate && target instanceof Item && target.visible === false) return;
-		const progress = this.$duration > 0 ? Math.min(Math.max(t / this.$duration, 0), 1) : 1;
+		const linear = this.$duration > 0 ? Math.min(Math.max(t / this.$duration, 0), 1) : 1;
+		const curve = this.$easing;
+		const progress = curve.$type === 0 ? linear : easingValue(curve.$type, linear, curve.$amplitude, curve.$overshoot, curve.$period);
 		if (this.$captured === null) this.$captured = Object.create(null);
 		// Animation writes are not script assignments: they must not drop a binding on the
 		// animated property (width/opacity/… are in BREAKS_BINDING for real script writes).
@@ -5928,6 +7691,15 @@ export class Animation extends Item {
 }
 
 defineField(Animation.prototype, 'duration', '$duration', toFloat);
+defineReadOnly(
+	Animation.prototype,
+	'easing',
+	function () {
+		return this.$easing;
+	},
+	undefined,
+	true,
+);
 defineField(Animation.prototype, 'loops', '$loops', toFloat);
 defineField(Animation.prototype, 'property', '$property', (v) => (v === undefined || v === null ? '' : String(v)));
 defineField(Animation.prototype, 'properties', '$properties', (v) => (v === undefined || v === null ? '' : String(v)));
@@ -6208,6 +7980,68 @@ defineReadOnly(Repeater.prototype, 'count', function () {
 	return this.$built.length;
 });
 
+// `Instantiator` (QtQml): makes an object of the delegate for every row of the model, like a Repeater does for items. The objects are
+// not drawn (a QtObject, a MenuItem); `objectAdded(index, object)` / `objectRemoved(index, object)` are the signals of itemAdded / itemRemoved,
+// `objectAt(index)` is itemAt. While `active` is false there are no objects.
+export class Instantiator extends Repeater {
+	constructor() {
+		super();
+		this.$typeName = 'Instantiator';
+		this.$active = true;
+		this.$declareSignal('objectAdded', ['index', 'object']);
+		this.$declareSignal('objectRemoved', ['index', 'object']);
+		this.$rawModel = 0;
+		Object.defineProperty(this, '$model', {
+			get: () => (this.$active ? this.$rawModel : 0),
+			set: (value) => {
+				this.$rawModel = value;
+			},
+		});
+	}
+
+	$emit(name, args = []) {
+		if (name === 'itemAdded') name = 'objectAdded';
+		else if (name === 'itemRemoved') name = 'objectRemoved';
+		super.$emit(name, args);
+	}
+
+	objectAt(index) {
+		return this.itemAt(index);
+	}
+}
+// A change of the model or of `active` makes the objects before the next line of the script, as in Qt.
+defineProp(
+	Instantiator.prototype,
+	'model',
+	function () {
+		return this.$rawModel;
+	},
+	function (value) {
+		if (value === this.$rawModel) return;
+		noteListModelWatcher(this.$rawModel, -1);
+		this.$model = value;
+		noteListModelWatcher(value, 1);
+		this.$update();
+		if (!this.$constructing && hooks.syncRepeater !== null) hooks.syncRepeater(this);
+	},
+	true,
+);
+defineProp(
+	Instantiator.prototype,
+	'active',
+	function () {
+		return this.$active;
+	},
+	function (value) {
+		const active = toBool(value);
+		if (active === this.$active) return;
+		this.$active = active;
+		this.$update();
+		if (!this.$constructing && hooks.syncRepeater !== null) hooks.syncRepeater(this);
+	},
+	true,
+);
+
 // A type the engine does not implement (Connections, an unknown component ...): an
 // item that only keeps its properties and children, draws nothing and ignores unknown handlers.
 export class Placeholder extends Item {
@@ -6261,6 +8095,45 @@ defineField(RegularExpressionValidator.prototype, 'regularExpression', '$express
 	return value;
 });
 
+// `IntValidator`: an integer from `bottom` to `top`.
+export class IntValidator extends QtObject {
+	constructor() {
+		super();
+		this.$typeName = 'IntValidator';
+		for (const [name, initial] of [['bottom', -2147483648], ['top', 2147483647], ['locale', '']]) this.$defineCustom(name, initial);
+	}
+
+	accepts(text) {
+		const value = String(text).trim();
+		if (!/^[+-]?\d+$/.test(value)) return false;
+		const number = Number(value);
+		return number >= this.bottom && number <= this.top;
+	}
+}
+
+// `DoubleValidator`: a number from `bottom` to `top` with at most `decimals` digits after the decimal point of the locale
+// (the one of the browser, as Qt.locale(); '.' for the locale "C"). `notation`: 0 standard, 1 scientific (the default).
+export class DoubleValidator extends QtObject {
+	constructor() {
+		super();
+		this.$typeName = 'DoubleValidator';
+		for (const [name, initial] of [['bottom', -Infinity], ['top', Infinity], ['decimals', 1000], ['notation', 1], ['locale', '']]) {
+			this.$defineCustom(name, initial);
+		}
+	}
+
+	accepts(text) {
+		const point = this.locale === 'C' ? '.' : (1.5).toLocaleString().charAt(1);
+		const value = String(text).trim().replace(point, '.');
+		const pattern = this.notation === 0 ? /^[+-]?(\d*)(?:\.(\d*))?$/ : /^[+-]?(\d*)(?:\.(\d*))?(?:[eE][+-]?\d+)?$/;
+		const match = pattern.exec(value);
+		if (match === null || (match[1] === '' && !match[2])) return false;
+		if (match[2] !== undefined && match[2].length > this.decimals) return false;
+		const number = Number(value);
+		return Number.isFinite(number) && number >= this.bottom && number <= this.top;
+	}
+}
+
 // The data model of ImtCore (`TreeItemModel`): a list of rows, each row is a map key -> value, where a value
 // is a plain value or a nested model. Only the commonly used part of its interface is implemented.
 /* probe-xhr */ if (typeof XMLHttpRequest !== 'undefined') { const open = XMLHttpRequest.prototype.open; XMLHttpRequest.prototype.open = function () { const r = open.apply(this, arguments); if (XMLHttpRequest.QMLAuthToken) this.setRequestHeader('X-authentication-token', XMLHttpRequest.QMLAuthToken); return r; }; }
@@ -6280,8 +8153,24 @@ export class TreeItemModel extends Item {
 		hooks.touch();
 		markReaders(this, '$rows');
 		markReaders(this, 'count');
+		if (this.$updatesOff === true) return;
 		notifyViews(this);
 		if (this.$sigs.get('modelChanged').handlers.length > 0) this.$emit('modelChanged', []);
+	}
+
+	// The model that holds this one as the value of a key (CTreeItemModel::GetParent), null for the top one.
+	getParent() {
+		return this.$ownerModel || null;
+	}
+
+	// While it is false the model does not tell its views and handlers about changes (m_isUpdateEnabled); the data is written all the same.
+	setUpdateEnabled(enabled) {
+		this.$updatesOff = !toBool(enabled);
+	}
+
+	$adopt(value) {
+		if (value instanceof TreeItemModel && value !== this && !value.$wrapped) value.$ownerModel = this;
+		return value;
 	}
 
 	static $wrap(value) {
@@ -6336,14 +8225,14 @@ export class TreeItemModel extends Item {
 	}
 
 	setData(key, value, index = 0) {
-		this.$ensureRow(index)[key] = value;
+		this.$ensureRow(index)[key] = this.$adopt(value);
 		this.$touch();
 		return true;
 	}
 
 	addTreeModel(key, index = 0) {
 		const model = new TreeItemModel();
-		this.$ensureRow(index)[key] = model;
+		this.$ensureRow(index)[key] = this.$adopt(model);
 		this.$touch();
 		return model;
 	}
@@ -6358,6 +8247,15 @@ export class TreeItemModel extends Item {
 		this.$rows.splice(at, 0, {});
 		this.$touch();
 		return at;
+	}
+
+	// A row at `index` with the keys of the object; an index out of range is ignored (CTreeItemModel::InsertNewItemWithParameters).
+	insertNewItemWithParameters(index, parameters) {
+		if (!(index >= 0 && index <= this.$rows.length)) return;
+		const row = {};
+		for (const key of Object.keys(parameters || {})) row[key] = this.$adopt(parameters[key]);
+		this.$rows.splice(index, 0, row);
+		this.$touch();
 	}
 
 	removeItem(index) {
@@ -6383,6 +8281,11 @@ export class TreeItemModel extends Item {
 		return this.containsKey(key, index) && this.$rows[index][key] !== undefined && this.$rows[index][key] !== null;
 	}
 
+	// True if the value of the key is a nested model (a record or an array is one, getTreeItemModel wraps it), as in the C++ model.
+	isTreeModel(key, index = 0) {
+		return this.getTreeItemModel(key, index) !== null;
+	}
+
 	copyMe() {
 		const model = new TreeItemModel();
 		model.copy(this);
@@ -6403,6 +8306,19 @@ export class TreeItemModel extends Item {
 		this.$rows[index] = clone.$rows[0] === undefined ? {} : clone.$rows[0];
 		this.$touch();
 		return true;
+	}
+
+	// The keys of the row `index` are set in the row `externalIndex` of `other` (the C++ CopyItemDataToModel): the values are not
+	// copied deeply, a nested model is shared. false when the row has no keys, as in C++.
+	copyItemDataToModel(index, other, externalIndex = 0) {
+		const row = this.$rows[index];
+		if (row === undefined || !(other instanceof TreeItemModel)) return false;
+		let result = false;
+		for (const key of Object.keys(row)) {
+			result = other.setData(key, row[key], externalIndex);
+			if (!result) break;
+		}
+		return result;
 	}
 }
 
@@ -6634,9 +8550,22 @@ export class Loader extends Item {
 		this.$sizing = false;
 		this.$failed = false;
 		this.$statusSent = 0;
+		this.$loaded = null; // the item that was loaded: the other children are declared in the Loader (a Connections, a Timer) and stay
 		this.$declareSignal('loaded', []);
 		this.$declareSignal('itemChanged', []);
 		this.$declareSignal('statusChanged', []);
+	}
+
+	// The item the Loader loaded, or null. Not `$children[0]`: what is declared inside the Loader comes first.
+	$loadedItem() {
+		const item = this.$loaded;
+		return item !== null && item.$parent === this && item.$destroyed !== true ? item : null;
+	}
+
+	$sever() {
+		this.$sourceComponent = null;
+		this.$loaded = null;
+		super.$sever();
 	}
 
 	// An explicit width (or anchors that set it) wins; otherwise the loaded item's width.
@@ -6649,13 +8578,13 @@ export class Loader extends Item {
 	}
 
 	get $implicitWidth() {
-		const item = this.$children.length > 0 ? this.$children[0] : null;
+		const item = this.$loadedItem();
 		if (item === null) return 0;
 		return this.$widthExplicit() ? item.$implicitWidth : item.width;
 	}
 
 	get $implicitHeight() {
-		const item = this.$children.length > 0 ? this.$children[0] : null;
+		const item = this.$loadedItem();
 		if (item === null) return 0;
 		return this.$heightExplicit() ? item.$implicitHeight : item.height;
 	}
@@ -6664,7 +8593,7 @@ export class Loader extends Item {
 	// Only when the Loader's size changed or the item is new: a script may resize the item afterwards (Qt).
 	$pushSize() {
 		if (this.$holdSize === true) return;
-		const item = this.$children.length > 0 ? this.$children[0] : null;
+		const item = this.$loadedItem();
 		if (item === null) {
 			this.$pushedItem = null;
 			return;
@@ -6789,7 +8718,7 @@ defineProp(
 	function () {
 		if (this.$anchors !== null && this.$anchors.$affectsWidth) return this.$aw;
 		if (this.$w > 0) return this.$w;
-		const item = this.$children.length > 0 ? this.$children[0] : null;
+		const item = this.$loadedItem();
 		return item !== null ? item.width : 0;
 	},
 	function (v) {
@@ -6807,7 +8736,7 @@ defineProp(
 	function () {
 		if (this.$anchors !== null && this.$anchors.$affectsHeight) return this.$ah;
 		if (this.$h > 0) return this.$h;
-		const item = this.$children.length > 0 ? this.$children[0] : null;
+		const item = this.$loadedItem();
 		return item !== null ? item.height : 0;
 	},
 	function (v) {
@@ -6820,12 +8749,12 @@ defineProp(
 	},
 );
 defineReadOnly(Loader.prototype, 'item', function () {
-	return this.$children.length > 0 ? this.$children[0] : null;
+	return this.$loadedItem();
 });
 defineReadOnly(Loader.prototype, 'status', function () {
 	if (!this.$active) return 0;
 	if (this.$failed) return 3;
-	return this.$children.length > 0 ? 1 : 0;
+	return this.$loadedItem() !== null ? 1 : 0;
 });
 Loader.prototype.$contentSized = true;
 
@@ -7836,6 +9765,79 @@ defineProp(
 	},
 	true,
 );
+
+// `FolderDialog` (Qt.labs.platform) backed by the browser chooser of a folder, which is an `<input type=file webkitdirectory>`. The browser gives
+// the files of the folder, not its path: `folder` is `file:///<name of the folder>`, which the QML of ImtCore cuts down to the name
+// (`folder.toString().replace('file:///', '')`). `currentFolder` follows it, like `currentFile` follows the file of FileDialog.
+export class FolderDialog extends FileDialog {
+	constructor() {
+		super();
+		this.$typeName = 'FolderDialog';
+	}
+
+	open() {
+		if (typeof document === 'undefined') return;
+		this.$shown = true;
+		const input = document.createElement('input');
+		input.type = 'file';
+		input.webkitdirectory = true;
+		input.addEventListener('change', () => {
+			const files = [...input.files];
+			if (files.length === 0) this.$reject();
+			else this.$acceptFolder(files);
+		});
+		input.addEventListener('cancel', () => this.$reject());
+		input.click();
+	}
+
+	$acceptFolder(files) {
+		this.$shown = false;
+		const path = String(files[0].webkitRelativePath || '');
+		const name = path.includes('/') ? path.slice(0, path.indexOf('/')) : '';
+		this.folder = `file:///${name}`;
+		this.currentFolder = this.folder;
+		this.$emit('accepted');
+	}
+}
+
+// `FileIO` (imtqml::CFileIO: `source`, `read()`, `write(data)`). The browser has no file system: `write` saves the data as a download named after
+// the last part of `source` and answers true, `read` has no file to read and answers an empty string.
+export class FileIO extends Item {
+	constructor() {
+		super();
+		this.$typeName = 'FileIO';
+		this.$nonVisual = true;
+		this.$defineCustom('source', '');
+	}
+
+	read() {
+		return '';
+	}
+
+	write(data) {
+		if (typeof document === 'undefined' || typeof Blob === 'undefined' || typeof URL === 'undefined' || !URL.createObjectURL) return false;
+		const text = String(data === undefined || data === null ? '' : data);
+		// A string that holds bytes (the result of Qt.atob) is saved as they are; any other text as UTF-8.
+		let bytes = new Uint8Array(text.length);
+		for (let i = 0; i < text.length; i++) {
+			const code = text.charCodeAt(i);
+			if (code > 0xff) {
+				bytes = new TextEncoder().encode(text);
+				break;
+			}
+			bytes[i] = code;
+		}
+		const parts = String(this.source || '').split(/[\\/]/);
+		const link = document.createElement('a');
+		link.href = URL.createObjectURL(new Blob([bytes]));
+		link.download = parts[parts.length - 1] || 'file';
+		if (document.body) document.body.appendChild(link);
+		link.click();
+		if (document.body) document.body.removeChild(link);
+		if (URL.revokeObjectURL) URL.revokeObjectURL(link.href);
+		return true;
+	}
+}
 
 // `StackLayout`: one visible child, resized to the stack. `currentIndex` applies before the next read.
 export class StackLayout extends Item {
@@ -9798,6 +11800,8 @@ readsUntracked(SdlList, ['get']);
 
 export const BUILTIN_TYPES = new Map([
 	['RegularExpressionValidator', RegularExpressionValidator],
+	['IntValidator', IntValidator],
+	['DoubleValidator', DoubleValidator],
 	['Settings', Settings],
 	['WebSocket', WebSocketItem],
 	['GqlModel', GqlModel],
@@ -9805,6 +11809,10 @@ export const BUILTIN_TYPES = new Map([
 	['BaseClass', BaseClass],
 	['BaseModel', BaseModel],
 	['FileDialog', FileDialog],
+	['DropArea', DropArea],
+	['Instantiator', Instantiator],
+	['FolderDialog', FolderDialog],
+	['FileIO', FileIO],
 	['Item', Item],
 	['Rectangle', Rectangle],
 	['DropShadow', DropShadow],
@@ -9837,6 +11845,7 @@ export const BUILTIN_TYPES = new Map([
 	['Timer', Timer],
 	['QtObject', QtObject],
 	['Shortcut', Shortcut],
+	['TestCase', TestCase],
 	['Gradient', Gradient],
 	['GradientStop', GradientStop],
 ]);

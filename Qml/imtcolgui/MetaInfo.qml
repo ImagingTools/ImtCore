@@ -159,7 +159,7 @@ Rectangle {
 
 		Timer {
 			id: showDelayTimer;
-			interval: 300;
+			interval: Style.skeletonDelay;
 			repeat: false;
 
 			onTriggered: {

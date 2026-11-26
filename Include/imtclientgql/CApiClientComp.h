@@ -30,7 +30,7 @@ public:
 	CApiClientComp();
 
 	// reimplemented (IGqlClient)
-	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr = nullptr) const override;
+	virtual GqlResult SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr = nullptr) const override;
 	virtual bool SendRequestNoWait(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr = nullptr) const override;
 
 protected:
@@ -46,5 +46,3 @@ private:
 
 
 } // namespace imtclientgql
-
-

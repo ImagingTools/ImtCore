@@ -100,6 +100,24 @@ bool CPersonalAccessTokenControllerComp::AreRequestedScopesAllowed(
 		return false;
 	}
 
+	// Through the server of a product the scopes are given as the permissions of a role are: within what this server holds for the user
+	bool isGrantingAdmin = false;
+	QByteArrayList grantingPermissions;
+	if (gqlContextPtr->GetGrantingAuthority(isGrantingAdmin, grantingPermissions)){
+		// What it may give is known for the product of the request only; the caller binds the token to it
+		if (productId.isEmpty() || productId != gqlContextPtr->GetProductId()){
+			return false;
+		}
+
+		for (const QByteArray& scope : scopes){
+			if (!isGrantingAdmin && !imtauth::HasPermission(grantingPermissions, scope)){
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	// Administrators may grant any scope, mirroring OnGetUserPermissions()
 	// which presents them the full permission tree.
 	if (callerInfoPtr->IsAdmin()){
@@ -152,7 +170,7 @@ sdl::V1_0::imtauth::CPersonalAccessTokenList CPersonalAccessTokenControllerComp:
 		getTokenListRequest.GetRequestedArguments();
 
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return response;
 	}
 
@@ -208,7 +226,7 @@ sdl::V1_0::imtauth::CPersonalAccessToken CPersonalAccessTokenControllerComp::OnG
 		getTokenRequest.GetRequestedArguments();
 
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return response;
 	}
 
@@ -257,7 +275,7 @@ sdl::V1_0::imtauth::CValidateTokenPayload CPersonalAccessTokenControllerComp::On
 		validateTokenRequest.GetRequestedArguments();
 
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return response;
 	}
 
@@ -278,12 +296,19 @@ sdl::V1_0::imtauth::CValidateTokenPayload CPersonalAccessTokenControllerComp::On
 	QByteArray userId;
 	QByteArray tokenId;
 	QByteArrayList scopes;
-	bool isValid = m_tokenManagerCompPtr->ValidateToken(rawToken, userId, tokenId, scopes);
+	QByteArray productId;
+	QByteArray clientProductId;
+	bool isValid = m_tokenManagerCompPtr->ValidateToken(rawToken, userId, tokenId, scopes, &productId, &clientProductId);
 
 	response.valid = isValid;
 
 	if (isValid){
+		// A receiving server caches the answer, so this is the only trace of the token being used there
+		m_tokenManagerCompPtr->UpdateLastUsedAt(tokenId);
+
 		response.userId = userId;
+		response.productId = productId;
+		response.clientProductId = clientProductId;
 		response.scopes.Emplace().FromList(scopes);
 		response.message = "Token is valid";
 	}
@@ -314,7 +339,7 @@ sdl::V1_0::imtauth::CCreateTokenPayload CPersonalAccessTokenControllerComp::OnCr
 		createTokenRequest.GetRequestedArguments();
 
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return response;
 	}
 
@@ -381,6 +406,22 @@ sdl::V1_0::imtauth::CCreateTokenPayload CPersonalAccessTokenControllerComp::OnCr
 		return response;
 	}
 
+	// Through the server of a product a token is of that product: what it may give is known for it only, and a token without a product would work in all
+	bool isGrantingAdmin = false;
+	QByteArrayList grantingPermissions;
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr && gqlContextPtr->GetGrantingAuthority(isGrantingAdmin, grantingPermissions)){
+		const QByteArray contextProductId = gqlContextPtr->GetProductId();
+		if (productId.isEmpty()){
+			productId = contextProductId;
+		}
+		if (productId.isEmpty() || productId != contextProductId){
+			errorMessage = QStringLiteral("A token issued through the server of '%1' is a token of that product").arg(QString::fromUtf8(contextProductId));
+			response.message = errorMessage;
+			return response;
+		}
+	}
+
 	// A token must never carry permissions its creator does not have
 	// themselves; otherwise a user could escalate privileges via a
 	// hand-crafted createToken request bypassing the UI's filtered scope tree.
@@ -429,7 +470,7 @@ sdl::V1_0::imtauth::CRevokeTokenPayload CPersonalAccessTokenControllerComp::OnRe
 		revokeTokenRequest.GetRequestedArguments();
 
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return response;
 	}
 
@@ -492,7 +533,7 @@ sdl::V1_0::imtauth::CDeleteTokenPayload CPersonalAccessTokenControllerComp::OnDe
 		deleteTokenRequest.GetRequestedArguments();
 
 	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
+		errorMessage = QStringLiteral("The input is required");
 		return response;
 	}
 

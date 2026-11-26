@@ -81,7 +81,7 @@ Rectangle {
 					Text {
 						text: modelData.displayName || modelData.entityId
 						font.pixelSize: Style.fontSizeS
-						color: Style.imaginToolsAccentColor
+						color: Style.imagingToolsAccentColor
 					}
 
 					Text {

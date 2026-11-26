@@ -10,6 +10,9 @@
 #include <iprm/CParamsSet.h>
 #include <imeas/CSimpleNumericValue.h>
 
+// ImtCore includes
+#include <imtdoc/IDocumentService.h>
+
 
 namespace imtdoc
 {
@@ -106,18 +109,24 @@ iprm::IParamsSetUniquePtr CreateObjectSourceParams(const QByteArray& objectId, i
 }
 
 
-QByteArray GetObjectIdFromParams(const iprm::IParamsSet* paramsPtr)
+static QByteArray GetIdFromParams(const iprm::IParamsSet* paramsPtr, const QByteArray& paramId)
 {
 	if (paramsPtr == nullptr){
 		return QByteArray();
 	}
 
-	const iprm::IIdParam* objectIdParamPtr = dynamic_cast<const iprm::IIdParam*>(paramsPtr->GetParameter(s_objectIdParamId));
-	if (objectIdParamPtr == nullptr){
+	const iprm::IIdParam* idParamPtr = dynamic_cast<const iprm::IIdParam*>(paramsPtr->GetParameter(paramId));
+	if (idParamPtr == nullptr){
 		return QByteArray();
 	}
 
-	return objectIdParamPtr->GetId();
+	return idParamPtr->GetId();
+}
+
+
+QByteArray GetObjectIdFromParams(const iprm::IParamsSet* paramsPtr)
+{
+	return GetIdFromParams(paramsPtr, s_objectIdParamId);
 }
 
 
@@ -138,6 +147,38 @@ int GetRevisionFromParams(const iprm::IParamsSet* paramsPtr)
 	}
 
 	return qRound(values[0]);
+}
+
+
+QByteArray GetLanguageIdFromParams(const iprm::IParamsSet* paramsPtr)
+{
+	return GetIdFromParams(paramsPtr, s_languageIdParamId);
+}
+
+
+QByteArray GetDocumentObjectId(const IDocumentService& documentService, const QByteArray& userId, const QByteArray& documentId)
+{
+	const IDocumentService::DocumentList documentList = documentService.GetOpenedDocumentList(userId);
+	for (const IDocumentService::DocumentListItem& documentItem : documentList){
+		if (documentItem.documentId == documentId){
+			return SourceRefToObjectId(documentItem.documentSourceRef);
+		}
+	}
+
+	return QByteArray();
+}
+
+
+bool IsDocumentStored(const IDocumentService& documentService, const QByteArray& userId, const QByteArray& documentId)
+{
+	const IDocumentService::DocumentList documents = documentService.GetOpenedDocumentList(userId);
+	for (const IDocumentService::DocumentListItem& document : documents){
+		if (document.documentId == documentId){
+			return !document.documentSourceRef.isEmpty();
+		}
+	}
+
+	return true;
 }
 
 

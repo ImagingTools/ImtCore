@@ -57,6 +57,7 @@ int main(int argc, char *argv[])
 	Q_INIT_RESOURCE(imtdeskImtDeskSdl);
 	Q_INIT_RESOURCE(imtdeskTicketCollectionDocumentServiceSdl);
 	Q_INIT_RESOURCE(imtlicProductsSdl);
+	Q_INIT_RESOURCE(imtlicProductCollectionDocumentServiceSdl);
 	Q_INIT_RESOURCE(imtlicLicensesSdl);
 	Q_INIT_RESOURCE(imtlicFeaturesSdl);
 	Q_INIT_RESOURCE(imtpayImtPaySdl);

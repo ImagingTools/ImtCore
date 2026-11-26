@@ -27,17 +27,20 @@ public:
 
 	// reimplemented (imtgql::IGqlSubscriberController)
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
+	virtual bool IsOpenFor(SubscriberKind subscriberKind, const imtgql::CGqlRequest& gqlRequest) const override;
 	virtual bool RegisterSubscription(
 		const QByteArray& subscriptionId,
 		const imtgql::CGqlRequest& gqlRequest,
 		const imtrest::IRequest& networkRequest,
 		QString& errorMessage) override;
-	virtual bool UnregisterSubscription(const QByteArray& subscriptionId) override;
+	virtual bool UnregisterSubscription(const QByteArray& connectionId, const QByteArray& subscriptionId) override;
 
 protected:
 	I_MULTIREF(imtgql::IGqlSubscriberController, m_subscriberControllerListCompPtr);
 
-	typedef QMap<QByteArray, imtgql::IGqlSubscriberController*> PublisherMap;
+	// Key: connection-ID and subscription-ID
+	typedef QPair<QByteArray, QByteArray> PublisherKey;
+	typedef QMap<PublisherKey, imtgql::IGqlSubscriberController*> PublisherMap;
 	// Shared across WebSocket threads (CWebSocketThread per connection) — must be locked.
 	mutable QMutex m_publisherMapMutex;
 	PublisherMap m_publisherMap;
