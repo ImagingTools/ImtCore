@@ -66,9 +66,12 @@ Item {
 		return permissionsPage.editor.contractState === "Signed" ? qsTr("Once the contract comes into force") : qsTr("Not in force")
 	}
 
+	// The receiver chooses its groups and only it sees them; it chooses them while the contract is in force
 	function __groupsText(allocation, isReceived) {
-		if (!isReceived || !permissionsPage.editor.isConcluded)
-			return ""
+		if (!isReceived)
+			return qsTr("Set by receiver")
+		if (!permissionsPage.editor.isConcluded)
+			return qsTr("When in force")
 		var count = permissionsPage.editor.allocationGroupIds(allocation.allocationId).length
 		if (count === 0)
 			return qsTr("None yet")
@@ -117,7 +120,7 @@ Item {
 			anchors.verticalCenter: parent.verticalCenter
 			wrapMode: Text.WordWrap
 			text: (permissionsPage.allocationRows.length === 0 ? qsTr("No permissions are given yet.") + " " : "")
-				+ qsTr("Each party gives its own permissions to the parties it is linked with, and may take them back at any time. While the contract is in force, the receiver gives them to its groups (button Groups); their members then work in the organization of the giver.")
+				+ qsTr("Each party gives its own permissions to the parties it is linked with, and may take them back at any time. While the contract is in force, the receiver gives them to its groups (button Groups); their members then work in the organization of the giver. Only the receiver sees and chooses its groups.")
 			font.pixelSize: Style.fontSizeS
 			color: Style.inactiveTextColor
 		}
