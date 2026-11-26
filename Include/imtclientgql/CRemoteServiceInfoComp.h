@@ -53,6 +53,7 @@ public:
 	I_BEGIN_COMPONENT(CRemoteServiceInfoComp);
 		I_REGISTER_INTERFACE(imtcom::IServiceInfoProvider);
 		I_ASSIGN(m_serviceIdAttrPtr, "ServiceId", "Role of the remote service for the application, e.g. AuthServer", true, "");
+		I_ASSIGN(m_logIdAttrPtr, "LogId", "Identifier of the log file of the remote service, empty if the log cannot be downloaded", false, "");
 		I_ASSIGN(m_asyncClientCompPtr, "AsyncClient", "Asynchronous GraphQL client of the remote service", true, "AsyncClient");
 		I_ASSIGN(m_connectionStatusCompPtr, "ConnectionStatus", "Status of the connection to the remote service, the information is requested on each connection", true, "ConnectionStatus");
 		I_ASSIGN_TO(m_connectionStatusModelCompPtr, m_connectionStatusCompPtr, true);
@@ -87,6 +88,7 @@ private:
 
 private:
 	I_ATTR(QByteArray, m_serviceIdAttrPtr);
+	I_ATTR(QByteArray, m_logIdAttrPtr);
 	I_REF(IAsyncGqlClient, m_asyncClientCompPtr);
 	I_REF(imtcom::IConnectionStatusProvider, m_connectionStatusCompPtr);
 	I_REF(imod::IModel, m_connectionStatusModelCompPtr);

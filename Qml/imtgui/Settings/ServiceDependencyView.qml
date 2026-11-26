@@ -1,4 +1,6 @@
-import QtQuick 2.12
+﻿import QtQuick 2.12
+import QtQuick.Dialogs 1.3
+import Qt.labs.platform 1.1
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
@@ -17,8 +19,15 @@ ParamEditorBase {
 		ServiceInfo {}
 	}
 
-	property int indentWidth: Style.marginXL
-	property int versionX: Style.sizeHintXXS
+	property int indentWidth: Style.iconSizeXS * 2 + Style.spacingS
+	property int nameRight: 0
+	property int versionX: nameRight + Style.spacingXL
+
+	function reportNameRight(value){
+		if (value > serviceDependencyView.nameRight){
+			serviceDependencyView.nameRight = value
+		}
+	}
 
 	onEditorModelChanged: {
 		serviceDependencyView.updateRows()
@@ -28,8 +37,89 @@ ParamEditorBase {
 		id: rowsModel
 	}
 
+	// The statuses are part of the GetApplicationInfo response, so refresh it while the tree is shown
+	Timer {
+		interval: 2000
+		repeat: true
+		running: serviceDependencyView.visible
+		onTriggered: {
+			ApplicationInfoProvider.updateModel()
+		}
+	}
+
+	RemoteFileController {
+		id: remoteFileController
+		prefix: "/files/"
+	}
+
+	// The page gets the tree once as JSON, so the open page is refreshed from the provider
+	Connections {
+		target: ApplicationInfoProvider
+
+		function onUpdated(){
+			serviceDependencyView.refreshFromProvider()
+		}
+
+		function onUpdateFailed(){
+			serviceDependencyView.markDependenciesDisconnected()
+		}
+	}
+
+	// The server did not answer: the services it depends on cannot be reached through it, the server itself is shown as it was
+	function markDependenciesDisconnected(){
+		for (let i = 0; i < rowsModel.count; ++i){
+			if (rowsModel.get(i).level > 0){
+				rowsModel.setProperty(i, "status", ServiceStatusEnum.s_dISCONNECTED)
+				rowsModel.setProperty(i, "credentialStatus", ServerCredentialStatusEnum.s_nOT_USED)
+			}
+		}
+	}
+
+	function formatVersion(version, versionKind, buildTime){
+		let text = version ? String(version) : ""
+		if (versionKind){
+			text = text === "" ? String(versionKind) : text + " - " + String(versionKind)
+		}
+		if (buildTime){
+			let buildTimeText = Qt.formatDateTime(new Date(String(buildTime)), "dd.MM.yyyy hh:mm")
+			text = text === "" ? buildTimeText : text + " (" + buildTimeText + ")"
+		}
+
+		return text
+	}
+
+	function refreshFromProvider(){
+		let info = ApplicationInfoProvider.serverApplicationInfo
+		if (!info){
+			return
+		}
+
+		rowsModel.clear()
+		serviceDependencyView.nameRight = 0
+		serviceDependencyView.addRawRow(info, 0, true, true)
+	}
+
+	// Same as addRow, but for the raw GetApplicationInfo data, where the version is not formatted yet
+	function addRawRow(info, level, isLast, isRoot){
+		let hasChildren = info.m_dependencies && info.m_dependencies.getItemsCount() > 0
+		let name = info.m_applicationName ? String(info.m_applicationName) : (info.m_serviceId ? String(info.m_serviceId) : "")
+		let status = isRoot ? ServiceStatusEnum.s_cONNECTED : (info.m_status ? String(info.m_status) : ServiceStatusEnum.s_uNKNOWN)
+		let credentialStatus = info.m_credentialStatus ? String(info.m_credentialStatus) : ServerCredentialStatusEnum.s_nOT_USED
+		let logId = info.m_logId ? String(info.m_logId) : (isRoot ? "GetServerLog" : "")
+
+		rowsModel.append({"name": name, "level": level, "isLast": isLast, "hasChildren": hasChildren, "status": status, "version": serviceDependencyView.formatVersion(info.m_version, info.m_versionKind, info.m_buildTime), "credentialStatus": credentialStatus, "logId": logId})
+
+		if (hasChildren){
+			let count = info.m_dependencies.getItemsCount()
+			for (let i = 0; i < count; ++i){
+				serviceDependencyView.addRawRow(info.m_dependencies.get(i).item, level + 1, i === count - 1, false)
+			}
+		}
+	}
+
 	function updateRows(){
 		rowsModel.clear()
+		serviceDependencyView.nameRight = 0
 		if (serviceDependencyView.editorModel){
 			serviceDependencyView.addRow(serviceDependencyView.editorModel, 0, true)
 		}
@@ -39,7 +129,7 @@ ParamEditorBase {
 		let hasChildren = serviceInfo.m_dependencies && serviceInfo.m_dependencies.getItemsCount() > 0
 		let name = serviceInfo.m_applicationName !== "" ? serviceInfo.m_applicationName : serviceInfo.m_serviceId
 
-		rowsModel.append({"name": name, "level": level, "isLast": isLast, "hasChildren": hasChildren, "status": serviceInfo.m_status, "version": serviceInfo.m_version, "credentialStatus": String(serviceInfo.m_credentialStatus)})
+		rowsModel.append({"name": name, "level": level, "isLast": isLast, "hasChildren": hasChildren, "status": serviceInfo.m_status, "version": serviceInfo.m_version, "credentialStatus": String(serviceInfo.m_credentialStatus), "logId": serviceInfo.m_logId ? String(serviceInfo.m_logId) : (level === 0 ? "GetServerLog" : "")})
 
 		if (hasChildren){
 			let count = serviceInfo.m_dependencies.getItemsCount()
@@ -50,11 +140,11 @@ ParamEditorBase {
 	}
 
 	function getStatusColor(status){
-		if (status === "CONNECTED"){
+		if (status === ServiceStatusEnum.s_cONNECTED){
 			return Style.successColor
 		}
 
-		if (status === "DISCONNECTED"){
+		if (status === ServiceStatusEnum.s_dISCONNECTED){
 			return Style.dangerColor
 		}
 
@@ -62,11 +152,11 @@ ParamEditorBase {
 	}
 
 	function getStatusText(status, version){
-		if (status === "CONNECTED"){
+		if (status === ServiceStatusEnum.s_cONNECTED){
 			return version !== "" ? version : qsTr("Connected")
 		}
 
-		if (status === "DISCONNECTED"){
+		if (status === ServiceStatusEnum.s_dISCONNECTED){
 			return qsTr("Not connected")
 		}
 
@@ -74,11 +164,11 @@ ParamEditorBase {
 	}
 
 	function getCredentialText(credentialStatus){
-		if (credentialStatus === "MISSING"){
+		if (credentialStatus === ServerCredentialStatusEnum.s_mISSING){
 			return qsTr("no server token")
 		}
 
-		if (credentialStatus === "REJECTED"){
+		if (credentialStatus === ServerCredentialStatusEnum.s_rEJECTED){
 			return qsTr("server token is refused")
 		}
 
@@ -101,7 +191,7 @@ ParamEditorBase {
 						delegate: Item {
 							id: rowItem
 							width: rowsColumn.width
-							height: Style.controlHeightS
+							height: Style.controlHeightM + Style.spacingXS
 
 							property int dotX: model.level * serviceDependencyView.indentWidth
 							property int lineX: (model.level - 1) * serviceDependencyView.indentWidth + Style.iconSizeXS / 2
@@ -145,6 +235,7 @@ ParamEditorBase {
 							}
 
 							BaseText {
+								id: nameText
 								anchors.verticalCenter: rowItem.verticalCenter
 								anchors.left: statusIndicator.right
 								anchors.leftMargin: Style.spacingS
@@ -152,15 +243,56 @@ ParamEditorBase {
 								elide: Text.ElideRight
 								font.bold: true
 								text: model.name
+
+								property int rightEdge: rowItem.dotX + Style.iconSizeXS + Style.spacingS + implicitWidth
+								onRightEdgeChanged: serviceDependencyView.reportNameRight(rightEdge)
+								Component.onCompleted: serviceDependencyView.reportNameRight(rightEdge)
+
+								MouseArea {
+									id: nameMouseArea
+									anchors.fill: parent
+									acceptedButtons: Qt.NoButton
+								}
+
+								TooltipArea {
+									anchors.fill: parent
+									mouseArea: nameMouseArea
+									text: parent.truncated ? parent.text : ""
+								}
 							}
 
 							BaseText {
 								anchors.verticalCenter: rowItem.verticalCenter
 								x: serviceDependencyView.versionX
-								width: rowItem.width - x
+								width: rowItem.width - x - (downloadLogButton.visible ? downloadLogButton.width + Style.spacingS : 0)
 								elide: Text.ElideRight
-								color: model.status === "DISCONNECTED" || serviceDependencyView.getCredentialText(model.credentialStatus) !== "" ? Style.dangerColor : Style.textColor
+								color: model.status === ServiceStatusEnum.s_dISCONNECTED || serviceDependencyView.getCredentialText(model.credentialStatus) !== "" ? Style.dangerColor : Style.textColor
 								text: serviceDependencyView.getStatusText(model.status, model.version) + (serviceDependencyView.getCredentialText(model.credentialStatus) !== "" ? " - " + serviceDependencyView.getCredentialText(model.credentialStatus) : "")
+
+								MouseArea {
+									id: statusMouseArea
+									anchors.fill: parent
+									acceptedButtons: Qt.NoButton
+								}
+
+								TooltipArea {
+									anchors.fill: parent
+									mouseArea: statusMouseArea
+									text: parent.truncated ? parent.text : ""
+								}
+							}
+
+							Button {
+								id: downloadLogButton
+								anchors.verticalCenter: rowItem.verticalCenter
+								anchors.right: rowItem.right
+								width: Style.sizeHintBXS
+								height: Style.controlHeightM
+								visible: model.status === ServiceStatusEnum.s_cONNECTED && model.logId !== ""
+								text: qsTr("Download Log")
+								onClicked: {
+									remoteFileController.getFile(model.logId, model.name + "Log.txt")
+								}
 							}
 						}
 					}

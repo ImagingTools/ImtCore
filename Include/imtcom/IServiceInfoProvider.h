@@ -74,6 +74,11 @@ public:
 		CredentialStatus credentialStatus = CRS_NOT_USED;
 
 		/**
+			Identifier of the log file of the service, empty if the log cannot be downloaded.
+		*/
+		QByteArray logId;
+
+		/**
 			Services the service itself depends on.
 		*/
 		QList<ServiceInfo> dependencies;

@@ -309,6 +309,9 @@ imtsdl::TElementList<sdl::V1_0::imtapp::CServiceInfo> CApplicationInfoController
 		if (!dependency.versionKind.isEmpty()){
 			dependencyData.versionKind = dependency.versionKind;
 		}
+		if (!dependency.logId.isEmpty()){
+			dependencyData.logId = QString::fromUtf8(dependency.logId);
+		}
 		if (dependency.buildTime.isValid()){
 			dependencyData.buildTime = dependency.buildTime.toUTC().toString(Qt::ISODate);
 		}

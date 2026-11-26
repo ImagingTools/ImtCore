@@ -76,6 +76,9 @@
                     <AttributeInfo Id="ConnectionStatus" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Subscription/ConnectionStatusProvider"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="LogId" Type="Id" ExportId="AuthServerLogId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
