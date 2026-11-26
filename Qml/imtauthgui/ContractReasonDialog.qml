@@ -9,10 +9,10 @@ import imtauthgui 1.0
 /**
  * ContractReasonDialog
  *
- * A step of a contract that takes a reason: a refusal, a request of changes, a notice or a proposed termination.
- * The notice can be given at once (showImmediate), the termination is proposed for a day (showDate).
+ * A step of a contract that takes a reason: a refusal, a request of changes or a notice.
+ * The notice can be given at once (showImmediate).
  *
- * The result is read in onFinished from contentItem: reason, dateIso(), isImmediate.
+ * The result is read in onFinished from contentItem: reason, isImmediate.
  */
 Dialog {
 	id: reasonDialog
@@ -25,7 +25,6 @@ Dialog {
 	property string okText: qsTr("OK")
 	property string reasonName: qsTr("Reason")
 	property bool isReasonRequired: true
-	property bool showDate: false
 	property bool showImmediate: false
 
 	// The parameters of openDialog are set after the dialog is created: it is set up when it starts
@@ -50,11 +49,6 @@ Dialog {
 
 			readonly property string reason: reasonInput.text.trim()
 			readonly property bool isImmediate: immediateSwitch.checked
-
-			// The time of the API of the chosen day, empty for today
-			function dateIso() {
-				return ContractTexts.pickerIso(dateInput)
-			}
 
 			onReasonChanged: {
 				reasonDialog.__updateOk(reasonContent)
@@ -94,14 +88,6 @@ Dialog {
 						isRequired: reasonDialog.isReasonRequired || immediateSwitch.checked
 						name: reasonDialog.reasonName
 						placeHolderText: reasonInput.isRequired ? qsTr("Required") : qsTr("Optional")
-					}
-
-					DateTimePickerElementView {
-						id: dateInput
-						visible: reasonDialog.showDate
-						name: qsTr("Terminate on")
-						description: qsTr("Empty for today")
-						canShowCurrentDate: false
 					}
 
 					SwitchElementView {

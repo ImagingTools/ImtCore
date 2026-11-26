@@ -107,7 +107,6 @@ sdlauth::CGetContractPayload CContractControllerComp::OnGetContract(
 	for (const imtauth::IContractInfo::Attachment& attachment : privateInfoPtr->GetAttachments()){
 		sdlauth::CContractAttachment attachmentData;
 		attachmentData.attachmentId = attachment.attachmentId;
-		attachmentData.kind = ConvertEnum<sdlauth::ContractAttachmentKind>(attachment.kind);
 		attachmentData.fileName = attachment.fileName;
 		attachmentData.mimeType = attachment.mimeType;
 		attachmentData.fileSize = int(attachment.size);
@@ -535,9 +534,6 @@ sdlauth::CContractCommandPayload CContractControllerComp::OnSignContract(
 
 	imtauth::ContractSignatureRequest signature;
 	signature.position = input.position.value_or(QString());
-	signature.method = input.method ? ConvertEnum<imtauth::IContractInfo::SignatureMethod>(*input.method) : imtauth::IContractInfo::SM_IN_SYSTEM;
-	signature.externalSignatureId = input.externalSignatureId.value_or(QString()).toUtf8();
-	signature.attachmentId = input.attachmentId.value_or(QByteArray());
 
 	return RunCommand(gqlRequest, input.tenantId.value_or(QByteArray()), contractId, s_signContractsPermission, [&](const imtauth::ContractActor& actor, QString& error){
 		return m_contractManagerCompPtr->SignContract(actor, contractId, input.revision.value_or(0), signature, error);
@@ -599,47 +595,6 @@ sdlauth::CContractCommandPayload CContractControllerComp::OnGiveContractNonRenew
 }
 
 
-sdlauth::CContractCommandPayload CContractControllerComp::OnProposeContractTermination(
-			const sdlauth::CProposeContractTerminationGqlRequest& proposeContractTerminationRequest,
-			const ::imtgql::CGqlRequest& gqlRequest,
-			QString& /*errorMessage*/) const
-{
-	const sdlauth::ProposeContractTerminationRequestArguments arguments = proposeContractTerminationRequest.GetRequestedArguments();
-	const sdlauth::CProposeContractTerminationInput input = arguments.input ? *arguments.input : sdlauth::CProposeContractTerminationInput();
-	const QByteArray contractId = input.contractId.value_or(QByteArray());
-
-	return RunCommand(gqlRequest, input.tenantId.value_or(QByteArray()), contractId, s_signContractsPermission, [&](const imtauth::ContractActor& actor, QString& error){
-		return m_contractManagerCompPtr->ProposeTermination(actor, contractId, FromSdlTime(input.terminateAt), input.reason.value_or(QString()), error);
-	});
-}
-
-
-sdlauth::CContractCommandPayload CContractControllerComp::OnConsentContractTermination(
-			const sdlauth::CConsentContractTerminationGqlRequest& consentContractTerminationRequest,
-			const ::imtgql::CGqlRequest& gqlRequest,
-			QString& /*errorMessage*/) const
-{
-	IMT_CONTRACT_COMMAND_INPUT(CConsentContractTerminationGqlRequest, ConsentContractTerminationRequestArguments, consentContractTerminationRequest)
-
-	return RunCommand(gqlRequest, tenantId, contractId, s_signContractsPermission, [&](const imtauth::ContractActor& actor, QString& error){
-		return m_contractManagerCompPtr->ConsentTermination(actor, contractId, error);
-	});
-}
-
-
-sdlauth::CContractCommandPayload CContractControllerComp::OnCancelContractTerminationProposal(
-			const sdlauth::CCancelContractTerminationProposalGqlRequest& cancelContractTerminationProposalRequest,
-			const ::imtgql::CGqlRequest& gqlRequest,
-			QString& /*errorMessage*/) const
-{
-	IMT_CONTRACT_COMMAND_INPUT(CCancelContractTerminationProposalGqlRequest, CancelContractTerminationProposalRequestArguments, cancelContractTerminationProposalRequest)
-
-	return RunCommand(gqlRequest, tenantId, contractId, s_signContractsPermission, [&](const imtauth::ContractActor& actor, QString& error){
-		return m_contractManagerCompPtr->CancelTerminationProposal(actor, contractId, error);
-	});
-}
-
-
 sdlauth::CContractCommandPayload CContractControllerComp::OnSetContractAllocationsSuspended(
 			const sdlauth::CSetContractAllocationsSuspendedGqlRequest& setContractAllocationsSuspendedRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
@@ -680,7 +635,6 @@ sdlauth::CContractCommandPayload CContractControllerComp::OnAddContractAttachmen
 		}
 
 		imtauth::IContractInfo::Attachment attachment;
-		attachment.kind = input.kind ? ConvertEnum<imtauth::IContractInfo::AttachmentKind>(*input.kind) : imtauth::IContractInfo::AK_OTHER;
 		attachment.fileName = input.fileName.value_or(QString()).trimmed();
 		attachment.mimeType = input.mimeType.value_or(QString());
 		attachment.size = data.size();
@@ -837,8 +791,6 @@ bool CContractControllerComp::CreateDraft(const sdlauth::CContractDraftInput& in
 	draft.SetRenewalPeriodDays(input.renewalPeriodDays.value_or(0));
 	draft.SetRenewalNoticeDays(input.renewalNoticeDays.value_or(0));
 	draft.SetTerminationNoticeDays(input.terminationNoticeDays.value_or(0));
-	draft.SetSignDeadline(FromSdlTime(input.signDeadline));
-	draft.SetSignOrder(input.signOrder ? ConvertEnum<imtauth::IContractInfo::SignOrder>(*input.signOrder) : imtauth::IContractInfo::SO_PARALLEL);
 
 	imtauth::IContractInfo::Parties parties;
 	if (input.parties){
@@ -850,8 +802,6 @@ bool CContractControllerComp::CreateDraft(const sdlauth::CContractDraftInput& in
 			imtauth::IContractInfo::Party party;
 			party.tenantId = item->tenantId.value_or(QByteArray());
 			party.roleId = item->roleId.value_or(QByteArray());
-			party.signOrder = item->signOrder.value_or(0);
-			party.requiredSignatures = item->requiredSignatures.value_or(1);
 			parties.append(party);
 		}
 	}
@@ -946,8 +896,6 @@ sdlauth::CContract CContractControllerComp::CreateContractData(const imtauth::IC
 	retVal.renewalPeriodDays = contract.GetRenewalPeriodDays();
 	retVal.renewalNoticeDays = contract.GetRenewalNoticeDays();
 	retVal.terminationNoticeDays = contract.GetTerminationNoticeDays();
-	retVal.signDeadline = ToSdlTime(contract.GetSignDeadline());
-	retVal.signOrder = ConvertEnum<sdlauth::ContractSignOrder>(contract.GetSignOrder());
 
 	retVal.parties.Emplace();
 	for (const imtauth::IContractInfo::Party& party : contract.GetParties()){
@@ -956,8 +904,6 @@ sdlauth::CContract CContractControllerComp::CreateContractData(const imtauth::IC
 		partyData.tenantName = party.tenantName;
 		partyData.roleId = party.roleId;
 		partyData.roleName = GetRoleName(party.roleId, party.roleName, languageId);
-		partyData.signOrder = party.signOrder;
-		partyData.requiredSignatures = party.requiredSignatures;
 		partyData.channel = ConvertEnum<sdlauth::ContractPartyChannel>(party.channel);
 		partyData.state = ConvertEnum<sdlauth::ContractPartyState>(party.state);
 		partyData.stateComment = party.stateComment;
@@ -966,7 +912,6 @@ sdlauth::CContract CContractControllerComp::CreateContractData(const imtauth::IC
 		partyData.withdrawReason = party.withdrawReason;
 		partyData.nonRenewalNoticeAt = ToSdlTime(party.nonRenewalNoticeAt);
 		partyData.allocationsSuspended = party.allocationsSuspended;
-		partyData.terminationConsent = party.terminationConsent;
 		partyData.isBound = imtauth::IsPartyBoundAt(contract, party, now);
 		partyData.signatures.Emplace();
 		for (const imtauth::IContractInfo::Signature& signature : party.signatures){
@@ -977,9 +922,6 @@ sdlauth::CContract CContractControllerComp::CreateContractData(const imtauth::IC
 			signatureData.signedAt = ToSdlTime(signature.signedAt);
 			signatureData.revision = signature.revision;
 			signatureData.contentHash = QString::fromUtf8(signature.contentHash);
-			signatureData.method = ConvertEnum<sdlauth::ContractSignatureMethod>(signature.method);
-			signatureData.externalSignatureId = QString::fromUtf8(signature.externalSignatureId);
-			signatureData.attachmentId = signature.attachmentId;
 			partyData.signatures->push_back(signatureData);
 		}
 
@@ -1034,7 +976,6 @@ sdlauth::CContract CContractControllerComp::CreateContractData(const imtauth::IC
 	for (const imtauth::IContractInfo::Attachment& attachment : contract.GetAttachments()){
 		sdlauth::CContractAttachment attachmentData;
 		attachmentData.attachmentId = attachment.attachmentId;
-		attachmentData.kind = ConvertEnum<sdlauth::ContractAttachmentKind>(attachment.kind);
 		attachmentData.fileName = attachment.fileName;
 		attachmentData.mimeType = attachment.mimeType;
 		attachmentData.fileSize = int(attachment.size);
@@ -1057,7 +998,6 @@ sdlauth::CContract CContractControllerComp::CreateContractData(const imtauth::IC
 		retVal.roleSlots->push_back(slotData);
 	}
 
-	retVal.requiredAttachmentKinds = ToElementList(contract.GetRequiredAttachmentKinds());
 	retVal.revision = contract.GetRevision();
 	retVal.contentHash = QString::fromUtf8(contract.GetContentHash());
 	retVal.submittedAt = ToSdlTime(contract.GetSubmittedAt());
@@ -1065,16 +1005,6 @@ sdlauth::CContract CContractControllerComp::CreateContractData(const imtauth::IC
 	retVal.signedAt = ToSdlTime(contract.GetSignedAt());
 	retVal.terminatedAt = ToSdlTime(contract.GetTerminatedAt());
 	retVal.terminationReason = contract.GetTerminationReason();
-
-	const imtauth::IContractInfo::TerminationProposal proposal = contract.GetTerminationProposal();
-	if (proposal.IsValid()){
-		sdlauth::CContractTerminationProposal proposalData;
-		proposalData.proposedByTenantId = proposal.proposedByTenantId;
-		proposalData.proposedAt = ToSdlTime(proposal.proposedAt);
-		proposalData.terminateAt = ToSdlTime(proposal.terminateAt);
-		proposalData.reason = proposal.reason;
-		retVal.terminationProposal = proposalData;
-	}
 
 	retVal.supersededBy = contract.GetSupersededBy();
 	retVal.supersededAt = ToSdlTime(contract.GetSupersededAt());
@@ -1132,11 +1062,6 @@ sdlauth::CContractListItem CContractControllerComp::CreateListItem(const imtauth
 
 		const bool isNegotiated = stateInfo.state == imtauth::CS_NEGOTIATION || stateInfo.state == imtauth::CS_SIGNING;
 		isMyTurn = isNegotiated && (party.state == imtauth::IContractInfo::PS_REVIEWING || party.state == imtauth::IContractInfo::PS_APPROVED);
-		if (isMyTurn && contract.GetSignOrder() == imtauth::IContractInfo::SO_SEQUENTIAL){
-			for (const imtauth::IContractInfo::Party& otherParty : parties){
-				isMyTurn = isMyTurn && (otherParty.signOrder >= party.signOrder || otherParty.state == imtauth::IContractInfo::PS_SIGNED);
-			}
-		}
 	}
 
 	retVal.isMyTurnToSign = isMyTurn;

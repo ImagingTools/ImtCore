@@ -72,6 +72,7 @@ TenantMessagesPage 1.0 TenantMessagesPage.qml
 ShareDocumentDialog 1.0 ShareDocumentDialog.qml
 TenantDocumentSharesPage 1.0 TenantDocumentSharesPage.qml
 ContractView 1.0 ContractView.qml
+ContractStateBar 1.0 ContractStateBar.qml
 ContractsApiClient 1.0 ContractsApiClient.qml
 singleton ContractTexts 1.0 ContractTexts.qml
 ContractPartyDialog 1.0 ContractPartyDialog.qml
@@ -90,7 +91,6 @@ ContractLinksPage 1.0 ContractLinksPage.qml
 ContractPermissionsPage 1.0 ContractPermissionsPage.qml
 ContractReferencesPage 1.0 ContractReferencesPage.qml
 ContractDocumentsPage 1.0 ContractDocumentsPage.qml
-ContractInternalPage 1.0 ContractInternalPage.qml
 ContractJournalPage 1.0 ContractJournalPage.qml
 TenantPartyRolesPage 1.0 TenantPartyRolesPage.qml
 PartyRoleView 1.0 PartyRoleView.qml

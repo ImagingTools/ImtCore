@@ -101,18 +101,6 @@ public:
 	virtual int GetTerminationNoticeDays() const = 0;
 	virtual void SetTerminationNoticeDays(int value) = 0;
 
-	virtual IContractInfo::SignOrder GetSignOrder() const = 0;
-	virtual void SetSignOrder(IContractInfo::SignOrder value) = 0;
-
-	virtual int GetRequiredSignatures() const = 0;
-	virtual void SetRequiredSignatures(int value) = 0;
-
-	/**
-		Kinds of IContractInfo::AttachmentKind
-	*/
-	virtual QList<int> GetRequiredAttachmentKinds() const = 0;
-	virtual void SetRequiredAttachmentKinds(const QList<int>& value) = 0;
-
 	virtual AllocationTemplates GetAllocationTemplates() const = 0;
 	virtual void SetAllocationTemplates(const AllocationTemplates& value) = 0;
 

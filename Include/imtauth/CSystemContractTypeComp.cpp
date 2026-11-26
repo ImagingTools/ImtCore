@@ -44,15 +44,6 @@ void CSystemContractTypeComp::OnComponentCreated()
 	SetRenewalPeriodDays(*m_renewalPeriodDaysAttrPtr);
 	SetRenewalNoticeDays(*m_renewalNoticeDaysAttrPtr);
 	SetTerminationNoticeDays(*m_terminationNoticeDaysAttrPtr);
-	SetSignOrder(*m_isSequentialAttrPtr ? IContractInfo::SO_SEQUENTIAL : IContractInfo::SO_PARALLEL);
-	SetRequiredSignatures(qMax(1, *m_requiredSignaturesAttrPtr));
-
-	QList<int> requiredKinds;
-	for (int i = 0; i < m_requiredAttachmentKindsAttrPtr.GetCount(); ++i){
-		requiredKinds.append(m_requiredAttachmentKindsAttrPtr[i]);
-	}
-
-	SetRequiredAttachmentKinds(requiredKinds);
 }
 
 

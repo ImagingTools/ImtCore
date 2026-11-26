@@ -34,7 +34,6 @@ void AssignValue(istd::IChangeable& object, Value& member, const Value& value)
 bool SerializeAttachment(iser::IArchive& archive, IContractInfo::Attachment& item)
 {
 	bool retVal = af::Leaf(archive, "AttachmentId", item.attachmentId);
-	retVal = retVal && af::EnumLeaf(archive, "Kind", item.kind);
 	retVal = retVal && af::Leaf(archive, "FileName", item.fileName);
 	retVal = retVal && af::Leaf(archive, "MimeType", item.mimeType);
 	retVal = retVal && af::Leaf(archive, "Size", item.size);

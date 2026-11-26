@@ -248,33 +248,6 @@ sdl::V1_0::imtauth::CContractCommandPayload CRemoteContractControllerComp::OnGiv
 }
 
 
-sdl::V1_0::imtauth::CContractCommandPayload CRemoteContractControllerComp::OnProposeContractTermination(
-			const sdl::V1_0::imtauth::CProposeContractTerminationGqlRequest& /*proposeContractTerminationRequest*/,
-			const ::imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
-{
-	return SendModelRequest<sdl::V1_0::imtauth::CContractCommandPayload>(gqlRequest, errorMessage);
-}
-
-
-sdl::V1_0::imtauth::CContractCommandPayload CRemoteContractControllerComp::OnConsentContractTermination(
-			const sdl::V1_0::imtauth::CConsentContractTerminationGqlRequest& /*consentContractTerminationRequest*/,
-			const ::imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
-{
-	return SendModelRequest<sdl::V1_0::imtauth::CContractCommandPayload>(gqlRequest, errorMessage);
-}
-
-
-sdl::V1_0::imtauth::CContractCommandPayload CRemoteContractControllerComp::OnCancelContractTerminationProposal(
-			const sdl::V1_0::imtauth::CCancelContractTerminationProposalGqlRequest& /*cancelContractTerminationProposalRequest*/,
-			const ::imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
-{
-	return SendModelRequest<sdl::V1_0::imtauth::CContractCommandPayload>(gqlRequest, errorMessage);
-}
-
-
 sdl::V1_0::imtauth::CContractCommandPayload CRemoteContractControllerComp::OnSetContractAllocationsSuspended(
 			const sdl::V1_0::imtauth::CSetContractAllocationsSuspendedGqlRequest& /*setContractAllocationsSuspendedRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,

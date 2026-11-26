@@ -52,12 +52,6 @@ bool SerializeAllocationTemplate(iser::IArchive& archive, IContractTypeInfo::All
 }
 
 
-bool SerializeNumber(iser::IArchive& archive, int& number)
-{
-	return af::Leaf(archive, "Value", number);
-}
-
-
 } // anonymous namespace
 
 
@@ -87,8 +81,6 @@ CContractTypeInfo::CContractTypeInfo():
 	m_renewalPeriodDays(0),
 	m_renewalNoticeDays(0),
 	m_terminationNoticeDays(0),
-	m_signOrder(IContractInfo::SO_PARALLEL),
-	m_requiredSignatures(1),
 	m_archived(false)
 {
 }
@@ -252,42 +244,6 @@ void CContractTypeInfo::SetTerminationNoticeDays(int value)
 }
 
 
-IContractInfo::SignOrder CContractTypeInfo::GetSignOrder() const
-{
-	return m_signOrder;
-}
-
-
-void CContractTypeInfo::SetSignOrder(IContractInfo::SignOrder value)
-{
-	AssignValue(*this, m_signOrder, value);
-}
-
-
-int CContractTypeInfo::GetRequiredSignatures() const
-{
-	return m_requiredSignatures;
-}
-
-
-void CContractTypeInfo::SetRequiredSignatures(int value)
-{
-	AssignValue(*this, m_requiredSignatures, value);
-}
-
-
-QList<int> CContractTypeInfo::GetRequiredAttachmentKinds() const
-{
-	return m_requiredAttachmentKinds;
-}
-
-
-void CContractTypeInfo::SetRequiredAttachmentKinds(const QList<int>& value)
-{
-	AssignValue(*this, m_requiredAttachmentKinds, value);
-}
-
-
 IContractTypeInfo::AllocationTemplates CContractTypeInfo::GetAllocationTemplates() const
 {
 	return m_allocationTemplates;
@@ -331,9 +287,6 @@ bool CContractTypeInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && af::Leaf(archive, "RenewalPeriodDays", m_renewalPeriodDays);
 	retVal = retVal && af::Leaf(archive, "RenewalNoticeDays", m_renewalNoticeDays);
 	retVal = retVal && af::Leaf(archive, "TerminationNoticeDays", m_terminationNoticeDays);
-	retVal = retVal && af::EnumLeaf(archive, "SignOrder", m_signOrder);
-	retVal = retVal && af::Leaf(archive, "RequiredSignatures", m_requiredSignatures);
-	retVal = retVal && af::List(archive, "RequiredAttachmentKinds", "Kind", m_requiredAttachmentKinds, SerializeNumber);
 	retVal = retVal && af::List(archive, "AllocationTemplates", "Template", m_allocationTemplates, SerializeAllocationTemplate);
 	retVal = retVal && af::Leaf(archive, "IsArchived", m_archived);
 
@@ -365,9 +318,6 @@ bool CContractTypeInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*
 	m_renewalPeriodDays = sourcePtr->GetRenewalPeriodDays();
 	m_renewalNoticeDays = sourcePtr->GetRenewalNoticeDays();
 	m_terminationNoticeDays = sourcePtr->GetTerminationNoticeDays();
-	m_signOrder = sourcePtr->GetSignOrder();
-	m_requiredSignatures = sourcePtr->GetRequiredSignatures();
-	m_requiredAttachmentKinds = sourcePtr->GetRequiredAttachmentKinds();
 	m_allocationTemplates = sourcePtr->GetAllocationTemplates();
 	m_archived = sourcePtr->IsArchived();
 
@@ -395,9 +345,6 @@ bool CContractTypeInfo::IsEqual(const IChangeable& object) const
 				&& m_renewalPeriodDays == otherPtr->GetRenewalPeriodDays()
 				&& m_renewalNoticeDays == otherPtr->GetRenewalNoticeDays()
 				&& m_terminationNoticeDays == otherPtr->GetTerminationNoticeDays()
-				&& m_signOrder == otherPtr->GetSignOrder()
-				&& m_requiredSignatures == otherPtr->GetRequiredSignatures()
-				&& m_requiredAttachmentKinds == otherPtr->GetRequiredAttachmentKinds()
 				&& m_allocationTemplates == otherPtr->GetAllocationTemplates()
 				&& m_archived == otherPtr->IsArchived();
 }
@@ -431,9 +378,6 @@ bool CContractTypeInfo::ResetData(CompatibilityMode /*mode*/)
 	m_renewalPeriodDays = 0;
 	m_renewalNoticeDays = 0;
 	m_terminationNoticeDays = 0;
-	m_signOrder = IContractInfo::SO_PARALLEL;
-	m_requiredSignatures = 1;
-	m_requiredAttachmentKinds = QList<int>();
 	m_allocationTemplates = IContractTypeInfo::AllocationTemplates();
 	m_archived = false;
 

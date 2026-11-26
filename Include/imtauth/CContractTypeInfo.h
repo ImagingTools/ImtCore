@@ -43,12 +43,6 @@ public:
 	virtual void SetRenewalNoticeDays(int value) override;
 	virtual int GetTerminationNoticeDays() const override;
 	virtual void SetTerminationNoticeDays(int value) override;
-	virtual IContractInfo::SignOrder GetSignOrder() const override;
-	virtual void SetSignOrder(IContractInfo::SignOrder value) override;
-	virtual int GetRequiredSignatures() const override;
-	virtual void SetRequiredSignatures(int value) override;
-	virtual QList<int> GetRequiredAttachmentKinds() const override;
-	virtual void SetRequiredAttachmentKinds(const QList<int>& value) override;
 	virtual AllocationTemplates GetAllocationTemplates() const override;
 	virtual void SetAllocationTemplates(const AllocationTemplates& value) override;
 	virtual bool IsArchived() const override;
@@ -77,9 +71,6 @@ protected:
 	int m_renewalPeriodDays;
 	int m_renewalNoticeDays;
 	int m_terminationNoticeDays;
-	IContractInfo::SignOrder m_signOrder;
-	int m_requiredSignatures;
-	QList<int> m_requiredAttachmentKinds;
 	AllocationTemplates m_allocationTemplates;
 	bool m_archived;
 };

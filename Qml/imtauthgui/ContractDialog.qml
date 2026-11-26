@@ -10,7 +10,8 @@ import imtauthgui 1.0
  * ContractDialog
  *
  * The card of a contract (ContractView) in a dialog: its steps are the commands of the card,
- * its parts the pages of its MultiPageView. The dialog closes with Close, or by itself once a draft is removed.
+ * its parts the pages of its MultiPageView. The dialog closes with Close, or by itself once a draft is removed;
+ * unsaved changes of the terms are confirmed before.
  */
 Dialog {
 	id: contractDialog
@@ -30,10 +31,12 @@ Dialog {
 
 	property string __title: ""
 
-	// Save is a button of the dialog while the organization edits the terms; it leaves the dialog open
-	notClosingButtons: Enums.save
+	// Save is a button of the dialog while the organization edits the terms; it leaves the dialog open.
+	// Close, the cross and Escape are checked for unsaved changes first; Enums.yes closes the dialog then.
+	notClosingButtons: Enums.save | Enums.close | Enums.cancel
 	readonly property bool canEdit: contractDialog.contentItem && contractDialog.contentItem.view ? contractDialog.contentItem.view.isEditable : false
-	readonly property bool isBusy: contractDialog.contentItem && contractDialog.contentItem.view ? contractDialog.contentItem.view.isBusy : false
+	readonly property bool canSave: contractDialog.contentItem && contractDialog.contentItem.view ? contractDialog.contentItem.view.canSave : false
+	readonly property bool isDirty: contractDialog.contentItem && contractDialog.contentItem.view ? contractDialog.contentItem.view.isDirty : false
 
 	// The parameters of openDialog are set after the dialog is created: it is set up when it starts
 	onStarted: {
@@ -47,20 +50,33 @@ Dialog {
 		contractDialog.__updateSaveButton()
 	}
 
-	onIsBusyChanged: {
+	onCanSaveChanged: {
 		if (contractDialog.buttons)
-			contractDialog.buttons.setButtonState(Enums.save, !contractDialog.isBusy)
+			contractDialog.buttons.setButtonState(Enums.save, contractDialog.canSave)
 	}
 
 	onFinished: {
 		if (buttonId == Enums.save && contractDialog.contentItem)
 			contractDialog.contentItem.view.save()
+		else if (buttonId == Enums.close || buttonId == Enums.cancel)
+			contractDialog.__close()
+	}
+
+	function __close() {
+		if (!contractDialog.isDirty) {
+			contractDialog.finished(Enums.yes)
+			return
+		}
+		ModalDialogManager.showConfirmationDialog(qsTr("Unsaved changes"), qsTr("The changes of the terms are not saved. Close the contract and lose them?"), function(result) {
+			if (result === Enums.yes)
+				contractDialog.finished(Enums.yes)
+		})
 	}
 
 	function __updateSaveButton() {
 		contractDialog.removeButton(Enums.save)
 		if (contractDialog.canEdit)
-			contractDialog.insertButton(Enums.save, qsTr("Save"), !contractDialog.isBusy, 0)
+			contractDialog.insertButton(Enums.save, qsTr("Save"), contractDialog.canSave, 0)
 	}
 
 	contentComp: Component {

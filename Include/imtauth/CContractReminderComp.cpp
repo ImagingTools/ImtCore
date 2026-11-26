@@ -71,14 +71,7 @@ void CContractReminderComp::RemindParty(const IContractInfo& contract, const ICo
 	const ContractStateInfo stateInfo = ComputeContractState(contract, now);
 
 	QList<QPair<QByteArray, QDateTime>> dates;
-	if (stateInfo.state == CS_NEGOTIATION || stateInfo.state == CS_SIGNING){
-		// A party that did not answer yet, before the offer expires
-		const bool isAnswered = party.state == IContractInfo::PS_SIGNED || party.state == IContractInfo::PS_DECLINED || party.state == IContractInfo::PS_WITHDRAWN;
-		if (!isAnswered){
-			dates.append({QByteArrayLiteral("sign"), contract.GetSignDeadline()});
-		}
-	}
-	else if (stateInfo.state == CS_ACTIVE && IsPartyBoundAt(contract, party, now)){
+	if (stateInfo.state == CS_ACTIVE && IsPartyBoundAt(contract, party, now)){
 		// A refusal of any party ends a renewing contract with the period it allows
 		bool isRenewalRefused = false;
 		for (const IContractInfo::Party& otherParty : contract.GetParties()){

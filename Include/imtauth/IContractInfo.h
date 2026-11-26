@@ -37,7 +37,7 @@ public:
 		PS_CHANGES_REQUESTED,
 		/// Agreed to the terms inside the party, not signed yet
 		PS_APPROVED,
-		/// The required signatures of this revision are given
+		/// Signed this revision
 		PS_SIGNED,
 		/// Refuses to sign
 		PS_DECLINED,
@@ -48,17 +48,6 @@ public:
 	};
 
 	I_DECLARE_ENUM(PartyState, PS_INVITED, PS_REVIEWING, PS_CHANGES_REQUESTED, PS_APPROVED, PS_SIGNED, PS_DECLINED, PS_NOTICE_GIVEN, PS_WITHDRAWN);
-
-	enum SignatureMethod
-	{
-		SM_IN_SYSTEM = 0,
-		/// A scan of the signed paper is attached
-		SM_SCAN,
-		/// An electronic signature given outside the system
-		SM_EXTERNAL
-	};
-
-	I_DECLARE_ENUM(SignatureMethod, SM_IN_SYSTEM, SM_SCAN, SM_EXTERNAL);
 
 	enum ReferenceType
 	{
@@ -71,26 +60,6 @@ public:
 	};
 
 	I_DECLARE_ENUM(ReferenceType, RT_SUPERSEDES, RT_FRAMEWORK, RT_RELATED);
-
-	enum AttachmentKind
-	{
-		AK_MAIN_TEXT = 0,
-		AK_APPENDIX,
-		AK_SIGNED_COPY,
-		AK_AMENDMENT_DRAFT,
-		AK_OTHER
-	};
-
-	I_DECLARE_ENUM(AttachmentKind, AK_MAIN_TEXT, AK_APPENDIX, AK_SIGNED_COPY, AK_AMENDMENT_DRAFT, AK_OTHER);
-
-	enum SignOrder
-	{
-		SO_PARALLEL = 0,
-		/// A party signs after all parties with a lower order
-		SO_SEQUENTIAL
-	};
-
-	I_DECLARE_ENUM(SignOrder, SO_PARALLEL, SO_SEQUENTIAL);
 
 	/**
 		How the initiator reached a party: an organization never sees a contract of an organization it does not know.
@@ -114,9 +83,6 @@ public:
 		QDateTime signedAt;
 		int revision = 0;
 		QByteArray contentHash;
-		SignatureMethod method = SM_IN_SYSTEM;
-		QByteArray externalSignatureId;
-		QByteArray attachmentId;
 
 		bool operator==(const Signature& other) const;
 		bool operator!=(const Signature& other) const;
@@ -130,8 +96,6 @@ public:
 		QString tenantName;
 		QByteArray roleId;
 		QString roleName;
-		int signOrder = 0;
-		int requiredSignatures = 1;
 		PartyChannel channel = PC_ADDRESS_BOOK;
 		PartyState state = PS_INVITED;
 		QString stateComment;
@@ -144,8 +108,6 @@ public:
 		QDateTime nonRenewalNoticeAt;
 		/// The party stopped its own allocations
 		bool allocationsSuspended = false;
-		/// The party agrees to the proposed termination
-		bool terminationConsent = false;
 
 		bool operator==(const Party& other) const;
 		bool operator!=(const Party& other) const;
@@ -215,7 +177,6 @@ public:
 	struct Attachment
 	{
 		QByteArray attachmentId;
-		AttachmentKind kind = AK_OTHER;
 		QString fileName;
 		QString mimeType;
 		qint64 size = 0;
@@ -249,18 +210,6 @@ public:
 	};
 
 	typedef QList<RoleSlot> RoleSlots;
-
-	struct TerminationProposal
-	{
-		QByteArray proposedByTenantId;
-		QDateTime proposedAt;
-		QDateTime terminateAt;
-		QString reason;
-
-		bool IsValid() const;
-		bool operator==(const TerminationProposal& other) const;
-		bool operator!=(const TerminationProposal& other) const;
-	};
 
 	virtual QByteArray GetContractId() const = 0;
 	virtual void SetContractId(const QByteArray& value) = 0;
@@ -325,15 +274,6 @@ public:
 	virtual int GetTerminationNoticeDays() const = 0;
 	virtual void SetTerminationNoticeDays(int value) = 0;
 
-	/**
-		The offer lapses unless all parties signed before
-	*/
-	virtual QDateTime GetSignDeadline() const = 0;
-	virtual void SetSignDeadline(const QDateTime& value) = 0;
-
-	virtual SignOrder GetSignOrder() const = 0;
-	virtual void SetSignOrder(SignOrder value) = 0;
-
 	virtual Parties GetParties() const = 0;
 	virtual void SetParties(const Parties& value) = 0;
 
@@ -354,12 +294,6 @@ public:
 	*/
 	virtual RoleSlots GetRoleSlots() const = 0;
 	virtual void SetRoleSlots(const RoleSlots& value) = 0;
-
-	/**
-		The kinds of attachments the type needs
-	*/
-	virtual QList<int> GetRequiredAttachmentKinds() const = 0;
-	virtual void SetRequiredAttachmentKinds(const QList<int>& value) = 0;
 
 	virtual int GetRevision() const = 0;
 	virtual void SetRevision(int value) = 0;
@@ -384,9 +318,6 @@ public:
 
 	virtual QString GetTerminationReason() const = 0;
 	virtual void SetTerminationReason(const QString& value) = 0;
-
-	virtual TerminationProposal GetTerminationProposal() const = 0;
-	virtual void SetTerminationProposal(const TerminationProposal& value) = 0;
 
 	virtual QByteArray GetSupersededBy() const = 0;
 	virtual void SetSupersededBy(const QByteArray& value) = 0;

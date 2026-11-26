@@ -49,10 +49,6 @@ public:
 	virtual void SetRenewalNoticeDays(int value) override;
 	virtual int GetTerminationNoticeDays() const override;
 	virtual void SetTerminationNoticeDays(int value) override;
-	virtual QDateTime GetSignDeadline() const override;
-	virtual void SetSignDeadline(const QDateTime& value) override;
-	virtual SignOrder GetSignOrder() const override;
-	virtual void SetSignOrder(SignOrder value) override;
 	virtual Parties GetParties() const override;
 	virtual void SetParties(const Parties& value) override;
 	virtual Links GetLinks() const override;
@@ -65,8 +61,6 @@ public:
 	virtual void SetAttachments(const Attachments& value) override;
 	virtual RoleSlots GetRoleSlots() const override;
 	virtual void SetRoleSlots(const RoleSlots& value) override;
-	virtual QList<int> GetRequiredAttachmentKinds() const override;
-	virtual void SetRequiredAttachmentKinds(const QList<int>& value) override;
 	virtual int GetRevision() const override;
 	virtual void SetRevision(int value) override;
 	virtual QByteArray GetContentHash() const override;
@@ -81,8 +75,6 @@ public:
 	virtual void SetTerminatedAt(const QDateTime& value) override;
 	virtual QString GetTerminationReason() const override;
 	virtual void SetTerminationReason(const QString& value) override;
-	virtual TerminationProposal GetTerminationProposal() const override;
-	virtual void SetTerminationProposal(const TerminationProposal& value) override;
 	virtual QByteArray GetSupersededBy() const override;
 	virtual void SetSupersededBy(const QByteArray& value) override;
 	virtual QDateTime GetSupersededAt() const override;
@@ -118,15 +110,12 @@ protected:
 	int m_renewalPeriodDays;
 	int m_renewalNoticeDays;
 	int m_terminationNoticeDays;
-	QDateTime m_signDeadline;
-	SignOrder m_signOrder;
 	Parties m_parties;
 	Links m_links;
 	Allocations m_allocations;
 	References m_references;
 	Attachments m_attachments;
 	RoleSlots m_roleSlots;
-	QList<int> m_requiredAttachmentKinds;
 	int m_revision;
 	QByteArray m_contentHash;
 	QDateTime m_submittedAt;
@@ -134,7 +123,6 @@ protected:
 	QDateTime m_signedAt;
 	QDateTime m_terminatedAt;
 	QString m_terminationReason;
-	TerminationProposal m_terminationProposal;
 	QByteArray m_supersededBy;
 	QDateTime m_supersededAt;
 	QDateTime m_createdAt;

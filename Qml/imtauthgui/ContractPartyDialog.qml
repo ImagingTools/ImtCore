@@ -9,11 +9,11 @@ import imtauthgui 1.0
 /**
  * ContractPartyDialog
  *
- * A party of a contract: the organization, its role and the number of the signatures it gives.
+ * A party of a contract: the organization and its role.
  * The organization is chosen from the candidates (the address book and the parties of common contracts),
  * typed as a connection code (byCode), or fixed when only the role of a party changes (fixedTenantId).
  *
- * The result is read in onFinished from contentItem: tenantId, tenantName, code, roleId, roleName, requiredSignatures.
+ * The result is read in onFinished from contentItem: tenantId, tenantName, code, roleId, roleName.
  */
 Dialog {
 	id: partyDialog
@@ -28,7 +28,6 @@ Dialog {
 	property string fixedTenantId: ""
 	property string fixedTenantName: ""
 	property string initialRoleId: ""
-	property int initialRequiredSignatures: 1
 
 	readonly property bool __choosesTenant: !partyDialog.byCode && partyDialog.fixedTenantId === ""
 
@@ -64,7 +63,6 @@ Dialog {
 			readonly property string code: codeInput.text.trim()
 			readonly property string roleId: roleModel.idAt(roleCB.currentIndex)
 			readonly property string roleName: roleModel.nameAt(roleCB.currentIndex)
-			readonly property int requiredSignatures: Math.max(1, signaturesInput.value)
 
 			onTenantIdChanged: {
 				partyDialog.__updateOk(partyContent)
@@ -81,7 +79,6 @@ Dialog {
 			function init() {
 				tenantModel.fill(partyDialog.candidates, "tenantId", "tenantName", "")
 				roleCB.currentIndex = roleModel.fill(partyDialog.roles, "roleId", "name", partyDialog.initialRoleId)
-				signaturesInput.value = Math.max(1, partyDialog.initialRequiredSignatures)
 				partyDialog.__updateOk(partyContent)
 			}
 
@@ -159,13 +156,6 @@ Dialog {
 						errorText: qsTr("Choose the role of the organization in the contract")
 						name: qsTr("Role")
 						model: roleModel
-					}
-
-					SpinBoxElementView {
-						id: signaturesInput
-						name: qsTr("Signatures needed")
-						from: 1
-						to: 10
 					}
 				}
 			}

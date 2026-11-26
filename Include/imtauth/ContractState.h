@@ -21,7 +21,6 @@ enum ContractState
 	CS_NEGOTIATION,
 	CS_SIGNING,
 	CS_REJECTED,
-	CS_OFFER_EXPIRED,
 	CS_CANCELLED,
 	/// Signed by all parties, comes into force later
 	CS_SIGNED,
@@ -71,6 +70,11 @@ int FindContractAttachment(const IContractInfo::Attachments& attachments, const 
 QByteArrayList GetContractPartyTenantIds(const IContractInfo& contract);
 
 /**
+	A file attached before the contract was concluded: a part of the terms the parties sign.
+*/
+bool IsTermsAttachment(const IContractInfo& contract, const IContractInfo::Attachment& attachment);
+
+/**
 	The groups a party gives the permissions of an allocation to; none is nobody.
 */
 QByteArrayList GetAllocationGroupIds(const IContractPartyPrivateInfo& privateInfo, const QByteArray& allocationId);
@@ -111,7 +115,7 @@ bool GetLinkPeriod(const IContractInfo& contract, const IContractInfo::Link& lin
 
 /**
 	SHA-256 of what the parties sign: the terms, the parties, the links, the allocations, the references
-	and the content of the main text and of the appendices.
+	and the content of the files of the terms.
 */
 QByteArray ComputeContractContentHash(const IContractInfo& contract);
 

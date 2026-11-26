@@ -386,9 +386,6 @@
                     <AttributeInfo Id="Description" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Two organizations work together"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="IsSequential" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="LinkScheme" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="1"/>
                     </AttributeInfo>
@@ -403,9 +400,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="RenewalPeriodDays" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="0"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequiredSignatures" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="1"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TermDays" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="0"/>
@@ -428,9 +422,6 @@
                     <AttributeInfo Id="Description" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Delivery of goods to a customer"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="IsSequential" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="LinkScheme" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="2"/>
                     </AttributeInfo>
@@ -445,16 +436,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="RenewalPeriodDays" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="365"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequiredAttachmentKinds" Type="Integer[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>0</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequiredSignatures" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="1"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RoleSlots" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
@@ -488,9 +469,6 @@
                     <AttributeInfo Id="Description" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Services provided to a customer"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="IsSequential" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="LinkScheme" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="2"/>
                     </AttributeInfo>
@@ -505,16 +483,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="RenewalPeriodDays" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="365"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequiredAttachmentKinds" Type="Integer[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>0</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequiredSignatures" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="1"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RoleSlots" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
@@ -548,9 +516,6 @@
                     <AttributeInfo Id="Description" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="The parties keep the information of each other confidential"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="IsSequential" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="LinkScheme" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="1"/>
                     </AttributeInfo>
@@ -565,16 +530,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="RenewalPeriodDays" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="0"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequiredAttachmentKinds" Type="Integer[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>0</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequiredSignatures" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="1"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TermDays" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="1095"/>
@@ -597,9 +552,6 @@
                     <AttributeInfo Id="Description" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="General terms the later contracts of the parties refer to"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="IsSequential" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="LinkScheme" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="0"/>
                     </AttributeInfo>
@@ -614,16 +566,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="RenewalPeriodDays" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="0"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequiredAttachmentKinds" Type="Integer[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>0</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequiredSignatures" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="1"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TermDays" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="0"/>
@@ -1547,144 +1489,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ContractProposeTermination" PackageId="ImtCoreVoce" ComponentId="Command">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Alignment" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="1"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="ProposeTermination"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>/OrganizationManagement/Contracts/Sign</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Description" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Propose the parties to end the contract on a day"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="IconPath" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="Icons/Close"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="IsVisible" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Propose termination"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Priority" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="45"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="ContractAgreeTermination" PackageId="ImtCoreVoce" ComponentId="Command">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Alignment" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="1"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="AgreeTermination"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>/OrganizationManagement/Contracts/Sign</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Description" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Agree to end the contract on the proposed day"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="IconPath" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="Icons/Ok"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="IsVisible" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Agree to terminate"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Priority" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="40"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="ContractWithdrawTermination" PackageId="ImtCoreVoce" ComponentId="Command">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Alignment" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="1"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="WithdrawTermination"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>/OrganizationManagement/Contracts/Sign</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Description" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Withdraw the proposal to end the contract"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="IconPath" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="Icons/Undo"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="IsVisible" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Withdraw termination"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Priority" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="35"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="ContractSuspendPermissions" PackageId="ImtCoreVoce" ComponentId="Command">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -1803,9 +1607,6 @@
                                 <Value>ContractGiveNotice</Value>
                                 <Value>ContractRevokeNotice</Value>
                                 <Value>ContractStopRenewal</Value>
-                                <Value>ContractProposeTermination</Value>
-                                <Value>ContractAgreeTermination</Value>
-                                <Value>ContractWithdrawTermination</Value>
                                 <Value>ContractSuspendPermissions</Value>
                                 <Value>ContractResumePermissions</Value>
                             </Values>

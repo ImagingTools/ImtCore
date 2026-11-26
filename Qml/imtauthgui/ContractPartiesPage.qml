@@ -9,7 +9,7 @@ import imtauthgui 1.0
 /**
  * ContractPartiesPage
  *
- * The parties of a contract with their roles and states, and the signatures they gave.
+ * The parties of a contract with their roles and states, and the signature each one gave.
  * A page of ContractView: the parties are the list of the view, changed through the view.
  */
 Item {
@@ -26,47 +26,37 @@ Item {
 	signal addPartyByCodeRequested()
 	signal partyRoleRequested(string tenantId)
 
-	readonly property var partyRows: partiesPage.__partyRows(partiesPage.editor ? partiesPage.editor.parties : [])
-	readonly property var signatureRows: partiesPage.__signatureRows(partiesPage.editor ? partiesPage.editor.parties : [])
+	readonly property var partyRows: partiesPage.__partyRows(partiesPage.editor ? partiesPage.editor.parties : [], partiesPage.editor ? partiesPage.editor.contract : null)
 
-	function __partyRows(parties) {
+	// When the party signed; who signed is in the journal
+	function __signedText(party) {
+		var signatures = party.signatures || []
+		return signatures.length > 0 ? ContractTexts.dateText(signatures[signatures.length - 1].signedAt) : ""
+	}
+
+	// The parties of the working copy; their states and signatures are the stored ones, so they follow the others while the user edits
+	function __partyRows(parties, contract) {
 		var rows = []
 		for (var i = 0; i < parties.length; i++) {
 			var party = parties[i]
+			var stored = partiesPage.editor ? partiesPage.editor.contractParty(party.tenantId) : null
+			var facts = stored !== null ? stored : party
 			var isMe = partiesPage.editor && party.tenantId === partiesPage.editor.tenantId
 			var notes = []
-			if (party.stateComment)
-				notes.push(party.stateComment)
-			if (party.withdrawAt)
-				notes.push(qsTr("leaves on %1").arg(ContractTexts.dateText(party.withdrawAt)))
-			if (party.allocationsSuspended)
+			if (facts.stateComment)
+				notes.push(facts.stateComment)
+			if (facts.withdrawAt)
+				notes.push(qsTr("leaves on %1").arg(ContractTexts.dateText(facts.withdrawAt)))
+			if (facts.allocationsSuspended)
 				notes.push(qsTr("its permissions are stopped"))
 			rows.push({"id": party.tenantId,
 					   "organization": (party.tenantName || party.tenantId) + (isMe ? " " + qsTr("(you)") : ""),
 					   "role": party.roleName || "",
-					   "state": partiesPage.editor && partiesPage.editor.isSubmitted ? ContractTexts.partyStateText(party.state) : qsTr("Not sent yet"),
-					   "signatures": qsTr("%1 of %2").arg(party.signatures ? party.signatures.length : 0).arg(party.requiredSignatures || 1),
+					   "state": partiesPage.editor && partiesPage.editor.isSubmitted ? ContractTexts.partyStateText(facts.state) : qsTr("Not sent yet"),
+					   "signed": partiesPage.__signedText(facts),
 					   "channel": ContractTexts.channelText(party.channel),
 					   "notes": notes.join(" · "),
 					   "isMe": isMe})
-		}
-		return rows
-	}
-
-	function __signatureRows(parties) {
-		var rows = []
-		for (var i = 0; i < parties.length; i++) {
-			var signatures = parties[i].signatures || []
-			for (var j = 0; j < signatures.length; j++) {
-				var signature = signatures[j]
-				rows.push({"id": parties[i].tenantId + "/" + j,
-						   "organization": parties[i].tenantName || parties[i].tenantId,
-						   "signedBy": signature.userName || signature.userId || "",
-						   "position": signature.position || "",
-						   "signedAt": ContractTexts.dateTimeText(signature.signedAt),
-						   "method": ContractTexts.signatureMethodText(signature.method),
-						   "revision": String(signature.revision || "")})
-			}
 		}
 		return rows
 	}
@@ -96,7 +86,7 @@ Item {
 				wrapMode: Text.WordWrap
 				text: partiesPage.__isEditable && partiesPage.partyRows.length < 2
 					  ? qsTr("Add the other organizations of the contract: a partner from the address book, or, once the draft is saved, any organization by its connection code.")
-					  : qsTr("The organizations bound by the contract. Each one signs it for itself.")
+					  : qsTr("The organizations bound by the contract. Each one signs it for itself: one signature of a user with the right to sign is enough.")
 				font.pixelSize: Style.fontSizeS
 				color: Style.inactiveTextColor
 			}
@@ -136,52 +126,11 @@ Item {
 		anchors.leftMargin: Style.marginXL
 		anchors.right: parent.right
 		anchors.rightMargin: Style.marginXL
-		height: Math.min(partiesTable.contentHeight + partiesTable.headerHeight, (partiesPage.height - headerColumn.height) / 2)
-
-		selectable: false
-		elements: partiesPage.partyRows
-	}
-
-	BaseText {
-		id: signaturesTitle
-
-		anchors.top: partiesTable.bottom
-		anchors.topMargin: Style.marginXL
-		anchors.left: parent.left
-		anchors.leftMargin: Style.marginXL
-
-		text: qsTr("Signatures")
-		font.pixelSize: Style.fontSizeM
-		font.bold: true
-		color: Style.textColor
-	}
-
-	BaseText {
-		anchors.top: signaturesTitle.bottom
-		anchors.topMargin: Style.marginM
-		anchors.left: parent.left
-		anchors.leftMargin: Style.marginXL
-		visible: partiesPage.signatureRows.length === 0
-		text: qsTr("No signatures yet.")
-		font.pixelSize: Style.fontSizeS
-		color: Style.inactiveTextColor
-	}
-
-	Table {
-		id: signaturesTable
-
-		anchors.top: signaturesTitle.bottom
-		anchors.topMargin: Style.marginM
-		anchors.left: parent.left
-		anchors.leftMargin: Style.marginXL
-		anchors.right: parent.right
-		anchors.rightMargin: Style.marginXL
 		anchors.bottom: parent.bottom
 		anchors.bottomMargin: Style.marginXL
 
-		visible: partiesPage.signatureRows.length > 0
 		selectable: false
-		elements: partiesPage.signatureRows
+		elements: partiesPage.partyRows
 	}
 
 	TableHeaders {
@@ -191,26 +140,12 @@ Item {
 			addHeader("organization", qsTr("Organization"), false, false)
 			addHeader("role", qsTr("Role"), false, false)
 			addHeader("state", qsTr("State"), false, false)
-			addHeader("signatures", qsTr("Signatures"), false, false)
+			addHeader("signed", qsTr("Signed"), false, false)
 			addHeader("channel", qsTr("Found by"), false, false)
 			addHeader("notes", qsTr("Notes"), false, false)
 			addHeader("actions", "", false, false)
 			partiesTable.setColumnContentById("actions", partyActionsComp)
 			partiesTable.headers = partiesHeaders
-		}
-	}
-
-	TableHeaders {
-		id: signaturesHeaders
-
-		Component.onCompleted: {
-			addHeader("organization", qsTr("Organization"), false, false)
-			addHeader("signedBy", qsTr("Signed by"), false, false)
-			addHeader("position", qsTr("Position"), false, false)
-			addHeader("signedAt", qsTr("Signed"), false, false)
-			addHeader("method", qsTr("Signature"), false, false)
-			addHeader("revision", qsTr("Revision"), false, false)
-			signaturesTable.headers = signaturesHeaders
 		}
 	}
 
@@ -229,10 +164,10 @@ Item {
 				anchors.right: parent.right
 				anchors.rightMargin: Style.marginM
 				spacing: Style.marginS
-				visible: partiesPage.__isEditable
 
 				Button {
 					text: qsTr("Role")
+					visible: partiesPage.__isEditable
 					onClicked: {
 						partiesPage.partyRoleRequested(partyActions.tenantId)
 					}
@@ -240,7 +175,7 @@ Item {
 
 				Button {
 					text: qsTr("Remove")
-					visible: !partyActions.isMe
+					visible: partiesPage.__isEditable && !partyActions.isMe
 					onClicked: {
 						partiesPage.editor.removeParty(partyActions.tenantId)
 					}

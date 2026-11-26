@@ -92,14 +92,6 @@ public:
 	virtual bool GiveNotice(const ContractActor& actor, const QByteArray& contractId, const QString& reason, bool isImmediate, QString& errorMessage) override;
 	virtual bool RevokeNotice(const ContractActor& actor, const QByteArray& contractId, QString& errorMessage) override;
 	virtual bool GiveNonRenewalNotice(const ContractActor& actor, const QByteArray& contractId, QString& errorMessage) override;
-	virtual bool ProposeTermination(
-				const ContractActor& actor,
-				const QByteArray& contractId,
-				const QDateTime& terminateAt,
-				const QString& reason,
-				QString& errorMessage) override;
-	virtual bool ConsentTermination(const ContractActor& actor, const QByteArray& contractId, QString& errorMessage) override;
-	virtual bool CancelTerminationProposal(const ContractActor& actor, const QByteArray& contractId, QString& errorMessage) override;
 	virtual bool SetAllocationsSuspended(const ContractActor& actor, const QByteArray& contractId, bool isSuspended, QString& errorMessage) override;
 	virtual bool AddAttachment(
 				const ContractActor& actor,

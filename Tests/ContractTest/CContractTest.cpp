@@ -110,8 +110,7 @@ void CContractTest::testState_data()
 	QTest::newRow("negotiation") << QByteArray("negotiation") << 0 << int(imtauth::CS_NEGOTIATION) << -1;
 	QTest::newRow("a party signed") << QByteArray("one signed") << 0 << int(imtauth::CS_SIGNING) << -1;
 	QTest::newRow("a party declined") << QByteArray("declined") << 0 << int(imtauth::CS_REJECTED) << -1;
-	QTest::newRow("deadline passed") << QByteArray("deadline") << 3 << int(imtauth::CS_OFFER_EXPIRED) << 2;
-	QTest::newRow("cancelled before the deadline") << QByteArray("cancelled") << 3 << int(imtauth::CS_CANCELLED) << 1;
+	QTest::newRow("cancelled") << QByteArray("cancelled") << 3 << int(imtauth::CS_CANCELLED) << 1;
 	QTest::newRow("signed, not in force yet") << QByteArray("effective later") << 1 << int(imtauth::CS_SIGNED) << -1;
 	QTest::newRow("in force") << QByteArray("signed") << 1 << int(imtauth::CS_ACTIVE) << -1;
 	QTest::newRow("term ended") << QByteArray("term") << 31 << int(imtauth::CS_EXPIRED) << 30;
@@ -132,7 +131,7 @@ void CContractTest::testState()
 	QFETCH(int, endedAt);
 
 	const bool isSigned = !change.startsWith("draft") && change != "negotiation" && change != "one signed" && change != "declined"
-				&& change != "deadline" && change != "cancelled";
+				&& change != "cancelled";
 
 	imtauth::CContractInfo contract;
 	FillContract(contract, isSigned, change == "two parties, one left" ? 2 : 3);
@@ -147,11 +146,7 @@ void CContractTest::testState()
 		SetPartyState(contract, "B", imtauth::IContractInfo::PS_SIGNED);
 		SetPartyState(contract, "C", imtauth::IContractInfo::PS_DECLINED);
 	}
-	else if (change == "deadline"){
-		contract.SetSignDeadline(Day(2));
-	}
 	else if (change == "cancelled"){
-		contract.SetSignDeadline(Day(2));
 		contract.SetCancelledAt(Day(1));
 	}
 	else if (change == "effective later"){
@@ -343,14 +338,14 @@ void CContractTest::testContentHash_IgnoresOrderAndProgress()
 	reordered.SetParties(parties);
 	QCOMPARE(imtauth::ComputeContractContentHash(reordered), hash);
 
-	// A replaced document and a signed copy are no terms
+	// A replaced file and a file attached after the conclusion are no terms
 	imtauth::IContractInfo::Attachment copy;
 	copy.attachmentId = "copy";
-	copy.kind = imtauth::IContractInfo::AK_SIGNED_COPY;
+	copy.addedAt = Day(1);
 	copy.contentHash = "1111";
 	imtauth::IContractInfo::Attachment replaced;
 	replaced.attachmentId = "old";
-	replaced.kind = imtauth::IContractInfo::AK_MAIN_TEXT;
+	replaced.addedAt = Day(-1);
 	replaced.contentHash = "2222";
 	replaced.isReplaced = true;
 	reordered.SetAttachments({copy, replaced});
@@ -378,7 +373,6 @@ void CContractTest::testContentHash_FollowsTheTerms()
 	FillContract(changed, false);
 	imtauth::IContractInfo::Attachment text;
 	text.attachmentId = "text";
-	text.kind = imtauth::IContractInfo::AK_MAIN_TEXT;
 	text.contentHash = "3333";
 	changed.SetAttachments({text});
 	const QByteArray textHash = imtauth::ComputeContractContentHash(changed);
@@ -411,7 +405,6 @@ void CContractTest::testContractInfo_SerializeRoundTrip()
 	reference.contractId = "framework";
 	reference.type = imtauth::IContractInfo::RT_FRAMEWORK;
 	source.SetReferences({reference});
-	source.SetRequiredAttachmentKinds({int(imtauth::IContractInfo::AK_MAIN_TEXT)});
 
 	iser::CMemoryWriteArchive writeArchive;
 	QVERIFY(source.Serialize(writeArchive));

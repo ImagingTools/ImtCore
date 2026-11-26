@@ -93,7 +93,11 @@ void CContractNotificationPublisherComp::OnModelChanged(int /*modelId*/, const i
 		}
 
 		if (type == imtauth::TenantEvent::s_contractChanged){
-			PushChange(contractId, tenantIds);
+			PushChange(
+						contractId,
+						tenantIds,
+						event.value(imtauth::TenantEvent::s_userId).toByteArray(),
+						event.value(imtauth::TenantEvent::s_userName).toString());
 
 			continue;
 		}
@@ -128,9 +132,6 @@ CContractNotificationPublisherComp::NotificationKind CContractNotificationPublis
 	if (eventType == te::s_contractInvitationReceived){
 		retVal = {tn::s_contractInvitationReceived, istd::IInformationProvider::IC_INFO, true};
 	}
-	else if (eventType == te::s_contractTurnToSign){
-		retVal = {tn::s_contractTurnToSign, istd::IInformationProvider::IC_INFO, true};
-	}
 	else if (eventType == te::s_contractChangesRequested){
 		retVal = {tn::s_contractChangesRequested, istd::IInformationProvider::IC_WARNING, true};
 	}
@@ -151,12 +152,6 @@ CContractNotificationPublisherComp::NotificationKind CContractNotificationPublis
 	}
 	else if (eventType == te::s_contractWithdrawn){
 		retVal = {tn::s_contractWithdrawn, istd::IInformationProvider::IC_WARNING, false};
-	}
-	else if (eventType == te::s_contractTerminationProposed){
-		retVal = {tn::s_contractTerminationProposed, istd::IInformationProvider::IC_WARNING, true};
-	}
-	else if (eventType == te::s_contractTerminationAgreed){
-		retVal = {tn::s_contractTerminationAgreed, istd::IInformationProvider::IC_INFO, false};
 	}
 	else if (eventType == te::s_contractAllocationsSuspended){
 		retVal = {tn::s_contractAllocationsSuspended, istd::IInformationProvider::IC_WARNING, false};
@@ -189,8 +184,7 @@ CContractNotificationPublisherComp::PendingStepEnd CContractNotificationPublishe
 
 	if (eventType == te::s_contractDeclined
 				|| eventType == te::s_contractConcluded
-				|| eventType == te::s_contractCancelled
-				|| eventType == te::s_contractTerminationAgreed){
+				|| eventType == te::s_contractCancelled){
 		return PSE_ALL;
 	}
 
@@ -198,7 +192,7 @@ CContractNotificationPublisherComp::PendingStepEnd CContractNotificationPublishe
 }
 
 
-void CContractNotificationPublisherComp::PushChange(const QByteArray& contractId, const QByteArrayList& tenantIds) const
+void CContractNotificationPublisherComp::PushChange(const QByteArray& contractId, const QByteArrayList& tenantIds, const QByteArray& userId, const QString& userName) const
 {
 	const QByteArray commandId = GetPushCommandId().toUtf8();
 
@@ -207,6 +201,8 @@ void CContractNotificationPublisherComp::PushChange(const QByteArray& contractId
 		notification.notificationType = sdl::V1_0::imtauth::EContractNotificationType::ContractChanged;
 		notification.contractId = contractId;
 		notification.tenantId = tenantId;
+		notification.sourceUserId = userId;
+		notification.sourceUserName = userName;
 
 		QJsonObject jsonObject;
 		if (!notification.WriteToJsonObject(jsonObject)){

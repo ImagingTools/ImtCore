@@ -24,10 +24,9 @@ Item {
 	property var contractsApiClient: null
 	property bool canEdit: false
 
-	// The working copy: the fields of ContractTypeInput, the required documents as kinds of ContractTexts
+	// The working copy: the fields of ContractTypeInput
 	property var typeData: ({})
 	property var roleSlots: []
-	property var requiredKinds: []
 
 	readonly property bool isNew: typeView.contractType === null
 	readonly property bool isEditable: typeView.canEdit
@@ -61,14 +60,8 @@ Item {
 							 "starRoleId": type ? (type.starRoleId || "") : "", "termDays": type ? (type.termDays || 0) : 0,
 							 "autoRenew": type ? type.autoRenew === true : false, "renewalPeriodDays": type ? (type.renewalPeriodDays || 0) : 0,
 							 "renewalNoticeDays": type ? (type.renewalNoticeDays || 0) : 0, "terminationNoticeDays": type ? (type.terminationNoticeDays || 0) : 0,
-							 "isSequential": type ? type.isSequential === true : false, "requiredSignatures": type ? Math.max(1, type.requiredSignatures || 1) : 1,
 							 "allocationTemplates": type ? (type.allocationTemplates || []) : []}
 		typeView.roleSlots = type ? (type.roleSlots || []).slice() : []
-		var kinds = []
-		var required = type ? (type.requiredAttachmentKinds || []) : []
-		for (var i = 0; i < required.length; i++)
-			kinds.push(ContractTexts.attachmentKindAt(required[i]))
-		typeView.requiredKinds = kinds
 	}
 
 	readonly property string hintText: !typeView.isEditable
@@ -139,17 +132,6 @@ Item {
 		typeView.roleSlots = slots
 	}
 
-	function setKindRequired(kind, isRequired) {
-		var kinds = []
-		for (var i = 0; i < typeView.requiredKinds.length; i++) {
-			if (typeView.requiredKinds[i] !== kind)
-				kinds.push(typeView.requiredKinds[i])
-		}
-		if (isRequired)
-			kinds.push(kind)
-		typeView.requiredKinds = kinds
-	}
-
 	function __updateFromPages() {
 		for (var i = 0; i < multiPageView.pagesModel.count; i++) {
 			var page = multiPageView.getPageByIndex(i)
@@ -182,10 +164,6 @@ Item {
 		type.name = type.name.trim()
 		type.numberPrefix = (type.numberPrefix || "").trim()
 		type.roleSlots = typeView.roleSlots
-		var kinds = []
-		for (var k = 0; k < typeView.requiredKinds.length; k++)
-			kinds.push(ContractTexts.attachmentKinds.indexOf(typeView.requiredKinds[k]))
-		type.requiredAttachmentKinds = kinds
 		typeView.contractsApiClient.saveContractType(typeView.tenantId, type)
 		return true
 	}
@@ -226,7 +204,6 @@ Item {
 			multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
 			multiPageView.addPage("Period", qsTr("Period"), periodPageComp, "Icons/Calendar")
 			multiPageView.addPage("Parties", qsTr("Parties by role"), slotsPageComp, "Icons/Organizations")
-			multiPageView.addPage("Documents", qsTr("Documents"), documentsPageComp, "Icons/Attachment")
 			multiPageView.activatePage(0)
 		}
 	}
@@ -364,8 +341,6 @@ Item {
 				renewalPeriodInput.value = typeView.typeData.renewalPeriodDays || 0
 				renewalNoticeInput.value = typeView.typeData.renewalNoticeDays || 0
 				terminationNoticeInput.value = typeView.typeData.terminationNoticeDays || 0
-				sequentialSwitch.checked = typeView.typeData.isSequential === true
-				signaturesInput.value = Math.max(1, typeView.typeData.requiredSignatures || 1)
 			}
 
 			function updateModel() {
@@ -374,8 +349,6 @@ Item {
 				typeView.typeData.renewalPeriodDays = renewalPeriodInput.value
 				typeView.typeData.renewalNoticeDays = renewalNoticeInput.value
 				typeView.typeData.terminationNoticeDays = terminationNoticeInput.value
-				typeView.typeData.isSequential = sequentialSwitch.checked
-				typeView.typeData.requiredSignatures = Math.max(1, signaturesInput.value)
 			}
 
 			CustomScrollbar {
@@ -452,19 +425,6 @@ Item {
 							to: 36500
 						}
 
-						SwitchElementView {
-							id: sequentialSwitch
-							name: qsTr("The parties sign in their order")
-							readOnly: !typeView.isChangeable
-						}
-
-						SpinBoxElementView {
-							id: signaturesInput
-							name: qsTr("Signatures of each party")
-							readOnly: !typeView.isChangeable
-							from: 1
-							to: 10
-						}
 					}
 				}
 			}
@@ -592,95 +552,6 @@ Item {
 							onClicked: {
 								typeView.removeSlot(slotActions.rowData.id)
 							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// --- Documents ---
-	Component {
-		id: documentsPageComp
-
-		Item {
-			id: documentsPage
-
-			anchors.fill: parent
-
-			readonly property var kindRows: documentsPage.__kindRows(typeView.requiredKinds)
-
-			function __kindRows(requiredKinds) {
-				var rows = []
-				for (var i = 0; i < ContractTexts.attachmentKinds.length; i++) {
-					var kind = ContractTexts.attachmentKinds[i]
-					rows.push({"id": kind,
-							   "kind": ContractTexts.attachmentKindText(kind),
-							   "isRequired": requiredKinds.indexOf(kind) >= 0})
-				}
-				return rows
-			}
-
-			BaseText {
-				id: documentsDescription
-
-				anchors.top: parent.top
-				anchors.topMargin: Style.marginXL
-				anchors.left: parent.left
-				anchors.leftMargin: Style.marginXL
-				anchors.right: parent.right
-				anchors.rightMargin: Style.marginXL
-
-				wrapMode: Text.WordWrap
-				text: qsTr("The documents a contract of this type needs before it is sent to the parties.")
-				font.pixelSize: Style.fontSizeS
-				color: Style.inactiveTextColor
-			}
-
-			Table {
-				id: kindsTable
-
-				anchors.top: documentsDescription.bottom
-				anchors.topMargin: Style.marginM
-				anchors.left: parent.left
-				anchors.leftMargin: Style.marginXL
-				anchors.right: parent.right
-				anchors.rightMargin: Style.marginXL
-				anchors.bottom: parent.bottom
-				anchors.bottomMargin: Style.marginXL
-
-				selectable: false
-				elements: documentsPage.kindRows
-			}
-
-			TableHeaders {
-				id: kindsHeaders
-
-				Component.onCompleted: {
-					addHeader("kind", qsTr("Document"), false, false)
-					addHeader("required", qsTr("Needed"), false, false)
-					kindsTable.setColumnContentById("required", requiredCellComp)
-					kindsTable.headers = kindsHeaders
-				}
-			}
-
-			Component {
-				id: requiredCellComp
-
-				TableCellDelegateBase {
-					id: requiredCell
-
-					readonly property var rowData: requiredCell.getRowData()
-
-					CheckBox {
-						anchors.verticalCenter: parent.verticalCenter
-						anchors.left: parent.left
-						anchors.leftMargin: Style.marginM
-						enabled: typeView.isChangeable
-						checkState: requiredCell.rowData && requiredCell.rowData.isRequired ? Qt.Checked : Qt.Unchecked
-						onCheckStateChanged: {
-							if (requiredCell.rowData && (checkState === Qt.Checked) !== requiredCell.rowData.isRequired)
-								typeView.setKindRequired(requiredCell.rowData.id, checkState === Qt.Checked)
 						}
 					}
 				}

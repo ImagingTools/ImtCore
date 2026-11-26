@@ -45,6 +45,12 @@ Item {
 		nameInput.revealError()
 	}
 
+	// A field the user changed: the view compares its copy
+	function __changed() {
+		if (!termsPage.__filling && termsPage.editor)
+			termsPage.editor.markChanged()
+	}
+
 	function updateModel() {
 		if (!termsPage.editor)
 			return
@@ -93,6 +99,9 @@ Item {
 
 				TextInputElementView {
 					id: nameInput
+					onTextChanged: {
+						termsPage.__changed()
+					}
 					isRequired: true
 					showErrorWhenInvalid: true
 					deferErrorUntilEdited: true
@@ -118,6 +127,9 @@ Item {
 
 				TextInputElementView {
 					id: descriptionInput
+					onTextChanged: {
+						termsPage.__changed()
+					}
 					placeHolderText: qsTr("Optional: what the contract is about")
 					name: qsTr("Description")
 					readOnly: !termsPage.__isEditable
@@ -125,6 +137,9 @@ Item {
 
 				TextInputElementView {
 					id: termsInput
+					onTextChanged: {
+						termsPage.__changed()
+					}
 					name: qsTr("Terms")
 					readOnly: !termsPage.__isEditable
 					placeHolderText: qsTr("The terms agreed, or attach the main text")

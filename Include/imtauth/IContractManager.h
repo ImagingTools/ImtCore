@@ -24,9 +24,6 @@ struct ContractActor
 struct ContractSignatureRequest
 {
 	QString position;
-	IContractInfo::SignatureMethod method = IContractInfo::SM_IN_SYSTEM;
-	QByteArray externalSignatureId;
-	QByteArray attachmentId;
 };
 
 
@@ -88,25 +85,13 @@ public:
 	virtual bool GiveNonRenewalNotice(const ContractActor& actor, const QByteArray& contractId, QString& errorMessage) = 0;
 
 	/**
-		The contract ends at \c terminateAt once every party bound by it agreed.
-	*/
-	virtual bool ProposeTermination(
-				const ContractActor& actor,
-				const QByteArray& contractId,
-				const QDateTime& terminateAt,
-				const QString& reason,
-				QString& errorMessage) = 0;
-	virtual bool ConsentTermination(const ContractActor& actor, const QByteArray& contractId, QString& errorMessage) = 0;
-	virtual bool CancelTerminationProposal(const ContractActor& actor, const QByteArray& contractId, QString& errorMessage) = 0;
-
-	/**
 		Stop or resume the permissions the party gives the others; the party decides it alone.
 	*/
 	virtual bool SetAllocationsSuspended(const ContractActor& actor, const QByteArray& contractId, bool isSuspended, QString& errorMessage) = 0;
 
 	/**
 		Record an attachment the caller stored. An internal one is seen by the party of the actor only.
-		A new main text or appendix is a change of the terms.
+		A file attached before the contract is concluded is a part of the terms.
 	*/
 	virtual bool AddAttachment(
 				const ContractActor& actor,

@@ -126,9 +126,6 @@ sdlauth::CGetContractTypesPayload CContractCatalogControllerComp::OnGetContractT
 		typeData.renewalPeriodDays = typePtr->GetRenewalPeriodDays();
 		typeData.renewalNoticeDays = typePtr->GetRenewalNoticeDays();
 		typeData.terminationNoticeDays = typePtr->GetTerminationNoticeDays();
-		typeData.isSequential = typePtr->GetSignOrder() == imtauth::IContractInfo::SO_SEQUENTIAL;
-		typeData.requiredSignatures = typePtr->GetRequiredSignatures();
-		typeData.requiredAttachmentKinds = ToElementList(typePtr->GetRequiredAttachmentKinds());
 		typeData.isArchived = typePtr->IsArchived();
 		typeData.isSystem = isSystem;
 
@@ -289,9 +286,6 @@ sdlauth::CCatalogCommandPayload CContractCatalogControllerComp::OnSaveContractTy
 	typePtr->SetRenewalPeriodDays(input.renewalPeriodDays.value_or(0));
 	typePtr->SetRenewalNoticeDays(input.renewalNoticeDays.value_or(0));
 	typePtr->SetTerminationNoticeDays(input.terminationNoticeDays.value_or(0));
-	typePtr->SetSignOrder(input.isSequential.value_or(false) ? imtauth::IContractInfo::SO_SEQUENTIAL : imtauth::IContractInfo::SO_PARALLEL);
-	typePtr->SetRequiredSignatures(input.requiredSignatures.value_or(1));
-	typePtr->SetRequiredAttachmentKinds(FromElementList(input.requiredAttachmentKinds));
 
 	imtauth::IContractInfo::RoleSlots roleSlots;
 	if (input.roleSlots){

@@ -44,7 +44,6 @@ ViewBase {
 	// The working copy of the terms: the fields of ContractDraftInput but the lists
 	property var draft: ({})
 	// The working copy of the internal data of the organization
-	property var internalData: ({})
 	property var parties: []
 	property var links: []
 	property var allocations: []
@@ -53,6 +52,17 @@ ViewBase {
 	property string __currentId: contractView.contractId
 	property bool __busy: false
 
+	// The working copy differs from the contract it was filled from
+	property bool isDirty: false
+	// The revision the working copy was filled from: a save sends it, so a change made meanwhile is refused
+	property int __baseRevision: 0
+	property string __baseline: ""
+	property bool __rebaseline: false
+	// The next contract read replaces the working copy, edited or not: after the own save
+	property bool __replacesEdits: false
+	// The user whose change was read last
+	property string lastChangedBy: ""
+
 	// A command runs: the steps wait for its answer
 	readonly property bool isBusy: contractView.__busy
 	readonly property bool isNew: contractView.__currentId === ""
@@ -60,14 +70,12 @@ ViewBase {
 	readonly property bool isInitiator: contractView.isNew || (contractView.contract !== null && contractView.contract.initiatorTenantId === contractView.tenantId)
 	readonly property bool isSubmitted: contractView.contract !== null && !!contractView.contract.submittedAt
 	readonly property bool isNegotiated: contractView.contractState === "Negotiation" || contractView.contractState === "Signing"
-	readonly property bool isOfferStuck: contractView.contractState === "Rejected" || contractView.contractState === "OfferExpired"
+	readonly property bool isOfferStuck: contractView.contractState === "Rejected"
 	readonly property bool isConcluded: contractView.contractState === "Signed" || contractView.contractState === "Active"
 	readonly property bool isClosed: contractView.contract !== null && (!!contractView.contract.signedAt || !!contractView.contract.cancelledAt)
 	readonly property var myParty: contractView.__findParty(contractView.contract ? contractView.contract.parties : [], contractView.tenantId)
 	readonly property string myPartyState: contractView.myParty ? (contractView.myParty.state || "") : ""
 	readonly property bool myPartyBound: contractView.myParty ? contractView.myParty.isBound === true : false
-	readonly property var terminationProposal: contractView.contract && contractView.contract.terminationProposal && contractView.contract.terminationProposal.proposedAt
-		? contractView.contract.terminationProposal : null
 
 	readonly property bool canEdit: contractView.__can("canEditContracts")
 	readonly property bool canApprove: contractView.__can("canApproveContracts")
@@ -76,6 +84,11 @@ ViewBase {
 	readonly property bool canDistribute: contractView.__can("canDistributeContractPermissions")
 
 	readonly property bool isEditable: contractView.canEdit && contractView.isInitiator && !contractView.isClosed
+	// Another user changed the terms while this one edits them: the edits cannot be saved
+	readonly property bool hasConflict: contractView.isDirty && contractView.contract !== null && (contractView.contract.revision || 0) > contractView.__baseRevision
+	// A new contract is saved to see what it lacks; a stored one when it was changed
+	readonly property bool canSave: contractView.isEditable && !contractView.__busy && !contractView.hasConflict
+		&& (contractView.isNew || contractView.isDirty)
 
 	signal closeRequested()
 
@@ -145,6 +158,63 @@ ViewBase {
 		contractView.updateCommands()
 	}
 
+	onDraftChanged: {
+		contractView.markChanged()
+	}
+
+	onPartiesChanged: {
+		contractView.markChanged()
+	}
+
+	onLinksChanged: {
+		contractView.markChanged()
+	}
+
+	onAllocationsChanged: {
+		contractView.markChanged()
+	}
+
+	onReferencesChanged: {
+		contractView.markChanged()
+	}
+
+	// A page or a list of the working copy changed: compared once the bindings are updated
+	function markChanged() {
+		dirtyTimer.restart()
+	}
+
+	Timer {
+		id: dirtyTimer
+
+		interval: 0
+		repeat: false
+
+		onTriggered: {
+			contractView.__checkDirty()
+		}
+	}
+
+	// The working copy as the pages show it, against the copy it was filled from
+	function __checkDirty() {
+		if (!contractView.isEditable) {
+			contractView.isDirty = false
+			return
+		}
+		contractView.__updateFromPages()
+		var state = JSON.stringify(contractView.__buildDraft())
+		if (contractView.__rebaseline) {
+			contractView.__baseline = state
+			contractView.__rebaseline = false
+		}
+		contractView.isDirty = state !== contractView.__baseline
+	}
+
+	// The edits are dropped and the stored contract is shown
+	function discardChanges() {
+		contractView.isDirty = false
+		contractView.__fill()
+	}
+
 	// The commands are updated after the bindings of the contract have been updated
 	Timer {
 		id: commandsTimer
@@ -177,18 +247,16 @@ ViewBase {
 		var party = view.myParty
 		var isSuspended = party !== null && party.allocationsSuspended === true
 		var isSigned = view.contract !== null && !!view.contract.signedAt
-		var proposal = view.terminationProposal
 		// A party answers until it has signed or declined
 		var isAnswering = view.myPartyState === "Reviewing" || view.myPartyState === "Approved"
 		// Save is a button of the dialog; Ctrl+S still saves
 		view.__setCommand("Save", false)
 		view.__setCommand("Submit", view.isEditable && !view.isNew && !view.isSubmitted)
 		view.__setCommand("RemoveDraft", view.isEditable && !view.isNew && !view.isSubmitted)
-		// A refused or expired offer stands until the initiator changes it or withdraws it
+		// A refused offer stands until the initiator changes it or withdraws it
 		view.__setCommand("Withdraw", view.isEditable && view.isSubmitted && (view.isNegotiated || view.isOfferStuck))
 		view.__setCommand("Approve", view.canApprove && view.isNegotiated && view.myPartyState === "Reviewing")
-		view.__setCommand("Sign", view.canSign && view.isNegotiated && (view.myPartyState === "Reviewing" || view.myPartyState === "Approved")
-						  && view.__waitedParties().length === 0)
+		view.__setCommand("Sign", view.canSign && view.isNegotiated && isAnswering)
 		view.__setCommand("RequestChanges", view.canEdit && !view.isInitiator && view.isNegotiated && isAnswering)
 		view.__setCommand("Decline", view.canSign && !view.isInitiator && view.isNegotiated && isAnswering)
 		view.__setCommand("GiveNotice", view.canSign && view.isConcluded && view.myPartyState === "Signed")
@@ -197,9 +265,6 @@ ViewBase {
 						  && new Date(party.withdrawAt) > new Date())
 		view.__setCommand("StopRenewal", view.canSign && view.isConcluded && view.contract !== null && view.contract.autoRenew === true
 						  && view.myPartyBound && !(party && party.nonRenewalNoticeAt))
-		view.__setCommand("ProposeTermination", view.canSign && view.isConcluded && view.myPartyBound && proposal === null)
-		view.__setCommand("AgreeTermination", view.canSign && proposal !== null && view.myPartyBound && !(party && party.terminationConsent))
-		view.__setCommand("WithdrawTermination", view.canSign && proposal !== null && proposal.proposedByTenantId === view.tenantId)
 		view.__setCommand("SuspendPermissions", view.canSuspend && view.isConcluded && isSigned && party !== null && !isSuspended)
 		view.__setCommand("ResumePermissions", view.canSuspend && view.isConcluded && isSigned && party !== null && isSuspended)
 		view.commandsPanelVisible = view.__shownCommands > 0
@@ -226,7 +291,7 @@ ViewBase {
 		else if (commandId === "Approve")
 			contractView.run("ApproveContract", "")
 		else if (commandId === "Sign")
-			ModalDialogManager.openDialog(signDialogComp, {"signedCopies": contractView.__signedCopies(), "revision": contractView.contract.revision || 0})
+			ModalDialogManager.openDialog(signDialogComp, {"revision": contractView.contract.revision || 0})
 		else if (commandId === "RequestChanges")
 			contractView.askReason("RequestContractChanges", qsTr("The initiator sees what you ask to change."), qsTr("Ask"), true)
 		else if (commandId === "Decline")
@@ -237,18 +302,16 @@ ViewBase {
 			contractView.run("RevokeContractNotice", "")
 		else if (commandId === "StopRenewal")
 			contractView.run("GiveContractNonRenewalNotice", "")
-		else if (commandId === "ProposeTermination")
-			ModalDialogManager.openDialog(terminationDialogComp, {})
-		else if (commandId === "AgreeTermination")
-			contractView.run("ConsentContractTermination", "")
-		else if (commandId === "WithdrawTermination")
-			contractView.run("CancelContractTerminationProposal", "")
 		else if (commandId === "SuspendPermissions" || commandId === "ResumePermissions")
 			contractView.setAllocationsSuspended(commandId === "SuspendPermissions")
 	}
 
 	// A contract is sent once it has a party besides the organization
 	function submit() {
+		if (contractView.isDirty) {
+			PopupManager.addWarningMessage(qsTr("Save the changes first: the parties get the saved terms."), true)
+			return
+		}
 		if (contractView.parties.length < 2) {
 			PopupManager.addWarningMessage(qsTr("Add at least one more party before sending the contract."), true)
 			multiPageView.activatePage(multiPageView.getIndexById("Parties"))
@@ -271,19 +334,13 @@ ViewBase {
 			return ""
 		var state = view.contractState
 		if (state === "Draft") {
-			if (!view.isEditable)
-				return qsTr("The draft is prepared by the initiator.")
-			var missing = view.__missingDocuments()
-			return missing.length > 0
-				? qsTr("The type of the contract needs these documents before it is sent: %1. Attach them on the page Documents.").arg(missing.join(", "))
-				: qsTr("The draft is saved. Check the parties, the links and the permissions, then send the contract to the parties.")
+			return view.isEditable
+				? qsTr("The draft is saved. Check the parties, the links and the permissions, then send the contract to the parties.")
+				: qsTr("The draft is prepared by the initiator.")
 		}
 		if (view.isNegotiated) {
 			if (view.isInitiator && view.contract.isChangesRequested)
 				return qsTr("A party asked for changes, see the Journal. Change the terms and save: every party is asked again.")
-			var waited = view.__waitedParties()
-			if ((view.myPartyState === "Reviewing" || view.myPartyState === "Approved") && waited.length > 0)
-				return qsTr("The parties sign in their order: your organization signs after %1. Until then it may approve the terms.").arg(waited.join(", "))
 			if (view.myPartyState === "Reviewing")
 				return qsTr("Read the terms and answer: approve them, sign the contract, or ask for changes.")
 			if (view.myPartyState === "Approved")
@@ -302,9 +359,7 @@ ViewBase {
 					.arg(ContractTexts.dateText(view.myParty.withdrawAt))
 			if (view.contract.isTerminating && view.contract.endsAt)
 				return qsTr("A party gave notice: the contract ends on %1. It is in force until then.").arg(ContractTexts.dateText(view.contract.endsAt))
-			return view.terminationProposal !== null
-				? qsTr("A party proposed to end the contract. It ends on the day once every bound party agrees.")
-				: qsTr("The contract is in force: the links and the permissions given in it work until it ends.")
+			return qsTr("The contract is in force: the links and the permissions given in it work until it ends.")
 		}
 		if (view.contractState === "Rejected") {
 			if (view.isInitiator)
@@ -313,44 +368,11 @@ ViewBase {
 				? qsTr("Your organization declined the contract. The initiator may change the parties and ask again.")
 				: qsTr("A party declined the contract. The initiator decides how to go on.")
 		}
-		if (view.contractState === "OfferExpired")
-			return view.isInitiator
-				? qsTr("The deadline for signing passed. Set a new deadline on the page Period and save to ask the parties again, or withdraw the offer.")
-				: qsTr("The deadline for signing passed. The initiator may set a new one.")
 		if (view.contractState === "Cancelled")
 			return qsTr("The initiator withdrew the offer: the contract was not concluded. It stays in the history of the parties.")
 		if (!view.contract.signedAt)
 			return qsTr("The contract was not concluded. It stays in the history of the parties.")
 		return qsTr("The contract is closed. It stays in the history of the parties.")
-	}
-
-	// In a sequential order: the parties before the organization that have not signed yet
-	function __waitedParties() {
-		if (!contractView.contract || contractView.contract.signOrder !== "Sequential" || !contractView.myParty)
-			return []
-		var result = []
-		var parties = contractView.contract.parties || []
-		for (var i = 0; i < parties.length; i++) {
-			if (parties[i].signOrder < contractView.myParty.signOrder && parties[i].state !== "Signed")
-				result.push(parties[i].tenantName || parties[i].tenantId)
-		}
-		return result
-	}
-
-	// The kinds of documents the type needs and the contract has no current shared one of
-	function __missingDocuments() {
-		var required = contractView.contract ? (contractView.contract.requiredAttachmentKinds || []) : []
-		var attachments = contractView.contract ? (contractView.contract.attachments || []) : []
-		var result = []
-		for (var i = 0; i < required.length; i++) {
-			var kind = ContractTexts.attachmentKindAt(required[i])
-			var isAttached = false
-			for (var j = 0; j < attachments.length; j++)
-				isAttached = isAttached || (attachments[j].kind === kind && !attachments[j].isReplaced)
-			if (!isAttached)
-				result.push(ContractTexts.attachmentKindText(kind))
-		}
-		return result
 	}
 
 	function __load() {
@@ -364,15 +386,13 @@ ViewBase {
 
 	function __fillNew() {
 		contractView.title = qsTr("New contract")
-		// A year, a month of notice and a month to sign: a type or the initiator changes them
-		var signDeadline = new Date()
-		signDeadline.setDate(signDeadline.getDate() + 30)
+		// A year and a month of notice: a type or the initiator changes them
 		contractView.draft = {"name": "", "description": "", "terms": "", "typeId": "", "effectiveFrom": "", "termDays": 365, "validUntil": "",
-							  "autoRenew": false, "renewalPeriodDays": 365, "renewalNoticeDays": 30, "terminationNoticeDays": 30,
-							  "signDeadline": signDeadline.toISOString(), "signOrder": "Parallel"}
-		contractView.internalData = {"internalNumber": "", "notes": "", "reminderDays": 0}
+							  "autoRenew": false, "renewalPeriodDays": 365, "renewalNoticeDays": 30, "terminationNoticeDays": 30}
+		contractView.__rebaseline = true
+		contractView.__baseRevision = 0
 		contractView.parties = [{"tenantId": contractView.tenantId, "tenantName": contractView.tenantName, "roleId": "", "roleName": "",
-								 "requiredSignatures": 1, "state": "Invited", "channel": "Initiator"}]
+								 "state": "Invited", "channel": "Initiator"}]
 		contractView.links = []
 		contractView.allocations = []
 		contractView.references = []
@@ -384,15 +404,13 @@ ViewBase {
 		if (!contract)
 			return
 		contractView.title = contract.number ? contract.number + " " + (contract.name || "") : (contract.name || qsTr("Draft"))
+		contractView.__rebaseline = true
+		contractView.__baseRevision = contract.revision || 0
 		contractView.draft = {"name": contract.name || "", "description": contract.description || "", "terms": contract.terms || "",
 							  "typeId": contract.typeId || "", "effectiveFrom": contract.effectiveFrom || "", "termDays": contract.termDays || 0,
 							  "validUntil": contract.validUntil || "", "autoRenew": contract.autoRenew === true,
 							  "renewalPeriodDays": contract.renewalPeriodDays || 0, "renewalNoticeDays": contract.renewalNoticeDays || 0,
-							  "terminationNoticeDays": contract.terminationNoticeDays || 0, "signDeadline": contract.signDeadline || "",
-							  "signOrder": contract.signOrder || "Parallel"}
-		var info = contractView.privateInfo
-		contractView.internalData = {"internalNumber": info ? (info.internalNumber || "") : "", "notes": info ? (info.notes || "") : "",
-									 "reminderDays": info ? (info.reminderDays || 0) : 0}
+							  "terminationNoticeDays": contract.terminationNoticeDays || 0}
 		contractView.parties = (contract.parties || []).slice()
 		contractView.links = (contract.links || []).slice()
 		contractView.allocations = (contract.allocations || []).slice()
@@ -420,8 +438,7 @@ ViewBase {
 		var parties = []
 		for (var i = 0; i < contractView.parties.length; i++) {
 			var party = contractView.parties[i]
-			parties.push({"tenantId": party.tenantId, "roleId": party.roleId || "", "signOrder": i + 1,
-						  "requiredSignatures": Math.max(1, party.requiredSignatures || 1)})
+			parties.push({"tenantId": party.tenantId, "roleId": party.roleId || ""})
 		}
 		var links = []
 		for (var j = 0; j < contractView.links.length; j++) {
@@ -455,6 +472,9 @@ ViewBase {
 	function save() {
 		if (!contractView.contractsApiClient || contractView.__busy || !contractView.isEditable)
 			return
+		contractView.__checkDirty()
+		if (!contractView.canSave)
+			return
 		contractView.__updateFromPages()
 		var termsPage = multiPageView.getPageById("Terms")
 		var isNamed = !!contractView.draft.name && contractView.draft.name.trim() !== ""
@@ -469,18 +489,7 @@ ViewBase {
 		if (contractView.isNew)
 			contractView.contractsApiClient.createContract(contractView.tenantId, contractView.__buildDraft())
 		else
-			contractView.contractsApiClient.updateContract(contractView.tenantId, contractView.__currentId, contractView.contract.revision || 0, contractView.__buildDraft())
-	}
-
-	function saveInternalData() {
-		if (!contractView.contractsApiClient || contractView.__busy)
-			return
-		contractView.__updateFromPages()
-		contractView.__busy = true
-		contractView.contractsApiClient.setPrivateInfo(contractView.tenantId, contractView.__currentId,
-													   {"internalNumber": (contractView.internalData.internalNumber || "").trim(),
-														"notes": contractView.internalData.notes || "",
-														"reminderDays": contractView.internalData.reminderDays || 0})
+			contractView.contractsApiClient.updateContract(contractView.tenantId, contractView.__currentId, contractView.__baseRevision, contractView.__buildDraft())
 	}
 
 	// --- The catalogs ---
@@ -505,7 +514,7 @@ ViewBase {
 		return result
 	}
 
-	// The terms of the type are offered with it: the periods and the order of the signatures
+	// The terms of the type are offered with it: the periods
 	function applyType(typeId) {
 		var draft = contractView.__copy(contractView.draft)
 		draft.typeId = typeId
@@ -516,14 +525,6 @@ ViewBase {
 			draft.renewalPeriodDays = type.renewalPeriodDays || 0
 			draft.renewalNoticeDays = type.renewalNoticeDays || 0
 			draft.terminationNoticeDays = type.terminationNoticeDays || 0
-			draft.signOrder = type.isSequential === true ? "Sequential" : "Parallel"
-			var parties = []
-			for (var i = 0; i < contractView.parties.length; i++) {
-				var party = contractView.__copy(contractView.parties[i])
-				party.requiredSignatures = Math.max(1, type.requiredSignatures || 1)
-				parties.push(party)
-			}
-			contractView.parties = parties
 		}
 		contractView.draft = draft
 		contractView.__rebuildLinks()
@@ -585,7 +586,7 @@ ViewBase {
 
 	// --- The parties and the links ---
 
-	function addParty(tenantId, tenantName, roleId, roleName, requiredSignatures) {
+	function addParty(tenantId, tenantName, roleId, roleName) {
 		var parties = []
 		var role = contractView.__roleById(roleId)
 		var pairedRole = role && role.pairedRoleId ? contractView.__roleById(role.pairedRoleId) : null
@@ -597,20 +598,18 @@ ViewBase {
 			}
 			parties.push(party)
 		}
-		parties.push({"tenantId": tenantId, "tenantName": tenantName, "roleId": roleId, "roleName": roleName,
-					  "requiredSignatures": requiredSignatures, "state": "Invited"})
+		parties.push({"tenantId": tenantId, "tenantName": tenantName, "roleId": roleId, "roleName": roleName, "state": "Invited"})
 		contractView.parties = parties
 		contractView.__rebuildLinks()
 	}
 
-	function setPartyRole(tenantId, roleId, roleName, requiredSignatures) {
+	function setPartyRole(tenantId, roleId, roleName) {
 		var parties = []
 		for (var i = 0; i < contractView.parties.length; i++) {
 			var party = contractView.__copy(contractView.parties[i])
 			if (party.tenantId === tenantId) {
 				party.roleId = roleId
 				party.roleName = roleName
-				party.requiredSignatures = requiredSignatures
 			}
 			parties.push(party)
 		}
@@ -773,21 +772,11 @@ ViewBase {
 		return result
 	}
 
-	function __signedCopies() {
-		var result = []
-		var shared = contractView.contract ? (contractView.contract.attachments || []) : []
-		for (var i = 0; i < shared.length; i++) {
-			if (shared[i].kind === "SignedCopy" && !shared[i].isReplaced)
-				result.push({"attachmentId": shared[i].attachmentId, "fileName": shared[i].fileName})
-		}
-		return result
-	}
-
-	function attachDocument(kind, fileName, mimeType, data, isInternal, replacesId) {
+	function attachDocument(fileName, mimeType, data, isInternal, replacesId) {
 		if (!contractView.contractsApiClient || contractView.__busy)
 			return
 		contractView.__busy = true
-		contractView.contractsApiClient.addAttachment(contractView.tenantId, contractView.__currentId, kind, fileName, mimeType, data, replacesId || "", isInternal)
+		contractView.contractsApiClient.addAttachment(contractView.tenantId, contractView.__currentId, fileName, mimeType, data, replacesId || "", isInternal)
 	}
 
 	function downloadDocument(attachmentId) {
@@ -836,7 +825,7 @@ ViewBase {
 			parts.push(period)
 		if (contract.isTerminating)
 			parts.push(qsTr("terminating on %1").arg(ContractTexts.dateText(contract.endsAt)))
-		else if (contract.autoRenew && !contract.endedAt) {
+		else if (contract.autoRenew && !contract.endedAt && period !== "") {
 			var isRenewalStopped = false
 			var parties = contract.parties || []
 			for (var i = 0; i < parties.length; i++)
@@ -869,8 +858,6 @@ ViewBase {
 			return qsTr("The terms were approved")
 		if (command === "AddContractAttachment")
 			return qsTr("The document was attached")
-		if (command === "SetContractPrivateInfo")
-			return qsTr("The internal data were saved")
 		if (command === "CancelContract")
 			return qsTr("The offer was withdrawn")
 		if (command === "RequestContractChanges")
@@ -883,12 +870,6 @@ ViewBase {
 			return qsTr("The notice was revoked")
 		if (command === "GiveContractNonRenewalNotice")
 			return qsTr("The contract will not be renewed")
-		if (command === "ProposeContractTermination")
-			return qsTr("The termination was proposed")
-		if (command === "ConsentContractTermination")
-			return qsTr("The organization agreed to the termination")
-		if (command === "CancelContractTerminationProposal")
-			return qsTr("The termination proposal was withdrawn")
 		if (command === "AddContractPartyByCode")
 			return qsTr("The party was added")
 		if (command === "SetContractAllocationGroups")
@@ -904,9 +885,14 @@ ViewBase {
 		function onContractReceived(contractId) {
 			if (contractId !== contractView.__currentId)
 				return
+			var received = contractView.contractsApiClient.contract
+			// The edits stay while they can still be saved; the state, the parties and the documents follow at once
+			var keepsEdits = contractView.isDirty && !contractView.__replacesEdits && received !== null && !received.signedAt && !received.cancelledAt
+			contractView.__replacesEdits = false
 			contractView.privateInfo = contractView.contractsApiClient.privateInfo
-			contractView.contract = contractView.contractsApiClient.contract
-			contractView.__fill()
+			contractView.contract = received
+			if (!keepsEdits)
+				contractView.__fill()
 		}
 
 		function onEventsReceived(contractId) {
@@ -931,6 +917,8 @@ ViewBase {
 			}
 			if (command === "CreateContract")
 				contractView.__currentId = contractId
+			if (command === "CreateContract" || command === "UpdateContract")
+				contractView.__replacesEdits = true
 			PopupManager.addSuccessMessage(contractView.__successText(command), true)
 			contractView.__load()
 		}
@@ -943,9 +931,15 @@ ViewBase {
 			contractView.__load()
 		}
 
-		function onContractNotified(contractId, tenantId) {
-			if (!contractView.__busy && !contractView.isNew && (contractId === "" || contractId === contractView.__currentId))
-				contractView.__load()
+		function onContractNotified(contractId, tenantId, sourceUserId, sourceUserName) {
+			if (contractView.__busy || contractView.isNew || (contractId !== "" && contractId !== contractView.__currentId))
+				return
+			// Another user changed it: the user is told who
+			if (sourceUserId !== "" && sourceUserId !== AuthorizationController.getUserId()) {
+				contractView.lastChangedBy = sourceUserName !== "" ? sourceUserName : qsTr("Another user")
+				PopupManager.addInfoMessage(qsTr("%1 changed the contract").arg(contractView.lastChangedBy), true)
+			}
+			contractView.__load()
 		}
 
 		function onAttachmentReceived(attachmentId, fileName, mimeType, data) {
@@ -970,14 +964,23 @@ ViewBase {
 
 		spacing: Style.marginS
 
+		// Where the contract is: its stages and the state of every party
+		ContractStateBar {
+			width: parent.width
+			contractState: contractView.isNew || !contractView.contract ? "" : contractView.contractState
+			parties: contractView.contract ? (contractView.contract.parties || []) : []
+			ownTenantId: contractView.tenantId
+			wasConcluded: contractView.contract !== null && !!contractView.contract.signedAt
+		}
+
 		BaseText {
 			width: parent.width
 			wrapMode: Text.WordWrap
-			text: contractView.isNew
+			text: (contractView.isNew
 				? qsTr("New contract")
 				: qsTr("State: %1").arg(ContractTexts.contractStateText(contractView.contractState))
-					+ (contractView.myParty && contractView.isSubmitted && (contractView.isNegotiated || contractView.isOfferStuck || !!contractView.contract.signedAt) ? " · " + qsTr("your organization: %1").arg(ContractTexts.partyStateText(contractView.myPartyState)) : "")
-					+ (contractView.contract && contractView.contract.revision ? " · " + qsTr("revision %1").arg(contractView.contract.revision) : "")
+					+ (contractView.contract && contractView.contract.revision ? " · " + qsTr("revision %1").arg(contractView.contract.revision) : ""))
+				+ (contractView.isDirty ? " · " + qsTr("unsaved changes") : "")
 			font.pixelSize: Style.fontSizeM
 			font.bold: true
 			color: Style.textColor
@@ -1001,17 +1004,40 @@ ViewBase {
 			color: Style.textColor
 		}
 
-		BaseText {
+		// The terms changed under the edits of the user
+		Rectangle {
 			width: parent.width
-			visible: contractView.terminationProposal !== null
-			wrapMode: Text.WordWrap
-			text: contractView.terminationProposal
-				? qsTr("Termination on %1 proposed by %2").arg(ContractTexts.dateText(contractView.terminationProposal.terminateAt))
-					.arg(contractView.partyName(contractView.terminationProposal.proposedByTenantId))
-					+ (contractView.terminationProposal.reason ? ": " + contractView.terminationProposal.reason : "")
-				: ""
-			font.pixelSize: Style.fontSizeS
-			color: Style.errorColor
+			height: Math.max(conflictText.height, reloadButton.height) + 2 * Style.marginM
+			visible: contractView.hasConflict
+			radius: Style.radiusM
+			color: Style.alternateBaseColor
+			border.width: 1
+			border.color: Style.errorColor
+
+			BaseText {
+				id: conflictText
+				anchors.left: parent.left
+				anchors.right: reloadButton.left
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.margins: Style.marginM
+				wrapMode: Text.WordWrap
+				text: qsTr("%1 changed the terms meanwhile (revision %2). Your changes are based on revision %3 and cannot be saved: reload the contract and make them again.")
+					.arg(contractView.lastChangedBy !== "" ? contractView.lastChangedBy : qsTr("Another user"))
+					.arg(contractView.contract ? (contractView.contract.revision || 0) : 0).arg(contractView.__baseRevision)
+				font.pixelSize: Style.fontSizeS
+				color: Style.textColor
+			}
+
+			Button {
+				id: reloadButton
+				anchors.right: parent.right
+				anchors.rightMargin: Style.marginM
+				anchors.verticalCenter: parent.verticalCenter
+				text: qsTr("Reload")
+				onClicked: {
+					contractView.discardChanges()
+				}
+			}
 		}
 	}
 
@@ -1032,7 +1058,7 @@ ViewBase {
 				multiPageView.addPage(pageId, name, pageComp, icon)
 		}
 
-		// A new contract has its terms only; the stored one has its documents, internal data and journal too
+		// A new contract has its terms only; the stored one has its permissions, documents and journal too
 		function updatePages() {
 			multiPageView.addPageOnce("Terms", qsTr("Terms"), termsPageComp, "Icons/Edit")
 			multiPageView.addPageOnce("Period", qsTr("Period"), periodPageComp, "Icons/Calendar")
@@ -1043,13 +1069,16 @@ ViewBase {
 				return
 			multiPageView.addPageOnce("Permissions", qsTr("Permissions"), permissionsPageComp, "Icons/Key")
 			multiPageView.addPageOnce("Documents", qsTr("Documents"), documentsPageComp, "Icons/Attachment")
-			multiPageView.addPageOnce("Internal", qsTr("Internal data"), internalPageComp, "Icons/Lock")
 			multiPageView.addPageOnce("Journal", qsTr("Journal"), journalPageComp, "Icons/History")
 		}
 
 		onPageLoaded: {
 			if (pageItem && typeof pageItem.updateGui === "function")
 				pageItem.updateGui()
+			// A page shown first puts its fields into the copy: that is no change of the user
+			if (!contractView.isDirty)
+				contractView.__rebaseline = true
+			contractView.markChanged()
 		}
 
 		Component.onCompleted: {
@@ -1099,8 +1128,7 @@ ViewBase {
 				var party = contractView.__findParty(contractView.parties, tenantId)
 				if (party)
 					ModalDialogManager.openDialog(partyDialogComp, {"fixedTenantId": party.tenantId, "fixedTenantName": party.tenantName,
-																	"initialRoleId": party.roleId || "", "initialRequiredSignatures": party.requiredSignatures || 1,
-																	"roles": contractView.roles(true)})
+																	"initialRoleId": party.roleId || "", "roles": contractView.roles(true)})
 			}
 		}
 	}
@@ -1155,14 +1183,6 @@ ViewBase {
 	}
 
 	Component {
-		id: internalPageComp
-
-		ContractInternalPage {
-			editor: contractView
-		}
-	}
-
-	Component {
 		id: journalPageComp
 
 		ContractJournalPage {
@@ -1188,10 +1208,10 @@ ViewBase {
 																	content.code, content.roleId)
 				}
 				else if (partyDialog.fixedTenantId !== "") {
-					contractView.setPartyRole(content.tenantId, content.roleId, content.roleName, content.requiredSignatures)
+					contractView.setPartyRole(content.tenantId, content.roleId, content.roleName)
 				}
 				else {
-					contractView.addParty(content.tenantId, content.tenantName, content.roleId, content.roleName, content.requiredSignatures)
+					contractView.addParty(content.tenantId, content.tenantName, content.roleId, content.roleName)
 				}
 			}
 		}
@@ -1232,26 +1252,6 @@ ViewBase {
 	}
 
 	Component {
-		id: terminationDialogComp
-
-		ContractReasonDialog {
-			id: terminationDialog
-			title: qsTr("Propose termination")
-			message: qsTr("The contract ends on the day once every bound party agrees.")
-			okText: qsTr("Propose")
-			isReasonRequired: false
-			showDate: true
-			onFinished: {
-				var content = terminationDialog.contentItem
-				if (buttonId != Enums.ok || !content)
-					return
-				contractView.__busy = true
-				contractView.contractsApiClient.proposeTermination(contractView.tenantId, contractView.__currentId, content.dateIso(), content.reason)
-			}
-		}
-	}
-
-	Component {
 		id: signDialogComp
 
 		ContractSignDialog {
@@ -1262,8 +1262,7 @@ ViewBase {
 				if (buttonId != Enums.ok || !content)
 					return
 				contractView.__busy = true
-				contractView.contractsApiClient.signContract(contractView.tenantId, contractView.__currentId, contractView.contract.revision || 0,
-															 content.position, content.method, content.externalSignatureId, content.attachmentId)
+				contractView.contractsApiClient.signContract(contractView.tenantId, contractView.__currentId, contractView.contract.revision || 0, content.position)
 			}
 		}
 	}

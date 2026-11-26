@@ -260,6 +260,14 @@ QByteArrayList GetContractPartyTenantIds(const IContractInfo& contract)
 }
 
 
+bool IsTermsAttachment(const IContractInfo& contract, const IContractInfo::Attachment& attachment)
+{
+	const QDateTime signedAt = contract.GetSignedAt();
+
+	return !signedAt.isValid() || (attachment.addedAt.isValid() && attachment.addedAt <= signedAt);
+}
+
+
 QByteArrayList GetAllocationGroupIds(const IContractPartyPrivateInfo& privateInfo, const QByteArray& allocationId)
 {
 	for (const IContractPartyPrivateInfo::AllocationGroups& entry : privateInfo.GetAllocationGroups()){
@@ -385,10 +393,6 @@ ContractStateInfo ComputeContractState(const IContractInfo& contract, const QDat
 		}
 		else if (isDeclined){
 			retVal.state = CS_REJECTED;
-		}
-		else if (contract.GetSignDeadline().isValid() && now > contract.GetSignDeadline()){
-			retVal.state = CS_OFFER_EXPIRED;
-			retVal.endedAt = contract.GetSignDeadline();
 		}
 		else if (isSigned){
 			retVal.state = CS_SIGNING;
@@ -536,16 +540,12 @@ QByteArray ComputeContractContentHash(const IContractInfo& contract)
 	root["renewalPeriodDays"] = contract.GetRenewalPeriodDays();
 	root["renewalNoticeDays"] = contract.GetRenewalNoticeDays();
 	root["terminationNoticeDays"] = contract.GetTerminationNoticeDays();
-	root["signDeadline"] = TimeText(contract.GetSignDeadline());
-	root["signOrder"] = int(contract.GetSignOrder());
 
 	QMap<QByteArray, QJsonObject> parties;
 	for (const IContractInfo::Party& party : contract.GetParties()){
 		QJsonObject item;
 		item["tenantId"] = QString::fromUtf8(party.tenantId);
 		item["roleId"] = QString::fromUtf8(party.roleId);
-		item["signOrder"] = party.signOrder;
-		item["requiredSignatures"] = party.requiredSignatures;
 		parties.insert(party.tenantId, item);
 	}
 
@@ -589,8 +589,8 @@ QByteArray ComputeContractContentHash(const IContractInfo& contract)
 
 	QByteArrayList attachmentHashes;
 	for (const IContractInfo::Attachment& attachment : contract.GetAttachments()){
-		if (!attachment.isReplaced && (attachment.kind == IContractInfo::AK_MAIN_TEXT || attachment.kind == IContractInfo::AK_APPENDIX)){
-			attachmentHashes.append(QByteArray::number(int(attachment.kind)) + ':' + attachment.contentHash);
+		if (!attachment.isReplaced && IsTermsAttachment(contract, attachment)){
+			attachmentHashes.append(attachment.contentHash);
 		}
 	}
 
@@ -603,18 +603,12 @@ QByteArray ComputeContractContentHash(const IContractInfo& contract)
 		roleSlots.insert(slot.roleId, item);
 	}
 
-	QByteArrayList requiredKinds;
-	for (int kind : contract.GetRequiredAttachmentKinds()){
-		requiredKinds.append(QByteArray::number(kind));
-	}
-
 	root["parties"] = ToJsonArray(parties);
 	root["links"] = ToJsonArray(links);
 	root["allocations"] = ToJsonArray(allocations);
 	root["references"] = ToJsonArray(references);
 	root["roleSlots"] = ToJsonArray(roleSlots);
 	root["attachments"] = ToJsonArray(attachmentHashes);
-	root["requiredAttachmentKinds"] = ToJsonArray(requiredKinds);
 
 	// The keys of a JSON object are sorted, so equal terms give equal bytes
 	const QByteArray canonical = QJsonDocument(root).toJson(QJsonDocument::Compact);

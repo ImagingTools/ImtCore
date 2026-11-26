@@ -71,9 +71,6 @@
         <Element ComponentName="GiveContractNotice" X="150" Y="2250" Note=""/>
         <Element ComponentName="RevokeContractNotice" X="450" Y="2250" Note=""/>
         <Element ComponentName="GiveContractNonRenewalNotice" X="750" Y="2250" Note=""/>
-        <Element ComponentName="ProposeContractTermination" X="1050" Y="2250" Note=""/>
-        <Element ComponentName="ConsentContractTermination" X="1350" Y="2250" Note=""/>
-        <Element ComponentName="CancelContractTerminationProposal" X="150" Y="2400" Note=""/>
         <Element ComponentName="SetContractAllocationsSuspended" X="450" Y="2400" Note=""/>
         <Element ComponentName="AddContractAttachment" X="750" Y="2400" Note=""/>
         <Element ComponentName="SetContractPrivateInfo" X="1050" Y="2400" Note=""/>

@@ -3,7 +3,7 @@ pragma Singleton
 import QtQuick 2.12
 
 /**
- * The texts of the contracts shown to the user: the states, the events, the kinds,
+ * The texts of the contracts shown to the user: the states, the events, the choices,
  * and the dates of the API (ISO, UTC) in the form the user types them (dd.MM.yyyy).
  */
 QtObject {
@@ -18,8 +18,6 @@ QtObject {
 			return qsTr("Signing")
 		if (state === "Rejected")
 			return qsTr("Rejected")
-		if (state === "OfferExpired")
-			return qsTr("Offer expired")
 		if (state === "Cancelled")
 			return qsTr("Cancelled")
 		if (state === "Signed")
@@ -69,25 +67,6 @@ QtObject {
 		return channel || ""
 	}
 
-	readonly property var attachmentKinds: ["MainText", "Appendix", "SignedCopy", "AmendmentDraft", "Other"]
-
-	function attachmentKindText(kind) {
-		if (kind === "MainText")
-			return qsTr("Main text")
-		if (kind === "Appendix")
-			return qsTr("Appendix")
-		if (kind === "SignedCopy")
-			return qsTr("Signed copy")
-		if (kind === "AmendmentDraft")
-			return qsTr("Amendment draft")
-		return qsTr("Other")
-	}
-
-	// The kinds of the attachments as the numbers of the API
-	function attachmentKindAt(index) {
-		return index >= 0 && index < texts.attachmentKinds.length ? texts.attachmentKinds[index] : "Other"
-	}
-
 	readonly property var referenceTypes: ["Supersedes", "Framework", "Related"]
 
 	function referenceTypeText(referenceType) {
@@ -96,14 +75,6 @@ QtObject {
 		if (referenceType === "Framework")
 			return qsTr("Under the framework contract")
 		return qsTr("Related to")
-	}
-
-	function signatureMethodText(method) {
-		if (method === "Scan")
-			return qsTr("Scan of the signed copy")
-		if (method === "External")
-			return qsTr("External electronic signature")
-		return qsTr("In the system")
 	}
 
 	function eventText(eventType) {
@@ -139,14 +110,6 @@ QtObject {
 			return qsTr("Party left")
 		if (eventType === "NonRenewalNotice")
 			return qsTr("Renewal stopped")
-		if (eventType === "TerminationProposed")
-			return qsTr("Termination proposed")
-		if (eventType === "TerminationConsented")
-			return qsTr("Termination agreed by a party")
-		if (eventType === "TerminationProposalCancelled")
-			return qsTr("Termination proposal withdrawn")
-		if (eventType === "TerminationAgreed")
-			return qsTr("Termination agreed")
 		if (eventType === "AllocationsSuspended")
 			return qsTr("Permissions stopped")
 		if (eventType === "AllocationsResumed")
@@ -213,26 +176,10 @@ QtObject {
 
 	// --- The choices of the enumerations: [{id, name}] ---
 
-	function attachmentKindItems() {
-		var result = []
-		for (var i = 0; i < texts.attachmentKinds.length; i++)
-			result.push({"id": texts.attachmentKinds[i], "name": texts.attachmentKindText(texts.attachmentKinds[i])})
-		return result
-	}
-
 	function referenceTypeItems() {
 		var result = []
 		for (var i = 0; i < texts.referenceTypes.length; i++)
 			result.push({"id": texts.referenceTypes[i], "name": texts.referenceTypeText(texts.referenceTypes[i])})
-		return result
-	}
-
-	readonly property var signatureMethods: ["InSystem", "Scan", "External"]
-
-	function signatureMethodItems() {
-		var result = []
-		for (var i = 0; i < texts.signatureMethods.length; i++)
-			result.push({"id": texts.signatureMethods[i], "name": texts.signatureMethodText(texts.signatureMethods[i])})
 		return result
 	}
 

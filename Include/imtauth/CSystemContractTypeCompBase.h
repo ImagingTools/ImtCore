@@ -24,9 +24,6 @@ public:
 		I_ASSIGN(m_renewalPeriodDaysAttrPtr, "RenewalPeriodDays", "Length of a renewal in days", true, 0);
 		I_ASSIGN(m_renewalNoticeDaysAttrPtr, "RenewalNoticeDays", "Days of notice before the end of a period not to renew", true, 0);
 		I_ASSIGN(m_terminationNoticeDaysAttrPtr, "TerminationNoticeDays", "Days between the notice of a party and its leaving", true, 0);
-		I_ASSIGN(m_isSequentialAttrPtr, "IsSequential", "The parties sign one after another", true, false);
-		I_ASSIGN(m_requiredSignaturesAttrPtr, "RequiredSignatures", "Signatures each party gives", true, 1);
-		I_ASSIGN_MULTI_0(m_requiredAttachmentKindsAttrPtr, "RequiredAttachmentKinds", "Kinds of attachments a contract needs to be sent", false);
 	I_END_COMPONENT;
 
 protected:
@@ -35,9 +32,6 @@ protected:
 	I_ATTR(int, m_renewalPeriodDaysAttrPtr);
 	I_ATTR(int, m_renewalNoticeDaysAttrPtr);
 	I_ATTR(int, m_terminationNoticeDaysAttrPtr);
-	I_ATTR(bool, m_isSequentialAttrPtr);
-	I_ATTR(int, m_requiredSignaturesAttrPtr);
-	I_MULTIATTR(int, m_requiredAttachmentKindsAttrPtr);
 };
 
 

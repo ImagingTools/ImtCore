@@ -212,8 +212,8 @@ bool CContractTypeCatalogComp::CheckType(const IContractTypeInfo& type, QString&
 	}
 
 	if (type.GetTermDays() < 0 || type.GetRenewalPeriodDays() < 0 || type.GetRenewalNoticeDays() < 0
-				|| type.GetTerminationNoticeDays() < 0 || type.GetRequiredSignatures() < 1){
-		errorMessage = QStringLiteral("The periods of a type are not negative, and a party gives at least one signature");
+				|| type.GetTerminationNoticeDays() < 0){
+		errorMessage = QStringLiteral("The periods of a type are not negative");
 
 		return false;
 	}

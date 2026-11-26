@@ -39,9 +39,6 @@ bool SerializeSignature(iser::IArchive& archive, IContractInfo::Signature& item)
 	retVal = retVal && af::Leaf(archive, "SignedAt", item.signedAt);
 	retVal = retVal && af::Leaf(archive, "Revision", item.revision);
 	retVal = retVal && af::Leaf(archive, "ContentHash", item.contentHash);
-	retVal = retVal && af::EnumLeaf(archive, "Method", item.method);
-	retVal = retVal && af::Leaf(archive, "ExternalSignatureId", item.externalSignatureId);
-	retVal = retVal && af::Leaf(archive, "AttachmentId", item.attachmentId);
 
 	return retVal;
 }
@@ -53,8 +50,6 @@ bool SerializeParty(iser::IArchive& archive, IContractInfo::Party& item)
 	retVal = retVal && af::Leaf(archive, "TenantName", item.tenantName);
 	retVal = retVal && af::Leaf(archive, "RoleId", item.roleId);
 	retVal = retVal && af::Leaf(archive, "RoleName", item.roleName);
-	retVal = retVal && af::Leaf(archive, "SignOrder", item.signOrder);
-	retVal = retVal && af::Leaf(archive, "RequiredSignatures", item.requiredSignatures);
 	retVal = retVal && af::EnumLeaf(archive, "Channel", item.channel);
 	retVal = retVal && af::EnumLeaf(archive, "State", item.state);
 	retVal = retVal && af::Leaf(archive, "StateComment", item.stateComment);
@@ -64,7 +59,6 @@ bool SerializeParty(iser::IArchive& archive, IContractInfo::Party& item)
 	retVal = retVal && af::Leaf(archive, "WithdrawReason", item.withdrawReason);
 	retVal = retVal && af::Leaf(archive, "NonRenewalNoticeAt", item.nonRenewalNoticeAt);
 	retVal = retVal && af::Leaf(archive, "AllocationsSuspended", item.allocationsSuspended);
-	retVal = retVal && af::Leaf(archive, "TerminationConsent", item.terminationConsent);
 
 	return retVal;
 }
@@ -128,7 +122,6 @@ bool SerializeRoleSlot(iser::IArchive& archive, IContractInfo::RoleSlot& item)
 bool SerializeAttachment(iser::IArchive& archive, IContractInfo::Attachment& item)
 {
 	bool retVal = af::Leaf(archive, "AttachmentId", item.attachmentId);
-	retVal = retVal && af::EnumLeaf(archive, "Kind", item.kind);
 	retVal = retVal && af::Leaf(archive, "FileName", item.fileName);
 	retVal = retVal && af::Leaf(archive, "MimeType", item.mimeType);
 	retVal = retVal && af::Leaf(archive, "Size", item.size);
@@ -138,23 +131,6 @@ bool SerializeAttachment(iser::IArchive& archive, IContractInfo::Attachment& ite
 	retVal = retVal && af::Leaf(archive, "AddedAt", item.addedAt);
 	retVal = retVal && af::Leaf(archive, "ReplacesAttachmentId", item.replacesAttachmentId);
 	retVal = retVal && af::Leaf(archive, "IsReplaced", item.isReplaced);
-
-	return retVal;
-}
-
-
-bool SerializeNumber(iser::IArchive& archive, int& number)
-{
-	return af::Leaf(archive, "Value", number);
-}
-
-
-bool SerializeTerminationProposal(iser::IArchive& archive, IContractInfo::TerminationProposal& proposal)
-{
-	bool retVal = af::Leaf(archive, "TerminationProposedBy", proposal.proposedByTenantId);
-	retVal = retVal && af::Leaf(archive, "TerminationProposedAt", proposal.proposedAt);
-	retVal = retVal && af::Leaf(archive, "TerminationProposedFor", proposal.terminateAt);
-	retVal = retVal && af::Leaf(archive, "TerminationProposalReason", proposal.reason);
 
 	return retVal;
 }
@@ -172,10 +148,7 @@ bool IContractInfo::Signature::operator==(const Signature& other) const
 				&& position == other.position
 				&& signedAt == other.signedAt
 				&& revision == other.revision
-				&& contentHash == other.contentHash
-				&& method == other.method
-				&& externalSignatureId == other.externalSignatureId
-				&& attachmentId == other.attachmentId;
+				&& contentHash == other.contentHash;
 }
 
 
@@ -191,8 +164,6 @@ bool IContractInfo::Party::operator==(const Party& other) const
 				&& tenantName == other.tenantName
 				&& roleId == other.roleId
 				&& roleName == other.roleName
-				&& signOrder == other.signOrder
-				&& requiredSignatures == other.requiredSignatures
 				&& channel == other.channel
 				&& state == other.state
 				&& stateComment == other.stateComment
@@ -201,8 +172,7 @@ bool IContractInfo::Party::operator==(const Party& other) const
 				&& withdrawAt == other.withdrawAt
 				&& withdrawReason == other.withdrawReason
 				&& nonRenewalNoticeAt == other.nonRenewalNoticeAt
-				&& allocationsSuspended == other.allocationsSuspended
-				&& terminationConsent == other.terminationConsent;
+				&& allocationsSuspended == other.allocationsSuspended;
 }
 
 
@@ -278,7 +248,6 @@ bool IContractInfo::Reference::operator!=(const Reference& other) const
 bool IContractInfo::Attachment::operator==(const Attachment& other) const
 {
 	return attachmentId == other.attachmentId
-				&& kind == other.kind
 				&& fileName == other.fileName
 				&& mimeType == other.mimeType
 				&& size == other.size
@@ -311,27 +280,6 @@ bool IContractInfo::RoleSlot::operator!=(const RoleSlot& other) const
 }
 
 
-bool IContractInfo::TerminationProposal::IsValid() const
-{
-	return !proposedByTenantId.isEmpty() && terminateAt.isValid();
-}
-
-
-bool IContractInfo::TerminationProposal::operator==(const TerminationProposal& other) const
-{
-	return proposedByTenantId == other.proposedByTenantId
-				&& proposedAt == other.proposedAt
-				&& terminateAt == other.terminateAt
-				&& reason == other.reason;
-}
-
-
-bool IContractInfo::TerminationProposal::operator!=(const TerminationProposal& other) const
-{
-	return !(*this == other);
-}
-
-
 // public methods
 
 CContractInfo::CContractInfo():
@@ -340,7 +288,6 @@ CContractInfo::CContractInfo():
 	m_renewalPeriodDays(0),
 	m_renewalNoticeDays(0),
 	m_terminationNoticeDays(0),
-	m_signOrder(SO_PARALLEL),
 	m_revision(0)
 {
 }
@@ -540,30 +487,6 @@ void CContractInfo::SetTerminationNoticeDays(int value)
 }
 
 
-QDateTime CContractInfo::GetSignDeadline() const
-{
-	return m_signDeadline;
-}
-
-
-void CContractInfo::SetSignDeadline(const QDateTime& value)
-{
-	AssignValue(*this, m_signDeadline, value);
-}
-
-
-IContractInfo::SignOrder CContractInfo::GetSignOrder() const
-{
-	return m_signOrder;
-}
-
-
-void CContractInfo::SetSignOrder(IContractInfo::SignOrder value)
-{
-	AssignValue(*this, m_signOrder, value);
-}
-
-
 IContractInfo::Parties CContractInfo::GetParties() const
 {
 	return m_parties;
@@ -633,18 +556,6 @@ IContractInfo::RoleSlots CContractInfo::GetRoleSlots() const
 void CContractInfo::SetRoleSlots(const IContractInfo::RoleSlots& value)
 {
 	AssignValue(*this, m_roleSlots, value);
-}
-
-
-QList<int> CContractInfo::GetRequiredAttachmentKinds() const
-{
-	return m_requiredAttachmentKinds;
-}
-
-
-void CContractInfo::SetRequiredAttachmentKinds(const QList<int>& value)
-{
-	AssignValue(*this, m_requiredAttachmentKinds, value);
 }
 
 
@@ -732,18 +643,6 @@ void CContractInfo::SetTerminationReason(const QString& value)
 }
 
 
-IContractInfo::TerminationProposal CContractInfo::GetTerminationProposal() const
-{
-	return m_terminationProposal;
-}
-
-
-void CContractInfo::SetTerminationProposal(const IContractInfo::TerminationProposal& value)
-{
-	AssignValue(*this, m_terminationProposal, value);
-}
-
-
 QByteArray CContractInfo::GetSupersededBy() const
 {
 	return m_supersededBy;
@@ -814,15 +713,12 @@ bool CContractInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && af::Leaf(archive, "RenewalPeriodDays", m_renewalPeriodDays);
 	retVal = retVal && af::Leaf(archive, "RenewalNoticeDays", m_renewalNoticeDays);
 	retVal = retVal && af::Leaf(archive, "TerminationNoticeDays", m_terminationNoticeDays);
-	retVal = retVal && af::Leaf(archive, "SignDeadline", m_signDeadline);
-	retVal = retVal && af::EnumLeaf(archive, "SignOrder", m_signOrder);
 	retVal = retVal && af::List(archive, "Parties", "Party", m_parties, SerializeParty);
 	retVal = retVal && af::List(archive, "Links", "Link", m_links, SerializeLink);
 	retVal = retVal && af::List(archive, "Allocations", "Allocation", m_allocations, SerializeAllocation);
 	retVal = retVal && af::List(archive, "References", "Reference", m_references, SerializeReference);
 	retVal = retVal && af::List(archive, "Attachments", "Attachment", m_attachments, SerializeAttachment);
 	retVal = retVal && af::List(archive, "RoleSlots", "RoleSlot", m_roleSlots, SerializeRoleSlot);
-	retVal = retVal && af::List(archive, "RequiredAttachmentKinds", "Kind", m_requiredAttachmentKinds, SerializeNumber);
 	retVal = retVal && af::Leaf(archive, "Revision", m_revision);
 	retVal = retVal && af::Leaf(archive, "ContentHash", m_contentHash);
 	retVal = retVal && af::Leaf(archive, "SubmittedAt", m_submittedAt);
@@ -830,7 +726,6 @@ bool CContractInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && af::Leaf(archive, "SignedAt", m_signedAt);
 	retVal = retVal && af::Leaf(archive, "TerminatedAt", m_terminatedAt);
 	retVal = retVal && af::Leaf(archive, "TerminationReason", m_terminationReason);
-	retVal = retVal && SerializeTerminationProposal(archive, m_terminationProposal);
 	retVal = retVal && af::Leaf(archive, "SupersededBy", m_supersededBy);
 	retVal = retVal && af::Leaf(archive, "SupersededAt", m_supersededAt);
 	retVal = retVal && af::Leaf(archive, "CreatedAt", m_createdAt);
@@ -867,15 +762,12 @@ bool CContractInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode
 	m_renewalPeriodDays = sourcePtr->GetRenewalPeriodDays();
 	m_renewalNoticeDays = sourcePtr->GetRenewalNoticeDays();
 	m_terminationNoticeDays = sourcePtr->GetTerminationNoticeDays();
-	m_signDeadline = sourcePtr->GetSignDeadline();
-	m_signOrder = sourcePtr->GetSignOrder();
 	m_parties = sourcePtr->GetParties();
 	m_links = sourcePtr->GetLinks();
 	m_allocations = sourcePtr->GetAllocations();
 	m_references = sourcePtr->GetReferences();
 	m_attachments = sourcePtr->GetAttachments();
 	m_roleSlots = sourcePtr->GetRoleSlots();
-	m_requiredAttachmentKinds = sourcePtr->GetRequiredAttachmentKinds();
 	m_revision = sourcePtr->GetRevision();
 	m_contentHash = sourcePtr->GetContentHash();
 	m_submittedAt = sourcePtr->GetSubmittedAt();
@@ -883,7 +775,6 @@ bool CContractInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode
 	m_signedAt = sourcePtr->GetSignedAt();
 	m_terminatedAt = sourcePtr->GetTerminatedAt();
 	m_terminationReason = sourcePtr->GetTerminationReason();
-	m_terminationProposal = sourcePtr->GetTerminationProposal();
 	m_supersededBy = sourcePtr->GetSupersededBy();
 	m_supersededAt = sourcePtr->GetSupersededAt();
 	m_createdAt = sourcePtr->GetCreatedAt();
@@ -916,15 +807,12 @@ bool CContractInfo::IsEqual(const IChangeable& object) const
 				&& m_renewalPeriodDays == otherPtr->GetRenewalPeriodDays()
 				&& m_renewalNoticeDays == otherPtr->GetRenewalNoticeDays()
 				&& m_terminationNoticeDays == otherPtr->GetTerminationNoticeDays()
-				&& m_signDeadline == otherPtr->GetSignDeadline()
-				&& m_signOrder == otherPtr->GetSignOrder()
 				&& m_parties == otherPtr->GetParties()
 				&& m_links == otherPtr->GetLinks()
 				&& m_allocations == otherPtr->GetAllocations()
 				&& m_references == otherPtr->GetReferences()
 				&& m_attachments == otherPtr->GetAttachments()
 				&& m_roleSlots == otherPtr->GetRoleSlots()
-				&& m_requiredAttachmentKinds == otherPtr->GetRequiredAttachmentKinds()
 				&& m_revision == otherPtr->GetRevision()
 				&& m_contentHash == otherPtr->GetContentHash()
 				&& m_submittedAt == otherPtr->GetSubmittedAt()
@@ -932,7 +820,6 @@ bool CContractInfo::IsEqual(const IChangeable& object) const
 				&& m_signedAt == otherPtr->GetSignedAt()
 				&& m_terminatedAt == otherPtr->GetTerminatedAt()
 				&& m_terminationReason == otherPtr->GetTerminationReason()
-				&& m_terminationProposal == otherPtr->GetTerminationProposal()
 				&& m_supersededBy == otherPtr->GetSupersededBy()
 				&& m_supersededAt == otherPtr->GetSupersededAt()
 				&& m_createdAt == otherPtr->GetCreatedAt()
@@ -971,15 +858,12 @@ bool CContractInfo::ResetData(CompatibilityMode /*mode*/)
 	m_renewalPeriodDays = 0;
 	m_renewalNoticeDays = 0;
 	m_terminationNoticeDays = 0;
-	m_signDeadline = QDateTime();
-	m_signOrder = SO_PARALLEL;
 	m_parties = IContractInfo::Parties();
 	m_links = IContractInfo::Links();
 	m_allocations = IContractInfo::Allocations();
 	m_references = IContractInfo::References();
 	m_attachments = IContractInfo::Attachments();
 	m_roleSlots = IContractInfo::RoleSlots();
-	m_requiredAttachmentKinds = QList<int>();
 	m_revision = 0;
 	m_contentHash = QByteArray();
 	m_submittedAt = QDateTime();
@@ -987,7 +871,6 @@ bool CContractInfo::ResetData(CompatibilityMode /*mode*/)
 	m_signedAt = QDateTime();
 	m_terminatedAt = QDateTime();
 	m_terminationReason = QString();
-	m_terminationProposal = IContractInfo::TerminationProposal();
 	m_supersededBy = QByteArray();
 	m_supersededAt = QDateTime();
 	m_createdAt = QDateTime();

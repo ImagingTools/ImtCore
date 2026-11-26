@@ -35,7 +35,8 @@ QtObject {
 	signal commandFailed(string command, string errorMessage)
 	signal attachmentReceived(string attachmentId, string fileName, string mimeType, string data)
 	// A contract the organization takes part in changed, whoever changed it
-	signal contractNotified(string contractId, string tenantId)
+	// A contract changed; the user who changed it, empty when unknown
+	signal contractNotified(string contractId, string tenantId, string sourceUserId, string sourceUserName)
 
 	// --- Catalogs ---
 	property var partyRoles: []
@@ -69,23 +70,20 @@ QtObject {
 	function fetchPartyCandidates(tenantId) {}
 
 	// The draft has the fields of ContractDraftInput: name, description, terms, typeId, effectiveFrom, termDays,
-	// validUntil, autoRenew, renewalPeriodDays, renewalNoticeDays, terminationNoticeDays, signDeadline, signOrder,
-	// parties, links, allocations, references
+	// validUntil, autoRenew, renewalPeriodDays, renewalNoticeDays, terminationNoticeDays, parties, links, allocations, references
 	function createContract(tenantId, draft) {}
 	function updateContract(tenantId, contractId, revision, draft) {}
 	function addPartyByCode(tenantId, contractId, revision, connectionCode, roleId) {}
 
 	// The commands taking the read revision and a comment: RemoveContract, SubmitContract, CancelContract,
-	// RequestContractChanges, ApproveContract, DeclineContract, RevokeContractNotice, GiveContractNonRenewalNotice,
-	// ConsentContractTermination, CancelContractTerminationProposal
+	// RequestContractChanges, ApproveContract, DeclineContract, RevokeContractNotice, GiveContractNonRenewalNotice
 	function runCommand(command, tenantId, contractId, revision, comment) {}
-	function signContract(tenantId, contractId, revision, position, method, externalSignatureId, attachmentId) {}
+	function signContract(tenantId, contractId, revision, position) {}
 	function giveNotice(tenantId, contractId, reason, isImmediate) {}
-	function proposeTermination(tenantId, contractId, terminateAt, reason) {}
 	function setAllocationsSuspended(tenantId, contractId, isSuspended) {}
 
 	// The data is the Base64 of the file
-	function addAttachment(tenantId, contractId, kind, fileName, mimeType, data, replacesAttachmentId, isInternal) {}
+	function addAttachment(tenantId, contractId, fileName, mimeType, data, replacesAttachmentId, isInternal) {}
 	function fetchAttachment(tenantId, contractId, attachmentId) {}
 
 	// The info has the fields internalNumber, responsibleUserId, notes, reminderDays

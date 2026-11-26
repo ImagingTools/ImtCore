@@ -65,11 +65,9 @@ ContractsApiClient {
 					   {"tenantId": tenantId, "contractId": contractId, "revision": revision, "comment": comment || ""})
 	}
 
-	function signContract(tenantId, contractId, revision, position, method, externalSignatureId, attachmentId) {
+	function signContract(tenantId, contractId, revision, position) {
 		root.__enqueue(ImtauthContractsSdlCommandIds.s_signContract, "contract", root.__signInputComp,
-					   {"tenantId": tenantId, "contractId": contractId, "revision": revision, "position": position || "",
-						"method": method || ContractSignatureMethodEnum.s_inSystem, "externalSignatureId": externalSignatureId || "",
-						"attachmentId": attachmentId || ""})
+					   {"tenantId": tenantId, "contractId": contractId, "revision": revision, "position": position || ""})
 	}
 
 	function giveNotice(tenantId, contractId, reason, isImmediate) {
@@ -77,20 +75,14 @@ ContractsApiClient {
 					   {"tenantId": tenantId, "contractId": contractId, "reason": reason || "", "isImmediate": isImmediate === true})
 	}
 
-	function proposeTermination(tenantId, contractId, terminateAt, reason) {
-		root.__enqueue(ImtauthContractsSdlCommandIds.s_proposeContractTermination, "contract", root.__terminationInputComp,
-					   {"tenantId": tenantId, "contractId": contractId, "terminateAt": terminateAt || "", "reason": reason || ""})
-	}
-
 	function setAllocationsSuspended(tenantId, contractId, isSuspended) {
 		root.__enqueue(ImtauthContractsSdlCommandIds.s_setContractAllocationsSuspended, "contract", root.__suspendInputComp,
 					   {"tenantId": tenantId, "contractId": contractId, "isSuspended": isSuspended === true})
 	}
 
-	function addAttachment(tenantId, contractId, kind, fileName, mimeType, data, replacesAttachmentId, isInternal) {
+	function addAttachment(tenantId, contractId, fileName, mimeType, data, replacesAttachmentId, isInternal) {
 		root.__enqueue(ImtauthContractsSdlCommandIds.s_addContractAttachment, "contract", root.__attachmentInputComp,
-					   {"tenantId": tenantId, "contractId": contractId, "kind": kind || ContractAttachmentKindEnum.s_other,
-						"fileName": fileName, "mimeType": mimeType || "", "data": data,
+					   {"tenantId": tenantId, "contractId": contractId, "fileName": fileName, "mimeType": mimeType || "", "data": data,
 						"replacesAttachmentId": replacesAttachmentId || "", "isInternal": isInternal === true})
 	}
 
@@ -159,8 +151,6 @@ ContractsApiClient {
 		var input = {}
 		for (var key in draft)
 			input[key] = draft[key]
-		if (!input.signOrder || input.signOrder === "")
-			input.signOrder = ContractSignOrderEnum.s_parallel
 		var references = input.references || []
 		for (var i = 0; i < references.length; i++) {
 			if (!references[i].referenceType || references[i].referenceType === "")
@@ -417,11 +407,13 @@ ContractsApiClient {
 			if (!data)
 				return
 			root.contractNotified(data.containsKey("contractId") ? data.getData("contractId") : "",
-								 data.containsKey("tenantId") ? data.getData("tenantId") : "")
+								 data.containsKey("tenantId") ? data.getData("tenantId") : "",
+								 data.containsKey("sourceUserId") ? data.getData("sourceUserId") : "",
+								 data.containsKey("sourceUserName") ? data.getData("sourceUserName") : "")
 		}
 
 		onRefreshRequired: {
-			root.contractNotified("", "")
+			root.contractNotified("", "", "", "")
 		}
 	}
 
@@ -434,7 +426,6 @@ ContractsApiClient {
 	property Component __commandInputComp: Component { ContractCommandInput {} }
 	property Component __signInputComp: Component { SignContractInput {} }
 	property Component __noticeInputComp: Component { GiveContractNoticeInput {} }
-	property Component __terminationInputComp: Component { ProposeContractTerminationInput {} }
 	property Component __suspendInputComp: Component { SetContractAllocationsSuspendedInput {} }
 	property Component __attachmentInputComp: Component { AddContractAttachmentInput {} }
 	property Component __getAttachmentInputComp: Component { GetContractAttachmentInput {} }

@@ -10,7 +10,8 @@ import imtauthgui 1.0
  * ContractDocumentsPage
  *
  * The documents of a contract: the ones seen by all parties and the internal ones of the organization.
- * The main text and the appendices are part of the terms: attaching another one asks the parties again.
+ * The shared files attached before the contract is concluded are part of its terms: the initiator attaches them,
+ * and a new one asks the parties again. After the conclusion every party attaches files that are no terms.
  * A page of ContractView.
  */
 Item {
@@ -28,9 +29,9 @@ Item {
 			|| documentsPage.editor.contractState === "Superseded" || documentsPage.editor.contractState === "Cancelled")
 	readonly property bool __isSigned: documentsPage.editor !== null && documentsPage.editor.contract !== null && !!documentsPage.editor.contract.signedAt
 	readonly property bool __isInitiator: documentsPage.editor ? documentsPage.editor.isInitiator : false
-	readonly property bool __isInternalChosen: documentsPage.__isEnded || internalCheckBox.checkState === Qt.Checked
-	// The kinds the organization attaches now; the server checks the same
-	readonly property var kinds: documentsPage.__allowedKinds(documentsPage.__isInternalChosen, documentsPage.__isSigned, documentsPage.__isInitiator)
+	// The organization attaches a shared file now; the server checks the same
+	readonly property bool __canShare: !documentsPage.__isEnded && (documentsPage.__isSigned || documentsPage.__isInitiator)
+	readonly property bool __isInternalChosen: !documentsPage.__canShare || internalCheckBox.checkState === Qt.Checked
 
 	readonly property var attachmentFilters: ["PDF (*.pdf)", "Word (*.docx)", "Word 97 (*.doc)", "Excel (*.xlsx)", "Image (*.png)", "Image (*.jpg)", "Text (*.txt)", "Archive (*.zip)"]
 	readonly property var attachmentMimeTypes: ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/msword",
@@ -39,61 +40,28 @@ Item {
 	readonly property var documentRows: documentsPage.__documentRows(documentsPage.editor ? documentsPage.editor.contract : null,
 																	 documentsPage.editor ? documentsPage.editor.privateInfo : null)
 
-	property string __kind: "Other"
 	property bool __isInternal: false
 	property string __replacesId: ""
 
-	Component.onCompleted: {
-		documentsPage.__fillKinds()
+	// A shared file is a part of the terms when it was attached before the contract was concluded
+	function __isTerms(attachment) {
+		if (attachment.isInternal)
+			return false
+		var signedAt = documentsPage.editor && documentsPage.editor.contract ? documentsPage.editor.contract.signedAt : ""
+		return !signedAt || (!!attachment.addedAt && new Date(attachment.addedAt) <= new Date(signedAt))
 	}
 
-	onKindsChanged: {
-		documentsPage.__fillKinds()
-	}
-
-	function __fillKinds() {
-		var selectedId = kindCB.currentIndex >= 0 ? kindModel.idAt(kindCB.currentIndex) : ""
-		var items = []
-		for (var i = 0; i < documentsPage.kinds.length; i++)
-			items.push({"id": documentsPage.kinds[i], "name": ContractTexts.attachmentKindText(documentsPage.kinds[i])})
-		var index = kindModel.fill(items, "id", "name", selectedId)
-		kindCB.currentIndex = index >= 0 ? index : 0
-	}
-
-	function __allowedKinds(isInternal, isSigned, isInitiator) {
-		if (isInternal)
-			return ContractTexts.attachmentKinds
-		if (isSigned)
-			return ["SignedCopy", "Other"]
-		// A signed copy before the conclusion is the scan a party signs by
-		if (isInitiator)
-			return ["MainText", "Appendix", "SignedCopy", "AmendmentDraft", "Other"]
-		return ["SignedCopy", "AmendmentDraft", "Other"]
-	}
-
-	// A new version of a document: of the same kind and visibility, by an organization allowed to attach this kind
+	// A new version of an own current file; the signed files of the terms stay
 	function __canReplace(attachment) {
 		if (!documentsPage.__canAttach || attachment.isReplaced)
 			return false
 		if (attachment.isInternal)
 			return true
-		if (documentsPage.__isEnded || attachment.addedByTenantId !== documentsPage.editor.tenantId)
-			return false
-		return documentsPage.__allowedKinds(false, documentsPage.__isSigned, documentsPage.__isInitiator).indexOf(attachment.kind) >= 0
+		return documentsPage.__canShare && attachment.addedByTenantId === documentsPage.editor.tenantId
+			&& documentsPage.__isTerms(attachment) === !documentsPage.__isSigned
 	}
 
-	// The current shared main text: a new one replaces it
-	function __currentMainTextId() {
-		var attachments = documentsPage.editor ? documentsPage.editor.attachments() : []
-		for (var i = 0; i < attachments.length; i++) {
-			if (attachments[i].kind === "MainText" && !attachments[i].isInternal && !attachments[i].isReplaced)
-				return attachments[i].attachmentId
-		}
-		return ""
-	}
-
-	function __chooseFile(kind, isInternal, replacesId) {
-		documentsPage.__kind = kind
+	function __chooseFile(isInternal, replacesId) {
 		documentsPage.__isInternal = isInternal
 		documentsPage.__replacesId = replacesId
 		var dialog = importDialogComp.createObject(documentsPage)
@@ -107,20 +75,15 @@ Item {
 			var attachment = attachments[i]
 			rows.push({"id": attachment.attachmentId,
 					   "fileName": attachment.fileName || "",
-					   "kindId": attachment.kind,
 					   "isInternal": attachment.isInternal === true,
 					   "canReplace": documentsPage.__canReplace(attachment),
-					   "kind": ContractTexts.attachmentKindText(attachment.kind),
+					   "isTerms": documentsPage.__isTerms(attachment) ? qsTr("Yes") : qsTr("No"),
 					   "addedAt": ContractTexts.dateText(attachment.addedAt),
 					   "addedBy": documentsPage.editor.partyName(attachment.addedByTenantId),
 					   "visibility": attachment.isInternal ? qsTr("Internal") : qsTr("All parties"),
 					   "state": attachment.isReplaced ? qsTr("Replaced") : qsTr("Current")})
 		}
 		return rows
-	}
-
-	ChoiceModel {
-		id: kindModel
 	}
 
 	Item {
@@ -142,9 +105,11 @@ Item {
 			anchors.rightMargin: Style.marginL
 			anchors.verticalCenter: parent.verticalCenter
 			wrapMode: Text.WordWrap
-			text: documentsPage.documentRows.length === 0
-				? qsTr("No documents yet.")
-				: qsTr("An internal document is seen by your organization only.")
+			text: documentsPage.__isSigned
+				? qsTr("The files of the terms were signed with the contract and stay. An internal document is seen by your organization only.")
+				: documentsPage.__isInitiator
+					? qsTr("The shared files are part of the terms: a new one asks the parties again. An internal document is seen by your organization only.")
+					: qsTr("The initiator attaches the files of the terms. Your organization attaches internal documents, seen by it only.")
 			font.pixelSize: Style.fontSizeS
 			color: Style.inactiveTextColor
 		}
@@ -156,19 +121,13 @@ Item {
 			spacing: Style.marginS
 			visible: documentsPage.__canAttach
 
-			ComboBox {
-				id: kindCB
-				width: Style.sizeHintXS
-				model: kindModel
-			}
-
 			CheckBox {
 				id: internalCheckBox
 				anchors.verticalCenter: parent.verticalCenter
 				text: qsTr("Internal")
-				tooltipText: documentsPage.__isEnded ? qsTr("The contract has ended: only internal documents are attached") : qsTr("Seen by your organization only")
-				enabled: !documentsPage.__isEnded
-				checkState: documentsPage.__isEnded ? Qt.Checked : Qt.Unchecked
+				tooltipText: documentsPage.__canShare ? qsTr("Seen by your organization only") : qsTr("Your organization attaches only internal documents now")
+				enabled: documentsPage.__canShare
+				checkState: documentsPage.__canShare ? Qt.Unchecked : Qt.Checked
 			}
 
 			Button {
@@ -176,10 +135,7 @@ Item {
 				text: qsTr("Attach file")
 				enabled: documentsPage.editor ? !documentsPage.editor.isBusy : false
 				onClicked: {
-					var kind = kindModel.idAt(kindCB.currentIndex) !== "" ? kindModel.idAt(kindCB.currentIndex) : "Other"
-					var isInternal = documentsPage.__isInternalChosen
-					// A contract has one main text: a new one is its new version
-					documentsPage.__chooseFile(kind, isInternal, kind === "MainText" && !isInternal ? documentsPage.__currentMainTextId() : "")
+					documentsPage.__chooseFile(documentsPage.__isInternalChosen, "")
 				}
 			}
 		}
@@ -207,7 +163,7 @@ Item {
 
 		Component.onCompleted: {
 			addHeader("fileName", qsTr("File"), false, false)
-			addHeader("kind", qsTr("Kind"), false, false)
+			addHeader("isTerms", qsTr("Part of the terms"), false, false)
 			addHeader("addedAt", qsTr("Added"), false, false)
 			addHeader("addedBy", qsTr("By"), false, false)
 			addHeader("visibility", qsTr("Seen by"), false, false)
@@ -247,7 +203,7 @@ Item {
 					text: qsTr("New version")
 					tooltipText: qsTr("The current version is kept as replaced")
 					onClicked: {
-						documentsPage.__chooseFile(documentActions.rowData.kindId, documentActions.rowData.isInternal, documentActions.rowData.id)
+						documentsPage.__chooseFile(documentActions.rowData.isInternal, documentActions.rowData.id)
 					}
 				}
 
@@ -270,7 +226,7 @@ Item {
 			mimeTypes: documentsPage.attachmentMimeTypes
 
 			onImportDialogResult: {
-				documentsPage.editor.attachDocument(documentsPage.__kind, fileNameWithExtension, mimeType, encodedData, documentsPage.__isInternal, documentsPage.__replacesId)
+				documentsPage.editor.attachDocument(fileNameWithExtension, mimeType, encodedData, documentsPage.__isInternal, documentsPage.__replacesId)
 				importDialog.destroy()
 			}
 

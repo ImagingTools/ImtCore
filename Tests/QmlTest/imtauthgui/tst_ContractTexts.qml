@@ -34,12 +34,4 @@ TestCase {
 		compare(ContractTexts.periodText(start, ""), "01.01.2027 – " + qsTr("open-ended"))
 		compare(ContractTexts.periodText("", ""), "")
 	}
-
-	// The kinds of the attachments are the numbers of the API in the order of ContractAttachmentKind
-	function test_theAttachmentKindsFollowTheApiOrder(){
-		compare(ContractTexts.attachmentKindAt(0), "MainText")
-		compare(ContractTexts.attachmentKindAt(2), "SignedCopy")
-		compare(ContractTexts.attachmentKindAt(4), "Other")
-		compare(ContractTexts.attachmentKindAt(9), "Other")
-	}
 }

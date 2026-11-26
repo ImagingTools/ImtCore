@@ -9,7 +9,7 @@ import imtauthgui 1.0
 /**
  * ContractLinksPage
  *
- * The links between the parties of a contract: the parties of a link exchange messages and documents
+ * The links between the parties of a contract: the parties of a link share documents
  * and give each other permissions. The links follow the parties and the scheme of the type.
  * A page of ContractView: the links are the list of the view, changed through the view.
  */
@@ -36,7 +36,6 @@ Item {
 					   "partyB": linksPage.editor.partyName(link.tenantBId),
 					   "roleB": link.roleBName || linksPage.editor.roleName(link.roleBId || ""),
 					   "state": link.linkId ? (link.isInForce ? qsTr("In force") : qsTr("Saved")) : qsTr("New"),
-					   "isMessagingAllowed": link.isMessagingAllowed !== false,
 					   "isSharingAllowed": link.isSharingAllowed !== false})
 		}
 		return rows
@@ -53,9 +52,8 @@ Item {
 		anchors.rightMargin: Style.marginXL
 
 		wrapMode: Text.WordWrap
-		text: linksPage.linkRows.length === 0
-			? qsTr("The links appear with the parties: the parties of a link may exchange messages and documents and give each other permissions.")
-			: qsTr("The parties of a link may exchange messages and documents and give each other permissions.")
+		text: (linksPage.linkRows.length === 0 ? qsTr("The links appear with the parties.") + " " : "")
+			+ qsTr("A link is a pair of parties that work with each other under the contract: every two parties, or the central party with each other one when the type says so. While the contract is in force, Documents lets the two share documents, and permissions are given only within a link (page Permissions). Without a link two parties of the same contract have nothing to do with each other.")
 		font.pixelSize: Style.fontSizeS
 		color: Style.inactiveTextColor
 	}
@@ -85,34 +83,10 @@ Item {
 			addHeader("roleA", qsTr("Its role"), false, false)
 			addHeader("partyB", qsTr("Other party"), false, false)
 			addHeader("roleB", qsTr("Its role"), false, false)
-			addHeader("messages", qsTr("Messages"), false, false)
 			addHeader("documents", qsTr("Documents"), false, false)
 			addHeader("state", qsTr("State"), false, false)
-			linksTable.setColumnContentById("messages", messagesCellComp)
 			linksTable.setColumnContentById("documents", documentsCellComp)
 			linksTable.headers = linksHeaders
-		}
-	}
-
-	Component {
-		id: messagesCellComp
-
-		TableCellDelegateBase {
-			id: messagesCell
-
-			readonly property var rowData: messagesCell.getRowData()
-
-			CheckBox {
-				anchors.verticalCenter: parent.verticalCenter
-				anchors.left: parent.left
-				anchors.leftMargin: Style.marginM
-				enabled: linksPage.__isEditable
-				checkState: messagesCell.rowData && messagesCell.rowData.isMessagingAllowed ? Qt.Checked : Qt.Unchecked
-				onCheckStateChanged: {
-					if (messagesCell.rowData && (checkState === Qt.Checked) !== messagesCell.rowData.isMessagingAllowed)
-						linksPage.editor.setLinkFlag(messagesCell.rowData.index, "isMessagingAllowed", checkState === Qt.Checked)
-				}
-			}
 		}
 	}
 

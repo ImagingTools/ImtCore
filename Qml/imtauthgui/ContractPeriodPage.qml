@@ -9,8 +9,8 @@ import imtauthgui 1.0
 /**
  * ContractPeriodPage
  *
- * The period of a contract: when it comes into force, how long it runs, its renewal, the notice period
- * and the deadline of the signatures. The dates are picked in the calendar; an empty date is no date.
+ * When a contract starts and ends, its renewal and the notice of a party that leaves it, said in one sentence
+ * above the fields. The start and the end are chosen as a way first; the field of the chosen way follows.
  * A page of ContractView: it shows the working copy of the view and writes it back.
  */
 Item {
@@ -22,35 +22,101 @@ Item {
 	property var editor: null
 
 	readonly property bool __isEditable: periodPage.editor ? periodPage.editor.isEditable : false
+	// The fields are filled from the working copy: their changes are not the user's then
+	property bool __filling: false
+	// Changes with every edited date, so the sentence follows the dates too
+	property int __datesRevision: 0
+
+	readonly property string startMode: startModel.idAt(startCB.currentIndex)
+	readonly property string endMode: endModel.idAt(endCB.currentIndex)
+	readonly property bool hasEnd: periodPage.endMode === "days" || periodPage.endMode === "date"
+
+	Component.onCompleted: {
+		periodPage.__filling = true
+		startCB.currentIndex = startModel.fill([{"id": "signing", "name": qsTr("On the day the last party signs")},
+												{"id": "date", "name": qsTr("On a date")}], "id", "name", "signing")
+		endCB.currentIndex = endModel.fill([{"id": "none", "name": qsTr("Never: no end")},
+											{"id": "days", "name": qsTr("After a number of days")},
+											{"id": "date", "name": qsTr("On a date")}], "id", "name", "days")
+		periodPage.__filling = false
+	}
 
 	function updateGui() {
 		if (!periodPage.editor)
 			return
+		periodPage.__filling = true
 		var draft = periodPage.editor.draft
+		startCB.currentIndex = startModel.indexOfId(draft.effectiveFrom ? "date" : "signing")
 		ContractTexts.setPickerIso(effectiveFromInput, draft.effectiveFrom)
-		termDaysInput.value = draft.termDays || 0
+		endCB.currentIndex = endModel.indexOfId(draft.validUntil ? "date" : (draft.termDays > 0 ? "days" : "none"))
+		termDaysInput.value = draft.termDays > 0 ? draft.termDays : 365
 		ContractTexts.setPickerIso(validUntilInput, draft.validUntil)
 		autoRenewSwitch.checked = draft.autoRenew === true
-		renewalPeriodInput.value = draft.renewalPeriodDays || 0
+		renewalPeriodInput.value = draft.renewalPeriodDays > 0 ? draft.renewalPeriodDays : 365
 		renewalNoticeInput.value = draft.renewalNoticeDays || 0
 		terminationNoticeInput.value = draft.terminationNoticeDays || 0
-		ContractTexts.setPickerIso(signDeadlineInput, draft.signDeadline)
-		sequentialSwitch.checked = draft.signOrder === "Sequential"
+		periodPage.__filling = false
+		periodPage.__datesRevision++
+	}
+
+	// A field the user changed: the view compares its copy
+	function __changed() {
+		if (!periodPage.__filling && periodPage.editor)
+			periodPage.editor.markChanged()
 	}
 
 	function updateModel() {
 		if (!periodPage.editor)
 			return
 		var draft = periodPage.editor.draft
-		draft.effectiveFrom = ContractTexts.pickerIso(effectiveFromInput)
-		draft.termDays = termDaysInput.value
-		draft.validUntil = ContractTexts.pickerIso(validUntilInput)
-		draft.autoRenew = autoRenewSwitch.checked
-		draft.renewalPeriodDays = renewalPeriodInput.value
-		draft.renewalNoticeDays = renewalNoticeInput.value
+		draft.effectiveFrom = periodPage.startMode === "date" ? ContractTexts.pickerIso(effectiveFromInput) : ""
+		draft.termDays = periodPage.endMode === "days" ? termDaysInput.value : 0
+		draft.validUntil = periodPage.endMode === "date" ? ContractTexts.pickerIso(validUntilInput) : ""
+		// A contract without an end has nothing to renew
+		draft.autoRenew = periodPage.hasEnd && autoRenewSwitch.checked
+		draft.renewalPeriodDays = draft.autoRenew ? renewalPeriodInput.value : 0
+		draft.renewalNoticeDays = draft.autoRenew ? renewalNoticeInput.value : 0
 		draft.terminationNoticeDays = terminationNoticeInput.value
-		draft.signDeadline = ContractTexts.pickerIso(signDeadlineInput)
-		draft.signOrder = sequentialSwitch.checked ? "Sequential" : "Parallel"
+	}
+
+	// A chosen date way starts with a date: today for the start, a year later for the end
+	function __offerDate(picker, daysFromToday) {
+		if (periodPage.__filling || picker.getDateAsString() !== "")
+			return
+		var date = new Date()
+		date.setDate(date.getDate() + daysFromToday)
+		ContractTexts.setPickerIso(picker, date.toISOString())
+		periodPage.__datesRevision++
+	}
+
+	// The period in one sentence, as the fields say it now
+	function periodSentence() {
+		var startMode = startModel.idAt(startCB.currentIndex)
+		var endMode = endModel.idAt(endCB.currentIndex)
+		var text = startMode === "date" && effectiveFromInput.getDateAsString() !== ""
+			? qsTr("The contract comes into force on %1").arg(effectiveFromInput.getDateAsString())
+			: qsTr("The contract comes into force on the day the last party signs")
+		if (endMode === "days")
+			text += " " + qsTr("and runs for %1 days.").arg(termDaysInput.value)
+		else if (endMode === "date" && validUntilInput.getDateAsString() !== "")
+			text += " " + qsTr("and runs until %1.").arg(validUntilInput.getDateAsString())
+		else
+			text += " " + qsTr("and runs with no end.")
+		if ((endMode === "days" || endMode === "date") && autoRenewSwitch.checked)
+			text += " " + qsTr("Then it is renewed for %1 days each time, unless a party stops the renewal %2 days before the end.")
+				.arg(renewalPeriodInput.value).arg(renewalNoticeInput.value)
+		text += " " + (terminationNoticeInput.value > 0
+			? qsTr("A party may leave it with a notice of %1 days.").arg(terminationNoticeInput.value)
+			: qsTr("A party may leave it at once."))
+		return text
+	}
+
+	ChoiceModel {
+		id: startModel
+	}
+
+	ChoiceModel {
+		id: endModel
 	}
 
 	CustomScrollbar {
@@ -78,64 +144,130 @@ Item {
 			width: Math.min(flickable.width - Style.marginM, Style.contentWidthMax)
 			spacing: Style.marginL
 
+			// What the fields below make of the contract
+			Rectangle {
+				width: parent.width
+				height: sentenceText.height + 2 * Style.marginM
+				radius: Style.radiusM
+				color: Style.alternateBaseColor
+				border.width: 1
+				border.color: Style.borderColor
+
+				BaseText {
+					id: sentenceText
+					anchors.left: parent.left
+					anchors.right: parent.right
+					anchors.verticalCenter: parent.verticalCenter
+					anchors.margins: Style.marginM
+					wrapMode: Text.WordWrap
+					text: periodPage.__datesRevision >= 0 ? periodPage.periodSentence() : ""
+					color: Style.textColor
+				}
+			}
+
 			GroupElementView {
 				width: parent.width
 
+				ComboBoxElementView {
+					id: startCB
+					name: qsTr("Comes into force")
+					model: startModel
+					changeable: periodPage.__isEditable
+
+					// Read from the combo box: the bindings of the page may not be updated yet
+					onCurrentIndexChanged: {
+						if (startModel.idAt(startCB.currentIndex) === "date")
+							periodPage.__offerDate(effectiveFromInput, 0)
+						periodPage.__datesRevision++
+						periodPage.__changed()
+					}
+				}
+
 				DateTimePickerElementView {
 					id: effectiveFromInput
-					name: qsTr("In force from")
-					description: qsTr("Empty: from the day the last party signs")
+					visible: periodPage.startMode === "date"
+					name: qsTr("Date")
 					canShowCurrentDate: false
 					readOnly: !periodPage.__isEditable
+
+					onEditingFinished: {
+						periodPage.__datesRevision++
+						periodPage.__changed()
+					}
+				}
+
+				ComboBoxElementView {
+					id: endCB
+					name: qsTr("Ends")
+					model: endModel
+					changeable: periodPage.__isEditable
+
+					onCurrentIndexChanged: {
+						if (endModel.idAt(endCB.currentIndex) === "date")
+							periodPage.__offerDate(validUntilInput, 365)
+						periodPage.__datesRevision++
+						periodPage.__changed()
+					}
 				}
 
 				SpinBoxElementView {
 					id: termDaysInput
-					name: qsTr("Term")
-					description: qsTr("Counted from the day it comes into force; 0: no term")
+					onValueChanged: {
+						periodPage.__changed()
+					}
+					visible: periodPage.endMode === "days"
+					name: qsTr("Runs for")
+					description: qsTr("Counted from the day it comes into force")
 					units: qsTr("days")
+					from: 1
 					to: 36500
 					readOnly: !periodPage.__isEditable
 				}
 
 				DateTimePickerElementView {
 					id: validUntilInput
-					name: qsTr("Valid until")
-					description: qsTr("A fixed last day instead of the term; empty: none")
+					visible: periodPage.endMode === "date"
+					name: qsTr("Last day")
 					canShowCurrentDate: false
 					readOnly: !periodPage.__isEditable
+
+					onEditingFinished: {
+						periodPage.__datesRevision++
+						periodPage.__changed()
+					}
 				}
 
 				SwitchElementView {
 					id: autoRenewSwitch
+					onCheckedChanged: {
+						periodPage.__changed()
+					}
+					visible: periodPage.hasEnd
 					name: qsTr("Renewed automatically")
 					readOnly: !periodPage.__isEditable
 				}
 
 				SpinBoxElementView {
 					id: renewalPeriodInput
-					visible: autoRenewSwitch.checked
+					onValueChanged: {
+						periodPage.__changed()
+					}
+					visible: periodPage.hasEnd && autoRenewSwitch.checked
 					name: qsTr("Renewed for")
-					description: qsTr("Each renewal adds this time")
 					units: qsTr("days")
+					from: 1
 					to: 36500
 					readOnly: !periodPage.__isEditable
 				}
 
 				SpinBoxElementView {
 					id: renewalNoticeInput
-					visible: autoRenewSwitch.checked
-					name: qsTr("Stop the renewal at least")
-					description: qsTr("Days before the end of the term")
-					units: qsTr("days")
-					to: 3650
-					readOnly: !periodPage.__isEditable
-				}
-
-				SpinBoxElementView {
-					id: terminationNoticeInput
-					name: qsTr("Notice period")
-					description: qsTr("A party leaves this long after its notice; 0: at once")
+					onValueChanged: {
+						periodPage.__changed()
+					}
+					visible: periodPage.hasEnd && autoRenewSwitch.checked
+					name: qsTr("A party stops the renewal at least")
+					description: qsTr("Days before the end")
 					units: qsTr("days")
 					to: 3650
 					readOnly: !periodPage.__isEditable
@@ -145,17 +277,15 @@ Item {
 			GroupElementView {
 				width: parent.width
 
-				DateTimePickerElementView {
-					id: signDeadlineInput
-					name: qsTr("Sign until")
-					description: qsTr("The offer lapses after this day; empty: no deadline")
-					canShowCurrentDate: false
-					readOnly: !periodPage.__isEditable
-				}
-
-				SwitchElementView {
-					id: sequentialSwitch
-					name: qsTr("The parties sign in their order")
+				SpinBoxElementView {
+					id: terminationNoticeInput
+					onValueChanged: {
+						periodPage.__changed()
+					}
+					name: qsTr("Notice to leave")
+					description: qsTr("A party leaves this long after its notice; 0: at once")
+					units: qsTr("days")
+					to: 3650
 					readOnly: !periodPage.__isEditable
 				}
 			}

@@ -652,41 +652,8 @@ bool CContractManagerComp::SignContract(
 			return false;
 		}
 
-		if (contract.GetSignOrder() == IContractInfo::SO_SEQUENTIAL){
-			for (const IContractInfo::Party& otherParty : std::as_const(parties)){
-				if (otherParty.signOrder < parties[partyIndex].signOrder && otherParty.state != IContractInfo::PS_SIGNED){
-					error = QStringLiteral("The party signs after the parties before it");
-
-					return false;
-				}
-			}
-		}
-
 		if (actor.userId.isEmpty()){
 			error = QStringLiteral("A user signs");
-
-			return false;
-		}
-
-		for (const IContractInfo::Signature& givenSignature : parties[partyIndex].signatures){
-			if (givenSignature.userId == actor.userId){
-				error = QStringLiteral("The user signed for the party already");
-
-				return false;
-			}
-		}
-
-		if (signature.method == IContractInfo::SM_SCAN){
-			const IContractInfo::Attachments attachments = contract.GetAttachments();
-			const int attachmentIndex = FindContractAttachment(attachments, signature.attachmentId);
-			if (attachmentIndex < 0 || attachments[attachmentIndex].kind != IContractInfo::AK_SIGNED_COPY){
-				error = QStringLiteral("A signature by a scan names the attached signed copy");
-
-				return false;
-			}
-		}
-		else if (signature.method == IContractInfo::SM_EXTERNAL && signature.externalSignatureId.isEmpty()){
-			error = QStringLiteral("An external signature names its id");
 
 			return false;
 		}
@@ -698,19 +665,13 @@ bool CContractManagerComp::SignContract(
 		givenSignature.signedAt = now;
 		givenSignature.revision = contract.GetRevision();
 		givenSignature.contentHash = ComputeContractContentHash(contract);
-		givenSignature.method = signature.method;
-		givenSignature.externalSignatureId = signature.externalSignatureId;
-		givenSignature.attachmentId = signature.attachmentId;
 
+		// One signature of a user with the right to sign binds the party
 		IContractInfo::Party& party = parties[partyIndex];
-		party.signatures.append(givenSignature);
-		const bool isPartySigned = party.signatures.size() >= party.requiredSignatures;
-		if (isPartySigned){
-			party.state = IContractInfo::PS_SIGNED;
-			party.stateComment.clear();
-			party.stateChangedAt = now;
-		}
-
+		party.signatures = IContractInfo::Signatures() << givenSignature;
+		party.state = IContractInfo::PS_SIGNED;
+		party.stateComment.clear();
+		party.stateChangedAt = now;
 		contract.SetParties(parties);
 
 		record.journal.append(CreateEntry(actor, IContractEventInfo::ET_SIGNED, signature.position));
@@ -724,30 +685,7 @@ bool CContractManagerComp::SignContract(
 			return Conclude(contract, record, error);
 		}
 
-		if (isPartySigned){
-			record.events.append(CreateTenantEvent(TenantEvent::s_contractSigned, contract, actor.tenantId, GetContractPartyTenantIds(contract)));
-
-			// The parties whose turn came now
-			if (contract.GetSignOrder() == IContractInfo::SO_SEQUENTIAL){
-				QByteArrayList nextTenantIds;
-				for (const IContractInfo::Party& candidate : std::as_const(parties)){
-					if (candidate.state == IContractInfo::PS_SIGNED){
-						continue;
-					}
-
-					bool isTurn = true;
-					for (const IContractInfo::Party& otherParty : std::as_const(parties)){
-						isTurn = isTurn && (otherParty.signOrder >= candidate.signOrder || otherParty.state == IContractInfo::PS_SIGNED);
-					}
-
-					if (isTurn){
-						nextTenantIds.append(candidate.tenantId);
-					}
-				}
-
-				record.events.append(CreateTenantEvent(TenantEvent::s_contractTurnToSign, contract, actor.tenantId, nextTenantIds));
-			}
-		}
+		record.events.append(CreateTenantEvent(TenantEvent::s_contractSigned, contract, actor.tenantId, GetContractPartyTenantIds(contract)));
 
 		return true;
 	}, errorMessage);
@@ -881,117 +819,6 @@ bool CContractManagerComp::GiveNonRenewalNotice(const ContractActor& actor, cons
 }
 
 
-bool CContractManagerComp::ProposeTermination(
-			const ContractActor& actor,
-			const QByteArray& contractId,
-			const QDateTime& terminateAt,
-			const QString& reason,
-			QString& errorMessage)
-{
-	return ChangeContract(actor, contractId, [&](IContractInfo& contract, ChangeRecord& record, QString& error){
-		const QDateTime now = QDateTime::currentDateTimeUtc();
-		IContractInfo::Parties parties = contract.GetParties();
-		const int partyIndex = FindContractParty(parties, actor.tenantId);
-		if (!IsConcludedState(ComputeContractState(contract, now).state) || !IsPartyBoundAt(contract, parties[partyIndex], now)){
-			error = QStringLiteral("A party bound by a concluded contract proposes its termination");
-
-			return false;
-		}
-
-		if (contract.GetTerminationProposal().IsValid() || contract.GetTerminatedAt().isValid()){
-			error = QStringLiteral("The termination of the contract is proposed or agreed already");
-
-			return false;
-		}
-
-		IContractInfo::TerminationProposal proposal;
-		proposal.proposedByTenantId = actor.tenantId;
-		proposal.proposedAt = now;
-		proposal.terminateAt = (terminateAt.isValid() && terminateAt > now) ? terminateAt.toUTC() : now;
-		proposal.reason = reason.trimmed();
-		contract.SetTerminationProposal(proposal);
-
-		for (IContractInfo::Party& party : parties){
-			party.terminationConsent = party.tenantId == actor.tenantId;
-		}
-
-		contract.SetParties(parties);
-
-		record.journal.append(CreateEntry(actor, IContractEventInfo::ET_TERMINATION_PROPOSED, proposal.reason));
-		record.events.append(CreateTenantEvent(TenantEvent::s_contractTerminationProposed, contract, actor.tenantId, GetContractPartyTenantIds(contract)));
-
-		return true;
-	}, errorMessage);
-}
-
-
-bool CContractManagerComp::ConsentTermination(const ContractActor& actor, const QByteArray& contractId, QString& errorMessage)
-{
-	return ChangeContract(actor, contractId, [&](IContractInfo& contract, ChangeRecord& record, QString& error){
-		const QDateTime now = QDateTime::currentDateTimeUtc();
-		IContractInfo::Parties parties = contract.GetParties();
-		const int partyIndex = FindContractParty(parties, actor.tenantId);
-		const IContractInfo::TerminationProposal proposal = contract.GetTerminationProposal();
-		if (!proposal.IsValid() || contract.GetTerminatedAt().isValid() || !IsPartyBoundAt(contract, parties[partyIndex], now)){
-			error = QStringLiteral("A party bound by the contract agrees to a proposed termination");
-
-			return false;
-		}
-
-		parties[partyIndex].terminationConsent = true;
-		contract.SetParties(parties);
-		record.journal.append(CreateEntry(actor, IContractEventInfo::ET_TERMINATION_CONSENTED));
-
-		bool isAgreed = true;
-		for (const IContractInfo::Party& party : std::as_const(parties)){
-			if (IsPartyBoundAt(contract, party, now)){
-				isAgreed = isAgreed && party.terminationConsent;
-			}
-		}
-
-		if (isAgreed){
-			contract.SetTerminatedAt(qMax(proposal.terminateAt, now));
-			contract.SetTerminationReason(proposal.reason);
-
-			JournalEntry agreed;
-			agreed.type = IContractEventInfo::ET_TERMINATION_AGREED;
-			agreed.comment = proposal.reason;
-			record.journal.append(agreed);
-			record.events.append(CreateTenantEvent(TenantEvent::s_contractTerminationAgreed, contract, QByteArray(), GetContractPartyTenantIds(contract)));
-		}
-
-		return true;
-	}, errorMessage);
-}
-
-
-bool CContractManagerComp::CancelTerminationProposal(const ContractActor& actor, const QByteArray& contractId, QString& errorMessage)
-{
-	return ChangeContract(actor, contractId, [&](IContractInfo& contract, ChangeRecord& record, QString& error){
-		const IContractInfo::TerminationProposal proposal = contract.GetTerminationProposal();
-		if (!proposal.IsValid() || proposal.proposedByTenantId != actor.tenantId || contract.GetTerminatedAt().isValid()){
-			error = QStringLiteral("The party that proposed a termination withdraws it before all agreed");
-
-			return false;
-		}
-
-		contract.SetTerminationProposal(IContractInfo::TerminationProposal());
-
-		IContractInfo::Parties parties = contract.GetParties();
-		for (IContractInfo::Party& party : parties){
-			party.terminationConsent = false;
-		}
-
-		contract.SetParties(parties);
-
-		record.journal.append(CreateEntry(actor, IContractEventInfo::ET_TERMINATION_PROPOSAL_CANCELLED));
-		record.events.append(CreateTenantEvent(TenantEvent::s_contractUpdated, contract, actor.tenantId, GetContractPartyTenantIds(contract)));
-
-		return true;
-	}, errorMessage);
-}
-
-
 bool CContractManagerComp::SetAllocationsSuspended(const ContractActor& actor, const QByteArray& contractId, bool isSuspended, QString& errorMessage)
 {
 	return ChangeContract(actor, contractId, [&](IContractInfo& contract, ChangeRecord& record, QString& error){
@@ -1086,22 +913,16 @@ bool CContractManagerComp::AddAttachment(
 
 	return ChangeContract(actor, contractId, [&](IContractInfo& contract, ChangeRecord& record, QString& error){
 		const ContractState state = ComputeContractState(contract, QDateTime::currentDateTimeUtc()).state;
-		const bool isConcluded = contract.GetSignedAt().isValid();
-		const bool isTermsPart = newAttachment.kind == IContractInfo::AK_MAIN_TEXT || newAttachment.kind == IContractInfo::AK_APPENDIX;
+		// Before the contract is concluded its files are terms the parties sign, after it they are not
+		const bool isTermsPart = !contract.GetSignedAt().isValid();
 		if (contract.GetCancelledAt().isValid() || state == CS_EXPIRED || state == CS_TERMINATED || state == CS_SUPERSEDED){
 			error = QStringLiteral("An ended contract gets no attachments");
 
 			return false;
 		}
 
-		if (isConcluded && newAttachment.kind != IContractInfo::AK_SIGNED_COPY && newAttachment.kind != IContractInfo::AK_OTHER){
-			error = QStringLiteral("A concluded contract gets only signed copies and other files");
-
-			return false;
-		}
-
 		if (isTermsPart && actor.tenantId != contract.GetInitiatorTenantId()){
-			error = QStringLiteral("The initiator attaches the main text and the appendices");
+			error = QStringLiteral("The initiator attaches the files of the terms");
 
 			return false;
 		}
@@ -1109,8 +930,8 @@ bool CContractManagerComp::AddAttachment(
 		IContractInfo::Attachments attachments = contract.GetAttachments();
 		if (!newAttachment.replacesAttachmentId.isEmpty()){
 			const int replacedIndex = FindContractAttachment(attachments, newAttachment.replacesAttachmentId);
-			if (replacedIndex < 0 || attachments[replacedIndex].kind != newAttachment.kind || attachments[replacedIndex].isReplaced){
-				error = QStringLiteral("A new version replaces the current version of an attachment of the same kind");
+			if (replacedIndex < 0 || attachments[replacedIndex].isReplaced || IsTermsAttachment(contract, attachments[replacedIndex]) != isTermsPart){
+				error = QStringLiteral("A new version replaces the current version of a file; the signed files stay");
 
 				return false;
 			}
@@ -1569,7 +1390,25 @@ void CContractManagerComp::Announce(const IContractInfo& contract, const ChangeR
 		TenantEvent::Publish(this, event);
 	}
 
-	TenantEvent::Publish(this, CreateTenantEvent(TenantEvent::s_contractChanged, contract, QByteArray(), GetContractPartyTenantIds(contract)));
+	// Who changed the contract; a change of the private data of a party is told to that party only
+	JournalEntry actor;
+	bool isPrivate = !record.journal.isEmpty();
+	for (const JournalEntry& entry : record.journal){
+		if (!entry.userId.isEmpty()){
+			actor = entry;
+		}
+
+		isPrivate = isPrivate && entry.isPrivate;
+	}
+
+	QVariantMap changed = CreateTenantEvent(
+				TenantEvent::s_contractChanged,
+				contract,
+				QByteArray(),
+				isPrivate ? QByteArrayList({actor.tenantId}) : GetContractPartyTenantIds(contract));
+	changed.insert(TenantEvent::s_userId, actor.userId);
+	changed.insert(TenantEvent::s_userName, actor.userName);
+	TenantEvent::Publish(this, changed);
 }
 
 
@@ -1589,15 +1428,12 @@ bool CContractManagerComp::ApplyDraft(const IContractInfo& draft, IContractInfo&
 	contract.SetRenewalPeriodDays(draft.GetRenewalPeriodDays());
 	contract.SetRenewalNoticeDays(draft.GetRenewalNoticeDays());
 	contract.SetTerminationNoticeDays(draft.GetTerminationNoticeDays());
-	contract.SetSignDeadline(draft.GetSignDeadline());
-	contract.SetSignOrder(draft.GetSignOrder());
 
-	// The type is chosen with the draft; its slots and attachments are part of the terms
+	// The type is chosen with the draft; its slots are part of the terms
 	if (draft.GetTypeId() != contract.GetTypeId() || contract.GetTypeName().isEmpty()){
 		contract.SetTypeId(draft.GetTypeId());
 		contract.SetTypeName(QString());
 		contract.SetRoleSlots(IContractInfo::RoleSlots());
-		contract.SetRequiredAttachmentKinds(QList<int>());
 		if (!draft.GetTypeId().isEmpty()){
 			IContractTypeInfoUniquePtr typePtr = m_typeCatalogCompPtr->GetType(draft.GetTypeId());
 			if (!typePtr.IsValid() || typePtr->IsArchived()
@@ -1609,7 +1445,6 @@ bool CContractManagerComp::ApplyDraft(const IContractInfo& draft, IContractInfo&
 
 			contract.SetTypeName(typePtr->GetName());
 			contract.SetRoleSlots(typePtr->GetRoleSlots());
-			contract.SetRequiredAttachmentKinds(typePtr->GetRequiredAttachmentKinds());
 		}
 	}
 
@@ -1659,8 +1494,6 @@ bool CContractManagerComp::ApplyDraft(const IContractInfo& draft, IContractInfo&
 			}
 		}
 
-		party.signOrder = draftParty.signOrder;
-		party.requiredSignatures = qMax(1, draftParty.requiredSignatures);
 		parties.append(party);
 	}
 
@@ -1916,35 +1749,8 @@ bool CContractManagerComp::CheckSendable(const IContractInfo& contract, QString&
 		}
 	}
 
-	const IContractInfo::Attachments attachments = contract.GetAttachments();
-	for (int kind : contract.GetRequiredAttachmentKinds()){
-		bool isAttached = false;
-		for (const IContractInfo::Attachment& attachment : attachments){
-			isAttached = isAttached || (int(attachment.kind) == kind && !attachment.isReplaced);
-		}
-
-		if (!isAttached){
-			const QStringList kindNames = {
-						QStringLiteral("main text"),
-						QStringLiteral("appendix"),
-						QStringLiteral("signed copy"),
-						QStringLiteral("amendment draft"),
-						QStringLiteral("other document")};
-			const QString kindName = (kind >= 0 && kind < kindNames.size()) ? kindNames[kind] : QString::number(kind);
-			errorMessage = QStringLiteral("The type of the contract needs the %1 to be attached on the page Documents").arg(kindName);
-
-			return false;
-		}
-	}
-
 	if (contract.IsAutoRenew() && (contract.GetRenewalPeriodDays() <= 0 || (contract.GetTermDays() <= 0 && !contract.GetValidUntil().isValid()))){
 		errorMessage = QStringLiteral("A renewing contract has an end and the length of a renewal");
-
-		return false;
-	}
-
-	if (contract.GetSignDeadline().isValid() && contract.GetSignDeadline() <= QDateTime::currentDateTimeUtc()){
-		errorMessage = QStringLiteral("The deadline for the signatures has passed: set a later one in Sign until on the page Period");
 
 		return false;
 	}

@@ -13,7 +13,6 @@ enum ContractState {
 	Negotiation
 	Signing
 	Rejected
-	OfferExpired
 	Cancelled
 	Signed
 	Active
@@ -33,29 +32,10 @@ enum ContractPartyState {
 	Withdrawn
 }
 
-enum ContractSignatureMethod {
-	InSystem
-	Scan
-	External
-}
-
 enum ContractReferenceType {
 	Supersedes
 	Framework
 	Related
-}
-
-enum ContractAttachmentKind {
-	MainText
-	Appendix
-	SignedCopy
-	AmendmentDraft
-	Other
-}
-
-enum ContractSignOrder {
-	Parallel
-	Sequential
 }
 
 enum ContractPartyChannel {
@@ -83,10 +63,6 @@ enum ContractEventType {
 	NoticeRevoked
 	Withdrawn
 	NonRenewalNotice
-	TerminationProposed
-	TerminationConsented
-	TerminationProposalCancelled
-	TerminationAgreed
 	AllocationsSuspended
 	AllocationsResumed
 	Superseded
@@ -102,9 +78,6 @@ type ContractSignature {
 	signedAt: String
 	revision: Int
 	contentHash: String
-	method: ContractSignatureMethod
-	externalSignatureId: String
-	attachmentId: ID
 }
 
 type ContractParty {
@@ -112,8 +85,6 @@ type ContractParty {
 	tenantName: String
 	roleId: ID
 	roleName: String
-	signOrder: Int
-	requiredSignatures: Int
 	channel: ContractPartyChannel
 	state: ContractPartyState
 	stateComment: String
@@ -123,7 +94,6 @@ type ContractParty {
 	withdrawReason: String
 	nonRenewalNoticeAt: String
 	allocationsSuspended: Boolean
-	terminationConsent: Boolean
 	# Signed and not left now
 	isBound: Boolean
 }
@@ -131,8 +101,6 @@ type ContractParty {
 input ContractPartyInput {
 	tenantId: ID!
 	roleId: ID
-	signOrder: Int
-	requiredSignatures: Int
 }
 
 type ContractLink {
@@ -203,7 +171,6 @@ input ContractReferenceInput {
 
 type ContractAttachment {
 	attachmentId: ID!
-	kind: ContractAttachmentKind
 	fileName: String
 	mimeType: String
 	fileSize: Int
@@ -220,13 +187,6 @@ type ContractRoleSlot {
 	roleId: ID!
 	minCount: Int
 	maxCount: Int
-}
-
-type ContractTerminationProposal {
-	proposedByTenantId: ID
-	proposedAt: String
-	terminateAt: String
-	reason: String
 }
 
 type Contract {
@@ -246,16 +206,12 @@ type Contract {
 	renewalPeriodDays: Int
 	renewalNoticeDays: Int
 	terminationNoticeDays: Int
-	signDeadline: String
-	signOrder: ContractSignOrder
 	parties: [ContractParty]
 	links: [ContractLink]
 	allocations: [ContractAllocation]
 	references: [ContractReference]
 	attachments: [ContractAttachment]
 	roleSlots: [ContractRoleSlot]
-	# Kinds of ContractAttachmentKind
-	requiredAttachmentKinds: [Int]
 	revision: Int
 	contentHash: String
 	submittedAt: String
@@ -263,7 +219,6 @@ type Contract {
 	signedAt: String
 	terminatedAt: String
 	terminationReason: String
-	terminationProposal: ContractTerminationProposal
 	supersededBy: ID
 	supersededAt: String
 	createdAt: String
@@ -312,8 +267,6 @@ input ContractDraftInput {
 	renewalPeriodDays: Int
 	renewalNoticeDays: Int
 	terminationNoticeDays: Int
-	signDeadline: String
-	signOrder: ContractSignOrder
 	parties: [ContractPartyInput]
 	links: [ContractLinkInput]
 	allocations: [ContractAllocationInput]
@@ -415,9 +368,6 @@ input SignContractInput {
 	contractId: ID!
 	revision: Int!
 	position: String
-	method: ContractSignatureMethod
-	externalSignatureId: String
-	attachmentId: ID
 }
 
 input GiveContractNoticeInput {
@@ -425,13 +375,6 @@ input GiveContractNoticeInput {
 	contractId: ID!
 	reason: String
 	isImmediate: Boolean
-}
-
-input ProposeContractTerminationInput {
-	tenantId: ID!
-	contractId: ID!
-	terminateAt: String
-	reason: String
 }
 
 input SetContractAllocationsSuspendedInput {
@@ -443,7 +386,6 @@ input SetContractAllocationsSuspendedInput {
 input AddContractAttachmentInput {
 	tenantId: ID!
 	contractId: ID!
-	kind: ContractAttachmentKind!
 	fileName: String!
 	mimeType: String
 	# Base64 of the file
@@ -518,6 +460,9 @@ type ContractNotification {
 	notificationType: EContractNotificationType!
 	contractId: ID!
 	tenantId: ID!
+	# The user whose change is told
+	sourceUserId: ID
+	sourceUserName: String
 }
 
 input ContractNotificationSubscriptionInput {
@@ -547,9 +492,6 @@ type Mutation {
 	GiveContractNotice (input: GiveContractNoticeInput): ContractCommandPayload!
 	RevokeContractNotice (input: ContractCommandInput): ContractCommandPayload!
 	GiveContractNonRenewalNotice (input: ContractCommandInput): ContractCommandPayload!
-	ProposeContractTermination (input: ProposeContractTerminationInput): ContractCommandPayload!
-	ConsentContractTermination (input: ContractCommandInput): ContractCommandPayload!
-	CancelContractTerminationProposal (input: ContractCommandInput): ContractCommandPayload!
 	SetContractAllocationsSuspended (input: SetContractAllocationsSuspendedInput): ContractCommandPayload!
 	AddContractAttachment (input: AddContractAttachmentInput): ContractCommandPayload!
 	SetContractPrivateInfo (input: SetContractPrivateInfoInput): ContractCommandPayload!

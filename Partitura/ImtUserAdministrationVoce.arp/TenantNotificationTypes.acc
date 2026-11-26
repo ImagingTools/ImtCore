@@ -384,7 +384,6 @@
                                 <Value>ConnectionRequestRejected</Value>
                                 <Value>ConnectionRemoved</Value>
                                 <Value>ContractInvitationReceived</Value>
-                                <Value>ContractTurnToSign</Value>
                                 <Value>ContractChangesRequested</Value>
                                 <Value>ContractSigned</Value>
                                 <Value>ContractDeclined</Value>
@@ -392,8 +391,6 @@
                                 <Value>ContractCancelled</Value>
                                 <Value>ContractNoticeGiven</Value>
                                 <Value>ContractWithdrawn</Value>
-                                <Value>ContractTerminationProposed</Value>
-                                <Value>ContractTerminationAgreed</Value>
                                 <Value>ContractAllocationsSuspended</Value>
                                 <Value>ContractAllocationsResumed</Value>
                                 <Value>ContractPermissionsReceived</Value>
@@ -426,24 +423,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="TypeId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="imtauth.ContractInvitationReceived"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="ContractTurnToSign" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Icons/Assignment"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Message" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="It is your turn to sign the contract &quot;{subject}&quot;"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Contract to sign"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="imtauth.ContractTurnToSign"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -612,49 +591,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="TypeId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="imtauth.ContractWithdrawn"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="ContractTerminationProposed" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Icons/Warning"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Message" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="&quot;{partner}&quot; proposes to end the contract &quot;{subject}&quot;"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Contract termination proposed"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParameterIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>partner</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="imtauth.ContractTerminationProposed"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="ContractTerminationAgreed" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Icons/Assignment"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Message" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="The parties agreed to end the contract &quot;{subject}&quot;"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Contract termination agreed"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="imtauth.ContractTerminationAgreed"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

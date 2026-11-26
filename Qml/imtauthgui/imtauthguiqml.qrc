@@ -72,6 +72,7 @@
 	<file alias="imtauthgui/ShareDocumentDialog.qml">ShareDocumentDialog.qml</file>
 	<file alias="imtauthgui/TenantDocumentSharesPage.qml">TenantDocumentSharesPage.qml</file>
 	<file alias="imtauthgui/ContractView.qml">ContractView.qml</file>
+	<file alias="imtauthgui/ContractStateBar.qml">ContractStateBar.qml</file>
 	<file alias="imtauthgui/ContractsApiClient.qml">ContractsApiClient.qml</file>
 	<file alias="imtauthgui/ContractTexts.qml">ContractTexts.qml</file>
 	<file alias="imtauthgui/ContractPartyDialog.qml">ContractPartyDialog.qml</file>
@@ -90,7 +91,6 @@
 	<file alias="imtauthgui/ContractPermissionsPage.qml">ContractPermissionsPage.qml</file>
 	<file alias="imtauthgui/ContractReferencesPage.qml">ContractReferencesPage.qml</file>
 	<file alias="imtauthgui/ContractDocumentsPage.qml">ContractDocumentsPage.qml</file>
-	<file alias="imtauthgui/ContractInternalPage.qml">ContractInternalPage.qml</file>
 	<file alias="imtauthgui/ContractJournalPage.qml">ContractJournalPage.qml</file>
 	<file alias="imtauthgui/TenantPartyRolesPage.qml">TenantPartyRolesPage.qml</file>
 	<file alias="imtauthgui/PartyRoleView.qml">PartyRoleView.qml</file>

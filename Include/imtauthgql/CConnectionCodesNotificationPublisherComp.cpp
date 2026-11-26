@@ -125,11 +125,9 @@ void CConnectionCodesNotificationPublisherComp::PublishNotification(
 	const QByteArray& relatedId,
 	const QByteArray& partnerTenantId) const
 {
-	if (targetUserId.isEmpty()){
-		return;
+	if (!targetUserId.isEmpty()){
+		SendToNotificationCenter(targetUserId, notificationType, tenantId, relatedId, partnerTenantId);
 	}
-
-	SendToNotificationCenter(targetUserId, notificationType, tenantId, relatedId, partnerTenantId);
 
 	sdl::V1_0::imtauth::CConnectionNotification notification;
 	notification.notificationType = notificationType;
@@ -161,14 +159,14 @@ void CConnectionCodesNotificationPublisherComp::PublishNotification(
 		? m_commandIdsAttrPtr[0]
 		: QByteArrayLiteral("OnConnectionCodesNotification");
 
-	// Filter: only push to subscribers whose context userId matches targetUserId.
-	PublishDataFiltered(commandId, data, [targetUserId](const imtgql::CGqlRequest& gqlRequest) -> bool {
+	// The addressee, and whoever works in the organization now: an open address book follows its changes
+	PublishDataFiltered(commandId, data, [targetUserId, tenantId](const imtgql::CGqlRequest& gqlRequest) -> bool {
 		const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
-		if (contextPtr != nullptr){
-			const QByteArray contextUserId = contextPtr->GetUserId();
-			return contextUserId == targetUserId;
+		if (contextPtr == nullptr || contextPtr->GetUserId().isEmpty()){
+			return false;
 		}
-		return false;
+
+		return contextPtr->GetUserId() == targetUserId || contextPtr->GetTenantId() == tenantId;
 	});
 }
 

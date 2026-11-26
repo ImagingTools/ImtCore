@@ -107,18 +107,6 @@ protected:
 				const sdl::V1_0::imtauth::CGiveContractNonRenewalNoticeGqlRequest& giveContractNonRenewalNoticeRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtauth::CContractCommandPayload OnProposeContractTermination(
-				const sdl::V1_0::imtauth::CProposeContractTerminationGqlRequest& proposeContractTerminationRequest,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtauth::CContractCommandPayload OnConsentContractTermination(
-				const sdl::V1_0::imtauth::CConsentContractTerminationGqlRequest& consentContractTerminationRequest,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtauth::CContractCommandPayload OnCancelContractTerminationProposal(
-				const sdl::V1_0::imtauth::CCancelContractTerminationProposalGqlRequest& cancelContractTerminationProposalRequest,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtauth::CContractCommandPayload OnSetContractAllocationsSuspended(
 				const sdl::V1_0::imtauth::CSetContractAllocationsSuspendedGqlRequest& setContractAllocationsSuspendedRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

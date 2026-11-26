@@ -77,7 +77,7 @@ private:
 
 	static PendingStepEnd GetPendingStepEnd(const QString& eventType);
 
-	void PushChange(const QByteArray& contractId, const QByteArrayList& tenantIds) const;
+	void PushChange(const QByteArray& contractId, const QByteArrayList& tenantIds, const QByteArray& userId, const QString& userName) const;
 	void SendToNotificationCenter(const QVariantMap& event, const NotificationKind& kind, const QByteArrayList& tenantIds) const;
 	void WithdrawPending(const QByteArray& contractId, const QByteArrayList& tenantIds) const;
 	QString FindTenantName(const QByteArray& tenantId) const;

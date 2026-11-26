@@ -80,10 +80,6 @@ type ContractType {
 	renewalPeriodDays: Int
 	renewalNoticeDays: Int
 	terminationNoticeDays: Int
-	isSequential: Boolean
-	requiredSignatures: Int
-	# Kinds of ContractAttachmentKind
-	requiredAttachmentKinds: [Int]
 	allocationTemplates: [ContractAllocationTemplate]
 	isArchived: Boolean
 	isSystem: Boolean
@@ -103,9 +99,6 @@ input ContractTypeInput {
 	renewalPeriodDays: Int
 	renewalNoticeDays: Int
 	terminationNoticeDays: Int
-	isSequential: Boolean
-	requiredSignatures: Int
-	requiredAttachmentKinds: [Int]
 	allocationTemplates: [ContractAllocationTemplateInput]
 }
 
