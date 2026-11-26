@@ -14,7 +14,9 @@
 #include <itest/CStandardTestExecutor.h>
 
 // ImtCore includes
+#include <imtauth/CContractEventInfo.h>
 #include <imtauth/CContractInfo.h>
+#include <imtauth/CContractTypeInfo.h>
 #include <imtauth/ContractState.h>
 
 
@@ -416,6 +418,63 @@ void CContractTest::testContractInfo_SerializeRoundTrip()
 	QCOMPARE(target.GetAllocations().first().permissionIds, QByteArrayList({"Read", "Write"}));
 	QCOMPARE(int(target.GetReferences().first().type), int(imtauth::IContractInfo::RT_FRAMEWORK));
 	QCOMPARE(imtauth::ComputeContractContentHash(target), imtauth::ComputeContractContentHash(source));
+}
+
+
+void CContractTest::testContractTypeInfo_SerializeRoundTrip()
+{
+	imtauth::CContractTypeInfo source;
+	source.SetTypeId("supply");
+	source.SetName("Supply");
+	source.SetLinkScheme(imtauth::IContractTypeInfo::LS_STAR);
+	source.SetStarRoleId("customer");
+	source.SetTermDays(365);
+
+	imtauth::IContractInfo::RoleSlot slot;
+	slot.roleId = "supplier";
+	slot.minCount = 1;
+	slot.maxCount = 2;
+	source.SetRoleSlots({slot});
+
+	imtauth::IContractTypeInfo::AllocationTemplate allocationTemplate;
+	allocationTemplate.grantorRoleId = "supplier";
+	allocationTemplate.granteeRoleId = "customer";
+	allocationTemplate.productId = "ProLife";
+	allocationTemplate.permissionIds = {"Read", "Write"};
+	source.SetAllocationTemplates({allocationTemplate});
+
+	iser::CMemoryWriteArchive writeArchive;
+	QVERIFY(source.Serialize(writeArchive));
+
+	imtauth::CContractTypeInfo target;
+	iser::CMemoryReadArchive readArchive(writeArchive.GetBuffer(), writeArchive.GetBufferSize());
+	QVERIFY(target.Serialize(readArchive));
+	QVERIFY(target.IsEqual(source));
+	QCOMPARE(int(target.GetLinkScheme()), int(imtauth::IContractTypeInfo::LS_STAR));
+	QCOMPARE(target.GetAllocationTemplates().first().permissionIds, QByteArrayList({"Read", "Write"}));
+}
+
+
+void CContractTest::testContractEventInfo_SerializeRoundTrip()
+{
+	imtauth::CContractEventInfo source;
+	source.SetEventId("event");
+	source.SetContractId("contract");
+	source.SetEventType(imtauth::IContractEventInfo::ET_SIGNED);
+	source.SetUserName("Ann");
+	source.SetTime(s_start);
+	source.SetRevision(3);
+	source.SetPrivate(true);
+
+	iser::CMemoryWriteArchive writeArchive;
+	QVERIFY(source.Serialize(writeArchive));
+
+	imtauth::CContractEventInfo target;
+	iser::CMemoryReadArchive readArchive(writeArchive.GetBuffer(), writeArchive.GetBufferSize());
+	QVERIFY(target.Serialize(readArchive));
+	QVERIFY(target.IsEqual(source));
+	QCOMPARE(int(target.GetEventType()), int(imtauth::IContractEventInfo::ET_SIGNED));
+	QCOMPARE(target.GetTime(), s_start);
 }
 
 

@@ -33,6 +33,8 @@ private slots:
 
 	// Serialization
 	void testContractInfo_SerializeRoundTrip();
+	void testContractTypeInfo_SerializeRoundTrip();
+	void testContractEventInfo_SerializeRoundTrip();
 };
 
 

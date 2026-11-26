@@ -3,10 +3,9 @@
 
 
 // ACF includes
+#include <iser/CArchiveTag.h>
+#include <iser/CPrimitiveTypesSerializer.h>
 #include <istd/CChangeNotifier.h>
-
-// ImtCore includes
-#include <imtauth/ArchiveFields.h>
 
 
 namespace imtauth
@@ -15,9 +14,6 @@ namespace imtauth
 
 namespace
 {
-
-
-namespace af = ArchiveFields;
 
 
 template <typename Value>
@@ -33,16 +29,57 @@ void AssignValue(istd::IChangeable& object, Value& member, const Value& value)
 
 bool SerializeAttachment(iser::IArchive& archive, IContractInfo::Attachment& item)
 {
-	bool retVal = af::Leaf(archive, "AttachmentId", item.attachmentId);
-	retVal = retVal && af::Leaf(archive, "FileName", item.fileName);
-	retVal = retVal && af::Leaf(archive, "MimeType", item.mimeType);
-	retVal = retVal && af::Leaf(archive, "Size", item.size);
-	retVal = retVal && af::Leaf(archive, "ContentHash", item.contentHash);
-	retVal = retVal && af::Leaf(archive, "AddedByTenantId", item.addedByTenantId);
-	retVal = retVal && af::Leaf(archive, "AddedByUserId", item.addedByUserId);
-	retVal = retVal && af::Leaf(archive, "AddedAt", item.addedAt);
-	retVal = retVal && af::Leaf(archive, "ReplacesAttachmentId", item.replacesAttachmentId);
-	retVal = retVal && af::Leaf(archive, "IsReplaced", item.isReplaced);
+	bool retVal = true;
+
+	iser::CArchiveTag attachmentIdTag("AttachmentId", "Attachment ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(attachmentIdTag);
+	retVal = retVal && archive.Process(item.attachmentId);
+	retVal = retVal && archive.EndTag(attachmentIdTag);
+
+	iser::CArchiveTag fileNameTag("FileName", "File name", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(fileNameTag);
+	retVal = retVal && archive.Process(item.fileName);
+	retVal = retVal && archive.EndTag(fileNameTag);
+
+	iser::CArchiveTag mimeTypeTag("MimeType", "Mime type", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(mimeTypeTag);
+	retVal = retVal && archive.Process(item.mimeType);
+	retVal = retVal && archive.EndTag(mimeTypeTag);
+
+	iser::CArchiveTag sizeTag("Size", "Size", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(sizeTag);
+	retVal = retVal && archive.Process(item.size);
+	retVal = retVal && archive.EndTag(sizeTag);
+
+	iser::CArchiveTag contentHashTag("ContentHash", "Content hash", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(contentHashTag);
+	retVal = retVal && archive.Process(item.contentHash);
+	retVal = retVal && archive.EndTag(contentHashTag);
+
+	iser::CArchiveTag addedByTenantIdTag("AddedByTenantId", "Added by tenant ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(addedByTenantIdTag);
+	retVal = retVal && archive.Process(item.addedByTenantId);
+	retVal = retVal && archive.EndTag(addedByTenantIdTag);
+
+	iser::CArchiveTag addedByUserIdTag("AddedByUserId", "Added by user ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(addedByUserIdTag);
+	retVal = retVal && archive.Process(item.addedByUserId);
+	retVal = retVal && archive.EndTag(addedByUserIdTag);
+
+	iser::CArchiveTag addedAtTag("AddedAt", "Added at", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(addedAtTag);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeDateTime(archive, item.addedAt);
+	retVal = retVal && archive.EndTag(addedAtTag);
+
+	iser::CArchiveTag replacesAttachmentIdTag("ReplacesAttachmentId", "Replaces attachment ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(replacesAttachmentIdTag);
+	retVal = retVal && archive.Process(item.replacesAttachmentId);
+	retVal = retVal && archive.EndTag(replacesAttachmentIdTag);
+
+	iser::CArchiveTag isReplacedTag("IsReplaced", "Is replaced", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(isReplacedTag);
+	retVal = retVal && archive.Process(item.isReplaced);
+	retVal = retVal && archive.EndTag(isReplacedTag);
 
 	return retVal;
 }
@@ -50,8 +87,14 @@ bool SerializeAttachment(iser::IArchive& archive, IContractInfo::Attachment& ite
 
 bool SerializeAllocationGroups(iser::IArchive& archive, IContractPartyPrivateInfo::AllocationGroups& item)
 {
-	bool retVal = af::Leaf(archive, "AllocationId", item.allocationId);
-	retVal = retVal && af::Leaf(archive, "GroupIds", item.groupIds);
+	bool retVal = true;
+
+	iser::CArchiveTag allocationIdTag("AllocationId", "Allocation ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(allocationIdTag);
+	retVal = retVal && archive.Process(item.allocationId);
+	retVal = retVal && archive.EndTag(allocationIdTag);
+
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, item.groupIds, "GroupIds", "GroupId");
 
 	return retVal;
 }
@@ -199,15 +242,72 @@ bool CContractPartyPrivateInfo::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
-	bool retVal = af::Leaf(archive, "ContractId", m_contractId);
-	retVal = retVal && af::Leaf(archive, "TenantId", m_tenantId);
-	retVal = retVal && af::Leaf(archive, "InternalNumber", m_internalNumber);
-	retVal = retVal && af::Leaf(archive, "ResponsibleUserId", m_responsibleUserId);
-	retVal = retVal && af::Leaf(archive, "Notes", m_notes);
-	retVal = retVal && af::List(archive, "Attachments", "Attachment", m_attachments, SerializeAttachment);
-	retVal = retVal && af::List(archive, "AllocationGroups", "Entry", m_allocationGroups, SerializeAllocationGroups);
-	retVal = retVal && af::Leaf(archive, "ReminderDays", m_reminderDays);
-	retVal = retVal && af::Leaf(archive, "UpdatedAt", m_updatedAt);
+	bool retVal = true;
+
+	iser::CArchiveTag contractIdTag("ContractId", "Contract ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(contractIdTag);
+	retVal = retVal && archive.Process(m_contractId);
+	retVal = retVal && archive.EndTag(contractIdTag);
+
+	iser::CArchiveTag tenantIdTag("TenantId", "Tenant ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(tenantIdTag);
+	retVal = retVal && archive.Process(m_tenantId);
+	retVal = retVal && archive.EndTag(tenantIdTag);
+
+	iser::CArchiveTag internalNumberTag("InternalNumber", "Internal number", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(internalNumberTag);
+	retVal = retVal && archive.Process(m_internalNumber);
+	retVal = retVal && archive.EndTag(internalNumberTag);
+
+	iser::CArchiveTag responsibleUserIdTag("ResponsibleUserId", "Responsible user ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(responsibleUserIdTag);
+	retVal = retVal && archive.Process(m_responsibleUserId);
+	retVal = retVal && archive.EndTag(responsibleUserIdTag);
+
+	iser::CArchiveTag notesTag("Notes", "Notes", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(notesTag);
+	retVal = retVal && archive.Process(m_notes);
+	retVal = retVal && archive.EndTag(notesTag);
+
+	iser::CArchiveTag attachmentsTag("Attachments", "Attachments", iser::CArchiveTag::TT_MULTIPLE);
+	iser::CArchiveTag attachmentTag("Attachment", "Attachment", iser::CArchiveTag::TT_GROUP, &attachmentsTag);
+	int attachmentsCount = m_attachments.size();
+	retVal = retVal && archive.BeginMultiTag(attachmentsTag, attachmentTag, attachmentsCount);
+	if (retVal && !archive.IsStoring()){
+		m_attachments.clear();
+		m_attachments.resize(attachmentsCount);
+	}
+
+	for (int i = 0; retVal && i < attachmentsCount; ++i){
+		retVal = archive.BeginTag(attachmentTag) && SerializeAttachment(archive, m_attachments[i]) && archive.EndTag(attachmentTag);
+	}
+
+	retVal = retVal && archive.EndTag(attachmentsTag);
+
+	iser::CArchiveTag allocationGroupsTag("AllocationGroups", "Allocation groups", iser::CArchiveTag::TT_MULTIPLE);
+	iser::CArchiveTag entryTag("Entry", "Entry", iser::CArchiveTag::TT_GROUP, &allocationGroupsTag);
+	int allocationGroupsCount = m_allocationGroups.size();
+	retVal = retVal && archive.BeginMultiTag(allocationGroupsTag, entryTag, allocationGroupsCount);
+	if (retVal && !archive.IsStoring()){
+		m_allocationGroups.clear();
+		m_allocationGroups.resize(allocationGroupsCount);
+	}
+
+	for (int i = 0; retVal && i < allocationGroupsCount; ++i){
+		retVal = archive.BeginTag(entryTag) && SerializeAllocationGroups(archive, m_allocationGroups[i]) && archive.EndTag(entryTag);
+	}
+
+	retVal = retVal && archive.EndTag(allocationGroupsTag);
+
+	iser::CArchiveTag reminderDaysTag("ReminderDays", "Reminder days", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(reminderDaysTag);
+	retVal = retVal && archive.Process(m_reminderDays);
+	retVal = retVal && archive.EndTag(reminderDaysTag);
+
+	iser::CArchiveTag updatedAtTag("UpdatedAt", "Updated at", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(updatedAtTag);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeDateTime(archive, m_updatedAt);
+	retVal = retVal && archive.EndTag(updatedAtTag);
 
 	return retVal;
 }

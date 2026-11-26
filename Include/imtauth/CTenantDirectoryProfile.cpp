@@ -3,10 +3,9 @@
 
 
 // ACF includes
+#include <iser/CArchiveTag.h>
+#include <iser/CPrimitiveTypesSerializer.h>
 #include <istd/CChangeNotifier.h>
-
-// ImtCore includes
-#include <imtauth/ArchiveFields.h>
 
 
 namespace imtauth
@@ -15,9 +14,6 @@ namespace imtauth
 
 namespace
 {
-
-
-namespace af = ArchiveFields;
 
 
 template <typename Value>
@@ -184,17 +180,59 @@ bool CTenantDirectoryProfile::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
-	bool retVal = af::Leaf(archive, "TenantId", m_tenantId);
-	retVal = retVal && af::Leaf(archive, "TenantName", m_tenantName);
-	retVal = retVal && af::Leaf(archive, "IsTenantActive", m_tenantActive);
-	retVal = retVal && af::Leaf(archive, "IsListed", m_listed);
-	retVal = retVal && af::Leaf(archive, "AcceptsInvitationsFromUnknown", m_acceptingInvitationsFromUnknown);
-	retVal = retVal && af::Leaf(archive, "Description", m_description);
-	retVal = retVal && af::Leaf(archive, "OfferedRoleIds", m_offeredRoleIds);
-	retVal = retVal && af::Leaf(archive, "Industry", m_industry);
-	retVal = retVal && af::Leaf(archive, "Country", m_country);
-	retVal = retVal && af::Leaf(archive, "Website", m_website);
-	retVal = retVal && af::Leaf(archive, "UpdatedAt", m_updatedAt);
+	bool retVal = true;
+
+	iser::CArchiveTag tenantIdTag("TenantId", "Tenant ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(tenantIdTag);
+	retVal = retVal && archive.Process(m_tenantId);
+	retVal = retVal && archive.EndTag(tenantIdTag);
+
+	iser::CArchiveTag tenantNameTag("TenantName", "Tenant name", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(tenantNameTag);
+	retVal = retVal && archive.Process(m_tenantName);
+	retVal = retVal && archive.EndTag(tenantNameTag);
+
+	iser::CArchiveTag isTenantActiveTag("IsTenantActive", "Is tenant active", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(isTenantActiveTag);
+	retVal = retVal && archive.Process(m_tenantActive);
+	retVal = retVal && archive.EndTag(isTenantActiveTag);
+
+	iser::CArchiveTag isListedTag("IsListed", "Is listed", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(isListedTag);
+	retVal = retVal && archive.Process(m_listed);
+	retVal = retVal && archive.EndTag(isListedTag);
+
+	iser::CArchiveTag acceptsInvitationsFromUnknownTag("AcceptsInvitationsFromUnknown", "Accepts invitations from unknown", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(acceptsInvitationsFromUnknownTag);
+	retVal = retVal && archive.Process(m_acceptingInvitationsFromUnknown);
+	retVal = retVal && archive.EndTag(acceptsInvitationsFromUnknownTag);
+
+	iser::CArchiveTag descriptionTag("Description", "Description", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(descriptionTag);
+	retVal = retVal && archive.Process(m_description);
+	retVal = retVal && archive.EndTag(descriptionTag);
+
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_offeredRoleIds, "OfferedRoleIds", "RoleId");
+
+	iser::CArchiveTag industryTag("Industry", "Industry", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(industryTag);
+	retVal = retVal && archive.Process(m_industry);
+	retVal = retVal && archive.EndTag(industryTag);
+
+	iser::CArchiveTag countryTag("Country", "Country", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(countryTag);
+	retVal = retVal && archive.Process(m_country);
+	retVal = retVal && archive.EndTag(countryTag);
+
+	iser::CArchiveTag websiteTag("Website", "Website", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(websiteTag);
+	retVal = retVal && archive.Process(m_website);
+	retVal = retVal && archive.EndTag(websiteTag);
+
+	iser::CArchiveTag updatedAtTag("UpdatedAt", "Updated at", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(updatedAtTag);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeDateTime(archive, m_updatedAt);
+	retVal = retVal && archive.EndTag(updatedAtTag);
 
 	return retVal;
 }

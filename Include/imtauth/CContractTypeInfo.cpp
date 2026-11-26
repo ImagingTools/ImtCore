@@ -3,10 +3,9 @@
 
 
 // ACF includes
+#include <iser/CArchiveTag.h>
+#include <iser/CPrimitiveTypesSerializer.h>
 #include <istd/CChangeNotifier.h>
-
-// ImtCore includes
-#include <imtauth/ArchiveFields.h>
 
 
 namespace imtauth
@@ -15,9 +14,6 @@ namespace imtauth
 
 namespace
 {
-
-
-namespace af = ArchiveFields;
 
 
 template <typename Value>
@@ -33,9 +29,22 @@ void AssignValue(istd::IChangeable& object, Value& member, const Value& value)
 
 bool SerializeRoleSlot(iser::IArchive& archive, IContractInfo::RoleSlot& item)
 {
-	bool retVal = af::Leaf(archive, "RoleId", item.roleId);
-	retVal = retVal && af::Leaf(archive, "MinCount", item.minCount);
-	retVal = retVal && af::Leaf(archive, "MaxCount", item.maxCount);
+	bool retVal = true;
+
+	iser::CArchiveTag roleIdTag("RoleId", "Role ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(roleIdTag);
+	retVal = retVal && archive.Process(item.roleId);
+	retVal = retVal && archive.EndTag(roleIdTag);
+
+	iser::CArchiveTag minCountTag("MinCount", "Min count", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(minCountTag);
+	retVal = retVal && archive.Process(item.minCount);
+	retVal = retVal && archive.EndTag(minCountTag);
+
+	iser::CArchiveTag maxCountTag("MaxCount", "Max count", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(maxCountTag);
+	retVal = retVal && archive.Process(item.maxCount);
+	retVal = retVal && archive.EndTag(maxCountTag);
 
 	return retVal;
 }
@@ -43,10 +52,24 @@ bool SerializeRoleSlot(iser::IArchive& archive, IContractInfo::RoleSlot& item)
 
 bool SerializeAllocationTemplate(iser::IArchive& archive, IContractTypeInfo::AllocationTemplate& item)
 {
-	bool retVal = af::Leaf(archive, "GrantorRoleId", item.grantorRoleId);
-	retVal = retVal && af::Leaf(archive, "GranteeRoleId", item.granteeRoleId);
-	retVal = retVal && af::Leaf(archive, "ProductId", item.productId);
-	retVal = retVal && af::Leaf(archive, "PermissionIds", item.permissionIds);
+	bool retVal = true;
+
+	iser::CArchiveTag grantorRoleIdTag("GrantorRoleId", "Grantor role ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(grantorRoleIdTag);
+	retVal = retVal && archive.Process(item.grantorRoleId);
+	retVal = retVal && archive.EndTag(grantorRoleIdTag);
+
+	iser::CArchiveTag granteeRoleIdTag("GranteeRoleId", "Grantee role ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(granteeRoleIdTag);
+	retVal = retVal && archive.Process(item.granteeRoleId);
+	retVal = retVal && archive.EndTag(granteeRoleIdTag);
+
+	iser::CArchiveTag productIdTag("ProductId", "Product ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(productIdTag);
+	retVal = retVal && archive.Process(item.productId);
+	retVal = retVal && archive.EndTag(productIdTag);
+
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, item.permissionIds, "PermissionIds", "PermissionId");
 
 	return retVal;
 }
@@ -274,21 +297,102 @@ bool CContractTypeInfo::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
-	bool retVal = af::Leaf(archive, "TypeId", m_typeId);
-	retVal = retVal && af::Leaf(archive, "Name", m_name);
-	retVal = retVal && af::Leaf(archive, "Description", m_description);
-	retVal = retVal && af::Leaf(archive, "OwnerTenantId", m_ownerTenantId);
-	retVal = retVal && af::Leaf(archive, "NumberPrefix", m_numberPrefix);
-	retVal = retVal && af::List(archive, "RoleSlots", "RoleSlot", m_roleSlots, SerializeRoleSlot);
-	retVal = retVal && af::EnumLeaf(archive, "LinkScheme", m_linkScheme);
-	retVal = retVal && af::Leaf(archive, "StarRoleId", m_starRoleId);
-	retVal = retVal && af::Leaf(archive, "TermDays", m_termDays);
-	retVal = retVal && af::Leaf(archive, "AutoRenew", m_autoRenew);
-	retVal = retVal && af::Leaf(archive, "RenewalPeriodDays", m_renewalPeriodDays);
-	retVal = retVal && af::Leaf(archive, "RenewalNoticeDays", m_renewalNoticeDays);
-	retVal = retVal && af::Leaf(archive, "TerminationNoticeDays", m_terminationNoticeDays);
-	retVal = retVal && af::List(archive, "AllocationTemplates", "Template", m_allocationTemplates, SerializeAllocationTemplate);
-	retVal = retVal && af::Leaf(archive, "IsArchived", m_archived);
+	bool retVal = true;
+
+	iser::CArchiveTag typeIdTag("TypeId", "Type ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(typeIdTag);
+	retVal = retVal && archive.Process(m_typeId);
+	retVal = retVal && archive.EndTag(typeIdTag);
+
+	iser::CArchiveTag nameTag("Name", "Name", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(nameTag);
+	retVal = retVal && archive.Process(m_name);
+	retVal = retVal && archive.EndTag(nameTag);
+
+	iser::CArchiveTag descriptionTag("Description", "Description", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(descriptionTag);
+	retVal = retVal && archive.Process(m_description);
+	retVal = retVal && archive.EndTag(descriptionTag);
+
+	iser::CArchiveTag ownerTenantIdTag("OwnerTenantId", "Owner tenant ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(ownerTenantIdTag);
+	retVal = retVal && archive.Process(m_ownerTenantId);
+	retVal = retVal && archive.EndTag(ownerTenantIdTag);
+
+	iser::CArchiveTag numberPrefixTag("NumberPrefix", "Number prefix", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(numberPrefixTag);
+	retVal = retVal && archive.Process(m_numberPrefix);
+	retVal = retVal && archive.EndTag(numberPrefixTag);
+
+	iser::CArchiveTag roleSlotsTag("RoleSlots", "Role slots", iser::CArchiveTag::TT_MULTIPLE);
+	iser::CArchiveTag roleSlotTag("RoleSlot", "Role slot", iser::CArchiveTag::TT_GROUP, &roleSlotsTag);
+	int roleSlotsCount = m_roleSlots.size();
+	retVal = retVal && archive.BeginMultiTag(roleSlotsTag, roleSlotTag, roleSlotsCount);
+	if (retVal && !archive.IsStoring()){
+		m_roleSlots.clear();
+		m_roleSlots.resize(roleSlotsCount);
+	}
+
+	for (int i = 0; retVal && i < roleSlotsCount; ++i){
+		retVal = archive.BeginTag(roleSlotTag) && SerializeRoleSlot(archive, m_roleSlots[i]) && archive.EndTag(roleSlotTag);
+	}
+
+	retVal = retVal && archive.EndTag(roleSlotsTag);
+
+	iser::CArchiveTag linkSchemeTag("LinkScheme", "Link scheme", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(linkSchemeTag);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeEnum<LinkScheme, ToString, FromString>(archive, m_linkScheme);
+	retVal = retVal && archive.EndTag(linkSchemeTag);
+
+	iser::CArchiveTag starRoleIdTag("StarRoleId", "Star role ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(starRoleIdTag);
+	retVal = retVal && archive.Process(m_starRoleId);
+	retVal = retVal && archive.EndTag(starRoleIdTag);
+
+	iser::CArchiveTag termDaysTag("TermDays", "Term days", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(termDaysTag);
+	retVal = retVal && archive.Process(m_termDays);
+	retVal = retVal && archive.EndTag(termDaysTag);
+
+	iser::CArchiveTag autoRenewTag("AutoRenew", "Auto renew", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(autoRenewTag);
+	retVal = retVal && archive.Process(m_autoRenew);
+	retVal = retVal && archive.EndTag(autoRenewTag);
+
+	iser::CArchiveTag renewalPeriodDaysTag("RenewalPeriodDays", "Renewal period days", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(renewalPeriodDaysTag);
+	retVal = retVal && archive.Process(m_renewalPeriodDays);
+	retVal = retVal && archive.EndTag(renewalPeriodDaysTag);
+
+	iser::CArchiveTag renewalNoticeDaysTag("RenewalNoticeDays", "Renewal notice days", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(renewalNoticeDaysTag);
+	retVal = retVal && archive.Process(m_renewalNoticeDays);
+	retVal = retVal && archive.EndTag(renewalNoticeDaysTag);
+
+	iser::CArchiveTag terminationNoticeDaysTag("TerminationNoticeDays", "Termination notice days", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(terminationNoticeDaysTag);
+	retVal = retVal && archive.Process(m_terminationNoticeDays);
+	retVal = retVal && archive.EndTag(terminationNoticeDaysTag);
+
+	iser::CArchiveTag allocationTemplatesTag("AllocationTemplates", "Allocation templates", iser::CArchiveTag::TT_MULTIPLE);
+	iser::CArchiveTag templateTag("Template", "Template", iser::CArchiveTag::TT_GROUP, &allocationTemplatesTag);
+	int allocationTemplatesCount = m_allocationTemplates.size();
+	retVal = retVal && archive.BeginMultiTag(allocationTemplatesTag, templateTag, allocationTemplatesCount);
+	if (retVal && !archive.IsStoring()){
+		m_allocationTemplates.clear();
+		m_allocationTemplates.resize(allocationTemplatesCount);
+	}
+
+	for (int i = 0; retVal && i < allocationTemplatesCount; ++i){
+		retVal = archive.BeginTag(templateTag) && SerializeAllocationTemplate(archive, m_allocationTemplates[i]) && archive.EndTag(templateTag);
+	}
+
+	retVal = retVal && archive.EndTag(allocationTemplatesTag);
+
+	iser::CArchiveTag isArchivedTag("IsArchived", "Is archived", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(isArchivedTag);
+	retVal = retVal && archive.Process(m_archived);
+	retVal = retVal && archive.EndTag(isArchivedTag);
 
 	return retVal;
 }

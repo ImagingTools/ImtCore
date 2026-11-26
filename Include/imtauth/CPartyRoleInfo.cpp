@@ -3,10 +3,9 @@
 
 
 // ACF includes
+#include <iser/CArchiveTag.h>
+#include <iser/CPrimitiveTypesSerializer.h>
 #include <istd/CChangeNotifier.h>
-
-// ImtCore includes
-#include <imtauth/ArchiveFields.h>
 
 
 namespace imtauth
@@ -15,9 +14,6 @@ namespace imtauth
 
 namespace
 {
-
-
-namespace af = ArchiveFields;
 
 
 template <typename Value>
@@ -159,15 +155,49 @@ bool CPartyRoleInfo::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
-	bool retVal = af::Leaf(archive, "RoleId", m_roleId);
-	retVal = retVal && af::Leaf(archive, "Name", m_name);
-	retVal = retVal && af::Leaf(archive, "Description", m_description);
-	retVal = retVal && af::Leaf(archive, "OwnerTenantId", m_ownerTenantId);
-	retVal = retVal && af::Leaf(archive, "Applicability", m_applicability);
-	retVal = retVal && af::Leaf(archive, "PairedRoleId", m_pairedRoleId);
-	retVal = retVal && af::Leaf(archive, "TemplateProductId", m_templateProductId);
-	retVal = retVal && af::Leaf(archive, "TemplatePermissionIds", m_templatePermissionIds);
-	retVal = retVal && af::Leaf(archive, "IsArchived", m_archived);
+	bool retVal = true;
+
+	iser::CArchiveTag roleIdTag("RoleId", "Role ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(roleIdTag);
+	retVal = retVal && archive.Process(m_roleId);
+	retVal = retVal && archive.EndTag(roleIdTag);
+
+	iser::CArchiveTag nameTag("Name", "Name", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(nameTag);
+	retVal = retVal && archive.Process(m_name);
+	retVal = retVal && archive.EndTag(nameTag);
+
+	iser::CArchiveTag descriptionTag("Description", "Description", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(descriptionTag);
+	retVal = retVal && archive.Process(m_description);
+	retVal = retVal && archive.EndTag(descriptionTag);
+
+	iser::CArchiveTag ownerTenantIdTag("OwnerTenantId", "Owner tenant ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(ownerTenantIdTag);
+	retVal = retVal && archive.Process(m_ownerTenantId);
+	retVal = retVal && archive.EndTag(ownerTenantIdTag);
+
+	iser::CArchiveTag applicabilityTag("Applicability", "Applicability", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(applicabilityTag);
+	retVal = retVal && archive.Process(m_applicability);
+	retVal = retVal && archive.EndTag(applicabilityTag);
+
+	iser::CArchiveTag pairedRoleIdTag("PairedRoleId", "Paired role ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(pairedRoleIdTag);
+	retVal = retVal && archive.Process(m_pairedRoleId);
+	retVal = retVal && archive.EndTag(pairedRoleIdTag);
+
+	iser::CArchiveTag templateProductIdTag("TemplateProductId", "Template product ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(templateProductIdTag);
+	retVal = retVal && archive.Process(m_templateProductId);
+	retVal = retVal && archive.EndTag(templateProductIdTag);
+
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_templatePermissionIds, "TemplatePermissionIds", "PermissionId");
+
+	iser::CArchiveTag isArchivedTag("IsArchived", "Is archived", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(isArchivedTag);
+	retVal = retVal && archive.Process(m_archived);
+	retVal = retVal && archive.EndTag(isArchivedTag);
 
 	return retVal;
 }

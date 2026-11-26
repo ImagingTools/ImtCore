@@ -3,10 +3,9 @@
 
 
 // ACF includes
+#include <iser/CArchiveTag.h>
+#include <iser/CPrimitiveTypesSerializer.h>
 #include <istd/CChangeNotifier.h>
-
-// ImtCore includes
-#include <imtauth/ArchiveFields.h>
 
 
 namespace imtauth
@@ -15,9 +14,6 @@ namespace imtauth
 
 namespace
 {
-
-
-namespace af = ArchiveFields;
 
 
 template <typename Value>
@@ -184,17 +180,62 @@ bool CContractEventInfo::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
-	bool retVal = af::Leaf(archive, "EventId", m_eventId);
-	retVal = retVal && af::Leaf(archive, "ContractId", m_contractId);
-	retVal = retVal && af::EnumLeaf(archive, "Type", m_eventType);
-	retVal = retVal && af::Leaf(archive, "TenantId", m_tenantId);
-	retVal = retVal && af::Leaf(archive, "UserId", m_userId);
-	retVal = retVal && af::Leaf(archive, "UserName", m_userName);
-	retVal = retVal && af::Leaf(archive, "Time", m_time);
-	retVal = retVal && af::Leaf(archive, "Revision", m_revision);
-	retVal = retVal && af::Leaf(archive, "Comment", m_comment);
-	retVal = retVal && af::Leaf(archive, "SubjectId", m_subjectId);
-	retVal = retVal && af::Leaf(archive, "IsPrivate", m_private);
+	bool retVal = true;
+
+	iser::CArchiveTag eventIdTag("EventId", "Event ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(eventIdTag);
+	retVal = retVal && archive.Process(m_eventId);
+	retVal = retVal && archive.EndTag(eventIdTag);
+
+	iser::CArchiveTag contractIdTag("ContractId", "Contract ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(contractIdTag);
+	retVal = retVal && archive.Process(m_contractId);
+	retVal = retVal && archive.EndTag(contractIdTag);
+
+	iser::CArchiveTag typeTag("Type", "Type", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(typeTag);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeEnum<EventType, ToString, FromString>(archive, m_eventType);
+	retVal = retVal && archive.EndTag(typeTag);
+
+	iser::CArchiveTag tenantIdTag("TenantId", "Tenant ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(tenantIdTag);
+	retVal = retVal && archive.Process(m_tenantId);
+	retVal = retVal && archive.EndTag(tenantIdTag);
+
+	iser::CArchiveTag userIdTag("UserId", "User ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(userIdTag);
+	retVal = retVal && archive.Process(m_userId);
+	retVal = retVal && archive.EndTag(userIdTag);
+
+	iser::CArchiveTag userNameTag("UserName", "User name", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(userNameTag);
+	retVal = retVal && archive.Process(m_userName);
+	retVal = retVal && archive.EndTag(userNameTag);
+
+	iser::CArchiveTag timeTag("Time", "Time", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(timeTag);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeDateTime(archive, m_time);
+	retVal = retVal && archive.EndTag(timeTag);
+
+	iser::CArchiveTag revisionTag("Revision", "Revision", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(revisionTag);
+	retVal = retVal && archive.Process(m_revision);
+	retVal = retVal && archive.EndTag(revisionTag);
+
+	iser::CArchiveTag commentTag("Comment", "Comment", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(commentTag);
+	retVal = retVal && archive.Process(m_comment);
+	retVal = retVal && archive.EndTag(commentTag);
+
+	iser::CArchiveTag subjectIdTag("SubjectId", "Subject ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(subjectIdTag);
+	retVal = retVal && archive.Process(m_subjectId);
+	retVal = retVal && archive.EndTag(subjectIdTag);
+
+	iser::CArchiveTag isPrivateTag("IsPrivate", "Is private", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(isPrivateTag);
+	retVal = retVal && archive.Process(m_private);
+	retVal = retVal && archive.EndTag(isPrivateTag);
 
 	return retVal;
 }
