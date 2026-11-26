@@ -17,6 +17,7 @@ Rectangle {
 	signal settingsSaveFailed();
 	
 	property ParamsSet paramsSet: ParamsSet {}
+	property alias settingsController: preferenceDialog.settingsController
 	
 	onLocalSettingsChanged: {
 		console.log("onLocalSettingsChanged", localSettings)

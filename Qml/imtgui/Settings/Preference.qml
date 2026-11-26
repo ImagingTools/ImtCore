@@ -82,32 +82,53 @@ Item {
 				anchors.margins: Style.marginXL
 				clip: true;
 				contentWidth: width;
-				contentHeight: bodyPanel.height;
+				contentHeight: pageColumn.height;
 				boundsBehavior: Flickable.StopAtBounds;
 				
-				ComposedParamsGui {
-					id: bodyPanel;
+				Column {
+					id: pageColumn;
 					width: parent.width;
-					settingsController: root.settingsController
-					paramId: model.item.m_id
-					typeId: model.item.m_typeId
-					name: model.item.m_name
-					description: model.item.m_description
+					spacing: Style.marginXL;
 					
-					onEditorModelDataChanged: {
-						if (mainPanelRepeater.currentIndex >= 0){
-							let json = bodyPanel.paramsSet.toJson()
-							root.paramsSet.m_parameters.get(mainPanelRepeater.currentIndex).item.m_data = json
-						}
+					ComposedParamsGui {
+						id: bodyPanel;
+						width: parent.width;
+						settingsController: root.settingsController
+						paramId: model.item.m_id
+						typeId: model.item.m_typeId
+						name: model.item.m_name
+						description: model.item.m_description
+						
+						onEditorModelDataChanged: {
+							if (mainPanelRepeater.currentIndex >= 0){
+								let json = bodyPanel.paramsSet.toJson()
+								root.paramsSet.m_parameters.get(mainPanelRepeater.currentIndex).item.m_data = json
+							}
 
-						root.editorModelDataChanged(paramId, key)
+							root.editorModelDataChanged(paramId, key)
+						}
+						
+						Component.onCompleted: {
+							if (paramController){
+								let json = root.paramsSet.m_parameters.get(model.index).item.m_data
+								if (!paramController.createParamFromJson(json)){
+									console.error("Unable to create params set from JSON")
+								}
+							}
+						}
 					}
 					
-					Component.onCompleted: {
-						if (paramController){
-							let json = root.paramsSet.m_parameters.get(model.index).item.m_data
-							if (!paramController.createParamFromJson(json)){
-								console.error("Unable to create params set from JSON")
+					// Additional content of the page registered with SettingsController.registerPageExtension
+					Loader {
+						id: pageExtensionLoader;
+						width: parent.width;
+						visible: status === Loader.Ready;
+						sourceComponent: root.settingsController ? root.settingsController.getPageExtension(model.item.m_id) : null
+						
+						onLoaded: {
+							item.width = Qt.binding(function(){ return pageExtensionLoader.width })
+							if ("pageData" in item){
+								item.pageData = Qt.binding(function(){ return model.item.m_data })
 							}
 						}
 					}

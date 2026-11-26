@@ -1,14 +1,17 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CUserGroupCollectionControllerComp.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Groups.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 
 
 // Qt includes
 #include <QtCore/QMutexLocker>
+#include <QtCore/QUuid>
 
 // ACF includes
 #include <iqt/iqt.h>
 #include <istd/TInterfacePtr.h>
+#include <istd/CChangeGroup.h>
 
 // ImtCore includes
 #include <imtauth/CUserGroupDocumentValidatorComp.h>
@@ -16,11 +19,27 @@
 #include <imtauth/IUserInfoProvider.h>
 #include <imtauth/imtauth.h>
 #include <imtauthgql/CAssignmentCollector.h>
+#include <imtbase/imtbase.h>
+#include <imtbase/IIdentifiable.h>
 #include <imtbase/IObjectCollectionIterator.h>
 
 
 namespace imtauthgql
 {
+
+
+/**
+	A group stored under a new identity is no mirror of an external system group:
+	the synchronization of that system would remove it as a vanished mirror.
+*/
+static void ResetToInternalSystem(imtauth::IUserGroupInfo& groupInfo)
+{
+	for (const imtauth::IUserGroupInfo::SystemInfo& systemInfo : groupInfo.GetSystemInfos()){
+		groupInfo.RemoveFromSystem(systemInfo.systemId);
+	}
+
+	groupInfo.AddToSystem(imtauth::IUserGroupInfo::SystemInfo());
+}
 
 
 // protected methods
@@ -96,6 +115,83 @@ bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
 
 
 // reimplemented (sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase)
+
+sdl::V1_0::imtbase::CDuplicateElementsPayload CUserGroupCollectionControllerComp::OnDuplicateElements(
+			const sdl::V1_0::imtbase::CDuplicateElementsGqlRequest& duplicateElementsRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	sdl::V1_0::imtbase::CDuplicateElementsPayload response;
+
+	if (!m_objectCollectionCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CUserGroupCollectionControllerComp");
+		return response;
+	}
+
+	sdl::V1_0::imtbase::DuplicateElementsRequestArguments arguments = duplicateElementsRequest.GetRequestedArguments();
+	QByteArrayList elementIds;
+	if (arguments.input->elementIds.HasValue()){
+		elementIds = arguments.input->elementIds->ToList();
+	}
+
+	QString name;
+	if (arguments.input->name.HasValue()){
+		name = *arguments.input->name;
+	}
+
+	if (elementIds.isEmpty()){
+		errorMessage = QStringLiteral("Unable to duplicate elements. Error: Element-IDs is empty");
+		return response;
+	}
+
+	if (!CheckObjectAccess(gqlRequest, elementIds, imtauth::IDocumentShareInfo::DAL_VIEW, errorMessage)){
+		return response;
+	}
+
+	response.success = false;
+
+	istd::CChangeGroup changeGroup(m_objectCollectionCompPtr.GetPtr());
+
+	int count = imtbase::narrow_cast<int>(elementIds.size());
+	for (const QByteArray& elementId : elementIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_objectCollectionCompPtr->GetObjectData(elementId, dataPtr)){
+			istd::IChangeableUniquePtr clonedObjectPtr = dataPtr->CloneMe();
+			if (clonedObjectPtr.IsValid()){
+				// The duplicate is a new group: it gets a new identity and belongs to the internal system.
+				QByteArray duplicateId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+				imtbase::SetObjectUuid(clonedObjectPtr.GetPtr(), duplicateId);
+
+				auto clonedGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(clonedObjectPtr.GetPtr());
+				if (clonedGroupInfoPtr != nullptr){
+					clonedGroupInfoPtr->SetId(duplicateId);
+					ResetToInternalSystem(*clonedGroupInfoPtr);
+				}
+
+				QString duplicateName;
+				QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(elementId);
+
+				if (count == 1){
+					duplicateName = name;
+				}
+				else{
+					QString elementName = m_objectCollectionCompPtr->GetElementInfo(elementId, imtbase::ICollectionInfo::EIT_NAME).toString();
+					duplicateName = elementName + " Copy";
+				}
+
+				if (clonedGroupInfoPtr != nullptr){
+					clonedGroupInfoPtr->SetName(duplicateName);
+				}
+				m_objectCollectionCompPtr->InsertNewObject(typeId, duplicateName, "", clonedObjectPtr.GetPtr(), duplicateId);
+			}
+		}
+	}
+
+	response.success = true;
+
+	return response;
+}
+
 
 sdl::V1_0::imtbase::CVisualStatus CUserGroupCollectionControllerComp::OnGetObjectVisualStatus(
 			const sdl::V1_0::imtbase::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
@@ -501,6 +597,25 @@ istd::IChangeableUniquePtr CUserGroupCollectionControllerComp::CreateObjectFromR
 	}
 
 	return objectPtr;
+}
+
+
+bool CUserGroupCollectionControllerComp::ConvertObject(const istd::IChangeable& source, istd::IChangeable& target, QString& errorMessage) const
+{
+	if (!BaseClass::ConvertObject(source, target, errorMessage)){
+		return false;
+	}
+
+	// An imported group without its own identity is stored under a new ID and therefore belongs to the internal system.
+	// A group keeping its stored ID (e.g. a re-imported LDAP mirror) keeps its system.
+	if (imtbase::GetObjectUuid(&source).isEmpty()){
+		auto targetGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(&target);
+		if (targetGroupInfoPtr != nullptr){
+			ResetToInternalSystem(*targetGroupInfoPtr);
+		}
+	}
+
+	return true;
 }
 
 

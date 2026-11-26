@@ -38,6 +38,10 @@ protected:
 				QString& errorMessage) const;
 
 	// reimplemented (sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase)
+	virtual sdl::V1_0::imtbase::CDuplicateElementsPayload OnDuplicateElements(
+				const sdl::V1_0::imtbase::CDuplicateElementsGqlRequest& duplicateElementsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtbase::CVisualStatus OnGetObjectVisualStatus(
 				const sdl::V1_0::imtbase::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
@@ -68,6 +72,9 @@ protected:
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
 	virtual istd::IChangeableUniquePtr CreateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const override;
+
+	// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
+	virtual bool ConvertObject(const istd::IChangeable& source, istd::IChangeable& target, QString& errorMessage) const override;
 
 	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
 	virtual QJsonObject CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
