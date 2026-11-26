@@ -289,9 +289,10 @@ ParamEditorBase {
 								width: Style.sizeHintBXS
 								height: Style.controlHeightM
 								visible: model.status === ServiceStatusEnum.s_cONNECTED && model.logId !== ""
-								enabled: remoteFileController.state !== "Loading"
+								enabled: remoteFileController.state !== "Loading"
+
 								text: qsTr("Download Log")
-								onClicked: {
+									remoteFileController.getFile(model.logId, String(model.name).replace(/[\\/:*?"<>|\x00-\x1f]/g, "_") + "Log.txt")
 									remoteFileController.getFile(model.logId, model.name + "Log.txt")
 								}
 							}
