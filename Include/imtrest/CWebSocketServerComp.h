@@ -182,7 +182,8 @@ protected:
 	QTimer m_timer;
 	istd::TDelPtr<QWebSocketServer> m_webSocketServerPtr;
 	QList<CWebSocketThread*> m_webSocketThreadList;
-	QMap <QByteArray, QSharedPointer<CWebSocketSender>> m_senders;
+	// The senders of the clients, of the subscriptions and of the queries (a query is removed by SendResponse when it is answered)
+	mutable QMap <QByteArray, QSharedPointer<CWebSocketSender>> m_senders;
 	QMap <QByteArray, imtcom::IConnectionStatusProvider::ConnectionStatus> m_senderLoginStatusMap;
 	mutable QReadWriteLock m_sendersLock;
 private:
