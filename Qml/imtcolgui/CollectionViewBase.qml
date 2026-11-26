@@ -495,7 +495,6 @@ ViewBase {
 						ToolButtonDecorator {
 							// Matched to the reset button in the panel: same button size,
 							// same glyph size, so the pair reads as one control.
-							icon.width: Style.iconSizeM + Style.spacingXS
 							radius: height / 2
 							color: collectionViewBaseContainer.filterMenuVisible ? Style.selectedColor
 								: baseElement && baseElement.hovered ? Style.hover : "transparent"

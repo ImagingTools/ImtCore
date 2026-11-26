@@ -166,7 +166,7 @@ bool HasObjectAccess(
 		return false;
 	}
 
-	if (!tenantFilterPtr->GetTenantId().isEmpty()){
+	if (tenantFilterPtr->GetTenantType() == imtbase::TT_ORGANIZATION && !tenantFilterPtr->GetTenantId().isEmpty()){
 		const QByteArrayList shareOwnerTenantIds = shareManagerPtr != nullptr ? shareManagerPtr->GetShareOwnerTenantIds(tenantFilterPtr->GetTenantId()) : QByteArrayList();
 		tenantFilterPtr->SetShareOwnerTenantIds(shareOwnerTenantIds, true);
 		if (shareManagerPtr != nullptr){

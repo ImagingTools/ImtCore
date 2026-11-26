@@ -36,7 +36,7 @@ public:
 	virtual bool RemoveAllBindingsForTenant(const QByteArray& tenantId, const QByteArray& entityType) override;
 	virtual bool HasBinding(const QByteArray& tenantId, const QByteArray& entityType, const QByteArray& entityId, bool* isReadPtr = nullptr) const override;
 	virtual QByteArrayList GetEntityIds(const QByteArray& tenantId, const QByteArray& entityType) const override;
-	virtual bool HasAnyTenantBinding(const QByteArray& entityType, const QByteArray& entityId, bool* isReadPtr = nullptr) const override;
+	virtual bool HasOrganizationBinding(const QByteArray& entityType, const QByteArray& entityId, bool* isReadPtr = nullptr) const override;
 
 private:
 	QByteArrayList FindBindingIds(const QByteArray& tenantId, const QByteArray& entityType, const QByteArray& entityId, bool* isReadPtr = nullptr) const;

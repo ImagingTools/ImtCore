@@ -572,18 +572,20 @@ bool CUserGroupCollectionControllerComp::ValidateGroupForTenant(
 			QString& errorMessage) const
 {
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	const QByteArray tenantId = gqlContextPtr != nullptr ? gqlContextPtr->GetTenantId() : QByteArray();
+	imtbase::TenantType tenantType = imtbase::TT_ORGANIZATION;
+	const QByteArray tenantId = gqlContextPtr != nullptr ? imtgql::GetDataTenantId(*gqlContextPtr, tenantType) : QByteArray();
 
 	if (!imtauth::CUserGroupDocumentValidatorComp::CheckGroupNameUnique(
 				*m_objectCollectionCompPtr,
 				objectId,
 				userGroup.GetName(),
 				tenantId,
+				tenantType,
 				errorMessage)){
 		return false;
 	}
 
-	return imtauth::CUserGroupDocumentValidatorComp::CheckParentGroupsInTenant(*m_objectCollectionCompPtr, userGroup.GetParentGroups(), tenantId, errorMessage);
+	return imtauth::CUserGroupDocumentValidatorComp::CheckParentGroupsInTenant(*m_objectCollectionCompPtr, userGroup.GetParentGroups(), tenantId, tenantType, errorMessage);
 }
 
 

@@ -9,6 +9,7 @@
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Permissions.h>
 #include <imtauth/ITenantInfo.h>
 #include <imtauth/DelegatedTenantAccessUtils.h>
+#include <imtauth/imtauth.h>
 #include <imtgql/IGqlContext.h>
 #include <imtbase/imtbase.h>
 #include <imtauthgql/imtauthgql.h>
@@ -171,6 +172,58 @@ void CollectFeaturePaths(const imtlic::IFeatureInfo& featureInfo, QSet<QByteArra
 			CollectFeaturePaths(*subFeaturePtr, paths);
 		}
 	}
+}
+
+
+void CollectLeafPaths(const imtlic::IFeatureInfo& featureInfo, QByteArrayList& paths)
+{
+	const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
+	if (subFeatures.isEmpty()){
+		paths.append(imtlic::CalculateFeaturePath(featureInfo));
+
+		return;
+	}
+
+	for (const imtlic::IFeatureInfo::FeatureInfoPtr& subFeaturePtr : subFeatures){
+		if (subFeaturePtr.IsValid()){
+			CollectLeafPaths(*subFeaturePtr, paths);
+		}
+	}
+}
+
+
+/**
+	The permissions of an administrator: every leaf of the tree but the change of the permissions,
+	so only the owner and the creator appoint administrators.
+*/
+QByteArrayList GetAdministratorPermissions(const imtlic::IFeatureInfoProvider& provider)
+{
+	QByteArrayList paths;
+	for (const QByteArray& featureId : provider.GetFeatureList().GetElementIds()){
+		imtlic::IFeatureInfoSharedPtr featurePtr = provider.GetFeatureInfo(featureId);
+		if (featurePtr.IsValid()){
+			CollectLeafPaths(*featurePtr, paths);
+		}
+	}
+
+	paths.removeAll(imtauthgql::s_changeOrganizationPermissionsPermission);
+
+	return paths;
+}
+
+
+/**
+	Find a permission the actor would give without holding it; the permissions the member already holds stay.
+*/
+QByteArray FindPermissionBeyondActor(const QByteArrayList& actorPermissions, const QByteArrayList& memberPermissions, const QByteArrayList& newPermissions)
+{
+	for (const QByteArray& permission : newPermissions){
+		if (!memberPermissions.contains(permission) && !imtauth::HasPermission(actorPermissions, permission)){
+			return permission;
+		}
+	}
+
+	return QByteArray();
 }
 
 
@@ -564,6 +617,8 @@ sdl::V1_0::imtauth::CGetOrganizationPermissionsPayload CTenantMembershipManagerC
 			languageId,
 			nullptr);
 
+	response.administratorPermissions.Emplace().FromList(GetAdministratorPermissions(*m_organizationsProviderCompPtr));
+
 	if (isMemberRequested){
 		imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->FindMembership(userId, tenantId);
 		if (membershipPtr.IsValid()){
@@ -934,15 +989,23 @@ sdl::V1_0::imtauth::CUpdateMembershipPermissionsPayload CTenantMembershipManager
 			return response;
 		}
 
-		// Server-side protection for org perms assignment: only high-priv or users with relevant org perms in *their* membership
+		// The owner and the creator give any permission; a member needs the change of the permissions and gives only the ones it holds
 		imtauth::ITenantInfoUniquePtr tPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
 		bool isHighPriv = tPtr.IsValid() && (tPtr->GetOwnerId() == contextUserId || tPtr->GetCreatorId() == contextUserId);
 		if (!isHighPriv){
 			imtauth::ITenantMembershipUniquePtr actorMs = m_membershipManagerCompPtr->FindMembership(contextUserId, tenantId);
 			if (actorMs.IsValid() && actorMs->IsActive()){
-				if (!HasAnyOrganizationPermission(actorMs->GetOrganizationPermissions(), GetEditOrganizationMemberPermissions())){
+				const QByteArrayList actorPermissions = actorMs->GetOrganizationPermissions();
+				if (!HasAnyOrganizationPermission(actorPermissions, {s_changeOrganizationPermissionsPermission})){
 					response.success = false;
 					response.errorMessage = QStringLiteral("Insufficient organization permissions to update member organization permissions");
+					return response;
+				}
+
+				const QByteArray beyondPermission = FindPermissionBeyondActor(actorPermissions, membershipPtr->GetOrganizationPermissions(), permissions);
+				if (!beyondPermission.isEmpty()){
+					response.success = false;
+					response.errorMessage = QStringLiteral("The organization permission '%1' cannot be given without holding it").arg(QString::fromUtf8(beyondPermission));
 					return response;
 				}
 			} else {

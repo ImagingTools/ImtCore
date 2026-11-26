@@ -9,6 +9,7 @@
 #include <QtCore/QByteArrayList>
 
 // ImtCore includes
+#include <imtbase/TenantType.h>
 #include <imtauth/IDocumentShareInfo.h>
 
 
@@ -51,8 +52,12 @@ public:
 	virtual QByteArray GetTenantId() const = 0;
 	virtual void SetTenantId(const QByteArray& tenantId) = 0;
 
-	virtual QByteArray GetOwnerId() const = 0;
-	virtual void SetOwnerId(const QByteArray& ownerId) = 0;
+	/**
+		Kind of the tenant: an organization, or a user outside of any organization.
+		A user filter without a tenant ID selects every personal space: everything not bound to an organization.
+	*/
+	virtual imtbase::TenantType GetTenantType() const = 0;
+	virtual void SetTenantType(imtbase::TenantType tenantType) = 0;
 
 	virtual TenantFilterMode GetFilterMode() const = 0;
 	virtual void SetFilterMode(TenantFilterMode mode) = 0;

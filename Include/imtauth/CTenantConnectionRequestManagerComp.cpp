@@ -66,16 +66,9 @@ bool CTenantConnectionRequestManagerComp::StoreConnectionRequest(const ITenantCo
 	if (!dataPtr.IsValid()){
 		return false;
 	}
-	dataPtr->SetRequestId(requestInfo.GetRequestId());
-	dataPtr->SetSourceTenantId(requestInfo.GetSourceTenantId());
-	dataPtr->SetTargetTenantId(requestInfo.GetTargetTenantId());
-	dataPtr->SetConnectionCode(requestInfo.GetConnectionCode());
-	dataPtr->SetMessage(requestInfo.GetMessage());
-	dataPtr->SetStatus(requestInfo.GetStatus());
-	dataPtr->SetCreatedAt(requestInfo.GetCreatedAt());
-	dataPtr->SetRespondedAt(requestInfo.GetRespondedAt());
-	dataPtr->SetSourceTenantName(requestInfo.GetSourceTenantName());
-	dataPtr->SetTargetTenantName(requestInfo.GetTargetTenantName());
+	if (!dataPtr->CopyFrom(requestInfo)){
+		return false;
+	}
 
 	QByteArray requestId = requestInfo.GetRequestId();
 
@@ -655,7 +648,8 @@ QByteArray CTenantConnectionRequestManagerComp::CreateConnectionRequest(
 		const QByteArray& sourceTenantId,
 		const QString& connectionCode,
 		const QString& message,
-		QString* errorMessagePtr)
+		QString* errorMessagePtr,
+		const ITenantRelationshipProposalInfo* proposedRelationshipPtr)
 {
 	auto refuse = [this, errorMessagePtr](const QString& reason){
 		SendErrorMessage(0, reason, "CTenantConnectionRequestManagerComp");
@@ -720,6 +714,12 @@ QByteArray CTenantConnectionRequestManagerComp::CreateConnectionRequest(
 	reqPtr->SetMessage(message);
 	reqPtr->SetStatus(ITenantConnectionRequestInfo::CRS_PENDING);
 	reqPtr->SetCreatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs));
+	if (proposedRelationshipPtr != nullptr){
+		reqPtr->SetRelationshipProposed(true);
+		reqPtr->SetProposedSourceRole(proposedRelationshipPtr->GetProposedSourceRole());
+		reqPtr->SetProposedTargetRole(proposedRelationshipPtr->GetProposedTargetRole());
+		reqPtr->SetProposedScope(proposedRelationshipPtr->GetProposedScope());
+	}
 
 	// Resolve tenant names so they display correctly in the UI
 	if (m_tenantManagerCompPtr.IsValid()){
@@ -747,7 +747,7 @@ QByteArray CTenantConnectionRequestManagerComp::CreateConnectionRequest(
 }
 
 
-QByteArray CTenantConnectionRequestManagerComp::ApproveConnectionRequest(const QByteArray& requestId, const QByteArray& approvingTenantId)
+QByteArray CTenantConnectionRequestManagerComp::ApproveConnectionRequest(const QByteArray& requestId, const QByteArray& approvingTenantId, QByteArray* relationshipIdPtr)
 {
 	if (requestId.isEmpty() || approvingTenantId.isEmpty() || !m_requestCollectionCompPtr.IsValid()){
 		return QByteArray();
@@ -800,13 +800,31 @@ QByteArray CTenantConnectionRequestManagerComp::ApproveConnectionRequest(const Q
 		}
 	}
 
-	if (connectionId.isEmpty()){
+	const bool isNewConnection = connectionId.isEmpty();
+	if (isNewConnection){
 		connectionId = CreateConnection(reqPtr->GetSourceTenantId(), reqPtr->GetTargetTenantId());
 	}
 
 	if (connectionId.isEmpty()){
 		SendErrorMessage(0, "Failed to create or resolve connection for approved request", "CTenantConnectionRequestManagerComp");
 		return QByteArray();
+	}
+
+	// The relationship comes into force before the request is approved: a request it fails for stays pending
+	if (reqPtr->IsRelationshipProposed()){
+		const QByteArray relationshipId = ApplyRequestedRelationship(*reqPtr, connectionId);
+		if (relationshipId.isEmpty()){
+			if (isNewConnection && !RemoveConnection(connectionId, approvingTenantId)){
+				SendErrorMessage(0, QStringLiteral("The connection '%1' made for the request '%2' could not be removed").arg(QString::fromUtf8(connectionId), QString::fromUtf8(requestId)), "CTenantConnectionRequestManagerComp");
+			}
+			SendErrorMessage(0, QStringLiteral("The relationship proposed by the request '%1' could not come into force").arg(QString::fromUtf8(requestId)), "CTenantConnectionRequestManagerComp");
+
+			return QByteArray();
+		}
+
+		if (relationshipIdPtr != nullptr){
+			*relationshipIdPtr = relationshipId;
+		}
 	}
 
 	// Update the request status
@@ -830,6 +848,37 @@ QByteArray CTenantConnectionRequestManagerComp::ApproveConnectionRequest(const Q
 				{TenantEvent::s_status, int(updatedReqPtr->GetStatus())}});
 
 	return connectionId;
+}
+
+
+QByteArray CTenantConnectionRequestManagerComp::ApplyRequestedRelationship(const ITenantConnectionRequestInfo& request, const QByteArray& connectionId)
+{
+	ITenantRelationshipProposalInfoUniquePtr proposalPtr = m_proposalFactoryCompPtr.CreateInstance();
+	if (!proposalPtr.IsValid()){
+		return QByteArray();
+	}
+
+	// The requesting organization proposed the terms, the approving one accepts them: the usual proposal path
+	proposalPtr->SetConnectionId(connectionId);
+	proposalPtr->SetInitiatorTenantId(request.GetSourceTenantId());
+	proposalPtr->SetCounterpartyTenantId(request.GetTargetTenantId());
+	proposalPtr->SetProposalType(ITenantRelationshipProposalInfo::RPT_CREATE);
+	proposalPtr->SetProposedSourceRole(request.GetProposedSourceRole());
+	proposalPtr->SetProposedTargetRole(request.GetProposedTargetRole());
+	proposalPtr->SetProposedScope(request.GetProposedScope());
+	proposalPtr->SetMessage(request.GetMessage());
+
+	const QByteArray proposalId = CreateRelationshipProposal(*proposalPtr);
+	if (proposalId.isEmpty()){
+		return QByteArray();
+	}
+
+	const QByteArray relationshipId = ApproveRelationshipProposal(proposalId, request.GetTargetTenantId());
+	if (relationshipId.isEmpty() && !CancelRelationshipProposal(proposalId, request.GetSourceTenantId())){
+		SendErrorMessage(0, QStringLiteral("The relationship proposal '%1' of a connection request could not be withdrawn").arg(QString::fromUtf8(proposalId)), "CTenantConnectionRequestManagerComp");
+	}
+
+	return relationshipId;
 }
 
 

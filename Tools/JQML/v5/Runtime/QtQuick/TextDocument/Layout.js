@@ -7,6 +7,9 @@ const { OBJECT_REPLACEMENT, LINE_SEPARATOR } = require('./Document')
 // QTextDocument::indentWidth
 const INDENT_WIDTH = 40
 
+// limit table row allocations to avoid resource exhaustion on hostile/malformed content
+const MAX_TABLE_LAYOUT_ROWS = 10000
+
 // wrap modes (QTextOption::WrapMode as TextEdit.wrapMode has them)
 const NO_WRAP = 0, WORD_WRAP = 1, WRAP_ANYWHERE = 3, WRAP = 4
 
@@ -504,7 +507,9 @@ class Layouter {
         }
         // the cells laid out in their width; the rows as high as their cells
         let laid = []
-        let rowHeights = new Array(grid.rows).fill(0)
+        let rowCount = Number.isFinite(grid.rows) ? Math.max(0, Math.floor(grid.rows)) : 0
+        rowCount = Math.min(rowCount, MAX_TABLE_LAYOUT_ROWS)
+        let rowHeights = new Array(rowCount).fill(0)
         for(let cell of grid.cells){
             let cellWidth = widths.slice(cell.column, cell.column + cell.columnSpan).reduce((a, b) => a + b, 0) + spacing * (cell.columnSpan - 1)
             let contentWidth = Math.max(0, cellWidth - pad(cell, 'left') - pad(cell, 'right') - 2 * cellBorder)
@@ -518,14 +523,15 @@ class Layouter {
             item.flow = flow
             let h = flow.y + pad(item.cell, 'top') + pad(item.cell, 'bottom') + 2 * cellBorder
             heights.set(item.cell, h)
-            if(item.cell.rowSpan === 1) rowHeights[item.cell.row] = Math.max(rowHeights[item.cell.row], h)
+            if(item.cell.rowSpan === 1 && item.cell.row >= 0 && item.cell.row < rowCount) rowHeights[item.cell.row] = Math.max(rowHeights[item.cell.row], h)
         }
         for(let item of laid){
             let cell = item.cell
-            if(cell.rowSpan === 1) continue
-            let have = rowHeights.slice(cell.row, cell.row + cell.rowSpan).reduce((a, b) => a + b, 0) + spacing * (cell.rowSpan - 1)
+            if(cell.rowSpan === 1 || cell.row < 0 || cell.row >= rowCount) continue
+            let endRow = Math.min(rowCount, cell.row + cell.rowSpan)
+            let have = rowHeights.slice(cell.row, endRow).reduce((a, b) => a + b, 0) + spacing * (endRow - cell.row - 1)
             let need = heights.get(cell) - have
-            if(need > 0) rowHeights[cell.row + cell.rowSpan - 1] += need
+            if(need > 0) rowHeights[endRow - 1] += need
         }
         let rowY = []
         let ry = y + border + spacing

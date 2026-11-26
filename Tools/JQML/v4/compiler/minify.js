@@ -238,9 +238,12 @@ function localNames(tokens, paramNames) {
 					const u = tokens[j].text;
 					if (u === '(' || u === '[' || u === '{') nested++;
 					else if (u === ')' || u === ']' || u === '}') nested--;
+					// a closer that nothing here opened ends the block the declaration sits in, so it ended too (QML is written without
+					// ';': the statements that follow are not its initializer, and a ',' of a call among them is not its list)
+					if (nested < 0) break;
 					j++;
 				}
-				if (tokens[j] === undefined || tokens[j].text === ';') break;
+				if (tokens[j] === undefined || tokens[j].text === ';' || nested < 0) break;
 				j++; // the ',' of another name in the same declaration
 			}
 		}
