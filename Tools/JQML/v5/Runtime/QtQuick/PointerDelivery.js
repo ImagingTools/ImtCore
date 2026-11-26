@@ -107,6 +107,8 @@ const scene = {
     y: -1,
     modifiers: 0,
     contextMenuGrabbed: false,
+    // the timestamp of the event being delivered (QInputEvent::timestamp, ms), null: the clock's time
+    eventTime: null,
 }
 
 function targetsAt(x, y, all = false){

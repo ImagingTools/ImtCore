@@ -175,6 +175,16 @@ function aliasAssign(obj, name, child){
     if(child && child.$setParent && (prop !== 'children' || child.$isItem)) child.$setParent(owner)
 }
 
+// an object made as the value of a property (`property QtObject helper: QtObject {}`, `model: ListModel {}`): its
+// QObject parent is the object it was made for (QQmlObjectCreator), which destroys it; no visual parent
+function ownValue(owner, value){
+    if(!value || !(value instanceof QtObject) || value.$parent || value.$valueOwner || value === owner) return value
+    value.$valueOwner = owner
+    let list = owner.$valueObjects || (owner.$valueObjects = [])
+    list.push(value)
+    return value
+}
+
 function defaultAssign(Class, obj, child){
     Class.$defaultAssign(obj, child)
 }
@@ -411,7 +421,7 @@ function csetm(obj, key, name, v){
 }
 
 const JQ = {
-    cset, csetm, qsTrIn, forward, bindAlias, handleGroup, callCreateQmlObject, files, scripts, script, si, sis, moduleScripts, make: engine.make, inContext: engine.inContext, callCreateComponent, sctx, sctxValue, sset, singleton, defineMethod, defaultParent, defaultAssign, aliasAssign, ctx, ctxValue, mctx, mrole, as, ns, qmlModule, subAssign, rootContext,
+    cset, csetm, qsTrIn, forward, bindAlias, handleGroup, callCreateQmlObject, files, scripts, script, si, sis, moduleScripts, make: engine.make, inContext: engine.inContext, callCreateComponent, sctx, sctxValue, sset, singleton, defineMethod, defaultParent, defaultAssign, aliasAssign, ownValue, ctx, ctxValue, mctx, mrole, as, ns, qmlModule, subAssign, rootContext,
     engine, defineType, create,
     batch: engine.batch,
     stats: engine.stats,

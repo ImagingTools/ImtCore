@@ -384,7 +384,8 @@ class MouseArea extends Item {
         engine.emit(this, MouseArea.SIGNAL_pressedChanged, true, false)
         engine.emit(this, MouseArea.SIGNAL_containsPressChanged)
         engine.emit(this, MouseArea.SIGNAL_pressedButtonsChanged)
-        if(this.$hovered){
+        // the hover goes only when the pointer is not over the area any more (isUnderMouse)
+        if(this.$hovered && !pointerOver(this)){
             this.$hovered = false
             this.$v[MouseArea.CONTAINSMOUSE] = false
             engine.emit(this, MouseArea.SIGNAL_containsMouseChanged, true, false)
