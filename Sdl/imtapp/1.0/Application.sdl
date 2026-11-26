@@ -47,6 +47,7 @@ type ServiceInfo {
 	version: String
 	versionKind: String
 	buildTime: String
+	logId: String
 	dependencies: [ServiceInfo]
 }
 

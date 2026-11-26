@@ -61,6 +61,9 @@ void CRemoteServiceInfoComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	m_serviceInfo.serviceId = *m_serviceIdAttrPtr;
+	if (m_logIdAttrPtr.IsValid()){
+		m_serviceInfo.logId = *m_logIdAttrPtr;
+	}
 
 	// An auto instance is created before QCoreApplication, the connection (e.g. its SSL setup) must not be created that early
 	QMetaObject::invokeMethod(this, [this](){
@@ -175,6 +178,7 @@ void CRemoteServiceInfoComp::OnRequestFinished(int requestId, bool isTokenUsed, 
 	serviceInfo.serviceId = *m_serviceIdAttrPtr;
 	serviceInfo.status = imtcom::IConnectionStatusProvider::CS_CONNECTED;
 	serviceInfo.credentialStatus = GetServiceInfo().credentialStatus;
+	serviceInfo.logId = m_logIdAttrPtr.IsValid() ? *m_logIdAttrPtr : QByteArray();
 	if (result.model.applicationName.HasValue()){
 		serviceInfo.applicationName = *result.model.applicationName;
 	}
@@ -204,6 +208,7 @@ void CRemoteServiceInfoComp::SetServiceStatus(imtcom::IConnectionStatusProvider:
 	serviceInfo.serviceId = m_serviceInfo.serviceId;
 	serviceInfo.applicationName = m_serviceInfo.applicationName;
 	serviceInfo.credentialStatus = m_serviceInfo.credentialStatus;
+	serviceInfo.logId = m_serviceInfo.logId;
 	serviceInfo.status = status;
 
 	m_serviceInfo = serviceInfo;
@@ -307,6 +312,9 @@ void CRemoteServiceInfoComp::ReadDependencies(
 		}
 		if (dependencyData->versionKind.HasValue()){
 			dependency.versionKind = *dependencyData->versionKind;
+		}
+		if (dependencyData->logId.HasValue()){
+			dependency.logId = dependencyData->logId->toUtf8();
 		}
 		if (dependencyData->buildTime.HasValue()){
 			dependency.buildTime = QDateTime::fromString(*dependencyData->buildTime, Qt::ISODate);

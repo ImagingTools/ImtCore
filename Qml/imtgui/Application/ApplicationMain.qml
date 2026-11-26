@@ -44,6 +44,7 @@ Item {
 		property int appConnectionState: !application.useWebSocketSubscription ? 1 : (application.webSocketPort < 0 ? 0 : subscriptionManager_.status)
 		property int authConnectionState: 1
 		property int totalStatus: -1
+		property bool wasConnected: false
 		property var status: ({
 			TRY_CONNECTING_TO_AUTH_SERVER: 0,
 			AUTH_SERVER_CONNECTION_ERROR: 1,
@@ -86,6 +87,13 @@ Item {
 				internal.retryVisible = false
 				internal.loadingVisible = false
 			}
+			else if (totalStatus == status.TRY_CONNECTING_TO_APP_SERVER && connectionState.wasConnected){
+				// Reconnecting after a lost connection: keep the "connection is lost" message, no "Connecting to" window
+				internal.errorMessage = qsTr("The connection to the server is lost")
+				internal.errorDescription = qsTr("The application is paused until the connection is back. The open pages stay as they are.")
+				internal.retryVisible = true
+				internal.loadingVisible = false
+			}
 			else if (totalStatus == status.TRY_CONNECTING_TO_APP_SERVER){
 				// The address of the server comes with the client settings, maybe after this state, maybe never (the address is given to the engine).
 				// A web client gives the location of the page (an object): the server is its origin, as the address of the client settings
@@ -107,6 +115,7 @@ Item {
 				internal.loadingVisible = false
 			}
 			else if (totalStatus == status.CONNECTION_SUCCESFUL){
+				connectionState.wasConnected = true
 				statusTimer.stop()
 				thumbnailDecorator.stackView.clear();
 				Events.sendEvent("SearchVisible", true);
