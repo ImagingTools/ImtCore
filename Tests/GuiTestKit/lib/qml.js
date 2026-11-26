@@ -7,11 +7,9 @@
 //
 // The kit addresses items with a small CSS subset: `[objectName="X"]`, `[objectName^="X"]`, `[objectName$="X"]`,
 // `[objectName*="X"]`, `[visible]`, the tags `input`/`textarea`, the descendant combinator and a list of selectors
-// separated by commas. qmlSelectors() turns that into the selectors of qmlTest. Two rules of those selectors matter:
-// a name is always quoted (`"X":visible`; unquoted, `X:visible` is read as one name, and a name that is not ASCII
-// is refused), and an item without an objectName has an empty name on v4, where v3 named it after its type. So the
-// type names the kit uses (`MouseArea`, `TextInput`, `TextEdit`) stand for an item of that type that is unnamed or
-// named so (`""@MouseArea`, `"MouseArea"@MouseArea`), as on v3, where a MouseArea with a name of its own is skipped.
+// separated by commas. objectName conditions are checked against qmlTest handles so punctuation is treated literally
+// rather than as selector syntax or a glob. An item without an objectName has an empty name on v4, where v3 named it
+// after its type; the kit therefore also checks unnamed items by type for those legacy names.
 //
 // Clicks stay real mouse clicks at the middle of the item, as on v3, so the item on top at that point takes them
 // just as it does for a user. Text goes in through qmlTest.fill, which focuses the editor, selects its text and types.
@@ -67,7 +65,7 @@ async function backendOf(page, timeout = DEFAULT_WAIT_TIMEOUT) {
       fallbackUrlByPage.set(page, page.url());
       return 'dom';
     }
-    await page.waitForTimeout(POLL_MS);
+    await page.waitForTimeout(Math.min(POLL_MS, Math.max(0, deadline - Date.now())));
   }
 }
 
@@ -79,57 +77,193 @@ function unsupported(selector, part) {
   return new Error(`GUI selector is not supported on JQML v4: ${selector} (at ${part})`);
 }
 
-/**
- * One compound of the CSS subset (no spaces) -> the compounds of qmlTest that together find the same items; more than
- * one only for a type name, which stands for the unnamed items of the type and those named after it.
- * @returns {string[]}
- */
-function compoundToQml(selector, text) {
-  const match = /^([A-Za-z]*)((?:\[[^\]]*\])*)$/.exec(text);
-  if (!match) throw unsupported(selector, text);
-  let type = '';
-  if (match[1]) {
-    type = TAG_TYPES[match[1].toLowerCase()];
-    if (!type) throw unsupported(selector, text);
-  }
-  let names = [''];
-  let visible = false;
-  for (const attribute of match[2].match(/\[[^\]]*\]/g) || []) {
-    const parts = /^\[\s*(\w+)\s*(?:([\^$*]?=)\s*"((?:[^"\\]|\\.)*)")?\s*\]$/.exec(attribute);
-    if (!parts) throw unsupported(selector, attribute);
-    const [, key, op, raw] = parts;
-    if (key === 'visible' && !op) {
-      visible = true;
+function splitSelectorList(selector) {
+  if (!selector.trim()) return [''];
+  const alternatives = [];
+  let start = 0;
+  let quote = '';
+  let brackets = 0;
+  let escaped = false;
+  for (let i = 0; i < selector.length; i++) {
+    const character = selector[i];
+    if (escaped) {
+      escaped = false;
       continue;
     }
-    if (key !== 'objectName' || !op) throw unsupported(selector, attribute);
-    const value = raw.replace(/\\(.)/g, '$1');
-    if (op === '=' && TYPE_NAMES.has(value)) {
-      type = `@${value}`;
-      names = ['""', JSON.stringify(value)];
+    if (character === '\\') {
+      escaped = true;
       continue;
     }
-    if (op === '=') names = [JSON.stringify(value)];
-    else if (op === '^=') names = [JSON.stringify(`${value}*`)];
-    else if (op === '$=') names = [JSON.stringify(`*${value}`)];
-    else names = [JSON.stringify(`*${value}*`)];
+    if (quote) {
+      if (character === quote) quote = '';
+      continue;
+    }
+    if (character === '"' || character === "'") quote = character;
+    else if (character === '[') brackets++;
+    else if (character === ']') {
+      brackets--;
+      if (brackets < 0) throw unsupported(selector, character);
+    } else if (character === ',' && brackets === 0) {
+      alternatives.push(selector.slice(start, i).trim());
+      start = i + 1;
+    }
   }
-  return names.map((name) => `${name}${type}${visible ? ':visible' : ''}` || '*');
+  if (quote || brackets !== 0 || escaped) throw unsupported(selector, selector.slice(start));
+  alternatives.push(selector.slice(start).trim());
+  if (alternatives.some((alternative) => alternative === '')) throw unsupported(selector, selector);
+
+  return alternatives;
+}
+
+function splitCompounds(selector, alternative) {
+  if (!alternative.trim()) return [''];
+  const compounds = [];
+  let start = -1;
+  let quote = '';
+  let brackets = 0;
+  let escaped = false;
+  for (let i = 0; i < alternative.length; i++) {
+    const character = alternative[i];
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+    if (start < 0 && !/\s/.test(character)) start = i;
+    if (character === '\\') {
+      escaped = true;
+      continue;
+    }
+    if (quote) {
+      if (character === quote) quote = '';
+      continue;
+    }
+    if (character === '"' || character === "'") quote = character;
+    else if (character === '[') brackets++;
+    else if (character === ']') {
+      brackets--;
+      if (brackets < 0) throw unsupported(selector, alternative.slice(start < 0 ? 0 : start, i + 1));
+    } else if (/\s/.test(character) && brackets === 0) {
+      if (start >= 0) {
+        compounds.push(alternative.slice(start, i));
+        start = -1;
+      }
+    }
+  }
+  if (quote || brackets !== 0 || escaped) throw unsupported(selector, alternative.slice(start < 0 ? 0 : start));
+  if (start >= 0) compounds.push(alternative.slice(start));
+  if (compounds.length === 0) throw unsupported(selector, alternative);
+
+  return compounds;
+}
+
+function parseAttribute(selector, attribute) {
+  const match = /^\[\s*([\w-]+)\s*(.*)\]$/.exec(attribute);
+  if (!match) throw unsupported(selector, attribute);
+  const [, key, remainder] = match;
+  if (!remainder.trim()) {
+    if (key === 'visible') return { key };
+    throw unsupported(selector, attribute);
+  }
+
+  const operatorMatch = /^\s*(\^=|\$=|\*=|=)\s*/.exec(remainder);
+  if (key !== 'objectName' || !operatorMatch) throw unsupported(selector, attribute);
+  const operator = operatorMatch[1];
+  const valueStart = operatorMatch[0].length;
+  const quote = remainder[valueStart];
+  if (quote !== '"' && quote !== "'") throw unsupported(selector, attribute);
+
+  let escaped = false;
+  let end = valueStart + 1;
+  for (; end < remainder.length; end++) {
+    const character = remainder[end];
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+    if (character === '\\') {
+      escaped = true;
+      continue;
+    }
+    if (character === quote) break;
+  }
+  if (end === remainder.length || remainder.slice(end + 1).trim() !== '') throw unsupported(selector, attribute);
+
+  return {
+    key,
+    operator,
+    value: remainder.slice(valueStart + 1, end).replace(/\\(.)/gs, '$1'),
+  };
 }
 
 /**
- * The qmlTest selectors for a selector of the kit's CSS subset. Their items together are the items of the CSS
- * selector: one or more per alternative of a comma list (a type name gives two, see compoundToQml).
+ * One CSS compound -> qmlTest type/visibility searches plus literal objectName predicates.
+ * @returns {{ selector: string, names: Array<{ operator: string, value: string }> }[]}
+ */
+function compoundToQml(selector, text) {
+  const tagMatch = /^([A-Za-z]*)/.exec(text);
+  let type = '';
+  let rest = text.slice(tagMatch[0].length);
+  if (tagMatch[1]) {
+    type = TAG_TYPES[tagMatch[1].toLowerCase()];
+    if (!type) throw unsupported(selector, text);
+  }
+
+  const attributes = [];
+  while (rest) {
+    if (!rest.startsWith('[')) throw unsupported(selector, text);
+    let quote = '';
+    let escaped = false;
+    let end = 1;
+    for (; end < rest.length; end++) {
+      const character = rest[end];
+      if (escaped) {
+        escaped = false;
+        continue;
+      }
+      if (character === '\\') {
+        escaped = true;
+        continue;
+      }
+      if (quote) {
+        if (character === quote) quote = '';
+      } else if (character === '"' || character === "'") quote = character;
+      else if (character === ']') break;
+    }
+    if (end === rest.length || quote) throw unsupported(selector, rest);
+    attributes.push(parseAttribute(selector, rest.slice(0, end + 1)));
+    rest = rest.slice(end + 1);
+  }
+
+  let visible = false;
+  const names = [];
+  for (const attribute of attributes) {
+    if (attribute.key === 'visible') {
+      visible = true;
+      continue;
+    }
+    names.push({ operator: attribute.operator, value: attribute.value });
+  }
+  const state = visible ? ':visible' : '';
+  const variant = (searchType, nameFilters) => ({ selector: `${searchType || '*'}${state}`, names: nameFilters });
+  if (names.length === 0) return [variant(type, names)];
+
+  const variants = [variant(type, names)];
+  const typeName = names.find(({ operator }) => operator === '=');
+  if (!type && names.length === 1 && typeName && TYPE_NAMES.has(typeName.value)) {
+    variants.push(variant(`@${typeName.value}`, [{ operator: '=', value: '' }]));
+  }
+
+  return variants;
+}
+
+/**
+ * The parsed selector list. Each alternative is a descendant path of compounds; each compound has
+ * qmlTest searches and objectName predicates applied to the returned handles.
  * @param {string} css
- * @returns {string[]}
  */
 function qmlSelectors(css) {
-  return css.split(',').flatMap((alternative) =>
-    alternative
-      .trim()
-      .split(/\s+(?![^[]*\])/)
-      .map((compound) => compoundToQml(css, compound))
-      .reduce((heads, variants) => heads.flatMap((head) => variants.map((variant) => (head ? `${head} ${variant}` : variant))), [''])
+  return splitSelectorList(css).map((alternative) =>
+    splitCompounds(css, alternative).map((compound) => compoundToQml(css, compound))
   );
 }
 
@@ -165,11 +299,50 @@ async function inPage({ op, steps, args, notReady }) {
     const info = t.info(id);
     return property(id, 'visible') === true && info.width > 0 && info.height > 0;
   };
-  // The items below `scope` that one of the selectors finds, in the order of the tree, like a CSS selector list.
-  const findAll = (scope, selectors) => {
-    if (selectors.length === 1) return t.find(scope, selectors[0]);
-    const ids = new Set(selectors.flatMap((selector) => t.find(scope, selector).map((handle) => handle.id)));
-    return ids.size === 0 ? [] : t.find(scope, '*').filter((handle) => ids.has(handle.id));
+  const matchesNames = (handle, names) =>
+    names.every(({ operator, value }) => {
+      const name = handle.objectName || '';
+      if (operator === '=') return name === value;
+      if (operator === '^=') return name.startsWith(value);
+      if (operator === '$=') return name.endsWith(value);
+      return name.includes(value);
+    });
+  const findAll = (scope, searches) => {
+    const found = new Map();
+    for (const search of searches) {
+      for (const handle of t.find(scope, search.selector)) {
+        if (matchesNames(handle, search.names)) found.set(handle.id, handle);
+      }
+    }
+    if (found.size < 2) return [...found.values()];
+    return t.find(scope, '*').filter((handle) => found.has(handle.id));
+  };
+  const findSelector = (scope, compounds) => {
+    let found = [];
+    let scopes = [scope];
+    for (const compound of compounds) {
+      found = [];
+      const seen = new Set();
+      for (const parent of scopes) {
+        for (const handle of findAll(parent, compound)) {
+          if (!seen.has(handle.id)) {
+            seen.add(handle.id);
+            found.push(handle);
+          }
+        }
+      }
+      scopes = found.map((handle) => handle.id);
+      if (scopes.length === 0) break;
+    }
+    return found;
+  };
+  const findSelectors = (scope, alternatives) => {
+    const found = new Map();
+    for (const compounds of alternatives) {
+      for (const handle of findSelector(scope, compounds)) found.set(handle.id, handle);
+    }
+    if (found.size < 2) return [...found.values()];
+    return t.find(scope, '*').filter((handle) => found.has(handle.id));
   };
 
   let list = [];
@@ -178,7 +351,7 @@ async function inPage({ op, steps, args, notReady }) {
     list = [];
     const seen = new Set();
     for (const scope of scopes) {
-      for (const handle of findAll(scope, step.sel)) {
+      for (const handle of findSelectors(scope, step.sel)) {
         if (!seen.has(handle.id)) {
           seen.add(handle.id);
           list.push(handle);
@@ -297,7 +470,10 @@ class KitLocator {
   /** Runs one in-page operation; fails with a "not ready" error while the page has no window.qmlTest. */
   run(op, args = {}) {
     const steps = this.steps.map((step) => ({
-      sel: typeof step.css === 'string' ? qmlSelectors(step.css) : step.css.qml,
+      sel:
+        typeof step.css === 'string'
+          ? qmlSelectors(step.css)
+          : [[...step.css.qml.map((selector) => ({ selector, names: [] }))]],
       pick: step.pick,
     }));
     return this.page.evaluate(inPage, { op, steps, args, notReady: NOT_READY_MESSAGE });
@@ -318,17 +494,24 @@ class KitLocator {
   }
 
   async waitFor(options = {}) {
-    if (!(await this.isQml())) return this.playwright().waitFor(options);
-    const state = options.state || 'visible';
     const timeout = options.timeout === undefined ? DEFAULT_WAIT_TIMEOUT : options.timeout;
-    const deadline = Date.now() + timeout;
+    const deadline = timeout === 0 ? null : Date.now() + timeout;
+    const backend = await backendOf(this.page, timeout === 0 ? DEFAULT_WAIT_TIMEOUT : timeout);
+    if (backend !== 'qml') {
+      if (deadline === null) return this.playwright().waitFor(options);
+      const remaining = Math.max(0, deadline - Date.now());
+      if (remaining === 0) throw timeoutError(`locator.waitFor ${this}`, timeout);
+      return this.playwright().waitFor({ ...options, timeout: remaining });
+    }
+    const qmlDeadline = deadline === null ? Date.now() : deadline;
+    const state = options.state || 'visible';
     for (;;) {
       const now = await this.runOrNothing({ attached: false, visible: false }, 'state');
       const reached =
         state === 'attached' ? now.attached : state === 'detached' ? !now.attached : state === 'hidden' ? !now.visible : now.visible;
       if (reached) return;
-      if (Date.now() >= deadline) throw timeoutError(`locator.waitFor (${state}) ${this}`, timeout);
-      await this.page.waitForTimeout(POLL_MS);
+      if (Date.now() >= qmlDeadline) throw timeoutError(`locator.waitFor (${state}) ${this}`, timeout);
+      await this.page.waitForTimeout(Math.min(POLL_MS, Math.max(0, qmlDeadline - Date.now())));
     }
   }
 
@@ -412,6 +595,7 @@ module.exports = {
   isQml,
   compoundToQml,
   qmlSelectors,
+  playwrightLocator: (locator) => (locator instanceof KitLocator ? locator.playwright() : locator),
   locate,
   callQmlTest,
 };

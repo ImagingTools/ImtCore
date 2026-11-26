@@ -5,6 +5,7 @@
 
 const { expect } = require('@playwright/test');
 const dom = require('./dom');
+const { playwrightLocator } = require('./qml');
 const { waitForStable } = require('./stability');
 
 // A screenshot is the only assertion that compares EVERY pixel, so it settles harder than an action
@@ -140,7 +141,7 @@ async function checkElementScreenshot(page, path, name, mask) {
       await expect(page).toHaveScreenshot(`${name}.png`, { clip, threshold: THRESHOLD, maxDiffPixels: MAX_DIFF_PIXELS });
       return;
     }
-    await expect(locator).toHaveScreenshot(`${name}.png`, { threshold: THRESHOLD, maxDiffPixels: MAX_DIFF_PIXELS });
+    await expect(playwrightLocator(locator)).toHaveScreenshot(`${name}.png`, { threshold: THRESHOLD, maxDiffPixels: MAX_DIFF_PIXELS });
   } finally {
     for (const h of handles) await removeMask(page, h).catch(() => {});
   }
