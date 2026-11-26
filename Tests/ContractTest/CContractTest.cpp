@@ -223,12 +223,20 @@ void CContractTest::testState_ExpiringAndTerminatingFlags()
 	QCOMPARE(imtauth::ComputeContractState(contract, Day(10)).flags & imtauth::CSF_EXPIRING, 0);
 	QVERIFY(imtauth::ComputeContractState(contract, Day(70)).flags & imtauth::CSF_EXPIRING);
 
-	// A party that gave notice leaves later: the contract goes on until then
+	// The third party leaves later: the two others still hold the contract, it does not end
 	SetPartyState(contract, "C", imtauth::IContractInfo::PS_NOTICE_GIVEN, Day(20));
-	const imtauth::ContractStateInfo stateInfo = imtauth::ComputeContractState(contract, Day(10));
-	QCOMPARE(int(stateInfo.state), int(imtauth::CS_ACTIVE));
-	QVERIFY(stateInfo.flags & imtauth::CSF_TERMINATING);
-	QCOMPARE(stateInfo.endsAt, Day(20));
+	const imtauth::ContractStateInfo goesOn = imtauth::ComputeContractState(contract, Day(10));
+	QCOMPARE(int(goesOn.state), int(imtauth::CS_ACTIVE));
+	QCOMPARE(goesOn.flags & imtauth::CSF_TERMINATING, 0);
+
+	// One of two parties leaves later: the contract goes on until then and ends with it
+	imtauth::CContractInfo pair;
+	FillContract(pair, true, 2);
+	SetPartyState(pair, "B", imtauth::IContractInfo::PS_NOTICE_GIVEN, Day(20));
+	const imtauth::ContractStateInfo ending = imtauth::ComputeContractState(pair, Day(10));
+	QCOMPARE(int(ending.state), int(imtauth::CS_ACTIVE));
+	QVERIFY(ending.flags & imtauth::CSF_TERMINATING);
+	QCOMPARE(ending.endsAt, Day(20));
 
 	// Changes requested in the negotiation
 	imtauth::CContractInfo negotiated;
@@ -267,7 +275,7 @@ void CContractTest::testLink_InForceWithinItsPeriodAndBoundParties()
 }
 
 
-void CContractTest::testAllocation_InForceOnItsLinkUnlessSuspended()
+void CContractTest::testAllocation_InForceOnItsLinkWhileTheGrantorIsBound()
 {
 	imtauth::CContractInfo contract;
 	FillContract(contract, true);
@@ -290,15 +298,14 @@ void CContractTest::testAllocation_InForceOnItsLinkUnlessSuspended()
 	foreign.granteeTenantId = "C";
 	QVERIFY(!imtauth::IsAllocationInForce(contract, foreign, Day(1)));
 
-	// The grantor stops what it gives, the grantee does not
+	// The permissions end when the grantor leaves the contract
 	imtauth::IContractInfo::Parties parties = contract.GetParties();
-	parties[imtauth::FindContractParty(parties, "B")].allocationsSuspended = true;
+	imtauth::IContractInfo::Party& grantor = parties[imtauth::FindContractParty(parties, "A")];
+	grantor.state = imtauth::IContractInfo::PS_WITHDRAWN;
+	grantor.withdrawAt = Day(5);
 	contract.SetParties(parties);
-	QVERIFY(imtauth::IsAllocationInForce(contract, allocation, Day(1)));
-	parties[imtauth::FindContractParty(parties, "A")].allocationsSuspended = true;
-	contract.SetParties(parties);
-	QVERIFY(!imtauth::IsAllocationInForce(contract, allocation, Day(1)));
-	QVERIFY(imtauth::ComputeContractState(contract, Day(1)).flags & imtauth::CSF_PARTIALLY_SUSPENDED);
+	QVERIFY(imtauth::IsAllocationInForce(contract, allocation, Day(4)));
+	QVERIFY(!imtauth::IsAllocationInForce(contract, allocation, Day(6)));
 }
 
 
@@ -351,6 +358,17 @@ void CContractTest::testContentHash_IgnoresOrderAndProgress()
 	replaced.contentHash = "2222";
 	replaced.isReplaced = true;
 	reordered.SetAttachments({copy, replaced});
+	QCOMPARE(imtauth::ComputeContractContentHash(reordered), hash);
+
+	// The permissions a party gives are its own decision, not a term
+	imtauth::IContractInfo::Allocation allocation;
+	allocation.allocationId = "allocation";
+	allocation.linkId = "AB";
+	allocation.grantorTenantId = "A";
+	allocation.granteeTenantId = "B";
+	allocation.productId = "Product";
+	allocation.permissionIds = {"Read"};
+	reordered.SetAllocations({allocation});
 	QCOMPARE(imtauth::ComputeContractContentHash(reordered), hash);
 }
 

@@ -56,7 +56,7 @@ TestCase {
 			property bool canEditContracts: true
 			property bool canApproveContracts: true
 			property bool canSignContracts: true
-			property bool canSuspendContractPermissions: true
+			property bool canGiveContractPermissions: true
 			property bool canDistributeContractPermissions: true
 		}
 	}

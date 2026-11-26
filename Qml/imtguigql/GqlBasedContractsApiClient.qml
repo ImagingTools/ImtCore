@@ -75,9 +75,15 @@ ContractsApiClient {
 					   {"tenantId": tenantId, "contractId": contractId, "reason": reason || "", "isImmediate": isImmediate === true})
 	}
 
-	function setAllocationsSuspended(tenantId, contractId, isSuspended) {
-		root.__enqueue(ImtauthContractsSdlCommandIds.s_setContractAllocationsSuspended, "contract", root.__suspendInputComp,
-					   {"tenantId": tenantId, "contractId": contractId, "isSuspended": isSuspended === true})
+	function givePermissions(tenantId, contractId, granteeTenantId, productId, permissionIds, validUntil, comment) {
+		root.__enqueue(ImtauthContractsSdlCommandIds.s_giveContractPermissions, "contract", root.__giveInputComp,
+					   {"tenantId": tenantId, "contractId": contractId, "granteeTenantId": granteeTenantId, "productId": productId,
+						"permissionIds": permissionIds, "validUntil": validUntil || "", "comment": comment || ""})
+	}
+
+	function withdrawPermissions(tenantId, contractId, allocationId) {
+		root.__enqueue(ImtauthContractsSdlCommandIds.s_withdrawContractPermissions, "contract", root.__withdrawInputComp,
+					   {"tenantId": tenantId, "contractId": contractId, "allocationId": allocationId})
 	}
 
 	function addAttachment(tenantId, contractId, fileName, mimeType, data, replacesAttachmentId, isInternal) {
@@ -426,7 +432,8 @@ ContractsApiClient {
 	property Component __commandInputComp: Component { ContractCommandInput {} }
 	property Component __signInputComp: Component { SignContractInput {} }
 	property Component __noticeInputComp: Component { GiveContractNoticeInput {} }
-	property Component __suspendInputComp: Component { SetContractAllocationsSuspendedInput {} }
+	property Component __giveInputComp: Component { GiveContractPermissionsInput {} }
+	property Component __withdrawInputComp: Component { WithdrawContractPermissionsInput {} }
 	property Component __attachmentInputComp: Component { AddContractAttachmentInput {} }
 	property Component __getAttachmentInputComp: Component { GetContractAttachmentInput {} }
 	property Component __privateInfoInputComp: Component { SetContractPrivateInfoInput {} }

@@ -106,8 +106,6 @@ public:
 		QString withdrawReason;
 		/// The party does not want the contract to be renewed again
 		QDateTime nonRenewalNoticeAt;
-		/// The party stopped its own allocations
-		bool allocationsSuspended = false;
 
 		bool operator==(const Party& other) const;
 		bool operator!=(const Party& other) const;

@@ -24,7 +24,8 @@ Item {
 
 	function __eventRows(events) {
 		var rows = []
-		for (var i = 0; i < events.length; i++) {
+		// The newest first
+		for (var i = events.length - 1; i >= 0; i--) {
 			var event = events[i]
 			rows.push({"id": event.id || String(i),
 					   "time": ContractTexts.dateTimeText(event.time),

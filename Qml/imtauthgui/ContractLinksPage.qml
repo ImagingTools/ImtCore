@@ -25,6 +25,18 @@ Item {
 
 	readonly property var linkRows: linksPage.__linkRows(linksPage.editor ? linksPage.editor.links : [])
 
+	// Whether the two work with each other now, in the words of the user
+	function __stateText(link) {
+		if (!link.linkId)
+			return qsTr("Not saved yet")
+		if (link.isInForce)
+			return qsTr("In force")
+		var contract = linksPage.editor ? linksPage.editor.contract : null
+		if (!contract || !contract.signedAt)
+			return qsTr("Once all parties sign")
+		return linksPage.editor.contractState === "Signed" ? qsTr("Once the contract comes into force") : qsTr("Ended")
+	}
+
 	function __linkRows(links) {
 		var rows = []
 		for (var i = 0; i < links.length; i++) {
@@ -35,7 +47,7 @@ Item {
 					   "roleA": link.roleAName || linksPage.editor.roleName(link.roleAId || ""),
 					   "partyB": linksPage.editor.partyName(link.tenantBId),
 					   "roleB": link.roleBName || linksPage.editor.roleName(link.roleBId || ""),
-					   "state": link.linkId ? (link.isInForce ? qsTr("In force") : qsTr("Saved")) : qsTr("New"),
+					   "state": linksPage.__stateText(link),
 					   "isSharingAllowed": link.isSharingAllowed !== false})
 		}
 		return rows

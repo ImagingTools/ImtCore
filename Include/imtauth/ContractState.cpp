@@ -421,15 +421,12 @@ ContractStateInfo ComputeContractState(const IContractInfo& contract, const QDat
 
 	retVal.state = (now < retVal.effectiveStart) ? CS_SIGNED : CS_ACTIVE;
 
-	// What ends later: the termination, a party leaving, or the contract breaking up with it
+	// What ends the contract later: its termination, or a party leaving when the others no longer hold it
 	QDateTime endsAt = contract.GetTerminatedAt();
 	for (const IContractInfo::Party& party : parties){
-		if (party.state == IContractInfo::PS_NOTICE_GIVEN && party.withdrawAt.isValid() && party.withdrawAt > now){
+		if (party.state == IContractInfo::PS_NOTICE_GIVEN && party.withdrawAt.isValid() && party.withdrawAt > now
+					&& !IsViableAt(contract, party.withdrawAt)){
 			endsAt = EarlierOf(endsAt, party.withdrawAt);
-		}
-
-		if (IsPartyBoundAt(contract, party, now) && party.allocationsSuspended){
-			retVal.flags |= CSF_PARTIALLY_SUSPENDED;
 		}
 	}
 
@@ -487,14 +484,7 @@ bool IsAllocationInForce(const IContractInfo& contract, const IContractInfo::All
 		return false;
 	}
 
-	if ((allocation.validFrom.isValid() && now < allocation.validFrom) || (allocation.validUntil.isValid() && now >= allocation.validUntil)){
-		return false;
-	}
-
-	const IContractInfo::Parties parties = contract.GetParties();
-	const int grantorIndex = FindContractParty(parties, allocation.grantorTenantId);
-
-	return grantorIndex >= 0 && !parties[grantorIndex].allocationsSuspended;
+	return !(allocation.validFrom.isValid() && now < allocation.validFrom) && !(allocation.validUntil.isValid() && now >= allocation.validUntil);
 }
 
 
@@ -564,21 +554,6 @@ QByteArray ComputeContractContentHash(const IContractInfo& contract)
 		links.insert(link.linkId, item);
 	}
 
-	QMap<QByteArray, QJsonObject> allocations;
-	for (const IContractInfo::Allocation& allocation : contract.GetAllocations()){
-		QJsonObject item;
-		item["allocationId"] = QString::fromUtf8(allocation.allocationId);
-		item["linkId"] = QString::fromUtf8(allocation.linkId);
-		item["grantorTenantId"] = QString::fromUtf8(allocation.grantorTenantId);
-		item["granteeTenantId"] = QString::fromUtf8(allocation.granteeTenantId);
-		item["productId"] = QString::fromUtf8(allocation.productId);
-		item["permissionIds"] = ToJsonArray(allocation.permissionIds);
-		item["validFrom"] = TimeText(allocation.validFrom);
-		item["validUntil"] = TimeText(allocation.validUntil);
-		item["comment"] = allocation.comment;
-		allocations.insert(allocation.allocationId, item);
-	}
-
 	QMap<QByteArray, QJsonObject> references;
 	for (const IContractInfo::Reference& reference : contract.GetReferences()){
 		QJsonObject item;
@@ -605,7 +580,6 @@ QByteArray ComputeContractContentHash(const IContractInfo& contract)
 
 	root["parties"] = ToJsonArray(parties);
 	root["links"] = ToJsonArray(links);
-	root["allocations"] = ToJsonArray(allocations);
 	root["references"] = ToJsonArray(references);
 	root["roleSlots"] = ToJsonArray(roleSlots);
 	root["attachments"] = ToJsonArray(attachmentHashes);

@@ -85,9 +85,16 @@ public:
 	virtual bool GiveNonRenewalNotice(const ContractActor& actor, const QByteArray& contractId, QString& errorMessage) = 0;
 
 	/**
-		Stop or resume the permissions the party gives the others; the party decides it alone.
+		The organization of the actor gives its own permissions to a party it is linked with; it decides it alone,
+		so the terms and the signatures stay. The permissions work while the contract is in force.
+		The grantor and the link of \c allocation are set here.
 	*/
-	virtual bool SetAllocationsSuspended(const ContractActor& actor, const QByteArray& contractId, bool isSuspended, QString& errorMessage) = 0;
+	virtual bool GiveAllocation(const ContractActor& actor, const QByteArray& contractId, const IContractInfo::Allocation& allocation, QString& errorMessage) = 0;
+
+	/**
+		The organization of the actor takes back permissions it gave.
+	*/
+	virtual bool WithdrawAllocation(const ContractActor& actor, const QByteArray& contractId, const QByteArray& allocationId, QString& errorMessage) = 0;
 
 	/**
 		Record an attachment the caller stored. An internal one is seen by the party of the actor only.

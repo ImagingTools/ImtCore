@@ -153,11 +153,8 @@ CContractNotificationPublisherComp::NotificationKind CContractNotificationPublis
 	else if (eventType == te::s_contractWithdrawn){
 		retVal = {tn::s_contractWithdrawn, istd::IInformationProvider::IC_WARNING, false};
 	}
-	else if (eventType == te::s_contractAllocationsSuspended){
-		retVal = {tn::s_contractAllocationsSuspended, istd::IInformationProvider::IC_WARNING, false};
-	}
-	else if (eventType == te::s_contractAllocationsResumed){
-		retVal = {tn::s_contractAllocationsResumed, istd::IInformationProvider::IC_INFO, false};
+	else if (eventType == te::s_contractPermissionsWithdrawn){
+		retVal = {tn::s_contractPermissionsWithdrawn, istd::IInformationProvider::IC_WARNING, false};
 	}
 	else if (eventType == te::s_contractPermissionsReceived){
 		retVal = {tn::s_contractPermissionsReceived, istd::IInformationProvider::IC_INFO, false};

@@ -244,7 +244,8 @@
                                 <Value>GiveContractNotice</Value>
                                 <Value>RevokeContractNotice</Value>
                                 <Value>GiveContractNonRenewalNotice</Value>
-                                <Value>SetContractAllocationsSuspended</Value>
+                                <Value>GiveContractPermissions</Value>
+                                <Value>WithdrawContractPermissions</Value>
                                 <Value>AddContractAttachment</Value>
                                 <Value>SetContractPrivateInfo</Value>
                                 <Value>SetContractAllocationGroups</Value>
@@ -1440,11 +1441,33 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SetContractAllocationsSuspended" PackageId="ImtServerAppPck" ComponentId="SingleCommandPermissionsProvider">
+        <Element Id="GiveContractPermissions" PackageId="ImtServerAppPck" ComponentId="SingleCommandPermissionsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="SetContractAllocationsSuspended"/>
+                        <Data IsEnabled="true" Value="GiveContractPermissions"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>/OrganizationManagement/View</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="WithdrawContractPermissions" PackageId="ImtServerAppPck" ComponentId="SingleCommandPermissionsProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="WithdrawContractPermissions"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">

@@ -46,7 +46,6 @@ ViewBase {
 	// The working copy of the internal data of the organization
 	property var parties: []
 	property var links: []
-	property var allocations: []
 	property var references: []
 
 	property string __currentId: contractView.contractId
@@ -80,7 +79,7 @@ ViewBase {
 	readonly property bool canEdit: contractView.__can("canEditContracts")
 	readonly property bool canApprove: contractView.__can("canApproveContracts")
 	readonly property bool canSign: contractView.__can("canSignContracts")
-	readonly property bool canSuspend: contractView.__can("canSuspendContractPermissions")
+	readonly property bool canGive: contractView.__can("canGiveContractPermissions")
 	readonly property bool canDistribute: contractView.__can("canDistributeContractPermissions")
 
 	readonly property bool isEditable: contractView.canEdit && contractView.isInitiator && !contractView.isClosed
@@ -170,10 +169,6 @@ ViewBase {
 		contractView.markChanged()
 	}
 
-	onAllocationsChanged: {
-		contractView.markChanged()
-	}
-
 	onReferencesChanged: {
 		contractView.markChanged()
 	}
@@ -245,7 +240,6 @@ ViewBase {
 		contractView.__shownCommands = 0
 		var view = contractView
 		var party = view.myParty
-		var isSuspended = party !== null && party.allocationsSuspended === true
 		var isSigned = view.contract !== null && !!view.contract.signedAt
 		// A party answers until it has signed or declined
 		var isAnswering = view.myPartyState === "Reviewing" || view.myPartyState === "Approved"
@@ -263,10 +257,9 @@ ViewBase {
 		// A notice is revoked until the day the organization leaves
 		view.__setCommand("RevokeNotice", view.canSign && view.myPartyState === "NoticeGiven" && party !== null && !!party.withdrawAt
 						  && new Date(party.withdrawAt) > new Date())
+		// One refusal ends the renewal for all
 		view.__setCommand("StopRenewal", view.canSign && view.isConcluded && view.contract !== null && view.contract.autoRenew === true
-						  && view.myPartyBound && !(party && party.nonRenewalNoticeAt))
-		view.__setCommand("SuspendPermissions", view.canSuspend && view.isConcluded && isSigned && party !== null && !isSuspended)
-		view.__setCommand("ResumePermissions", view.canSuspend && view.isConcluded && isSigned && party !== null && isSuspended)
+						  && view.myPartyBound && !view.__isRenewalStopped())
 		view.commandsPanelVisible = view.__shownCommands > 0
 	}
 
@@ -302,8 +295,6 @@ ViewBase {
 			contractView.run("RevokeContractNotice", "")
 		else if (commandId === "StopRenewal")
 			contractView.run("GiveContractNonRenewalNotice", "")
-		else if (commandId === "SuspendPermissions" || commandId === "ResumePermissions")
-			contractView.setAllocationsSuspended(commandId === "SuspendPermissions")
 	}
 
 	// A contract is sent once it has a party besides the organization
@@ -318,11 +309,6 @@ ViewBase {
 			return
 		}
 		contractView.run("SubmitContract", "")
-	}
-
-	function setAllocationsSuspended(isSuspended) {
-		contractView.__busy = true
-		contractView.contractsApiClient.setAllocationsSuspended(contractView.tenantId, contractView.__currentId, isSuspended)
 	}
 
 	// What the organization does next, by the state of the contract and of its party
@@ -340,7 +326,7 @@ ViewBase {
 		}
 		if (view.isNegotiated) {
 			if (view.isInitiator && view.contract.isChangesRequested)
-				return qsTr("A party asked for changes, see the Journal. Change the terms and save: every party is asked again.")
+				return qsTr("Changes asked by %1. Change the terms and save: every party is asked again.").arg(view.__partiesInStateText("ChangesRequested"))
 			if (view.myPartyState === "Reviewing")
 				return qsTr("Read the terms and answer: approve them, sign the contract, or ask for changes.")
 			if (view.myPartyState === "Approved")
@@ -354,6 +340,9 @@ ViewBase {
 			return qsTr("The parties are reading the terms.")
 		}
 		if (view.isConcluded) {
+			if (view.myPartyState === "Withdrawn")
+				return qsTr("Your organization left the contract on %1. The other parties go on with it; for your organization it stays in the history.")
+					.arg(ContractTexts.dateText(view.myParty ? view.myParty.withdrawAt : ""))
 			if (view.myPartyState === "NoticeGiven" && view.myParty && view.myParty.withdrawAt)
 				return qsTr("Your organization gave notice and leaves the contract on %1. Until then the notice can be revoked.")
 					.arg(ContractTexts.dateText(view.myParty.withdrawAt))
@@ -362,11 +351,12 @@ ViewBase {
 			return qsTr("The contract is in force: the links and the permissions given in it work until it ends.")
 		}
 		if (view.contractState === "Rejected") {
-			if (view.isInitiator)
-				return qsTr("A party declined the contract, see the Journal. Remove or replace it on the page Parties and save to ask the parties again, or withdraw the offer.")
-			return view.myPartyState === "Declined"
-				? qsTr("Your organization declined the contract. The initiator may change the parties and ask again.")
-				: qsTr("A party declined the contract. The initiator decides how to go on.")
+			if (view.myPartyState === "Declined")
+				return qsTr("Your organization declined the contract. The initiator may change the parties and ask again.")
+			var refusals = view.__partiesInStateText("Declined")
+			return view.isInitiator
+				? qsTr("Declined by %1. Remove or replace the party on the page Parties and save to ask the parties again, or withdraw the offer.").arg(refusals)
+				: qsTr("Declined by %1. The initiator decides how to go on.").arg(refusals)
 		}
 		if (view.contractState === "Cancelled")
 			return qsTr("The initiator withdrew the offer: the contract was not concluded. It stays in the history of the parties.")
@@ -394,7 +384,6 @@ ViewBase {
 		contractView.parties = [{"tenantId": contractView.tenantId, "tenantName": contractView.tenantName, "roleId": "", "roleName": "",
 								 "state": "Invited", "channel": "Initiator"}]
 		contractView.links = []
-		contractView.allocations = []
 		contractView.references = []
 		contractView.__updatePagesGui()
 	}
@@ -413,7 +402,6 @@ ViewBase {
 							  "terminationNoticeDays": contract.terminationNoticeDays || 0}
 		contractView.parties = (contract.parties || []).slice()
 		contractView.links = (contract.links || []).slice()
-		contractView.allocations = (contract.allocations || []).slice()
 		contractView.references = (contract.references || []).slice()
 		contractView.__updatePagesGui()
 	}
@@ -448,14 +436,6 @@ ViewBase {
 						"validUntil": link.validUntil || "", "isMessagingAllowed": link.isMessagingAllowed !== false,
 						"isSharingAllowed": link.isSharingAllowed !== false})
 		}
-		var allocations = []
-		for (var k = 0; k < contractView.allocations.length; k++) {
-			var allocation = contractView.allocations[k]
-			allocations.push({"allocationId": allocation.allocationId || "", "linkId": allocation.linkId,
-							  "grantorTenantId": allocation.grantorTenantId, "granteeTenantId": allocation.granteeTenantId,
-							  "productId": allocation.productId, "permissionIds": allocation.permissionIds || [],
-							  "validFrom": allocation.validFrom || "", "validUntil": allocation.validUntil || "", "comment": allocation.comment || ""})
-		}
 		var references = []
 		for (var r = 0; r < contractView.references.length; r++)
 			references.push({"contractId": contractView.references[r].contractId, "referenceType": contractView.references[r].referenceType})
@@ -464,7 +444,6 @@ ViewBase {
 		result.name = (result.name || "").trim()
 		result.parties = parties
 		result.links = links
-		result.allocations = allocations
 		result.references = references
 		return result
 	}
@@ -624,13 +603,6 @@ ViewBase {
 				parties.push(contractView.parties[i])
 		}
 		contractView.parties = parties
-		var allocations = []
-		for (var j = 0; j < contractView.allocations.length; j++) {
-			var allocation = contractView.allocations[j]
-			if (allocation.grantorTenantId !== tenantId && allocation.granteeTenantId !== tenantId)
-				allocations.push(allocation)
-		}
-		contractView.allocations = allocations
 		contractView.__rebuildLinks()
 	}
 
@@ -689,30 +661,40 @@ ViewBase {
 		contractView.links = links
 	}
 
-	// The links saved with an id: the permissions are given within them
-	function savedLinks() {
+	// --- The permissions ---
+
+	// The parties the organization is linked with by the saved contract: it gives its permissions to them
+	function linkedPartners() {
 		var result = []
-		for (var i = 0; i < contractView.links.length; i++) {
-			var link = contractView.links[i]
-			if (link.linkId && link.linkId !== "")
-				result.push({"linkId": link.linkId, "tenantAId": link.tenantAId, "tenantAName": contractView.partyName(link.tenantAId),
-							 "tenantBId": link.tenantBId, "tenantBName": contractView.partyName(link.tenantBId)})
+		var links = contractView.contract ? (contractView.contract.links || []) : []
+		for (var i = 0; i < links.length; i++) {
+			var otherId = links[i].tenantAId === contractView.tenantId ? links[i].tenantBId
+				: (links[i].tenantBId === contractView.tenantId ? links[i].tenantAId : "")
+			var other = otherId !== "" ? contractView.contractParty(otherId) : null
+			if (other && other.state !== "Declined" && other.state !== "Withdrawn")
+				result.push({"tenantId": otherId, "tenantName": other.tenantName || otherId})
 		}
 		return result
 	}
 
-	// --- The permissions ---
+	// The organization gives and takes back its own permissions until the contract ends, unless it declined or left it
+	readonly property bool canChangeOwnPermissions: contractView.canGive && !contractView.isNew && contractView.contract !== null
+		&& contractView.myParty !== null && contractView.myPartyState !== "Declined" && contractView.myPartyState !== "Withdrawn"
+		&& ["Cancelled", "Expired", "Terminated", "Superseded"].indexOf(contractView.contractState) < 0
 
-	function addAllocation(allocation) {
-		var allocations = contractView.allocations.slice()
-		allocations.push(allocation)
-		contractView.allocations = allocations
+	function givePermissions(granteeTenantId, permissionIds, validUntil, comment) {
+		if (!contractView.contractsApiClient || contractView.__busy)
+			return
+		contractView.__busy = true
+		contractView.contractsApiClient.givePermissions(contractView.tenantId, contractView.__currentId, granteeTenantId,
+														AuthorizationController.productId, permissionIds, validUntil, comment)
 	}
 
-	function removeAllocation(index) {
-		var allocations = contractView.allocations.slice()
-		allocations.splice(index, 1)
-		contractView.allocations = allocations
+	function withdrawPermissions(allocationId) {
+		if (!contractView.contractsApiClient || contractView.__busy)
+			return
+		contractView.__busy = true
+		contractView.contractsApiClient.withdrawPermissions(contractView.tenantId, contractView.__currentId, allocationId)
 	}
 
 	function allocationGroupIds(allocationId) {
@@ -797,11 +779,16 @@ ViewBase {
 	function __noticeText(isImmediate) {
 		var days = contractView.contract ? (contractView.contract.terminationNoticeDays || 0) : 0
 		var parties = contractView.contract ? (contractView.contract.parties || []) : []
-		var boundOthers = 0
+		var boundOthers = []
 		for (var i = 0; i < parties.length; i++) {
 			if (parties[i].tenantId !== contractView.tenantId && (parties[i].state === "Signed" || parties[i].state === "NoticeGiven"))
-				boundOthers++
+				boundOthers.push(parties[i].tenantId)
 		}
+		// The others hold the contract while two of them stay linked with each other
+		var links = contractView.contract ? (contractView.contract.links || []) : []
+		var isLinkLeft = false
+		for (var l = 0; l < links.length; l++)
+			isLinkLeft = isLinkLeft || (boundOthers.indexOf(links[l].tenantAId) >= 0 && boundOthers.indexOf(links[l].tenantBId) >= 0)
 		var leaveDate = new Date()
 		leaveDate.setDate(leaveDate.getDate() + days)
 		var text = isImmediate
@@ -810,9 +797,29 @@ ViewBase {
 				? qsTr("Your organization leaves the contract on %1, after the notice period of %2 days. The other parties are told now.")
 					.arg(ContractTexts.dateText(leaveDate.toISOString())).arg(days)
 				: qsTr("The contract has no notice period: your organization leaves it at once.")
-		if (boundOthers < 2)
-			text = text + " " + qsTr("No other party stays bound, so the contract ends then.")
+		if (!isLinkLeft)
+			text = text + " " + qsTr("No two other parties stay linked with each other, so the contract ends then.")
 		return text
+	}
+
+	// The parties in a state with their comments: "QUISS (reason)"
+	function __partiesInStateText(state) {
+		var result = []
+		var parties = contractView.contract ? (contractView.contract.parties || []) : []
+		for (var i = 0; i < parties.length; i++) {
+			if (parties[i].state === state)
+				result.push((parties[i].tenantName || parties[i].tenantId) + (parties[i].stateComment ? " (" + parties[i].stateComment + ")" : ""))
+		}
+		return result.join(", ")
+	}
+
+	function __isRenewalStopped() {
+		var parties = contractView.contract ? (contractView.contract.parties || []) : []
+		for (var i = 0; i < parties.length; i++) {
+			if (parties[i].nonRenewalNoticeAt)
+				return true
+		}
+		return false
 	}
 
 	// The period and the marks of the contract, joined by dots
@@ -832,10 +839,14 @@ ViewBase {
 				isRenewalStopped = isRenewalStopped || !!parties[i].nonRenewalNoticeAt
 			parts.push(isRenewalStopped ? qsTr("not renewed: a party stopped the renewal") : qsTr("renewed automatically"))
 		}
+		// A party that leaves while the others keep the contract
+		var leaving = contract.parties || []
+		for (var p = 0; p < leaving.length; p++) {
+			if (!contract.isTerminating && leaving[p].state === "NoticeGiven" && leaving[p].withdrawAt && new Date(leaving[p].withdrawAt) > new Date())
+				parts.push(qsTr("%1 leaves on %2").arg(leaving[p].tenantName || leaving[p].tenantId).arg(ContractTexts.dateText(leaving[p].withdrawAt)))
+		}
 		if (contract.isChangesRequested && contractView.isNegotiated)
 			parts.push(qsTr("a party asked for changes"))
-		if (contract.isPartiallySuspended)
-			parts.push(qsTr("some permissions are stopped"))
 		if (contract.supersededBy)
 			parts.push(qsTr("replaced by another contract on %1").arg(ContractTexts.dateText(contract.supersededAt)))
 		return parts.join(" · ")
@@ -874,8 +885,10 @@ ViewBase {
 			return qsTr("The party was added")
 		if (command === "SetContractAllocationGroups")
 			return qsTr("The groups were saved")
-		if (command === "SetContractAllocationsSuspended")
-			return qsTr("The permissions were changed")
+		if (command === "GiveContractPermissions")
+			return qsTr("The permissions were given")
+		if (command === "WithdrawContractPermissions")
+			return qsTr("The permissions were taken back")
 		return qsTr("Done")
 	}
 
@@ -1121,6 +1134,11 @@ ViewBase {
 			}
 
 			onAddPartyByCodeRequested: {
+				// The server adds the party to the saved terms: the edits are saved first
+				if (contractView.isDirty) {
+					PopupManager.addWarningMessage(qsTr("Save the changes first: a party found by its code is added to the saved terms."), true)
+					return
+				}
 				ModalDialogManager.openDialog(partyDialogComp, {"byCode": true, "roles": contractView.roles(true)})
 			}
 
@@ -1148,13 +1166,12 @@ ViewBase {
 			editor: contractView
 
 			onAddAllocationRequested: {
-				var links = contractView.savedLinks()
-				if (links.length === 0) {
-					PopupManager.addWarningMessage(qsTr("Save the terms first: the permissions are given within a saved link."), true)
+				var partners = contractView.linkedPartners()
+				if (partners.length === 0) {
+					PopupManager.addWarningMessage(qsTr("Your organization is linked with no party yet: the permissions are given within a saved link (page Links)."), true)
 					return
 				}
-				ModalDialogManager.openDialog(allocationDialogComp, {"links": links, "tenantId": contractView.tenantId,
-																	 "productId": AuthorizationController.productId,
+				ModalDialogManager.openDialog(allocationDialogComp, {"partners": partners,
 																	 "tenantApiClient": contractView.tenantApiClient,
 																	 "scopeIds": contractView.stateManager && contractView.stateManager.tenantData
 																		 ? (contractView.stateManager.tenantData.m_tenantPermissions || []) : []})
@@ -1223,7 +1240,9 @@ ViewBase {
 		ContractReasonDialog {
 			id: reasonDialog
 			property string command: ""
-			title: qsTr("Contract")
+			title: reasonDialog.command === "CancelContract" ? qsTr("Withdraw the offer")
+				: reasonDialog.command === "RequestContractChanges" ? qsTr("Ask for changes")
+				: reasonDialog.command === "DeclineContract" ? qsTr("Decline the contract") : qsTr("Contract")
 			onFinished: {
 				if (buttonId == Enums.ok && reasonDialog.contentItem)
 					contractView.run(reasonDialog.command, reasonDialog.contentItem.reason)
@@ -1277,9 +1296,7 @@ ViewBase {
 				var content = allocationDialog.contentItem
 				if (buttonId != Enums.ok || !content)
 					return
-				contractView.addAllocation({"allocationId": "", "linkId": content.linkId, "grantorTenantId": content.grantorTenantId,
-											"granteeTenantId": content.granteeTenantId, "productId": content.productId,
-											"permissionIds": content.permissionIds, "validUntil": content.validUntil(), "comment": content.comment})
+				contractView.givePermissions(content.granteeTenantId, content.permissionIds, content.validUntil(), content.comment)
 			}
 		}
 	}

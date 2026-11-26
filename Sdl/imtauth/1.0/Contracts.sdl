@@ -63,8 +63,8 @@ enum ContractEventType {
 	NoticeRevoked
 	Withdrawn
 	NonRenewalNotice
-	AllocationsSuspended
-	AllocationsResumed
+	PermissionsGiven
+	PermissionsWithdrawn
 	Superseded
 	PrivateInfoChanged
 	AllocationGroupsChanged
@@ -93,7 +93,6 @@ type ContractParty {
 	withdrawAt: String
 	withdrawReason: String
 	nonRenewalNoticeAt: String
-	allocationsSuspended: Boolean
 	# Signed and not left now
 	isBound: Boolean
 }
@@ -142,19 +141,6 @@ type ContractAllocation {
 	validUntil: String
 	comment: String
 	isInForce: Boolean
-}
-
-input ContractAllocationInput {
-	# Empty for a new allocation
-	allocationId: ID
-	linkId: ID!
-	grantorTenantId: ID!
-	granteeTenantId: ID!
-	productId: ID!
-	permissionIds: [ID]
-	validFrom: String
-	validUntil: String
-	comment: String
 }
 
 type ContractReference {
@@ -228,7 +214,6 @@ type Contract {
 	isChangesRequested: Boolean
 	isTerminating: Boolean
 	isExpiring: Boolean
-	isPartiallySuspended: Boolean
 	effectiveStart: String
 	periodEnd: String
 	endsAt: String
@@ -269,7 +254,6 @@ input ContractDraftInput {
 	terminationNoticeDays: Int
 	parties: [ContractPartyInput]
 	links: [ContractLinkInput]
-	allocations: [ContractAllocationInput]
 	references: [ContractReferenceInput]
 }
 
@@ -377,10 +361,21 @@ input GiveContractNoticeInput {
 	isImmediate: Boolean
 }
 
-input SetContractAllocationsSuspendedInput {
+# The organization gives its own permissions to a party it is linked with
+input GiveContractPermissionsInput {
 	tenantId: ID!
 	contractId: ID!
-	isSuspended: Boolean!
+	granteeTenantId: ID!
+	productId: ID!
+	permissionIds: [ID]
+	validUntil: String
+	comment: String
+}
+
+input WithdrawContractPermissionsInput {
+	tenantId: ID!
+	contractId: ID!
+	allocationId: ID!
 }
 
 input AddContractAttachmentInput {
@@ -492,7 +487,8 @@ type Mutation {
 	GiveContractNotice (input: GiveContractNoticeInput): ContractCommandPayload!
 	RevokeContractNotice (input: ContractCommandInput): ContractCommandPayload!
 	GiveContractNonRenewalNotice (input: ContractCommandInput): ContractCommandPayload!
-	SetContractAllocationsSuspended (input: SetContractAllocationsSuspendedInput): ContractCommandPayload!
+	GiveContractPermissions (input: GiveContractPermissionsInput): ContractCommandPayload!
+	WithdrawContractPermissions (input: WithdrawContractPermissionsInput): ContractCommandPayload!
 	AddContractAttachment (input: AddContractAttachmentInput): ContractCommandPayload!
 	SetContractPrivateInfo (input: SetContractPrivateInfoInput): ContractCommandPayload!
 	SetContractAllocationGroups (input: SetContractAllocationGroupsInput): ContractCommandPayload!

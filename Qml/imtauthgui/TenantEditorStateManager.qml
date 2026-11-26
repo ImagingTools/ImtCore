@@ -101,7 +101,7 @@ QtObject {
 	readonly property bool canEditContracts: stateManager.hasPermission("/OrganizationManagement/Contracts/Edit")
 	readonly property bool canApproveContracts: stateManager.hasPermission("/OrganizationManagement/Contracts/Approve")
 	readonly property bool canSignContracts: stateManager.hasPermission("/OrganizationManagement/Contracts/Sign")
-	readonly property bool canSuspendContractPermissions: stateManager.hasPermission("/OrganizationManagement/Contracts/Suspend")
+	readonly property bool canGiveContractPermissions: stateManager.hasPermission("/OrganizationManagement/Contracts/Give")
 	readonly property bool canDistributeContractPermissions: stateManager.hasPermission("/OrganizationManagement/Contracts/Distribute")
 	readonly property bool canEditPartyRoles: stateManager.hasPermission("/OrganizationManagement/PartyRoles/Edit")
 	readonly property bool canEditContractTypes: stateManager.hasPermission("/OrganizationManagement/ContractTypes/Edit")

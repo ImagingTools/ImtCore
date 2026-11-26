@@ -139,11 +139,6 @@ bool SerializeParty(iser::IArchive& archive, IContractInfo::Party& item)
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeDateTime(archive, item.nonRenewalNoticeAt);
 	retVal = retVal && archive.EndTag(nonRenewalNoticeAtTag);
 
-	iser::CArchiveTag allocationsSuspendedTag("AllocationsSuspended", "Allocations suspended", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(allocationsSuspendedTag);
-	retVal = retVal && archive.Process(item.allocationsSuspended);
-	retVal = retVal && archive.EndTag(allocationsSuspendedTag);
-
 	return retVal;
 }
 
@@ -405,8 +400,7 @@ bool IContractInfo::Party::operator==(const Party& other) const
 				&& signatures == other.signatures
 				&& withdrawAt == other.withdrawAt
 				&& withdrawReason == other.withdrawReason
-				&& nonRenewalNoticeAt == other.nonRenewalNoticeAt
-				&& allocationsSuspended == other.allocationsSuspended;
+				&& nonRenewalNoticeAt == other.nonRenewalNoticeAt;
 }
 
 

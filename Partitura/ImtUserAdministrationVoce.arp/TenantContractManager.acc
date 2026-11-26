@@ -1489,98 +1489,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ContractSuspendPermissions" PackageId="ImtCoreVoce" ComponentId="Command">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Alignment" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="1"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="SuspendPermissions"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>/OrganizationManagement/Contracts/Suspend</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Description" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Stop the permissions your organization gives within the contract"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="IconPath" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="Icons/Pause"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="IsVisible" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Stop permissions"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Priority" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="30"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="ContractResumePermissions" PackageId="ImtCoreVoce" ComponentId="Command">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Alignment" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="1"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="ResumePermissions"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>/OrganizationManagement/Contracts/Suspend</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Description" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Give the stopped permissions again"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="IconPath" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="Icons/Play"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="IsVisible" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Resume permissions"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Priority" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="25"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="ContractCommands" PackageId="ImtGraphQlVoce" ComponentId="CommandsController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -1607,8 +1515,6 @@
                                 <Value>ContractGiveNotice</Value>
                                 <Value>ContractRevokeNotice</Value>
                                 <Value>ContractStopRenewal</Value>
-                                <Value>ContractSuspendPermissions</Value>
-                                <Value>ContractResumePermissions</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

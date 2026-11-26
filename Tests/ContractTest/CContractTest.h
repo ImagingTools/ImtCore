@@ -24,7 +24,7 @@ private slots:
 
 	// What is in force
 	void testLink_InForceWithinItsPeriodAndBoundParties();
-	void testAllocation_InForceOnItsLinkUnlessSuspended();
+	void testAllocation_InForceOnItsLinkWhileTheGrantorIsBound();
 	void testPartyBound_UntilItLeaves();
 
 	// Content hash

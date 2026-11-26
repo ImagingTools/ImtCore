@@ -47,8 +47,6 @@ Item {
 				notes.push(facts.stateComment)
 			if (facts.withdrawAt)
 				notes.push(qsTr("leaves on %1").arg(ContractTexts.dateText(facts.withdrawAt)))
-			if (facts.allocationsSuspended)
-				notes.push(qsTr("its permissions are stopped"))
 			rows.push({"id": party.tenantId,
 					   "organization": (party.tenantName || party.tenantId) + (isMe ? " " + qsTr("(you)") : ""),
 					   "role": party.roleName || "",

@@ -92,7 +92,8 @@ public:
 	virtual bool GiveNotice(const ContractActor& actor, const QByteArray& contractId, const QString& reason, bool isImmediate, QString& errorMessage) override;
 	virtual bool RevokeNotice(const ContractActor& actor, const QByteArray& contractId, QString& errorMessage) override;
 	virtual bool GiveNonRenewalNotice(const ContractActor& actor, const QByteArray& contractId, QString& errorMessage) override;
-	virtual bool SetAllocationsSuspended(const ContractActor& actor, const QByteArray& contractId, bool isSuspended, QString& errorMessage) override;
+	virtual bool GiveAllocation(const ContractActor& actor, const QByteArray& contractId, const IContractInfo::Allocation& allocation, QString& errorMessage) override;
+	virtual bool WithdrawAllocation(const ContractActor& actor, const QByteArray& contractId, const QByteArray& allocationId, QString& errorMessage) override;
 	virtual bool AddAttachment(
 				const ContractActor& actor,
 				const QByteArray& contractId,
@@ -154,12 +155,25 @@ private:
 		A party new to the contract must be known to the initiator.
 	*/
 	bool ApplyDraft(const IContractInfo& draft, IContractInfo& contract, QString& errorMessage) const;
+
+	/**
+		Links a party added by the server as the type links its parties: with the center of a star, or with every other party.
+	*/
+	void AddSchemeLinks(IContractInfo& contract, const QByteArray& tenantId) const;
 	bool CheckStructure(const IContractInfo& contract, QString& errorMessage) const;
 	bool CheckSendable(const IContractInfo& contract, QString& errorMessage) const;
 	bool CheckReferences(const IContractInfo& contract, QString& errorMessage) const;
 	/// The owner, the creator or an active member of the organization
 	bool IsTenantUser(const QByteArray& tenantId, const QByteArray& userId) const;
-	bool CheckAllocationScopes(const IContractInfo& contract, QString& errorMessage) const;
+	/**
+		The grantor holds the permissions it gives, and a framework contract it is concluded under gives them too.
+	*/
+	bool CheckAllocationScope(const IContractInfo& contract, const IContractInfo::Allocation& allocation, QString& errorMessage) const;
+
+	/**
+		A party gives and takes back its permissions until the contract ends, unless it declined or left it.
+	*/
+	bool CanPartyChangeAllocations(const IContractInfo& contract, const QByteArray& tenantId, QString& errorMessage) const;
 	/// The terms changed: a sent contract is reviewed again, every approval and signature ends
 	void RestartReview(IContractInfo& contract) const;
 	/// The last signature was given: the contract is concluded

@@ -248,8 +248,17 @@ sdl::V1_0::imtauth::CContractCommandPayload CRemoteContractControllerComp::OnGiv
 }
 
 
-sdl::V1_0::imtauth::CContractCommandPayload CRemoteContractControllerComp::OnSetContractAllocationsSuspended(
-			const sdl::V1_0::imtauth::CSetContractAllocationsSuspendedGqlRequest& /*setContractAllocationsSuspendedRequest*/,
+sdl::V1_0::imtauth::CContractCommandPayload CRemoteContractControllerComp::OnGiveContractPermissions(
+			const sdl::V1_0::imtauth::CGiveContractPermissionsGqlRequest& /*giveContractPermissionsRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CContractCommandPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CContractCommandPayload CRemoteContractControllerComp::OnWithdrawContractPermissions(
+			const sdl::V1_0::imtauth::CWithdrawContractPermissionsGqlRequest& /*withdrawContractPermissionsRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {

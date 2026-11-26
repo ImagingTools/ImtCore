@@ -107,8 +107,12 @@ protected:
 				const sdl::V1_0::imtauth::CGiveContractNonRenewalNoticeGqlRequest& giveContractNonRenewalNoticeRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtauth::CContractCommandPayload OnSetContractAllocationsSuspended(
-				const sdl::V1_0::imtauth::CSetContractAllocationsSuspendedGqlRequest& setContractAllocationsSuspendedRequest,
+	virtual sdl::V1_0::imtauth::CContractCommandPayload OnGiveContractPermissions(
+				const sdl::V1_0::imtauth::CGiveContractPermissionsGqlRequest& giveContractPermissionsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CContractCommandPayload OnWithdrawContractPermissions(
+				const sdl::V1_0::imtauth::CWithdrawContractPermissionsGqlRequest& withdrawContractPermissionsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtauth::CContractCommandPayload OnAddContractAttachment(

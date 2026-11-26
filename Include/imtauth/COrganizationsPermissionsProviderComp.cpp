@@ -218,9 +218,9 @@ void COrganizationsPermissionsProviderComp::CreateOrganizationFeatures()
 				QT_TRANSLATE_NOOP("Feature", "Sign Contracts"),
 				QT_TRANSLATE_NOOP("Feature", "Allows signing and declining contracts, leaving and terminating them."),
 				{QByteArrayLiteral("/OrganizationManagement/Contracts/View")});
-	AddPermission(*contractsPtr, "Suspend",
-				QT_TRANSLATE_NOOP("Feature", "Suspend Permissions"),
-				QT_TRANSLATE_NOOP("Feature", "Allows stopping and resuming the permissions the organization gives by a contract."),
+	AddPermission(*contractsPtr, "Give",
+				QT_TRANSLATE_NOOP("Feature", "Give Permissions"),
+				QT_TRANSLATE_NOOP("Feature", "Allows giving the permissions of the organization to the other parties of its contracts and taking them back."),
 				{QByteArrayLiteral("/OrganizationManagement/Contracts/View")});
 	AddPermission(*contractsPtr, "Distribute",
 				QT_TRANSLATE_NOOP("Feature", "Distribute Received Permissions"),

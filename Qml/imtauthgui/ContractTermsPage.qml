@@ -102,7 +102,7 @@ Item {
 					onTextChanged: {
 						termsPage.__changed()
 					}
-					isRequired: true
+					isRequired: termsPage.__isEditable
 					showErrorWhenInvalid: true
 					deferErrorUntilEdited: true
 					errorText: qsTr("Enter the name of the contract")

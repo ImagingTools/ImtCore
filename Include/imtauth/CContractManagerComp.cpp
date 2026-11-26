@@ -435,10 +435,11 @@ bool CContractManagerComp::AddPartyByCode(
 		const QByteArrayList previousParties = GetContractPartyTenantIds(contract);
 		parties.append(party);
 		contract.SetParties(parties);
+		AddSchemeLinks(contract, tenantId);
 
 		RestartReview(contract);
 
-		JournalEntry entry = CreateEntry(actor, IContractEventInfo::ET_PARTY_ADDED);
+		JournalEntry entry = CreateEntry(actor, IContractEventInfo::ET_PARTY_ADDED, party.tenantName);
 		entry.subjectId = tenantId;
 		record.journal.append(entry);
 		if (isSubmitted){
@@ -819,30 +820,86 @@ bool CContractManagerComp::GiveNonRenewalNotice(const ContractActor& actor, cons
 }
 
 
-bool CContractManagerComp::SetAllocationsSuspended(const ContractActor& actor, const QByteArray& contractId, bool isSuspended, QString& errorMessage)
+bool CContractManagerComp::GiveAllocation(const ContractActor& actor, const QByteArray& contractId, const IContractInfo::Allocation& allocation, QString& errorMessage)
 {
+	IContractInfo::Allocation newAllocation = allocation;
+	newAllocation.allocationId = CreateId();
+	newAllocation.grantorTenantId = actor.tenantId;
+	newAllocation.permissionIds.removeAll(QByteArray());
+	std::sort(newAllocation.permissionIds.begin(), newAllocation.permissionIds.end());
+	newAllocation.permissionIds.erase(std::unique(newAllocation.permissionIds.begin(), newAllocation.permissionIds.end()), newAllocation.permissionIds.end());
+
+	if (newAllocation.productId.isEmpty() || newAllocation.permissionIds.isEmpty()){
+		errorMessage = QStringLiteral("Choose the permissions to give");
+
+		return false;
+	}
+
+	if (newAllocation.validFrom.isValid() && newAllocation.validUntil.isValid() && newAllocation.validUntil <= newAllocation.validFrom){
+		errorMessage = QStringLiteral("The permissions end after they start");
+
+		return false;
+	}
+
 	return ChangeContract(actor, contractId, [&](IContractInfo& contract, ChangeRecord& record, QString& error){
-		if (!contract.GetSignedAt().isValid()){
-			error = QStringLiteral("The permissions of a concluded contract are stopped");
+		if (!CanPartyChangeAllocations(contract, actor.tenantId, error)){
+			return false;
+		}
+
+		const IContractInfo::Links links = contract.GetLinks();
+		const int linkIndex = FindContractLinkOfPair(links, actor.tenantId, newAllocation.granteeTenantId);
+		if (linkIndex < 0 || newAllocation.granteeTenantId == actor.tenantId){
+			error = QStringLiteral("Your organization gives permissions to a party it is linked with (page Links)");
 
 			return false;
 		}
 
-		IContractInfo::Parties parties = contract.GetParties();
-		IContractInfo::Party& party = parties[FindContractParty(parties, actor.tenantId)];
-		if (party.allocationsSuspended == isSuspended){
-			return true;
+		newAllocation.linkId = links[linkIndex].linkId;
+		if (!CheckAllocationScope(contract, newAllocation, error)){
+			return false;
 		}
 
-		party.allocationsSuspended = isSuspended;
-		contract.SetParties(parties);
+		IContractInfo::Allocations allocations = contract.GetAllocations();
+		allocations.append(newAllocation);
+		contract.SetAllocations(allocations);
 
-		record.journal.append(CreateEntry(actor, isSuspended ? IContractEventInfo::ET_ALLOCATIONS_SUSPENDED : IContractEventInfo::ET_ALLOCATIONS_RESUMED));
-		record.events.append(CreateTenantEvent(
-					isSuspended ? TenantEvent::s_contractAllocationsSuspended : TenantEvent::s_contractAllocationsResumed,
-					contract,
-					actor.tenantId,
-					GetGranteeTenantIds(contract, actor.tenantId)));
+		JournalEntry entry = CreateEntry(actor, IContractEventInfo::ET_PERMISSIONS_GIVEN, FindTenantName(newAllocation.granteeTenantId));
+		entry.subjectId = newAllocation.allocationId;
+		record.journal.append(entry);
+		if (contract.GetSignedAt().isValid()){
+			record.events.append(CreateTenantEvent(TenantEvent::s_contractPermissionsReceived, contract, actor.tenantId, {newAllocation.granteeTenantId}));
+		}
+
+		return true;
+	}, errorMessage);
+}
+
+
+bool CContractManagerComp::WithdrawAllocation(const ContractActor& actor, const QByteArray& contractId, const QByteArray& allocationId, QString& errorMessage)
+{
+	return ChangeContract(actor, contractId, [&](IContractInfo& contract, ChangeRecord& record, QString& error){
+		if (!CanPartyChangeAllocations(contract, actor.tenantId, error)){
+			return false;
+		}
+
+		IContractInfo::Allocations allocations = contract.GetAllocations();
+		const int allocationIndex = FindContractAllocation(allocations, allocationId);
+		if (allocationIndex < 0 || allocations[allocationIndex].grantorTenantId != actor.tenantId){
+			error = QStringLiteral("An organization takes back only the permissions it gave");
+
+			return false;
+		}
+
+		const QByteArray granteeTenantId = allocations[allocationIndex].granteeTenantId;
+		allocations.removeAt(allocationIndex);
+		contract.SetAllocations(allocations);
+
+		JournalEntry entry = CreateEntry(actor, IContractEventInfo::ET_PERMISSIONS_WITHDRAWN, FindTenantName(granteeTenantId));
+		entry.subjectId = allocationId;
+		record.journal.append(entry);
+		if (contract.GetSignedAt().isValid()){
+			record.events.append(CreateTenantEvent(TenantEvent::s_contractPermissionsWithdrawn, contract, actor.tenantId, {granteeTenantId}));
+		}
 
 		return true;
 	}, errorMessage);
@@ -1412,6 +1469,69 @@ void CContractManagerComp::Announce(const IContractInfo& contract, const ChangeR
 }
 
 
+void CContractManagerComp::AddSchemeLinks(IContractInfo& contract, const QByteArray& tenantId) const
+{
+	const QByteArray initiatorTenantId = contract.GetInitiatorTenantId();
+	bool isStar = false;
+	QByteArray starRoleId;
+	if (!contract.GetTypeId().isEmpty()){
+		IContractTypeInfoUniquePtr typePtr = m_typeCatalogCompPtr->GetType(contract.GetTypeId());
+		if (typePtr.IsValid()){
+			isStar = typePtr->GetLinkScheme() == IContractTypeInfo::LS_STAR;
+			starRoleId = typePtr->GetStarRoleId();
+		}
+	}
+
+	const IContractInfo::Parties parties = contract.GetParties();
+	QByteArray centerTenantId;
+	if (isStar){
+		for (const IContractInfo::Party& party : parties){
+			if (party.roleId == starRoleId){
+				centerTenantId = party.tenantId;
+
+				break;
+			}
+		}
+
+		if (centerTenantId.isEmpty() && !parties.isEmpty()){
+			centerTenantId = parties.first().tenantId;
+		}
+	}
+
+	const int partyIndex = FindContractParty(parties, tenantId);
+	if (partyIndex < 0){
+		return;
+	}
+
+	// A role of a party is its role on its links when the role is one of the links
+	const QByteArray roleId = parties[partyIndex].roleId;
+	const QString roleName = roleId.isEmpty() ? QString() : FindRoleName(roleId, initiatorTenantId, IPartyRoleInfo::RA_LINK);
+
+	IContractInfo::Links links = contract.GetLinks();
+	for (const IContractInfo::Party& other : parties){
+		if (other.tenantId == tenantId || FindContractLinkOfPair(links, tenantId, other.tenantId) >= 0){
+			continue;
+		}
+
+		if (isStar && tenantId != centerTenantId && other.tenantId != centerTenantId){
+			continue;
+		}
+
+		IContractInfo::Link link;
+		link.linkId = CreateId();
+		link.tenantAId = other.tenantId;
+		link.tenantBId = tenantId;
+		link.roleAName = other.roleId.isEmpty() ? QString() : FindRoleName(other.roleId, initiatorTenantId, IPartyRoleInfo::RA_LINK);
+		link.roleAId = link.roleAName.isEmpty() ? QByteArray() : other.roleId;
+		link.roleBName = roleName;
+		link.roleBId = roleName.isEmpty() ? QByteArray() : roleId;
+		links.append(link);
+	}
+
+	contract.SetLinks(links);
+}
+
+
 bool CContractManagerComp::ApplyDraft(const IContractInfo& draft, IContractInfo& contract, QString& errorMessage) const
 {
 	const QByteArray initiatorTenantId = contract.GetInitiatorTenantId();
@@ -1547,16 +1667,12 @@ bool CContractManagerComp::ApplyDraft(const IContractInfo& draft, IContractInfo&
 
 	contract.SetLinks(links);
 
+	// The permissions a party gives are its own: they stay while their link does
 	IContractInfo::Allocations allocations;
-	for (IContractInfo::Allocation allocation : draft.GetAllocations()){
-		if (allocation.allocationId.isEmpty()){
-			allocation.allocationId = CreateId();
+	for (const IContractInfo::Allocation& allocation : contract.GetAllocations()){
+		if (FindContractLink(links, allocation.linkId) >= 0){
+			allocations.append(allocation);
 		}
-
-		allocation.permissionIds.removeAll(QByteArray());
-		std::sort(allocation.permissionIds.begin(), allocation.permissionIds.end());
-		allocation.permissionIds.erase(std::unique(allocation.permissionIds.begin(), allocation.permissionIds.end()), allocation.permissionIds.end());
-		allocations.append(allocation);
 	}
 
 	contract.SetAllocations(allocations);
@@ -1624,37 +1740,6 @@ bool CContractManagerComp::CheckStructure(const IContractInfo& contract, QString
 
 		if (link.validFrom.isValid() && link.validUntil.isValid() && link.validUntil <= link.validFrom){
 			errorMessage = QStringLiteral("A link ends after it starts");
-
-			return false;
-		}
-	}
-
-	QSet<QByteArray> allocationIds;
-	for (const IContractInfo::Allocation& allocation : contract.GetAllocations()){
-		if (allocationIds.contains(allocation.allocationId)){
-			errorMessage = QStringLiteral("An allocation has a unique id");
-
-			return false;
-		}
-
-		allocationIds.insert(allocation.allocationId);
-
-		const int linkIndex = FindContractLink(links, allocation.linkId);
-		if (linkIndex < 0 || allocation.grantorTenantId == allocation.granteeTenantId
-					|| !links[linkIndex].Connects(allocation.grantorTenantId, allocation.granteeTenantId)){
-			errorMessage = QStringLiteral("An allocation gives permissions between the two parties of its link");
-
-			return false;
-		}
-
-		if (allocation.productId.isEmpty() || allocation.permissionIds.isEmpty()){
-			errorMessage = QStringLiteral("An allocation names a product and its permissions");
-
-			return false;
-		}
-
-		if (allocation.validFrom.isValid() && allocation.validUntil.isValid() && allocation.validUntil <= allocation.validFrom){
-			errorMessage = QStringLiteral("An allocation ends after it starts");
 
 			return false;
 		}
@@ -1755,7 +1840,7 @@ bool CContractManagerComp::CheckSendable(const IContractInfo& contract, QString&
 		return false;
 	}
 
-	return CheckAllocationScopes(contract, errorMessage) && CheckReferences(contract, errorMessage);
+	return CheckReferences(contract, errorMessage);
 }
 
 
@@ -1805,29 +1890,6 @@ bool CContractManagerComp::CheckReferences(const IContractInfo& contract, QStrin
 				}
 			}
 
-			// A contract under a framework gives no more than the framework does between the same parties
-			const IContractInfo::Allocations frameworkAllocations = referencedPtr->GetAllocations();
-			for (const IContractInfo::Allocation& allocation : contract.GetAllocations()){
-				QSet<QByteArray> frameworkPermissions;
-				for (const IContractInfo::Allocation& frameworkAllocation : frameworkAllocations){
-					if (frameworkAllocation.grantorTenantId == allocation.grantorTenantId
-								&& frameworkAllocation.granteeTenantId == allocation.granteeTenantId
-								&& frameworkAllocation.productId == allocation.productId){
-						for (const QByteArray& permissionId : frameworkAllocation.permissionIds){
-							frameworkPermissions.insert(permissionId);
-						}
-					}
-				}
-
-				for (const QByteArray& permissionId : allocation.permissionIds){
-					if (!frameworkPermissions.contains(permissionId)){
-						errorMessage = QStringLiteral("The permission '%1' is not given by the framework contract").arg(QString::fromUtf8(permissionId));
-
-						return false;
-					}
-				}
-			}
-
 			const QDateTime frameworkEnd = GetContractPeriodEnd(*referencedPtr, now);
 			if (frameworkEnd.isValid() && contract.GetValidUntil().isValid() && contract.GetValidUntil() > frameworkEnd){
 				errorMessage = QStringLiteral("A contract ends with its framework contract at the latest");
@@ -1874,27 +1936,73 @@ bool CContractManagerComp::CheckReferences(const IContractInfo& contract, QStrin
 }
 
 
-bool CContractManagerComp::CheckAllocationScopes(const IContractInfo& contract, QString& errorMessage) const
+bool CContractManagerComp::CheckAllocationScope(const IContractInfo& contract, const IContractInfo::Allocation& allocation, QString& errorMessage) const
 {
-	QHash<QByteArray, QSet<QByteArray>> scopes;
-	for (const IContractInfo::Allocation& allocation : contract.GetAllocations()){
-		auto scopeIter = scopes.find(allocation.grantorTenantId);
-		if (scopeIter == scopes.end()){
-			QSet<QByteArray> scope;
-			for (const QByteArray& permissionId : m_tenantManagerCompPtr->GetTenantPermissions(allocation.grantorTenantId)){
-				scope.insert(permissionId.trimmed());
-			}
+	QSet<QByteArray> scope;
+	for (const QByteArray& permissionId : m_tenantManagerCompPtr->GetTenantPermissions(allocation.grantorTenantId)){
+		scope.insert(permissionId.trimmed());
+	}
 
-			scopeIter = scopes.insert(allocation.grantorTenantId, scope);
+	for (const QByteArray& permissionId : allocation.permissionIds){
+		if (!scope.contains(permissionId)){
+			errorMessage = QStringLiteral("The permission '%1' is not available to your organization").arg(QString::fromUtf8(permissionId));
+
+			return false;
+		}
+	}
+
+	// A contract under a framework gives no more than the framework does between the same parties
+	for (const IContractInfo::Reference& reference : contract.GetReferences()){
+		if (reference.type != IContractInfo::RT_FRAMEWORK){
+			continue;
+		}
+
+		IContractInfoUniquePtr frameworkPtr = ReadContract(reference.contractId);
+		if (!frameworkPtr.IsValid()){
+			errorMessage = QStringLiteral("The framework contract could not be read");
+
+			return false;
+		}
+
+		QSet<QByteArray> frameworkPermissions;
+		for (const IContractInfo::Allocation& frameworkAllocation : frameworkPtr->GetAllocations()){
+			if (frameworkAllocation.grantorTenantId == allocation.grantorTenantId
+						&& frameworkAllocation.granteeTenantId == allocation.granteeTenantId
+						&& frameworkAllocation.productId == allocation.productId){
+				for (const QByteArray& permissionId : frameworkAllocation.permissionIds){
+					frameworkPermissions.insert(permissionId);
+				}
+			}
 		}
 
 		for (const QByteArray& permissionId : allocation.permissionIds){
-			if (!scopeIter->contains(permissionId)){
-				errorMessage = QStringLiteral("The permission '%1' is not available to the organization giving it").arg(QString::fromUtf8(permissionId));
+			if (!frameworkPermissions.contains(permissionId)){
+				errorMessage = QStringLiteral("The permission '%1' is not given by the framework contract").arg(QString::fromUtf8(permissionId));
 
 				return false;
 			}
 		}
+	}
+
+	return true;
+}
+
+
+bool CContractManagerComp::CanPartyChangeAllocations(const IContractInfo& contract, const QByteArray& tenantId, QString& errorMessage) const
+{
+	const ContractState state = ComputeContractState(contract, QDateTime::currentDateTimeUtc()).state;
+	if (state == CS_CANCELLED || state == CS_EXPIRED || state == CS_TERMINATED || state == CS_SUPERSEDED){
+		errorMessage = QStringLiteral("The permissions of an ended contract stay as they were");
+
+		return false;
+	}
+
+	const IContractInfo::Parties parties = contract.GetParties();
+	const int partyIndex = FindContractParty(parties, tenantId);
+	if (partyIndex < 0 || parties[partyIndex].state == IContractInfo::PS_DECLINED || parties[partyIndex].state == IContractInfo::PS_WITHDRAWN){
+		errorMessage = QStringLiteral("A party that declined or left the contract gives no permissions");
+
+		return false;
 	}
 
 	return true;

@@ -391,8 +391,7 @@
                                 <Value>ContractCancelled</Value>
                                 <Value>ContractNoticeGiven</Value>
                                 <Value>ContractWithdrawn</Value>
-                                <Value>ContractAllocationsSuspended</Value>
-                                <Value>ContractAllocationsResumed</Value>
+                                <Value>ContractPermissionsWithdrawn</Value>
                                 <Value>ContractPermissionsReceived</Value>
                                 <Value>ContractSuperseded</Value>
                                 <Value>ContractReminder</Value>
@@ -595,17 +594,17 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ContractAllocationsSuspended" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+        <Element Id="ContractPermissionsWithdrawn" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="IconPath" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Icons/Key"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Message" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="&quot;{partner}&quot; suspended the permissions given by the contract &quot;{subject}&quot;"/>
+                        <Data IsEnabled="true" Value="&quot;{partner}&quot; took back the permissions it gave by the contract &quot;{subject}&quot;"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Name" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Contract permissions suspended"/>
+                        <Data IsEnabled="true" Value="Contract permissions taken back"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ParameterIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
@@ -615,32 +614,7 @@
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="TypeId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="imtauth.ContractAllocationsSuspended"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="ContractAllocationsResumed" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Icons/Key"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Message" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="&quot;{partner}&quot; resumed the permissions given by the contract &quot;{subject}&quot;"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Contract permissions resumed"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParameterIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>partner</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="imtauth.ContractAllocationsResumed"/>
+                        <Data IsEnabled="true" Value="imtauth.ContractPermissionsWithdrawn"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

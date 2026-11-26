@@ -10,9 +10,9 @@ import imtauthgui 1.0
 /**
  * ContractPermissionsPage
  *
- * The permissions the parties give each other within the links of a contract. The organization receiving
- * permissions gives them to its groups once the contract is in force.
- * A page of ContractView: the permissions are the list of the view, changed through the view.
+ * The permissions the parties give each other within the links of a contract. Each party gives and takes back
+ * its own permissions; the one receiving them gives them to its groups while the contract is in force.
+ * A page of ContractView: the permissions are the ones of the stored contract.
  */
 Item {
 	id: permissionsPage
@@ -22,11 +22,11 @@ Item {
 	// ContractView
 	property var editor: null
 
-	readonly property bool __isEditable: permissionsPage.editor ? permissionsPage.editor.isEditable : false
+	readonly property bool __canGive: permissionsPage.editor ? permissionsPage.editor.canChangeOwnPermissions : false
 
 	signal addAllocationRequested()
 
-	readonly property var allocationRows: permissionsPage.__allocationRows(permissionsPage.editor ? permissionsPage.editor.allocations : [],
+	readonly property var allocationRows: permissionsPage.__allocationRows(permissionsPage.editor && permissionsPage.editor.contract ? (permissionsPage.editor.contract.allocations || []) : [],
 																		  permissionsPage.editor ? permissionsPage.editor.privateInfo : null,
 																		  permissionsPage.__catalog)
 	// The permissions of the product, for their names
@@ -58,20 +58,16 @@ Item {
 	}
 
 	function __stateText(allocation) {
-		if (!allocation.allocationId)
-			return qsTr("Not saved")
 		if (allocation.isInForce)
 			return qsTr("In force")
-		if (!permissionsPage.editor.isConcluded)
-			return qsTr("In the terms")
-		var grantor = permissionsPage.editor.contractParty(allocation.grantorTenantId)
-		if (grantor && grantor.allocationsSuspended)
-			return qsTr("Stopped by %1").arg(permissionsPage.editor.partyName(allocation.grantorTenantId))
-		return qsTr("Not in force")
+		var contract = permissionsPage.editor.contract
+		if (!contract || !contract.signedAt)
+			return qsTr("Once all parties sign")
+		return permissionsPage.editor.contractState === "Signed" ? qsTr("Once the contract comes into force") : qsTr("Not in force")
 	}
 
 	function __groupsText(allocation, isReceived) {
-		if (!isReceived || !allocation.allocationId || !permissionsPage.editor.isConcluded)
+		if (!isReceived || !permissionsPage.editor.isConcluded)
 			return ""
 		var count = permissionsPage.editor.allocationGroupIds(allocation.allocationId).length
 		if (count === 0)
@@ -84,18 +80,19 @@ Item {
 		for (var i = 0; i < allocations.length; i++) {
 			var allocation = allocations[i]
 			var isReceived = allocation.granteeTenantId === permissionsPage.editor.tenantId
+			var isGiven = allocation.grantorTenantId === permissionsPage.editor.tenantId
 			rows.push({"id": String(i),
 					   "index": i,
 					   "allocationId": allocation.allocationId || "",
 					   "grantor": permissionsPage.editor.partyName(allocation.grantorTenantId),
 					   "grantee": permissionsPage.editor.partyName(allocation.granteeTenantId),
-					   "product": allocation.productId || "",
 					   "permissions": permissionsPage.__permissionNames(allocation.permissionIds || [], catalog || []),
 					   "validUntil": ContractTexts.dateText(allocation.validUntil),
 					   "groups": permissionsPage.__groupsText(allocation, isReceived),
 					   "state": permissionsPage.__stateText(allocation),
 					   "comment": allocation.comment || "",
-					   "isReceived": isReceived})
+					   "isReceived": isReceived,
+					   "isGiven": isGiven})
 		}
 		return rows
 	}
@@ -120,7 +117,7 @@ Item {
 			anchors.verticalCenter: parent.verticalCenter
 			wrapMode: Text.WordWrap
 			text: (permissionsPage.allocationRows.length === 0 ? qsTr("No permissions are given yet.") + " " : "")
-				+ qsTr("A row is what one party gives another: permissions of the product, no more than the giver holds itself (its Available permissions). Once the contract is in force, the receiver chooses its groups with the button Groups; their members then work in the organization of the giver with these permissions.")
+				+ qsTr("Each party gives its own permissions to the parties it is linked with, and may take them back at any time. While the contract is in force, the receiver gives them to its groups (button Groups); their members then work in the organization of the giver.")
 			font.pixelSize: Style.fontSizeS
 			color: Style.inactiveTextColor
 		}
@@ -129,7 +126,7 @@ Item {
 			id: addButton
 			anchors.right: parent.right
 			anchors.verticalCenter: parent.verticalCenter
-			visible: permissionsPage.__isEditable
+			visible: permissionsPage.__canGive
 			variant: "primary"
 			text: qsTr("Give permissions")
 			onClicked: {
@@ -161,7 +158,6 @@ Item {
 		Component.onCompleted: {
 			addHeader("grantor", qsTr("Gives"), false, false)
 			addHeader("grantee", qsTr("Receives"), false, false)
-			addHeader("product", qsTr("Product"), false, false)
 			addHeader("permissions", qsTr("Permissions"), false, false)
 			addHeader("validUntil", qsTr("Until"), false, false)
 			addHeader("groups", qsTr("Groups"), false, false)
@@ -189,8 +185,7 @@ Item {
 
 			readonly property var rowData: allocationActions.getRowData()
 			readonly property bool canGiveToGroups: allocationActions.rowData !== null && allocationActions.rowData !== undefined
-				&& allocationActions.rowData.isReceived === true && allocationActions.rowData.allocationId !== ""
-				&& permissionsPage.editor.canDistribute && permissionsPage.editor.isConcluded
+				&& allocationActions.rowData.isReceived === true && permissionsPage.editor.canDistribute && permissionsPage.editor.isConcluded
 
 			Row {
 				anchors.verticalCenter: parent.verticalCenter
@@ -211,10 +206,17 @@ Item {
 				}
 
 				Button {
-					text: qsTr("Remove")
-					visible: permissionsPage.__isEditable
+					text: qsTr("Take back")
+					visible: permissionsPage.__canGive && allocationActions.rowData !== null && allocationActions.rowData !== undefined
+						&& allocationActions.rowData.isGiven === true
 					onClicked: {
-						permissionsPage.editor.removeAllocation(allocationActions.rowData.index)
+						var allocationId = allocationActions.rowData.allocationId
+						ModalDialogManager.showConfirmationDialog(qsTr("Take back permissions"),
+																  qsTr("Take back these permissions? The members of the other organization lose them at once."),
+																  function(result) {
+																	  if (result === Enums.yes)
+																		  permissionsPage.editor.withdrawPermissions(allocationId)
+																  })
 					}
 				}
 			}

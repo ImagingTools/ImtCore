@@ -595,17 +595,39 @@ sdlauth::CContractCommandPayload CContractControllerComp::OnGiveContractNonRenew
 }
 
 
-sdlauth::CContractCommandPayload CContractControllerComp::OnSetContractAllocationsSuspended(
-			const sdlauth::CSetContractAllocationsSuspendedGqlRequest& setContractAllocationsSuspendedRequest,
+sdlauth::CContractCommandPayload CContractControllerComp::OnGiveContractPermissions(
+			const sdlauth::CGiveContractPermissionsGqlRequest& giveContractPermissionsRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& /*errorMessage*/) const
 {
-	const sdlauth::SetContractAllocationsSuspendedRequestArguments arguments = setContractAllocationsSuspendedRequest.GetRequestedArguments();
-	const sdlauth::CSetContractAllocationsSuspendedInput input = arguments.input ? *arguments.input : sdlauth::CSetContractAllocationsSuspendedInput();
+	const sdlauth::GiveContractPermissionsRequestArguments arguments = giveContractPermissionsRequest.GetRequestedArguments();
+	const sdlauth::CGiveContractPermissionsInput input = arguments.input ? *arguments.input : sdlauth::CGiveContractPermissionsInput();
 	const QByteArray contractId = input.contractId.value_or(QByteArray());
 
-	return RunCommand(gqlRequest, input.tenantId.value_or(QByteArray()), contractId, s_suspendContractPermissionsPermission, [&](const imtauth::ContractActor& actor, QString& error){
-		return m_contractManagerCompPtr->SetAllocationsSuspended(actor, contractId, input.isSuspended.value_or(false), error);
+	imtauth::IContractInfo::Allocation allocation;
+	allocation.granteeTenantId = input.granteeTenantId.value_or(QByteArray());
+	allocation.productId = input.productId.value_or(QByteArray());
+	allocation.permissionIds = FromElementList(input.permissionIds);
+	allocation.validUntil = FromSdlTime(input.validUntil);
+	allocation.comment = input.comment.value_or(QString());
+
+	return RunCommand(gqlRequest, input.tenantId.value_or(QByteArray()), contractId, s_giveContractPermissionsPermission, [&](const imtauth::ContractActor& actor, QString& error){
+		return m_contractManagerCompPtr->GiveAllocation(actor, contractId, allocation, error);
+	});
+}
+
+
+sdlauth::CContractCommandPayload CContractControllerComp::OnWithdrawContractPermissions(
+			const sdlauth::CWithdrawContractPermissionsGqlRequest& withdrawContractPermissionsRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& /*errorMessage*/) const
+{
+	const sdlauth::WithdrawContractPermissionsRequestArguments arguments = withdrawContractPermissionsRequest.GetRequestedArguments();
+	const sdlauth::CWithdrawContractPermissionsInput input = arguments.input ? *arguments.input : sdlauth::CWithdrawContractPermissionsInput();
+	const QByteArray contractId = input.contractId.value_or(QByteArray());
+
+	return RunCommand(gqlRequest, input.tenantId.value_or(QByteArray()), contractId, s_giveContractPermissionsPermission, [&](const imtauth::ContractActor& actor, QString& error){
+		return m_contractManagerCompPtr->WithdrawAllocation(actor, contractId, input.allocationId.value_or(QByteArray()), error);
 	});
 }
 
@@ -831,29 +853,6 @@ bool CContractControllerComp::CreateDraft(const sdlauth::CContractDraftInput& in
 
 	draft.SetLinks(links);
 
-	imtauth::IContractInfo::Allocations allocations;
-	if (input.allocations){
-		for (const istd::TNullableValue<sdlauth::CContractAllocationInput>& item : *input.allocations){
-			if (!item){
-				continue;
-			}
-
-			imtauth::IContractInfo::Allocation allocation;
-			allocation.allocationId = item->allocationId.value_or(QByteArray());
-			allocation.linkId = item->linkId.value_or(QByteArray());
-			allocation.grantorTenantId = item->grantorTenantId.value_or(QByteArray());
-			allocation.granteeTenantId = item->granteeTenantId.value_or(QByteArray());
-			allocation.productId = item->productId.value_or(QByteArray());
-			allocation.permissionIds = FromElementList(item->permissionIds);
-			allocation.validFrom = FromSdlTime(item->validFrom);
-			allocation.validUntil = FromSdlTime(item->validUntil);
-			allocation.comment = item->comment.value_or(QString());
-			allocations.append(allocation);
-		}
-	}
-
-	draft.SetAllocations(allocations);
-
 	imtauth::IContractInfo::References references;
 	if (input.references){
 		for (const istd::TNullableValue<sdlauth::CContractReferenceInput>& item : *input.references){
@@ -911,7 +910,6 @@ sdlauth::CContract CContractControllerComp::CreateContractData(const imtauth::IC
 		partyData.withdrawAt = ToSdlTime(party.withdrawAt);
 		partyData.withdrawReason = party.withdrawReason;
 		partyData.nonRenewalNoticeAt = ToSdlTime(party.nonRenewalNoticeAt);
-		partyData.allocationsSuspended = party.allocationsSuspended;
 		partyData.isBound = imtauth::IsPartyBoundAt(contract, party, now);
 		partyData.signatures.Emplace();
 		for (const imtauth::IContractInfo::Signature& signature : party.signatures){
@@ -1015,7 +1013,6 @@ sdlauth::CContract CContractControllerComp::CreateContractData(const imtauth::IC
 	retVal.isChangesRequested = (stateInfo.flags & imtauth::CSF_CHANGES_REQUESTED) != 0;
 	retVal.isTerminating = (stateInfo.flags & imtauth::CSF_TERMINATING) != 0;
 	retVal.isExpiring = (stateInfo.flags & imtauth::CSF_EXPIRING) != 0;
-	retVal.isPartiallySuspended = (stateInfo.flags & imtauth::CSF_PARTIALLY_SUSPENDED) != 0;
 	retVal.effectiveStart = ToSdlTime(stateInfo.effectiveStart);
 	retVal.periodEnd = ToSdlTime(stateInfo.periodEnd);
 	retVal.endsAt = ToSdlTime(stateInfo.endsAt);

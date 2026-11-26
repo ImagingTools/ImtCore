@@ -35,8 +35,7 @@
         <Element ComponentName="ContractCancelled" X="450" Y="1750" Note=""/>
         <Element ComponentName="ContractNoticeGiven" X="750" Y="1750" Note=""/>
         <Element ComponentName="ContractWithdrawn" X="1050" Y="1750" Note=""/>
-        <Element ComponentName="ContractAllocationsSuspended" X="450" Y="1900" Note=""/>
-        <Element ComponentName="ContractAllocationsResumed" X="750" Y="1900" Note=""/>
+        <Element ComponentName="ContractPermissionsWithdrawn" X="450" Y="1900" Note=""/>
         <Element ComponentName="ContractPermissionsReceived" X="1050" Y="1900" Note=""/>
         <Element ComponentName="ContractSuperseded" X="1350" Y="1900" Note=""/>
         <Element ComponentName="ContractReminder" X="150" Y="2050" Note=""/>

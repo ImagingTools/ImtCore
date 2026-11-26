@@ -35,12 +35,11 @@ enum ContractStateFlag
 {
 	CSF_NONE = 0,
 	CSF_CHANGES_REQUESTED = 1,
-	/// A party leaves, or the contract is terminated, at endsAt
+	/// The contract ends at endsAt: it is terminated, or a party leaves and the others no longer hold it
 	CSF_TERMINATING = 2,
 	/// The current period ends soon
 	CSF_EXPIRING = 4,
 	/// A party stopped its allocations
-	CSF_PARTIALLY_SUSPENDED = 8
 };
 
 
@@ -55,7 +54,7 @@ struct ContractStateInfo
 	QDateTime effectiveStart;
 	/// End of the current period, invalid for a contract without an end
 	QDateTime periodEnd;
-	/// When a party leaves or the contract ends, for CSF_TERMINATING
+	/// When the contract ends, for CSF_TERMINATING
 	QDateTime endsAt;
 	/// When a contract that is over ended
 	QDateTime endedAt;
@@ -114,8 +113,8 @@ bool IsAllocationInForce(const IContractInfo& contract, const IContractInfo::All
 bool GetLinkPeriod(const IContractInfo& contract, const IContractInfo::Link& link, const QDateTime& now, RelationshipPeriod& period);
 
 /**
-	SHA-256 of what the parties sign: the terms, the parties, the links, the allocations, the references
-	and the content of the files of the terms.
+	SHA-256 of what the parties sign: the terms, the parties, the links, the references
+	and the content of the files of the terms. The permissions a party gives are its own decision, not a term.
 */
 QByteArray ComputeContractContentHash(const IContractInfo& contract);
 
