@@ -378,6 +378,29 @@ void CSdlGenTest::TestImportedEnumArrayQObjectSetter()
 }
 
 
+void CSdlGenTest::TestLongLongQObjectSetter()
+{
+	CImtSdlGenTest testSuite;
+	PrepareSuite(testSuite, m_tempOutputDir);
+
+	auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+	argParserPtr->SetCppEnabled();
+	argParserPtr->SetGqlEnabled();
+	argParserPtr->SetQmlEnabled();
+
+	ExecuteTest(testSuite, "LongLongFields.sdl");
+
+	QFile generatedSource(m_tempOutputDir.absoluteFilePath(
+		"longlongtestsdl/SDL/1.0/CPP/LongLongFields.cpp"));
+	QVERIFY(generatedSource.open(QIODevice::ReadOnly | QIODevice::Text));
+
+	// A value set from QML keeps all 64 bits, in a single field and in an array
+	const QByteArray source = generatedSource.readAll();
+	QVERIFY(source.contains("CByteCounts::size = v.value<qlonglong>();"));
+	QVERIFY(source.contains("istd::TNullableValue<qlonglong> tempItem(tempValue.value<qlonglong>());"));
+}
+
+
 void CSdlGenTest::TestTreeModelExplicitNullKey()
 {
 	imtbase::CTreeItemModel model;

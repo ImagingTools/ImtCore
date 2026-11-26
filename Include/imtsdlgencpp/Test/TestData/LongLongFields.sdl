@@ -1,0 +1,9 @@
+schema {
+	namespace: longlongtest
+	version: 1.0
+}
+
+type ByteCounts {
+	size: LongLong
+	sizes: [LongLong]
+}
