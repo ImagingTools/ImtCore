@@ -108,6 +108,9 @@
                     <AttributeInfo Id="UseDataMetaInfo" Type="Boolean" ExportId="UseDataMetaInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="UseTenantEntityBindings" Type="Boolean" ExportId="UseTenantEntityBindings">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
