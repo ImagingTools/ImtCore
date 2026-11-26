@@ -140,7 +140,7 @@ Dialog {
 					wrapMode: Text.WordWrap
 					font.pixelSize: Style.fontSizeS
 					color: Style.inactiveTextColor
-					text: qsTr("Choose among the permissions your organization holds. While the contract is in force, %1 gives them to its groups, and their members work in your organization with them.")
+					text: qsTr("Choose among the permissions your organization holds. %1 gives them to its groups; while the contract is in force, their members work in your organization with them.")
 						.arg(allocationContent.granteeName !== "" ? allocationContent.granteeName : qsTr("the party"))
 				}
 

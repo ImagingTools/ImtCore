@@ -10768,8 +10768,8 @@
     </message>
     <message>
         <location line="+10"/>
-        <source>Choose among the permissions your organization holds. While the contract is in force, %1 gives them to its groups, and their members work in your organization with them.</source>
-        <translation>Выберите из прав, которые есть у вашей организации. Пока контракт действует, %1 передаёт их своим группам, и их участники работают с ними в вашей организации.</translation>
+        <source>Choose among the permissions your organization holds. %1 gives them to its groups; while the contract is in force, their members work in your organization with them.</source>
+        <translation>Выберите из прав, которые есть у вашей организации. %1 передаёт их своим группам; пока контракт действует, участники этих групп работают с ними в вашей организации.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -11376,8 +11376,8 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Each party gives its own permissions to the parties it is linked with, and may take them back at any time. While the contract is in force, the receiver gives them to its groups (button Groups); their members then work in the organization of the giver. Only the receiver sees and chooses its groups.</source>
-        <translation>Каждая сторона сама выдаёт свои права сторонам, с которыми у неё есть связь, и может в любой момент их забрать. Пока контракт действует, получатель передаёт их своим группам (кнопка «Группы»); их участники работают в организации, выдавшей права. Группы видит и выбирает только получатель.</translation>
+        <source>Each party gives its own permissions to the parties it is linked with, and may take them back at any time. The receiver gives them to its groups (button Groups) once the contract is sent; while the contract is in force, the members of these groups work in the organization of the giver. Only the receiver sees and chooses its groups.</source>
+        <translation>Каждая сторона сама выдаёт свои права сторонам, с которыми у неё есть связь, и может в любой момент их забрать. Получатель передаёт их своим группам (кнопка «Группы»), как только контракт отправлен; пока контракт действует, участники этих групп работают в организации, выдавшей права. Группы видит и выбирает только получатель.</translation>
     </message>
     <message>
         <location line="+11"/>

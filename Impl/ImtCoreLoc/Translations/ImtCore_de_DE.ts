@@ -10588,8 +10588,8 @@
     </message>
     <message>
         <location line="+10"/>
-        <source>Choose among the permissions your organization holds. While the contract is in force, %1 gives them to its groups, and their members work in your organization with them.</source>
-        <translation>Wählen Sie aus den Berechtigungen Ihrer Organisation. Solange der Vertrag gilt, gibt %1 sie an seine Gruppen weiter, deren Mitglieder damit in Ihrer Organisation arbeiten.</translation>
+        <source>Choose among the permissions your organization holds. %1 gives them to its groups; while the contract is in force, their members work in your organization with them.</source>
+        <translation>Wählen Sie aus den Berechtigungen Ihrer Organisation. %1 gibt sie an seine Gruppen weiter; solange der Vertrag gilt, arbeiten deren Mitglieder damit in Ihrer Organisation.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -11196,8 +11196,8 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Each party gives its own permissions to the parties it is linked with, and may take them back at any time. While the contract is in force, the receiver gives them to its groups (button Groups); their members then work in the organization of the giver. Only the receiver sees and chooses its groups.</source>
-        <translation>Jede Partei erteilt ihre eigenen Berechtigungen den Parteien, mit denen sie verbunden ist, und kann sie jederzeit zurücknehmen. Solange der Vertrag gilt, gibt der Empfänger sie an seine Gruppen weiter (Schaltfläche „Gruppen“); deren Mitglieder arbeiten dann in der Organisation des Gebers. Nur der Empfänger sieht und wählt seine Gruppen.</translation>
+        <source>Each party gives its own permissions to the parties it is linked with, and may take them back at any time. The receiver gives them to its groups (button Groups) once the contract is sent; while the contract is in force, the members of these groups work in the organization of the giver. Only the receiver sees and chooses its groups.</source>
+        <translation>Jede Partei erteilt ihre eigenen Berechtigungen den Parteien, mit denen sie verbunden ist, und kann sie jederzeit zurücknehmen. Der Empfänger gibt sie an seine Gruppen weiter (Schaltfläche „Gruppen“), sobald der Vertrag gesendet ist; solange der Vertrag gilt, arbeiten die Mitglieder dieser Gruppen in der Organisation des Gebers. Nur der Empfänger sieht und wählt seine Gruppen.</translation>
     </message>
     <message>
         <location line="+11"/>

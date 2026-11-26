@@ -23,6 +23,9 @@ Item {
 	property var editor: null
 
 	readonly property bool __canGive: permissionsPage.editor ? permissionsPage.editor.canChangeOwnPermissions : false
+	// The receiver chooses its groups once the contract is sent, so the permissions work from the day it comes into force
+	readonly property bool __canChooseGroups: permissionsPage.editor !== null && permissionsPage.editor.canDistribute && permissionsPage.editor.isSubmitted
+		&& ["Cancelled", "Expired", "Terminated", "Superseded"].indexOf(permissionsPage.editor.contractState) < 0
 
 	signal addAllocationRequested()
 
@@ -66,12 +69,10 @@ Item {
 		return permissionsPage.editor.contractState === "Signed" ? qsTr("Once the contract comes into force") : qsTr("Not in force")
 	}
 
-	// The receiver chooses its groups and only it sees them; it chooses them while the contract is in force
+	// The receiver chooses its groups and only it sees them
 	function __groupsText(allocation, isReceived) {
 		if (!isReceived)
 			return qsTr("Set by receiver")
-		if (!permissionsPage.editor.isConcluded)
-			return qsTr("When in force")
 		var count = permissionsPage.editor.allocationGroupIds(allocation.allocationId).length
 		if (count === 0)
 			return qsTr("None yet")
@@ -120,7 +121,7 @@ Item {
 			anchors.verticalCenter: parent.verticalCenter
 			wrapMode: Text.WordWrap
 			text: (permissionsPage.allocationRows.length === 0 ? qsTr("No permissions are given yet.") + " " : "")
-				+ qsTr("Each party gives its own permissions to the parties it is linked with, and may take them back at any time. While the contract is in force, the receiver gives them to its groups (button Groups); their members then work in the organization of the giver. Only the receiver sees and chooses its groups.")
+				+ qsTr("Each party gives its own permissions to the parties it is linked with, and may take them back at any time. The receiver gives them to its groups (button Groups) once the contract is sent; while the contract is in force, the members of these groups work in the organization of the giver. Only the receiver sees and chooses its groups.")
 			font.pixelSize: Style.fontSizeS
 			color: Style.inactiveTextColor
 		}
@@ -188,7 +189,7 @@ Item {
 
 			readonly property var rowData: allocationActions.getRowData()
 			readonly property bool canGiveToGroups: allocationActions.rowData !== null && allocationActions.rowData !== undefined
-				&& allocationActions.rowData.isReceived === true && permissionsPage.editor.canDistribute && permissionsPage.editor.isConcluded
+				&& allocationActions.rowData.isReceived === true && permissionsPage.__canChooseGroups
 
 			Row {
 				anchors.verticalCenter: parent.verticalCenter
