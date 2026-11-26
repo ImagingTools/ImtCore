@@ -12,4 +12,9 @@ class CRemoteFileSystemStructureProviderTest: public QObject
 private slots:
 	void LargeSizesSurviveTheWireTest();
 	void ServerErrorReachesTheCallerTest();
+	void RequestsEveryFieldOfTheListingTest();
+	void DownloadLinkSurvivesTheWireTest();
+	void DownloadLinkWithUrlOnlySurvivesTheWireTest();
+	void DownloadLinkErrorReachesTheCallerTest();
+	void RequestsEveryFieldOfTheLinkTest();
 };

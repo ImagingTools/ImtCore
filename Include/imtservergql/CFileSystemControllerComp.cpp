@@ -41,6 +41,12 @@ imtfile::IFileSystemStructureProvider* CFileSystemControllerComp::GetFileSystemP
 }
 
 
+imtfile::IFileDownloadLinkProvider* CFileSystemControllerComp::GetDownloadLinkProvider() const
+{
+	return m_downloadLinkProviderCompPtr.IsValid() ? m_downloadLinkProviderCompPtr.GetPtr() : nullptr;
+}
+
+
 sdl::V1_0::imtbase::CGetFileSystemEntriesPayload CFileSystemControllerComp::OnGetFileSystemEntries(
 			const sdl::V1_0::imtbase::CGetFileSystemEntriesGqlRequest& getFileSystemEntriesRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
@@ -146,6 +152,62 @@ sdl::V1_0::imtbase::CGetFileSystemEntriesPayload CFileSystemControllerComp::OnGe
 		entries.FromList(entryList);
 		response.entries = entries;
 	}
+
+	return response;
+}
+
+
+sdl::V1_0::imtbase::CGetDownloadLinkPayload CFileSystemControllerComp::OnGetDownloadLink(
+			const sdl::V1_0::imtbase::CGetDownloadLinkGqlRequest& getDownloadLinkRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& errorMessage) const
+{
+	sdl::V1_0::imtbase::CGetDownloadLinkPayload response;
+
+	const imtfile::IFileDownloadLinkProvider* providerPtr = GetDownloadLinkProvider();
+	if (providerPtr == nullptr){
+		errorMessage = QStringLiteral("Download links are not supported");
+
+		return response;
+	}
+
+	QString path;
+	const sdl::V1_0::imtbase::GetDownloadLinkRequestArguments& arguments = getDownloadLinkRequest.GetRequestedArguments();
+	if (arguments.input.has_value() && arguments.input->path.has_value()){
+		path = *arguments.input->path;
+	}
+
+	imtfile::IFileDownloadLinkProvider::DownloadLink link;
+	if (!providerPtr->GetDownloadLink(path, link, errorMessage)){
+		// Without a message the answer would pass for a success without a link
+		if (errorMessage.isEmpty()){
+			errorMessage = QStringLiteral("Unable to get a download link for '%1'").arg(path);
+		}
+
+		return response;
+	}
+
+	sdl::V1_0::imtbase::CDownloadLink sdlLink;
+	sdlLink.url = link.url;
+	// Like the entries of an empty folder, an empty list is not sent at all
+	if (!link.alternativeUrls.isEmpty()){
+		imtsdl::TElementList<QString> alternativeUrls;
+		alternativeUrls.FromList(link.alternativeUrls);
+		sdlLink.alternativeUrls = alternativeUrls;
+	}
+	if (link.expiresAt.isValid()){
+		sdlLink.expiresAt = link.expiresAt.toUTC().toString(Qt::ISODate);
+	}
+	if (link.size >= 0){
+		sdlLink.size = link.size;
+	}
+	if (!link.sha256.isEmpty()){
+		sdlLink.sha256 = link.sha256;
+	}
+	if (!link.etag.isEmpty()){
+		sdlLink.etag = link.etag;
+	}
+	response.link = sdlLink;
 
 	return response;
 }

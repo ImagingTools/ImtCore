@@ -65,6 +65,36 @@ type GetFileSystemEntriesPayload
 	hasMore: Boolean!
 }
 
+input GetDownloadLinkInput
+{
+	# Path of a file as GetFileSystemEntries returns it.
+	path: String!
+}
+
+type DownloadLink
+{
+	# Self-contained URL: a plain GET without other credentials.
+	url: String!
+	# Other URLs of the same content by priority. Not sent when there are none.
+	alternativeUrls: [String!]
+	# Until when the URLs are valid, ISO 8601 in UTC (e.g. "2024-06-05T12:34:56Z").
+	# A hint only: the clocks of the client and of the source may differ.
+	expiresAt: String
+	size: LongLong
+	# SHA-256 of the content, lowercase hex.
+	sha256: String
+	# Strong entity tag exactly as it goes in the ETag header, with the quotes.
+	# The provider forms it; clients compare it as an opaque string.
+	# Not sent when the source cannot resume a download.
+	etag: String
+}
+
+type GetDownloadLinkPayload
+{
+	link: DownloadLink
+}
+
 type Query {
 	GetFileSystemEntries(input: GetFileSystemEntriesInput): GetFileSystemEntriesPayload!
+	GetDownloadLink(input: GetDownloadLinkInput): GetDownloadLinkPayload!
 }
