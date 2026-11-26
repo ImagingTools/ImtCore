@@ -42,6 +42,12 @@ QByteArray GetPendingGroupKey(const QByteArray& contractId)
 }
 
 
+QByteArray GetSignedGroupKey(const QByteArray& contractId)
+{
+	return QByteArrayLiteral("contract-signed:") + contractId;
+}
+
+
 } // anonymous namespace
 
 
@@ -88,7 +94,13 @@ void CContractNotificationPublisherComp::OnModelChanged(int /*modelId*/, const i
 		const QString type = event.value(imtauth::TenantEvent::s_type).toString();
 		const QByteArray contractId = event.value(imtauth::TenantEvent::s_contractId).toByteArray();
 		const QByteArrayList tenantIds = ToTenantIds(event.value(imtauth::TenantEvent::s_recipientTenantIds));
-		if (contractId.isEmpty() || tenantIds.isEmpty()){
+		if (contractId.isEmpty()){
+			continue;
+		}
+
+		// A step ends even when nobody is told, e.g. the terms changed after the only other party was replaced
+		EndStep(event, GetStepEnd(type), tenantIds);
+		if (tenantIds.isEmpty()){
 			continue;
 		}
 
@@ -100,17 +112,6 @@ void CContractNotificationPublisherComp::OnModelChanged(int /*modelId*/, const i
 						event.value(imtauth::TenantEvent::s_userName).toString());
 
 			continue;
-		}
-
-		const PendingStepEnd stepEnd = GetPendingStepEnd(type);
-		if (stepEnd == PSE_ACTOR){
-			WithdrawPending(contractId, {event.value(imtauth::TenantEvent::s_sourceTenantId).toByteArray()});
-		}
-		else if (stepEnd == PSE_ALL){
-			imtauth::IContractInfoUniquePtr contractPtr = m_contractProviderCompPtr->GetContract(contractId);
-			if (contractPtr.IsValid()){
-				WithdrawPending(contractId, imtauth::GetContractPartyTenantIds(*contractPtr));
-			}
 		}
 
 		const NotificationKind kind = GetNotificationKind(type);
@@ -128,64 +129,86 @@ CContractNotificationPublisherComp::NotificationKind CContractNotificationPublis
 	namespace te = imtauth::TenantEvent;
 	namespace tn = TenantNotification;
 
+	const istd::IInformationProvider::InformationCategory info = istd::IInformationProvider::IC_INFO;
+	const istd::IInformationProvider::InformationCategory warning = istd::IInformationProvider::IC_WARNING;
+
 	NotificationKind retVal;
 	if (eventType == te::s_contractInvitationReceived){
-		retVal = {tn::s_contractInvitationReceived, istd::IInformationProvider::IC_INFO, true};
+		retVal = {tn::s_contractInvitationReceived, info, NG_PENDING};
 	}
 	else if (eventType == te::s_contractChangesRequested){
-		retVal = {tn::s_contractChangesRequested, istd::IInformationProvider::IC_WARNING, true};
+		retVal = {tn::s_contractChangesRequested, warning, NG_PENDING};
+	}
+	else if (eventType == te::s_contractTermsChanged){
+		retVal = {tn::s_contractTermsChanged, warning, NG_PENDING};
+	}
+	else if (eventType == te::s_contractPartyRemoved){
+		retVal = {tn::s_contractPartyRemoved, warning, NG_NONE};
 	}
 	else if (eventType == te::s_contractSigned){
-		retVal = {tn::s_contractSigned, istd::IInformationProvider::IC_INFO, false};
+		retVal = {tn::s_contractSigned, info, NG_SIGNED};
 	}
 	else if (eventType == te::s_contractDeclined){
-		retVal = {tn::s_contractDeclined, istd::IInformationProvider::IC_WARNING, false};
+		retVal = {tn::s_contractDeclined, warning, NG_NONE};
 	}
 	else if (eventType == te::s_contractConcluded){
-		retVal = {tn::s_contractConcluded, istd::IInformationProvider::IC_INFO, false};
+		retVal = {tn::s_contractConcluded, info, NG_NONE};
 	}
 	else if (eventType == te::s_contractCancelled){
-		retVal = {tn::s_contractCancelled, istd::IInformationProvider::IC_WARNING, false};
+		retVal = {tn::s_contractCancelled, warning, NG_NONE};
 	}
 	else if (eventType == te::s_contractNoticeGiven){
-		retVal = {tn::s_contractNoticeGiven, istd::IInformationProvider::IC_WARNING, false};
+		retVal = {tn::s_contractNoticeGiven, warning, NG_NONE};
+	}
+	else if (eventType == te::s_contractNoticeRevoked){
+		retVal = {tn::s_contractNoticeRevoked, info, NG_NONE};
+	}
+	else if (eventType == te::s_contractRenewalStopped){
+		retVal = {tn::s_contractRenewalStopped, warning, NG_NONE};
 	}
 	else if (eventType == te::s_contractWithdrawn){
-		retVal = {tn::s_contractWithdrawn, istd::IInformationProvider::IC_WARNING, false};
+		retVal = {tn::s_contractWithdrawn, warning, NG_NONE};
 	}
 	else if (eventType == te::s_contractPermissionsWithdrawn){
-		retVal = {tn::s_contractPermissionsWithdrawn, istd::IInformationProvider::IC_WARNING, false};
+		retVal = {tn::s_contractPermissionsWithdrawn, warning, NG_NONE};
 	}
 	else if (eventType == te::s_contractPermissionsReceived){
-		retVal = {tn::s_contractPermissionsReceived, istd::IInformationProvider::IC_INFO, false};
+		retVal = {tn::s_contractPermissionsReceived, info, NG_NONE};
 	}
 	else if (eventType == te::s_contractSuperseded){
-		retVal = {tn::s_contractSuperseded, istd::IInformationProvider::IC_INFO, false};
+		retVal = {tn::s_contractSuperseded, info, NG_NONE};
 	}
 	else if (eventType == te::s_contractReminder){
-		retVal = {tn::s_contractReminder, istd::IInformationProvider::IC_WARNING, false};
+		retVal = {tn::s_contractReminder, warning, NG_NONE};
 	}
 
 	return retVal;
 }
 
 
-CContractNotificationPublisherComp::PendingStepEnd CContractNotificationPublisherComp::GetPendingStepEnd(const QString& eventType)
+CContractNotificationPublisherComp::StepEnd CContractNotificationPublisherComp::GetStepEnd(const QString& eventType)
 {
 	namespace te = imtauth::TenantEvent;
 
-	// A signature answers for the party that signed; a decline or the end of the negotiation for all
-	if (eventType == te::s_contractSigned){
-		return PSE_ACTOR;
+	if (eventType == te::s_contractSigned || eventType == te::s_contractChangesRequested){
+		return SE_ACTOR_ANSWERED;
+	}
+
+	if (eventType == te::s_contractTermsChanged){
+		return SE_TERMS_CHANGED;
+	}
+
+	if (eventType == te::s_contractPartyRemoved){
+		return SE_RECIPIENTS_REMOVED;
 	}
 
 	if (eventType == te::s_contractDeclined
 				|| eventType == te::s_contractConcluded
 				|| eventType == te::s_contractCancelled){
-		return PSE_ALL;
+		return SE_ALL;
 	}
 
-	return PSE_NONE;
+	return SE_NONE;
 }
 
 
@@ -244,7 +267,13 @@ void CContractNotificationPublisherComp::SendToNotificationCenter(const QVariant
 		arguments.append(imtnotify::NotificationArgument::Object(QByteArrayLiteral("partner"), tn::TenantLink(partnerTenantId, FindTenantName(partnerTenantId))));
 	}
 
-	const QByteArray groupKey = kind.isPending ? GetPendingGroupKey(contractId) : QByteArray();
+	QByteArray groupKey;
+	if (kind.group == NG_PENDING){
+		groupKey = GetPendingGroupKey(contractId);
+	}
+	else if (kind.group == NG_SIGNED){
+		groupKey = GetSignedGroupKey(contractId);
+	}
 	const imtnotify::ObjectLinkInfo actor = tn::RequestUserLink(m_userCollectionCompPtr.GetPtr());
 
 	for (const QByteArray& tenantId : tenantIds){
@@ -273,14 +302,58 @@ void CContractNotificationPublisherComp::SendToNotificationCenter(const QVariant
 }
 
 
-void CContractNotificationPublisherComp::WithdrawPending(const QByteArray& contractId, const QByteArrayList& tenantIds) const
+void CContractNotificationPublisherComp::EndStep(const QVariantMap& event, StepEnd stepEnd, const QByteArrayList& recipientTenantIds) const
+{
+	const QByteArray contractId = event.value(imtauth::TenantEvent::s_contractId).toByteArray();
+	const QByteArrayList actorTenantIds = {event.value(imtauth::TenantEvent::s_sourceTenantId).toByteArray()};
+
+	switch (stepEnd){
+	case SE_ACTOR_ANSWERED:
+		{
+			// The changes asked of the initiator stay until it changes the terms, even if it signs meanwhile
+			imtauth::IContractInfoUniquePtr contractPtr = m_contractProviderCompPtr->GetContract(contractId);
+			if (contractPtr.IsValid() && contractPtr->GetInitiatorTenantId() != actorTenantIds.first()){
+				WithdrawGroup(GetPendingGroupKey(contractId), actorTenantIds);
+			}
+		}
+		break;
+
+	case SE_TERMS_CHANGED:
+		WithdrawGroup(GetPendingGroupKey(contractId), actorTenantIds);
+		WithdrawGroup(GetSignedGroupKey(contractId), actorTenantIds);
+		break;
+
+	case SE_RECIPIENTS_REMOVED:
+		WithdrawGroup(GetPendingGroupKey(contractId), recipientTenantIds);
+		break;
+
+	case SE_ALL:
+		{
+			imtauth::IContractInfoUniquePtr contractPtr = m_contractProviderCompPtr->GetContract(contractId);
+			if (contractPtr.IsValid()){
+				const QByteArrayList partyTenantIds = imtauth::GetContractPartyTenantIds(*contractPtr);
+				WithdrawGroup(GetPendingGroupKey(contractId), partyTenantIds);
+				WithdrawGroup(GetSignedGroupKey(contractId), {contractPtr->GetInitiatorTenantId()});
+			}
+		}
+		break;
+
+	case SE_NONE:
+		break;
+	}
+}
+
+
+void CContractNotificationPublisherComp::WithdrawGroup(const QByteArray& groupKey, const QByteArrayList& tenantIds) const
 {
 	if (!m_notificationSenderCompPtr.IsValid()){
 		return;
 	}
 
 	for (const QByteArray& tenantId : tenantIds){
-		TenantNotification::Withdraw(m_notificationSenderCompPtr.GetPtr(), tenantId, GetPendingGroupKey(contractId));
+		if (!tenantId.isEmpty()){
+			TenantNotification::Withdraw(m_notificationSenderCompPtr.GetPtr(), tenantId, groupKey);
+		}
 	}
 }
 

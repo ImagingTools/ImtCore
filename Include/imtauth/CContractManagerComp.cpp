@@ -347,7 +347,18 @@ bool CContractManagerComp::UpdateContract(const ContractActor& actor, const ICon
 
 		record.journal.append(CreateEntry(actor, IContractEventInfo::ET_UPDATED));
 		if (isSubmitted){
-			record.events.append(CreateTenantEvent(TenantEvent::s_contractUpdated, contract, actor.tenantId, previousParties));
+			const QByteArrayList currentParties = GetContractPartyTenantIds(contract);
+			QByteArrayList keptParties;
+			QByteArrayList removedParties;
+			for (const QByteArray& tenantId : previousParties){
+				(currentParties.contains(tenantId) ? keptParties : removedParties).append(tenantId);
+			}
+
+			record.events.append(CreateTenantEvent(TenantEvent::s_contractTermsChanged, contract, actor.tenantId, keptParties));
+			if (!removedParties.isEmpty()){
+				record.events.append(CreateTenantEvent(TenantEvent::s_contractPartyRemoved, contract, actor.tenantId, removedParties));
+			}
+
 			if (!addedParties.isEmpty()){
 				record.events.append(CreateTenantEvent(TenantEvent::s_contractInvitationReceived, contract, actor.tenantId, addedParties));
 			}
@@ -443,7 +454,7 @@ bool CContractManagerComp::AddPartyByCode(
 		entry.subjectId = tenantId;
 		record.journal.append(entry);
 		if (isSubmitted){
-			record.events.append(CreateTenantEvent(TenantEvent::s_contractUpdated, contract, actor.tenantId, previousParties));
+			record.events.append(CreateTenantEvent(TenantEvent::s_contractTermsChanged, contract, actor.tenantId, previousParties));
 			record.events.append(CreateTenantEvent(TenantEvent::s_contractInvitationReceived, contract, actor.tenantId, {tenantId}));
 		}
 
@@ -686,7 +697,8 @@ bool CContractManagerComp::SignContract(
 			return Conclude(contract, record, error);
 		}
 
-		record.events.append(CreateTenantEvent(TenantEvent::s_contractSigned, contract, actor.tenantId, GetContractPartyTenantIds(contract)));
+		// The initiator follows the signatures; the others hear when the contract is concluded
+		record.events.append(CreateTenantEvent(TenantEvent::s_contractSigned, contract, actor.tenantId, {contract.GetInitiatorTenantId()}));
 
 		return true;
 	}, errorMessage);
@@ -786,7 +798,7 @@ bool CContractManagerComp::RevokeNotice(const ContractActor& actor, const QByteA
 		contract.SetParties(parties);
 
 		record.journal.append(CreateEntry(actor, IContractEventInfo::ET_NOTICE_REVOKED));
-		record.events.append(CreateTenantEvent(TenantEvent::s_contractUpdated, contract, actor.tenantId, GetContractPartyTenantIds(contract)));
+		record.events.append(CreateTenantEvent(TenantEvent::s_contractNoticeRevoked, contract, actor.tenantId, GetContractPartyTenantIds(contract)));
 
 		return true;
 	}, errorMessage);
@@ -813,7 +825,7 @@ bool CContractManagerComp::GiveNonRenewalNotice(const ContractActor& actor, cons
 		contract.SetParties(parties);
 
 		record.journal.append(CreateEntry(actor, IContractEventInfo::ET_NON_RENEWAL_NOTICE));
-		record.events.append(CreateTenantEvent(TenantEvent::s_contractUpdated, contract, actor.tenantId, GetContractPartyTenantIds(contract)));
+		record.events.append(CreateTenantEvent(TenantEvent::s_contractRenewalStopped, contract, actor.tenantId, GetContractPartyTenantIds(contract)));
 
 		return true;
 	}, errorMessage);
@@ -1017,7 +1029,7 @@ bool CContractManagerComp::AddAttachment(
 		entry.subjectId = newAttachment.attachmentId;
 		record.journal.append(entry);
 		if (isTermsPart && contract.GetSubmittedAt().isValid()){
-			record.events.append(CreateTenantEvent(TenantEvent::s_contractUpdated, contract, actor.tenantId, GetContractPartyTenantIds(contract)));
+			record.events.append(CreateTenantEvent(TenantEvent::s_contractTermsChanged, contract, actor.tenantId, GetContractPartyTenantIds(contract)));
 		}
 
 		return true;

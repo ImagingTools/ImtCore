@@ -60,13 +60,17 @@ static const inline QString s_recipientTenantIds = QStringLiteral("recipientTena
 // Every change of a contract, for all its parties
 static const inline QString s_contractChanged = QStringLiteral("ContractChanged");
 static const inline QString s_contractInvitationReceived = QStringLiteral("ContractInvitationReceived");
-static const inline QString s_contractUpdated = QStringLiteral("ContractUpdated");
+// The terms of a sent contract changed: the parties review it again
+static const inline QString s_contractTermsChanged = QStringLiteral("ContractTermsChanged");
+static const inline QString s_contractPartyRemoved = QStringLiteral("ContractPartyRemoved");
 static const inline QString s_contractChangesRequested = QStringLiteral("ContractChangesRequested");
 static const inline QString s_contractSigned = QStringLiteral("ContractSigned");
 static const inline QString s_contractDeclined = QStringLiteral("ContractDeclined");
 static const inline QString s_contractConcluded = QStringLiteral("ContractConcluded");
 static const inline QString s_contractCancelled = QStringLiteral("ContractCancelled");
 static const inline QString s_contractNoticeGiven = QStringLiteral("ContractNoticeGiven");
+static const inline QString s_contractNoticeRevoked = QStringLiteral("ContractNoticeRevoked");
+static const inline QString s_contractRenewalStopped = QStringLiteral("ContractRenewalStopped");
 static const inline QString s_contractWithdrawn = QStringLiteral("ContractWithdrawn");
 static const inline QString s_contractPermissionsWithdrawn = QStringLiteral("ContractPermissionsWithdrawn");
 static const inline QString s_contractPermissionsReceived = QStringLiteral("ContractPermissionsReceived");

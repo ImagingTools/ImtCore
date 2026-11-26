@@ -53,12 +53,21 @@ protected:
 	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
 private:
+	/// The group of a contract a notification joins: one row per inbox, withdrawn when it is no longer true
+	enum NotificationGroup
+	{
+		NG_NONE,
+		/// The party is to answer: review, sign, change the terms
+		NG_PENDING,
+		/// The signatures the initiator collects
+		NG_SIGNED
+	};
+
 	struct NotificationKind
 	{
 		QByteArray typeId;
 		istd::IInformationProvider::InformationCategory severity = istd::IInformationProvider::IC_INFO;
-		/// The notification waits for an answer of the party, and is withdrawn when the contract leaves that step
-		bool isPending = false;
+		NotificationGroup group = NG_NONE;
 	};
 
 	/**
@@ -66,20 +75,26 @@ private:
 	*/
 	static NotificationKind GetNotificationKind(const QString& eventType);
 
-	enum PendingStepEnd
+	/// The grouped notifications an event makes untrue
+	enum StepEnd
 	{
-		PSE_NONE,
+		SE_NONE,
 		/// The party that acted answered its pending notification
-		PSE_ACTOR,
-		/// Nothing is pending for any party any more
-		PSE_ALL
+		SE_ACTOR_ANSWERED,
+		/// The initiator changed the terms: what it was asked and the signatures it collected are gone
+		SE_TERMS_CHANGED,
+		/// The parties told are out of the contract
+		SE_RECIPIENTS_REMOVED,
+		/// The negotiation ended for all parties
+		SE_ALL
 	};
 
-	static PendingStepEnd GetPendingStepEnd(const QString& eventType);
+	static StepEnd GetStepEnd(const QString& eventType);
 
 	void PushChange(const QByteArray& contractId, const QByteArrayList& tenantIds, const QByteArray& userId, const QString& userName) const;
 	void SendToNotificationCenter(const QVariantMap& event, const NotificationKind& kind, const QByteArrayList& tenantIds) const;
-	void WithdrawPending(const QByteArray& contractId, const QByteArrayList& tenantIds) const;
+	void EndStep(const QVariantMap& event, StepEnd stepEnd, const QByteArrayList& recipientTenantIds) const;
+	void WithdrawGroup(const QByteArray& groupKey, const QByteArrayList& tenantIds) const;
 	QString FindTenantName(const QByteArray& tenantId) const;
 	QString GetPushCommandId() const;
 

@@ -7548,6 +7548,38 @@
         <source>Contract permissions taken back</source>
         <translation>Права по контракту забраны</translation>
     </message>
+    <message>
+        <source>&quot;{partner}&quot; changed the terms of the contract &quot;{subject}&quot;: review them again</source>
+        <translation>«{partner}» изменил(а) условия контракта «{subject}»: проверьте их снова</translation>
+    </message>
+    <message>
+        <source>Contract terms changed</source>
+        <translation>Условия контракта изменены</translation>
+    </message>
+    <message>
+        <source>&quot;{partner}&quot; removed your organization from the contract &quot;{subject}&quot;</source>
+        <translation>«{partner}» исключил(а) вашу организацию из контракта «{subject}»</translation>
+    </message>
+    <message>
+        <source>Removed from a contract</source>
+        <translation>Исключение из контракта</translation>
+    </message>
+    <message>
+        <source>&quot;{partner}&quot; revoked its notice and stays in the contract &quot;{subject}&quot;</source>
+        <translation>«{partner}» отозвал(а) уведомление о выходе и остаётся в контракте «{subject}»</translation>
+    </message>
+    <message>
+        <source>Contract notice revoked</source>
+        <translation>Уведомление о выходе отозвано</translation>
+    </message>
+    <message>
+        <source>&quot;{partner}&quot; will not renew the contract &quot;{subject}&quot;</source>
+        <translation>«{partner}» не будет продлевать контракт «{subject}»</translation>
+    </message>
+    <message>
+        <source>Contract renewal stopped</source>
+        <translation>Продление контракта остановлено</translation>
+    </message>
 </context>
 <context>
     <name>AuthorizationController</name>

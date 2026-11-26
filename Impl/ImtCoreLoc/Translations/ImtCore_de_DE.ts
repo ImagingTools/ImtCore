@@ -7400,6 +7400,38 @@
         <source>Contract permissions taken back</source>
         <translation>Vertragsberechtigungen zurückgenommen</translation>
     </message>
+    <message>
+        <source>&quot;{partner}&quot; changed the terms of the contract &quot;{subject}&quot;: review them again</source>
+        <translation>„{partner}“ hat die Bedingungen des Vertrags „{subject}“ geändert: prüfen Sie sie erneut</translation>
+    </message>
+    <message>
+        <source>Contract terms changed</source>
+        <translation>Vertragsbedingungen geändert</translation>
+    </message>
+    <message>
+        <source>&quot;{partner}&quot; removed your organization from the contract &quot;{subject}&quot;</source>
+        <translation>„{partner}“ hat Ihre Organisation aus dem Vertrag „{subject}“ entfernt</translation>
+    </message>
+    <message>
+        <source>Removed from a contract</source>
+        <translation>Aus einem Vertrag entfernt</translation>
+    </message>
+    <message>
+        <source>&quot;{partner}&quot; revoked its notice and stays in the contract &quot;{subject}&quot;</source>
+        <translation>„{partner}“ hat die Kündigung zurückgenommen und bleibt im Vertrag „{subject}“</translation>
+    </message>
+    <message>
+        <source>Contract notice revoked</source>
+        <translation>Kündigung zurückgenommen</translation>
+    </message>
+    <message>
+        <source>&quot;{partner}&quot; will not renew the contract &quot;{subject}&quot;</source>
+        <translation>„{partner}“ wird den Vertrag „{subject}“ nicht verlängern</translation>
+    </message>
+    <message>
+        <source>Contract renewal stopped</source>
+        <translation>Vertragsverlängerung beendet</translation>
+    </message>
 </context>
 <context>
     <name>AuthorizationController</name>

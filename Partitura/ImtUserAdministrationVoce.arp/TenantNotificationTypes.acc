@@ -395,6 +395,10 @@
                                 <Value>ContractPermissionsReceived</Value>
                                 <Value>ContractSuperseded</Value>
                                 <Value>ContractReminder</Value>
+                                <Value>ContractTermsChanged</Value>
+                                <Value>ContractPartyRemoved</Value>
+                                <Value>ContractNoticeRevoked</Value>
+                                <Value>ContractRenewalStopped</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -669,6 +673,106 @@
                     </AttributeInfo>
                     <AttributeInfo Id="TypeId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="imtauth.ContractReminder"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ContractTermsChanged" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Assignment"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Message" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="&quot;{partner}&quot; changed the terms of the contract &quot;{subject}&quot;: review them again"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Contract terms changed"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParameterIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>partner</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="imtauth.ContractTermsChanged"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ContractPartyRemoved" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Warning"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Message" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="&quot;{partner}&quot; removed your organization from the contract &quot;{subject}&quot;"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Removed from a contract"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParameterIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>partner</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="imtauth.ContractPartyRemoved"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ContractNoticeRevoked" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Assignment"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Message" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="&quot;{partner}&quot; revoked its notice and stays in the contract &quot;{subject}&quot;"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Contract notice revoked"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParameterIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>partner</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="imtauth.ContractNoticeRevoked"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ContractRenewalStopped" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Warning"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Message" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="&quot;{partner}&quot; will not renew the contract &quot;{subject}&quot;"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Contract renewal stopped"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParameterIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>partner</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="imtauth.ContractRenewalStopped"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
