@@ -35,8 +35,115 @@ Rectangle {
 	}
 	
 	// property TreeItemModel objectsModel: TreeItemModel{};
+	// Current object (the last selected one); setting it from outside selects this object only.
 	property int selectedIndex: -1;
-	
+
+	// IDs of all selected objects; the current object (selectedIndex) is one of them. A click selects
+	// one object, Ctrl+click adds or removes an object, a drag with Ctrl selects the objects touched
+	// by the selection rectangle (Escape cancels it). Use setSelection() to change it.
+	property var selectedIds: []
+	// Emitted once after selectedIds or selectedIndex were changed.
+	signal selectionChanged()
+
+	// Clicked link {fromId, toId} (the same direction as in extraLinks), null if none. Selecting an
+	// object or clicking an empty place clears it.
+	property var selectedLink: null
+	signal linkClicked(string fromId, string toId)
+
+	function isObjectSelected(index){
+		if (index < 0 || index >= canvasPage.objectsModel.count){
+			return false
+		}
+		let item = canvasPage.objectsModel.get(index).item
+		return item ? canvasPage.selectedIds.indexOf(item.m_id) >= 0 : false
+	}
+
+	// Indexes of the selected objects in the model.
+	function selectedObjectIndexes(){
+		let result = []
+		for (let i = 0; i < canvasPage.objectsModel.count; i++){
+			if (canvasPage.isObjectSelected(i)){
+				result.push(i)
+			}
+		}
+		return result
+	}
+
+	// ids: IDs of the selected objects; currentIndex: the current object (added to ids if missing), -1 for none.
+	function setSelection(ids, currentIndex){
+		let newIds = []
+		for (let i = 0; ids && i < ids.length; i++){
+			if (newIds.indexOf(ids[i]) < 0 && canvasPage.findModelIndex(ids[i]) >= 0){
+				newIds.push(ids[i])
+			}
+		}
+		let current = currentIndex >= 0 && currentIndex < canvasPage.objectsModel.count ? currentIndex : -1
+		if (current >= 0){
+			let currentId = canvasPage.objectsModel.get(current).item.m_id
+			if (newIds.indexOf(currentId) < 0){
+				newIds.push(currentId)
+			}
+		}
+		else if (newIds.length > 0){
+			current = canvasPage.findModelIndex(newIds[newIds.length - 1])
+		}
+
+		let changed = current !== canvas.selectedIndex || newIds.length !== canvasPage.selectedIds.length
+		for (let i = 0; !changed && i < newIds.length; i++){
+			changed = canvasPage.selectedIds.indexOf(newIds[i]) < 0
+		}
+
+		if (newIds.length > 0){
+			canvasPage.setSelectedLink(null)
+		}
+		canvasPage.selectedIds = newIds
+		canvas.selectedIndex = current
+		if (changed){
+			canvasPage.selectionChanged()
+		}
+		canvas.requestPaint()
+	}
+
+	// Ctrl+click: adds the object to the selection or removes it.
+	function toggleObjectSelection(index){
+		if (index < 0 || index >= canvasPage.objectsModel.count){
+			return
+		}
+		let objectId = canvasPage.objectsModel.get(index).item.m_id
+		let ids = canvasPage.selectedIds.slice()
+		let position = ids.indexOf(objectId)
+		if (position < 0){
+			ids.push(objectId)
+			canvasPage.setSelection(ids, index)
+			return
+		}
+
+		ids.splice(position, 1)
+		let current = canvas.selectedIndex
+		if (current === index){
+			current = ids.length > 0 ? canvasPage.findModelIndex(ids[ids.length - 1]) : -1
+		}
+		canvasPage.setSelection(ids, current)
+	}
+
+	function setSelectedLink(link){
+		let fromId = link ? link.fromId : ""
+		let toId = link ? link.toId : ""
+		let currentFromId = canvasPage.selectedLink ? canvasPage.selectedLink.fromId : ""
+		let currentToId = canvasPage.selectedLink ? canvasPage.selectedLink.toId : ""
+		if (fromId === currentFromId && toId === currentToId){
+			return
+		}
+		canvasPage.selectedLink = link ? {"fromId": fromId, "toId": toId} : null
+		canvas.requestPaint()
+	}
+
+	function isLinkSelected(fromId, toId){
+		let link = canvasPage.selectedLink
+		return link !== null && link !== undefined
+				&& ((link.fromId === fromId && link.toId === toId) || (link.fromId === toId && link.toId === fromId))
+	}
+
 	//for scrollBars
 	property real contentHeight: backgroundRec.height;
 	property real contentY: -canvas.deltaY;
@@ -75,6 +182,8 @@ Rectangle {
 	// objectX/objectY: position of the dropped object at the release (scheme coordinates).
 	signal objectDropped(string objectId, string targetId, real objectX, real objectY);
 
+	// All selected objects are dragged together; the target is found under the current one and must
+	// accept every dragged object.
 	function findDropCandidate(){
 		if (!canvasPage.dropTargetFilter || canvas.selectedIndex < 0 || canvas.selectedIndex >= canvasPage.objectsModel.count){
 			return -1
@@ -82,10 +191,19 @@ Rectangle {
 
 		let dragged = canvasPage.objectsModel.get(canvas.selectedIndex).item
 		let draggedWidth = dragged.m_width ? dragged.m_width : canvas.mainRec_width
+		let draggedIds = canvasPage.selectedIds.length > 0 ? canvasPage.selectedIds : [dragged.m_id]
+		let acceptsAll = function(targetId){
+			for (let k = 0; k < draggedIds.length; k++){
+				if (!canvasPage.dropTargetFilter(draggedIds[k], targetId)){
+					return false
+				}
+			}
+			return true
+		}
 		let bestIndex = -1
 		let bestArea = 0
 		for (let i = 0; i < canvasPage.objectsModel.count; i++){
-			if (i === canvas.selectedIndex){
+			if (i === canvas.selectedIndex || canvasPage.isObjectSelected(i)){
 				continue
 			}
 			let item = canvasPage.objectsModel.get(i).item
@@ -96,7 +214,7 @@ Rectangle {
 				continue
 			}
 			let area = overlapX * overlapY
-			if (area > bestArea && canvasPage.dropTargetFilter(dragged.m_id, item.m_id)){
+			if (area > bestArea && acceptsAll(item.m_id)){
 				bestArea = area
 				bestIndex = i
 			}
@@ -198,7 +316,61 @@ Rectangle {
 			canvasPage.resetDrop()
 		}
 	}
-	
+
+	// Escape hides the selection rectangle and restores the selection it was started with.
+	Shortcut {
+		sequence: "Escape"
+		enabled: canvasPage.visible && canvas.rubberBandActive
+		onActivated: {
+			canvasPage.cancelRubberBand()
+		}
+	}
+
+	function cancelRubberBand(){
+		if (!canvas.rubberBandActive){
+			return
+		}
+		canvas.rubberBandActive = false
+		canvas.rubberBandCanceled = true
+		canvasPage.setSelection(controlArea.rubberBandBaseIds, controlArea.rubberBandBaseIndex)
+	}
+
+	// Selects the objects touched by the rectangle (window corners in canvas coordinates) in addition
+	// to the selection the rectangle was started with.
+	function updateRubberBand(fromPoint, toPoint){
+		canvas.rubberBandX = Math.min(fromPoint.x, toPoint.x)
+		canvas.rubberBandY = Math.min(fromPoint.y, toPoint.y)
+		canvas.rubberBandWidth = Math.abs(toPoint.x - fromPoint.x)
+		canvas.rubberBandHeight = Math.abs(toPoint.y - fromPoint.y)
+		if (canvas.scaleCoeff < 0.0000001){
+			return
+		}
+
+		let left = (canvas.rubberBandX - canvas.deltaX) / canvas.scaleCoeff
+		let top = (canvas.rubberBandY - canvas.deltaY) / canvas.scaleCoeff
+		let right = left + canvas.rubberBandWidth / canvas.scaleCoeff
+		let bottom = top + canvas.rubberBandHeight / canvas.scaleCoeff
+
+		let ids = controlArea.rubberBandBaseIds.slice()
+		let current = controlArea.rubberBandBaseIndex
+		let lastHitIndex = -1
+		for (let i = 0; i < canvasPage.objectsModel.count; i++){
+			let item = canvasPage.objectsModel.get(i).item
+			let width_ = item.m_width ? item.m_width : canvas.mainRec_width
+			if (item.m_x > right || item.m_x + width_ < left || item.m_y > bottom || item.m_y + canvas.mainRec_height < top){
+				continue
+			}
+			if (ids.indexOf(item.m_id) < 0){
+				ids.push(item.m_id)
+			}
+			lastHitIndex = i
+		}
+		if (current < 0){
+			current = lastHitIndex
+		}
+		canvasPage.setSelection(ids, current)
+	}
+
 	ApplicationEvents {
 		onDesignSchemeChanged: {
 			canvasPage.designSchemeChanged(scheme)
@@ -225,6 +397,15 @@ Rectangle {
 		controlArea.setLinkHintHover(-1);
 		canvasPage.resetDrop();
 		canvas.dropSuppressedIndex = -1;
+		canvas.rubberBandActive = false;
+		// The selection keeps the objects of the new model only.
+		if (canvasPage.selectedIds.length > 0){
+			canvasPage.setSelection(canvasPage.selectedIds, -1);
+		}
+		if (canvasPage.selectedLink !== null && (canvasPage.findModelIndex(canvasPage.selectedLink.fromId) < 0
+				|| canvasPage.findModelIndex(canvasPage.selectedLink.toId) < 0)){
+			canvasPage.setSelectedLink(null);
+		}
 		canvas.requestPaint();
 	}
 	
@@ -235,12 +416,19 @@ Rectangle {
 	}
 	
 	onSelectedIndexChanged: {
-		// Selection set from outside (e.g. after the model was replaced) must reach the canvas too.
+		// Selection set from outside (e.g. after the model was replaced) must reach the canvas too;
+		// only this object is selected then.
 		if (canvas.selectedIndex !== selectedIndex){
 			canvas.selectedIndex = selectedIndex
+			let item = selectedIndex >= 0 && selectedIndex < canvasPage.objectsModel.count
+					? canvasPage.objectsModel.get(selectedIndex).item : null
+			canvasPage.selectedIds = item ? [item.m_id] : []
+			if (item){
+				canvasPage.setSelectedLink(null)
+			}
+			canvasPage.selectionChanged()
 			canvas.requestPaint()
 		}
-		console.log("SchemeView.qml onSelectedIndexChanged", selectedIndex)
 	}
 
 	function designSchemeChanged(scheme){
@@ -412,76 +600,122 @@ Rectangle {
 			
 			// The right button only selects an object, it neither moves objects nor pans the scheme.
 			property bool rightButtonPressed: false;
+			// What the pressed left button does: "move" (the selected objects), "pan" (the scheme),
+			// "select" (Ctrl: toggles the object by a click, selects by a rectangle when dragged), "none".
+			property string pressMode: "none";
+			// Object under the cursor at the press, -1 for none.
+			property int pressedIndex: -1;
+			// Link under the cursor at the press ({fromId, toId} or null); selected by a click.
+			property var pressedLink: null;
+			// A press on one of several selected objects keeps them for moving; a click without moving selects this object only.
+			property bool pendingSingleSelect: false;
+			// Selection when the selection rectangle was started (restored by Escape).
+			property var rubberBandBaseIds: [];
+			property int rubberBandBaseIndex: -1;
+			// Distance (pixels) the mouse must move before a press becomes a drag.
+			property real dragThreshold: 4;
 
-			
+			function movedFromPress(){
+				return Math.abs(controlArea.coord.x - controlArea.coordPressed.x) > controlArea.dragThreshold
+						|| Math.abs(controlArea.coord.y - controlArea.coordPressed.y) > controlArea.dragThreshold;
+			}
+
 			onRightClicked: {
 				if (canvas.selectedIndex >= 0){
 					let point = controlArea.mapToItem(null, mouseX, mouseY);
 					canvasPage.contextMenuRequested(canvas.selectedIndex, point.x, point.y);
 				}
 			}
-			
+
 			onClicked: {
 				if(!wasMoving){
-					if(canvas.selectedIndex >= 0){
-						for(let i = 0; i < canvasPage.objectsModel.count; i++){
-							let item = canvasPage.objectsModel.get(i).item;
-							item.m_selected = (i == canvas.selectedIndex);
-						}
-					}
-					else {
-						for(let i = 0; i < canvasPage.objectsModel.count; i++){
-							let item = canvasPage.objectsModel.get(i).item;
-							item.m_selected = false;
-						}
+					for(let i = 0; i < canvasPage.objectsModel.count; i++){
+						let item = canvasPage.objectsModel.get(i).item;
+						item.m_selected = canvasPage.isObjectSelected(i);
 					}
 					canvas.requestPaint();
 				}
 			}
-			
+
 			onPressed: {
-				console.log("onPressed", canvas.selectedIndex)
 				controlArea.setLinkHintHover(-1);
 				canvas.dropSuppressedIndex = -1;
+				canvas.rubberBandActive = false;
+				canvas.rubberBandCanceled = false;
 				controlArea.rightButtonPressed = mouse.button == Qt.RightButton;
-				canvas.selectedIndex = -1;
-				for(let i = 0; i < canvasPage.objectsModel.count; i++){
-					let item = canvasPage.objectsModel.get(i).item;
-					let x_ = item.m_x;
-					let y_ = item.m_y;
-					
-					let width_ = item.m_width ? item.m_width : canvas.mainRec_width;
-					let height_ = canvas.mainRec_height;
-					
-					x_ = x_ * canvas.scaleCoeff + canvas.deltaX;
-					y_ = y_ * canvas.scaleCoeff + canvas.deltaY;
-					width_ = width_ * canvas.scaleCoeff;
-					height_ = height_  * canvas.scaleCoeff;
-					
-					let ok = checkInsideMovingItem(x_, y_, width_, height_);
-					if(ok){
-						canvas.selectedIndex = i;
+				controlArea.pendingSingleSelect = false;
+				controlArea.pressedLink = null;
+				controlArea.pressedIndex = canvas.findObjectAt(controlArea.coordPressed.x, controlArea.coordPressed.y);
+
+				// Ctrl: the selection is changed on the release (click) or while dragging (rectangle);
+				// neither the objects nor the scheme are moved.
+				if (!controlArea.rightButtonPressed && (mouse.modifiers & Qt.ControlModifier)){
+					controlArea.pressMode = "select";
+					controlArea.rubberBandBaseIds = canvasPage.selectedIds.slice();
+					controlArea.rubberBandBaseIndex = canvas.selectedIndex;
+					controlArea.cursorShape = Qt.ArrowCursor;
+					return;
+				}
+
+				let hitIndex = controlArea.pressedIndex;
+				if (hitIndex >= 0){
+					let hitId = canvasPage.objectsModel.get(hitIndex).item.m_id;
+					if (canvasPage.selectedIds.length > 1 && canvasPage.selectedIds.indexOf(hitId) >= 0){
+						// A selected object of several: all of them are kept (and moved together).
+						canvasPage.setSelection(canvasPage.selectedIds, hitIndex);
+						controlArea.pendingSingleSelect = !controlArea.rightButtonPressed;
 					}
+					else {
+						canvasPage.setSelection([hitId], hitIndex);
+					}
+					controlArea.pressMode = controlArea.rightButtonPressed ? "none" : "move";
+					return;
 				}
-				if(canvas.selectedIndex == -1 && !controlArea.rightButtonPressed){
-					controlArea.cursorShape = Qt.ClosedHandCursor;
+
+				canvasPage.setSelection([], -1);
+				if (controlArea.rightButtonPressed){
+					controlArea.pressMode = "none";
+					return;
 				}
+				controlArea.pressMode = "pan";
+				controlArea.pressedLink = canvas.findLinkAt(controlArea.coordPressed.x, controlArea.coordPressed.y);
+				controlArea.cursorShape = Qt.ClosedHandCursor;
 			}
-			
+
 			onCanceled: {
 				controlArea.isPressed = false;
 				controlArea.wasMoving = false;
+				controlArea.pressMode = "none";
+				canvas.rubberBandActive = false;
+				canvas.rubberBandCanceled = false;
 				canvasPage.resetDrop();
 				canvas.dropSuppressedIndex = -1;
 			}
-			
+
 			onReleased: {
+				let pressMode = controlArea.pressMode;
+				controlArea.pressMode = "none";
+
+				if (pressMode === "select"){
+					if (canvas.rubberBandActive){
+						// The selection was updated while dragging.
+						canvas.rubberBandActive = false;
+					}
+					else if (!canvas.rubberBandCanceled && !controlArea.movedFromPress() && controlArea.pressedIndex >= 0){
+						canvasPage.toggleObjectSelection(controlArea.pressedIndex);
+					}
+					canvas.rubberBandCanceled = false;
+					controlArea.cursorShape = Qt.ArrowCursor;
+					canvas.requestPaint();
+					return;
+				}
+
 				// Released over a blinking target: the object is dropped onto it instead of being moved.
 				let dropTargetIndex = canvas.dropTargetIndex
 				let droppedIndex = canvas.selectedIndex
 				canvasPage.resetDrop()
 				canvas.dropSuppressedIndex = -1
-				if (dropTargetIndex >= 0 && droppedIndex >= 0 && !controlArea.rightButtonPressed
+				if (pressMode === "move" && dropTargetIndex >= 0 && droppedIndex >= 0
 						&& dropTargetIndex < canvasPage.objectsModel.count && droppedIndex < canvasPage.objectsModel.count
 						&& canvasPage.findDropCandidate() === dropTargetIndex){
 					let droppedItem = canvasPage.objectsModel.get(droppedIndex).item
@@ -490,51 +724,85 @@ Rectangle {
 					canvasPage.objectDropped(droppedItem.m_id, targetItem.m_id, droppedItem.m_x, droppedItem.m_y)
 					return
 				}
+
+				// A click on one of several selected objects selects this object only.
+				if (pressMode === "move" && controlArea.pendingSingleSelect && !wasMoving && controlArea.pressedIndex >= 0
+						&& controlArea.pressedIndex < canvasPage.objectsModel.count){
+					canvasPage.setSelection([canvasPage.objectsModel.get(controlArea.pressedIndex).item.m_id], controlArea.pressedIndex);
+				}
+				controlArea.pendingSingleSelect = false;
+
+				// A click on a link (not on an object) selects it, a click on an empty place clears the selected link.
+				if (pressMode === "pan" && !controlArea.movedFromPress()){
+					let link = controlArea.pressedLink;
+					canvasPage.setSelectedLink(link);
+					if (link){
+						canvasPage.linkClicked(link.fromId, link.toId);
+					}
+				}
+
 				if(canvas.selectedIndex >= 0){
 					controlArea.cursorShape = Qt.ArrowCursor;
 				}
 				else {
 					controlArea.cursorShape = Qt.OpenHandCursor
 				}
-				if (canvas.selectedIndex >= 0 && wasMoving && !controlArea.rightButtonPressed){
+				if (pressMode === "move" && canvas.selectedIndex >= 0 && wasMoving){
 					canvasPage.objectMoveFinished()
 				}
 			}
-			
+
 			onDoubleClicked: {
 				wasMoving = false;
 				isPressed = false;
-				
-				if(canvas.selectedIndex >= 0 && mouse.button != Qt.RightButton){
+
+				if(canvas.selectedIndex >= 0 && mouse.button != Qt.RightButton && !(mouse.modifiers & Qt.ControlModifier)){
 					canvasPage.goInside();
 				}
 			}
-			
+
 			onDeltaSignal: {
 				if (controlArea.rightButtonPressed){
 					return;
 				}
-				
-				if(canvas.selectedIndex < 0){
+
+				if (controlArea.pressMode === "select"){
+					if (canvas.rubberBandCanceled){
+						return;
+					}
+					if (!canvas.rubberBandActive){
+						if (!controlArea.movedFromPress()){
+							return;
+						}
+						canvas.rubberBandActive = true;
+					}
+					canvasPage.updateRubberBand(controlArea.coordPressed, controlArea.coord);
+					return;
+				}
+
+				if(controlArea.pressMode === "pan"){
 					canvasPage.autoFit = false;
-					
+
 					canvas.deltaX += delta.x
 					canvas.deltaY += delta.y
 					canvas.requestPaint();
 				}
-				else {
+				else if (controlArea.pressMode === "move"){
+					if (controlArea.movedFromPress()){
+						controlArea.pendingSingleSelect = false;
+					}
 					movingFunction(delta);
 					canvasPage.updateDropTarget();
 				}
 			}
-			
+
 			onWheel: {
 				if (canvas.scaleCoeff == 0){
 					return
 				}
-				
+
 				canvasPage.autoFit = false;
-				
+
 				let deltaX = (wheel.x + canvas.deltaX) / canvas.scaleCoeff
 				let wheelDelta = wheel.angleDelta.y
 				let scaleCoeff_ = canvas.scaleCoeff;
@@ -548,59 +816,61 @@ Rectangle {
 						scaleCoeff_ -= scaleStep;
 					}
 				}
-				
+
 				canvas.setScale(scaleCoeff_, wheel.x, wheel.y)
 			}
-			
-			
-			function movingFunction(delta){//reimplemented
-				if(canvas.selectedIndex >= 0 && canvas.scaleCoeff != 0){
-					let item = canvasPage.objectsModel.get(canvas.selectedIndex).item;
-					if (!item){
-						return;
-					}
-					
-					let width_ = item.m_width ? item.m_width : canvas.mainRec_width;
-					let height_ = canvas.mainRec_height;
-					
-					width_ = width_ * canvas.scaleCoeff;
-					height_ = height_  * canvas.scaleCoeff;
-					
-					if (canvas.scaleCoeff < 0.0000001){
-						return;
-					}
-					
-					let newX = (item.m_x + delta.x / canvas.scaleCoeff);
-					let newY = (item.m_y + delta.y / canvas.scaleCoeff);
 
-					// fit to borders
-					let margin_ = 10;
-					if(newX < margin_){
-						newX = margin_;
-					}
-					if(newY < margin_){
-						newY = margin_;
-					}
-					
-					if (canvas.scaleCoeff - margin_ === 0){
-						return;
-					}
-					
-					if(newX > (backgroundRec.width  - width_) / canvas.scaleCoeff - margin_){
-						newX = (backgroundRec.width  - width_) / canvas.scaleCoeff - margin_
-					}
-					if(newY > (backgroundRec.height  - height_) / canvas.scaleCoeff - margin_){
-						newY = (backgroundRec.height  - height_) / canvas.scaleCoeff - margin_
-					}
-					
-					item.m_x = newX;
-					item.m_y = newY;
-					
-					canvas.requestPaint();
-					
-					canvasPage.modelDataChanged()
+
+			// Moves all selected objects by the same offset, keeping them inside the sheet.
+			function movingFunction(delta){//reimplemented
+				if (canvas.selectedIndex < 0 || canvas.scaleCoeff < 0.0000001){
+					return;
 				}
-				
+
+				let indexes = canvasPage.selectedObjectIndexes();
+				if (indexes.indexOf(canvas.selectedIndex) < 0){
+					indexes.push(canvas.selectedIndex);
+				}
+
+				let offsetX = delta.x / canvas.scaleCoeff;
+				let offsetY = delta.y / canvas.scaleCoeff;
+
+				// fit to borders
+				let margin_ = 10;
+				let minOffsetX = -Number.MAX_VALUE;
+				let maxOffsetX = Number.MAX_VALUE;
+				let minOffsetY = -Number.MAX_VALUE;
+				let maxOffsetY = Number.MAX_VALUE;
+				for (let i = 0; i < indexes.length; i++){
+					let item = canvasPage.objectsModel.get(indexes[i]).item;
+					if (!item){
+						continue;
+					}
+					let width_ = item.m_width ? item.m_width : canvas.mainRec_width;
+					minOffsetX = Math.max(minOffsetX, margin_ - item.m_x);
+					maxOffsetX = Math.min(maxOffsetX, canvas.backgroundWidth - width_ - margin_ - item.m_x);
+					minOffsetY = Math.max(minOffsetY, margin_ - item.m_y);
+					maxOffsetY = Math.min(maxOffsetY, canvas.backgroundHeight - canvas.mainRec_height - margin_ - item.m_y);
+				}
+				// Objects that do not fit together are moved without the correction.
+				if (minOffsetX <= maxOffsetX){
+					offsetX = Math.min(Math.max(offsetX, minOffsetX), maxOffsetX);
+				}
+				if (minOffsetY <= maxOffsetY){
+					offsetY = Math.min(Math.max(offsetY, minOffsetY), maxOffsetY);
+				}
+
+				for (let i = 0; i < indexes.length; i++){
+					let item = canvasPage.objectsModel.get(indexes[i]).item;
+					if (item){
+						item.m_x = item.m_x + offsetX;
+						item.m_y = item.m_y + offsetY;
+					}
+				}
+
+				canvas.requestPaint();
+
+				canvasPage.modelDataChanged()
 			}
 			
 			onPositionSignal: {
@@ -645,7 +915,8 @@ Rectangle {
 					canvas.requestPaint();
 				}
 				else {
-					controlArea.cursorShape = Qt.OpenHandCursor;
+					// A link can be clicked
+					controlArea.cursorShape = canvas.findLinkAt(position.x, position.y) ? Qt.PointingHandCursor : Qt.OpenHandCursor;
 					if(canvas.linkSelected){
 						canvas.linkSelected = false;
 						canvas.requestPaint();
@@ -702,7 +973,7 @@ Rectangle {
 				componentWidth: Style.sizeHintS;
 				horizontalAlignment: Text.AlignLeft;
 				// The same frame as the highlighted link icon
-				borderColor: canvas.compositeBorderColor;
+				borderColor: canvas.selectionColor;
 				borderWidth: 1;
 			}
 			//hover reaction
@@ -750,7 +1021,17 @@ Rectangle {
 			onDropScaleChanged: requestPaint()
 			property bool linkSelected: false;
 			property bool hasTailSelection: false;
-			
+			// Selection rectangle (Ctrl + drag), canvas coordinates
+			property bool rubberBandActive: false;
+			// Escape cancelled the rectangle; the drag is ignored until the release
+			property bool rubberBandCanceled: false;
+			property real rubberBandX: 0;
+			property real rubberBandY: 0;
+			property real rubberBandWidth: 0;
+			property real rubberBandHeight: 0;
+			// Distance (pixels) from a link at which a click selects it
+			property real linkHitTolerance: 6;
+
 			//sizes
 			property real mainRec_width: 250
 			property real mainRec_height: 60
@@ -775,12 +1056,15 @@ Rectangle {
 			property real imageMargin: 4
 			
 			//colors
-			property string selectedColor: Style.selectedColor
 			property string mainColor: Style.borderColor2
 			property string errorColor: Style.errorColor
 			property string compositeColor: Style.alternateBaseColor;
-			property string compositeSelectedColor: Style.selectedColor;
-			property string compositeBorderColor: Style.imagingToolsAccentColor;
+			// Composite objects have a double frame of the same color as the frame of the other objects
+			property string compositeBorderColor: canvas.mainColor;
+			// Frame of the selected objects (and of the selected link, the drop target, the selection
+			// rectangle); their background is the same color with selectionFillOpacity
+			property string selectionColor: Style.imagingToolsAccentColor;
+			property real selectionFillOpacity: 0.25;
 			property string selectedLinkFromColor: Style.selectedLinkFromColor
 			property string selectedLinkToColor: Style.selectedLinkToColor
 			property string linkColor: Style.borderColor2
@@ -896,17 +1180,107 @@ Rectangle {
 					if(fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) continue
 					canvas.drawLink(ctx, fromIndex, toIndex);
 				}
-				
-				//drawObject
+
+				// The selected link over the others
+				if(canvasPage.selectedLink){
+					let fromIndex = canvasPage.findModelIndex(canvasPage.selectedLink.fromId);
+					let toIndex = canvasPage.findModelIndex(canvasPage.selectedLink.toId);
+					if(fromIndex >= 0 && toIndex >= 0 && fromIndex !== toIndex){
+						canvas.drawLink(ctx, fromIndex, toIndex);
+					}
+				}
+
+				//drawObject: the selected objects over the others, the current one on top
+				let selectedIndexes = [];
 				for(let i = 0; i < canvasPage.objectsModel.count; i++){
-					if(i !== canvas.selectedIndex){
+					if(i === canvas.selectedIndex){
+						continue;
+					}
+					if(canvasPage.isObjectSelected(i)){
+						selectedIndexes.push(i);
+					}
+					else {
 						drawObject(ctx, i);
 					}
 				}
-				if(canvas.selectedIndex >= 0){
+				for(let i = 0; i < selectedIndexes.length; i++){
+					drawObject(ctx, selectedIndexes[i]);
+				}
+				if(canvas.selectedIndex >= 0 && canvas.selectedIndex < canvasPage.objectsModel.count){
 					drawObject(ctx, canvas.selectedIndex);
 				}
 			}//onPaint
+
+			// Index of the object at the point (canvas coordinates), -1 if none; the object drawn on top wins.
+			function findObjectAt(pointX, pointY){
+				let found = -1;
+				let foundSelected = false;
+				for(let i = 0; i < canvasPage.objectsModel.count; i++){
+					let item = canvasPage.objectsModel.get(i).item;
+					let width_ = item.m_width ? item.m_width : canvas.mainRec_width;
+					let x_ = item.m_x * canvas.scaleCoeff + canvas.deltaX;
+					let y_ = item.m_y * canvas.scaleCoeff + canvas.deltaY;
+					if(pointX < x_ || pointY < y_ || pointX > x_ + width_ * canvas.scaleCoeff || pointY > y_ + canvas.mainRec_height * canvas.scaleCoeff){
+						continue;
+					}
+					let selected = i === canvas.selectedIndex || canvasPage.isObjectSelected(i);
+					if(found < 0 || selected || !foundSelected){
+						found = i;
+						foundSelected = selected;
+					}
+					if(i === canvas.selectedIndex){
+						return i;
+					}
+				}
+				return found;
+			}
+
+			// Link {fromId, toId} drawn at the point (canvas coordinates), null if none; the nearest link wins.
+			function findLinkAt(pointX, pointY){
+				if(canvas.scaleCoeff < 0.0000001){
+					return null;
+				}
+				let px = (pointX - canvas.deltaX) / canvas.scaleCoeff;
+				let py = (pointY - canvas.deltaY) / canvas.scaleCoeff;
+				let bestDistance = canvas.linkHitTolerance / canvas.scaleCoeff;
+				let best = null;
+				let check = function(fromIndex, toIndex){
+					let fromItem = canvasPage.objectsModel.get(fromIndex).item;
+					let toItem = canvasPage.objectsModel.get(toIndex).item;
+					let x1 = fromItem.m_x + (fromItem.m_width ? fromItem.m_width : canvas.mainRec_width) / 2;
+					let y1 = fromItem.m_y + canvas.mainRec_height / 2;
+					let x2 = toItem.m_x + (toItem.m_width ? toItem.m_width : canvas.mainRec_width) / 2;
+					let y2 = toItem.m_y + canvas.mainRec_height / 2;
+					let dx = x2 - x1;
+					let dy = y2 - y1;
+					let lengthSquared = dx * dx + dy * dy;
+					let t = lengthSquared > 0 ? ((px - x1) * dx + (py - y1) * dy) / lengthSquared : 0;
+					t = Math.max(0, Math.min(1, t));
+					let distance = Math.sqrt(Math.pow(px - (x1 + t * dx), 2) + Math.pow(py - (y1 + t * dy), 2));
+					if(distance <= bestDistance){
+						bestDistance = distance;
+						best = {"fromId": fromItem.m_id, "toId": toItem.m_id};
+					}
+				}
+
+				for(let i = 0; i < canvasPage.objectsModel.count; i++){
+					let links = canvasPage.objectsModel.get(i).item.m_links;
+					for(let k = 0; links && k < links.count; k++){
+						let ind = canvasPage.findModelIndex(links.get(k).item.m_id);
+						if(ind >= 0 && ind !== i){
+							check(ind, i);
+						}
+					}
+				}
+				for(let i = 0; i < canvasPage.extraLinks.length; i++){
+					let fromIndex = canvasPage.findModelIndex(canvasPage.extraLinks[i].fromId);
+					let toIndex = canvasPage.findModelIndex(canvasPage.extraLinks[i].toId);
+					if(fromIndex >= 0 && toIndex >= 0 && fromIndex !== toIndex){
+						check(fromIndex, toIndex);
+					}
+				}
+				return best;
+			}
 			
 			
 			function drawBackground(ctx){
@@ -1038,12 +1412,12 @@ Rectangle {
 				ctx.roundedRect(item.m_x, item.m_y, width_, canvas.mainRec_height, canvas.radius_, canvas.radius_);
 				if (canvas.dropBlinkOn){
 					ctx.globalAlpha = 0.3;
-					ctx.fillStyle = canvas.compositeBorderColor;
+					ctx.fillStyle = canvas.selectionColor;
 					ctx.fill();
 					ctx.globalAlpha = 1.0;
 				}
 				ctx.lineWidth = 3;
-				ctx.strokeStyle = canvas.compositeBorderColor;
+				ctx.strokeStyle = canvas.selectionColor;
 				ctx.stroke();
 
 				ctx.restore();
@@ -1062,13 +1436,15 @@ Rectangle {
 				let iconUrl_1  = icon === "" ? "" : "../../../" + Style.getIconPath(icon, Icon.State.On, Icon.Mode.Normal)
 				icon = item.m_icon2
 				let iconUrl_2  = icon === "" ? "" : "../../../" + Style.getIconPath(icon, Icon.State.On, Icon.Mode.Normal)
-				// for future multiselect
-				// let selected = item.m_selected ? item.m_selected : false;
-				let selected = index === canvas.selectedIndex
-				
+				let selected = index === canvas.selectedIndex || canvasPage.isObjectSelected(index)
+
 				let hasError = item.m_hasError
 				let isComposite = item.m_isComposite === true
-				
+				// A selected object is framed with the selection color, the others with the common color
+				// (composite objects as well) or with the error color
+				let frameColor = selected ? canvas.selectionColor
+										  : hasError ? canvas.errorColor : isComposite ? canvas.compositeBorderColor : canvas.mainColor
+
 				ctx.lineCap = "round"
 				ctx.lineJoin = "round"
 				
@@ -1088,12 +1464,19 @@ Rectangle {
 				
 				//main rectangle
 				ctx.lineWidth = 2 ;
-				ctx.strokeStyle = hasError ? canvas.errorColor : isComposite ? canvas.compositeBorderColor : canvas.mainColor;
-				ctx.fillStyle = isComposite ? (selected ? canvas.compositeSelectedColor : canvas.compositeColor) :
-											  (selected ? canvas.selectedColor : backgroundColor);
+				ctx.strokeStyle = frameColor;
+				ctx.fillStyle = isComposite ? canvas.compositeColor : backgroundColor;
 				ctx.beginPath()
 				ctx.roundedRect(x_, y_, mainRecWidth, canvas.mainRec_height , canvas.radius_, canvas.radius_);
 				ctx.fill();
+				// The background of a selected object: the selection color with transparency (over the
+				// usual background, so the links and the grid do not show through)
+				if (selected){
+					ctx.globalAlpha = canvas.selectionFillOpacity;
+					ctx.fillStyle = canvas.selectionColor;
+					ctx.fill();
+					ctx.globalAlpha = 1.0;
+				}
 				ctx.stroke();
 				
 				//inner rectangle
@@ -1107,8 +1490,7 @@ Rectangle {
 				if (isComposite){
 					let stackOffset = canvas.compositeStackOffset
 					ctx.lineWidth = 1
-					ctx.strokeStyle = hasError ? canvas.errorColor : canvas.compositeBorderColor
-					ctx.fillStyle = canvas.compositeColor
+					ctx.strokeStyle = frameColor
 					ctx.beginPath()
 					ctx.roundedRect(x_ + stackOffset, y_ + stackOffset, mainRecWidth - 2 * stackOffset, canvas.mainRec_height - 2 * stackOffset, canvas.radius_, canvas.radius_);
 
@@ -1188,7 +1570,7 @@ Rectangle {
 					let hovered = index === canvas.hoverLinkHintIndex
 					if (hovered){
 						ctx.fillStyle = canvas.linkHintHoverColor
-						ctx.strokeStyle = canvas.compositeBorderColor
+						ctx.strokeStyle = canvas.selectionColor
 						ctx.lineWidth = 1
 						ctx.beginPath()
 						ctx.roundedRect(linkRect.x, linkRect.y, linkRect.width, linkRect.height, canvas.radius_, canvas.radius_)
@@ -1245,11 +1627,15 @@ Rectangle {
 				let x2_link = x2 + width2/2;
 				let y2_link = y2 + canvas.mainRec_height/2;
 				
+				// The clicked link is drawn thicker with the selection color
+				let linkSelected = canvasPage.isLinkSelected(fromItem.m_id, toItem.m_id);
+
 				ctx.lineCap = "round"
 				ctx.lineJoin = "round"
-				ctx.lineWidth = 2;
-				
-				ctx.strokeStyle = canvas.hoverIndex === fromIndex ? canvas.selectedLinkFromColor : canvas.hoverIndex === toIndex ? canvas.selectedLinkToColor : canvas.linkColor;
+				ctx.lineWidth = linkSelected ? 3 : 2;
+
+				ctx.strokeStyle = linkSelected ? canvas.selectionColor
+											   : canvas.hoverIndex === fromIndex ? canvas.selectedLinkFromColor : canvas.hoverIndex === toIndex ? canvas.selectedLinkToColor : canvas.linkColor;
 				ctx.fillStyle = ctx.strokeStyle
 				
 				ctx.beginPath()
@@ -1506,6 +1892,29 @@ Rectangle {
 				return angle;
 			}
 		}//canvas
+
+		// Selection rectangle (Ctrl + drag): a semi-transparent area with a frame of the selection color.
+		Rectangle {
+			id: rubberBand
+
+			x: canvas.rubberBandX
+			y: canvas.rubberBandY
+			width: canvas.rubberBandWidth
+			height: canvas.rubberBandHeight
+			visible: canvas.rubberBandActive
+
+			color: "transparent"
+			border.width: 1
+			border.color: canvas.selectionColor
+
+			Rectangle {
+				anchors.fill: parent
+				anchors.margins: 1
+
+				color: canvas.selectionColor
+				opacity: canvas.selectionFillOpacity
+			}
+		}
 	}//mainContainer
 	
 	
