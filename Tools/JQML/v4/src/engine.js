@@ -603,6 +603,7 @@ export class Engine {
 		this.onError = null;
 		this.onLog = null;
 		this.onQuit = null; // Qt.quit() from a script
+		this.pointerDriver = null; // { down, up, move, advance }: the mouse of QtTest in the comparison runner
 
 		// Lenient mode (for large real-world projects): unknown types become placeholders, unknown
 		// properties and handlers are ignored, and a failing property does not stop the load.
@@ -640,6 +641,7 @@ export class Engine {
 		// (the arrows of a tree) is requested from the server once.
 		this.imageCache = new Map();
 		this.animations = new Set();
+		this.flicks = new Set(); // the Flickables whose content runs on after the release
 		this.carets = new Set(); // editors with the focus: their text cursor blinks
 		this.fresh = []; // bindings created since they were last evaluated
 		this.freshLoading = false; // the first values of the bindings are being worked out (evaluateFresh)
@@ -870,6 +872,7 @@ export class Engine {
 		hooks.syncModel = (model) => this.syncModelNow(model);
 		hooks.syncRepeater = (repeater) => this.syncRepeaterNow(repeater);
 		hooks.watchHold = (area) => this.holds.add(area);
+		hooks.watchFlick = (flickable) => this.flicks.add(flickable);
 		hooks.now = () => this.time;
 		hooks.syncBinding = (item) => this.syncBindingItems(item);
 		hooks.syncConnection = (item) => this.syncConnections(item);
@@ -919,7 +922,7 @@ export class Engine {
 	}
 
 	get isAnimated() {
-		if (this.usesTime) return true;
+		if (this.usesTime || this.flicks.size > 0) return true;
 		// PauseAnimation only waits: ticking it must not force a full scene redraw every frame
 		// (CustomTooltip's open delay would flicker the gallery while the pointer rests/moves).
 		// An animation of a hidden item (e.g. an indeterminate ProgressBar on another page) keeps running
@@ -949,6 +952,7 @@ export class Engine {
 		this.qmlBindings.clear();
 		this.pendingImages.clear();
 		this.animations.clear();
+		this.flicks.clear();
 		this.carets.clear();
 		this.fresh = [];
 		this.subQueue = [];
@@ -2253,7 +2257,46 @@ export class Engine {
 			for (const key of Object.keys(props)) this.guard(() => this.assign(item, key.split('.'), props[key]), `property '${key}'`, 0);
 		}
 		this.runCompletedFrom(mark);
+		// Qt (measured): the change handlers of the new object run for the values of its bindings while it is created, before the script
+		// that called createObject goes on (it may point a Binding at the object: that Binding then comes last, over what the handlers wrote).
+		if (item !== null) this.settleNewObject(item);
 		return item;
+	}
+
+	// The bindings of a new object and of what it holds are evaluated until they agree (a binding that read an item that was made after
+	// it reads it again), then its change handlers run for those values (see instantiateComponent).
+	settleNewObject(item) {
+		const items = [];
+		const collect = (node) => {
+			items.push(node);
+			for (const child of node.$children) collect(child);
+			if (node.$owned !== undefined) for (const owned of node.$owned) collect(owned);
+		};
+		collect(item);
+		for (let round = 0; round < 3; round++) {
+			for (const node of items) {
+				if (node.$bindings === null || node.$bindings === undefined) continue;
+				for (const binding of [...node.$bindings]) {
+					if (binding.failed || binding.evaluating) continue;
+					this.evaluateOne(binding, false);
+				}
+			}
+		}
+		this.runNewObjectHandlers(item);
+	}
+
+	// The change handlers of an object and of what it holds, polled once now (see instantiateComponent).
+	runNewObjectHandlers(item) {
+		if (item.$chg !== undefined) {
+			for (const list of [...item.$chg.values()]) {
+				for (const handler of [...list]) {
+					if (handler.failed || handler.immediate === true) continue;
+					this.runChangeHandler(handler);
+				}
+			}
+		}
+		for (const child of item.$children) this.runNewObjectHandlers(child);
+		if (item.$owned !== undefined) for (const owned of item.$owned) this.runNewObjectHandlers(owned);
 	}
 
 	assign(item, path, value) {
@@ -2399,6 +2442,9 @@ export class Engine {
 				if (item.$destroyed === true || !item.$active) this.carets.delete(item);
 				else item.$blink(seconds);
 			}
+		}
+		for (const flickable of [...this.flicks]) {
+			if (flickable.$destroyed === true || !flickable.$flickTick(seconds)) this.flicks.delete(flickable);
 		}
 		for (const area of [...this.holds]) {
 			if (area.$destroyed === true || !area.$pressed || area.$holdDeadline === 0) this.holds.delete(area);
@@ -3389,7 +3435,11 @@ export class Engine {
 				if (current === null || current === undefined) return true;
 				current = current[part];
 			}
-			return !sameValue(current, state.value);
+			if (sameValue(current, state.value)) return false;
+			// A script that wrote the target after us took the binding of the target away (items.js scriptWrite) and wins, as in Qt:
+			// the Binding writes again when its own value changes (the first check above), not when something else changed the target.
+			if (!property.includes('.') && (target.$bindings === null || !target.$bindings.some((entry) => entry.key === property))) return false;
+			return true;
 		} catch {
 			return true;
 		}
@@ -3715,14 +3765,6 @@ export class Engine {
 	releaseItem(item, dead) {
 		if (item.$released) return;
 		item.$released = true;
-		if (item.$destruction !== undefined) {
-			const list = item.$destruction;
-			item.$destruction = undefined;
-			for (const entry of list) this.guard(() => entry.fn.call(item), `handler 'Component.onDestruction' (${entry.file})`, entry.line);
-		}
-		if (item.$component !== undefined) {
-			this.guard(() => item.$component.$emit('destruction'), 'signal \'Component.destruction\'', 0);
-		}
 		if (item.$links !== undefined) {
 			const links = item.$links;
 			item.$links = undefined;
@@ -3780,12 +3822,22 @@ export class Engine {
 			item.$running = false;
 			this.animations.delete(item);
 		}
-		for (const child of item.$children) this.releaseItem(child, dead);
+		// Qt (measured): Component.onDestruction of an item runs after those of what it owns: the objects of its properties (the last
+		// declared first), then its children (each of them after its own), the item itself last.
 		if (item.$owned !== undefined) {
-			for (const owned of item.$owned) this.releaseItem(owned, dead);
+			for (const owned of [...item.$owned].reverse()) this.releaseItem(owned, dead);
 		}
+		for (const child of item.$children) this.releaseItem(child, dead);
 		if (item instanceof ListView) {
 			for (const pooled of item.$pool) this.releaseItem(pooled, dead);
+		}
+		if (item.$destruction !== undefined) {
+			const list = item.$destruction;
+			item.$destruction = undefined;
+			for (const entry of list) this.guard(() => entry.fn.call(item), `handler 'Component.onDestruction' (${entry.file})`, entry.line);
+		}
+		if (item.$component !== undefined) {
+			this.guard(() => item.$component.$emit('destruction'), 'signal \'Component.destruction\'', 0);
 		}
 	}
 

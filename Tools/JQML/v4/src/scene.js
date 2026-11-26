@@ -1,6 +1,6 @@
 // The scene: the root item, the frame (layout, bindings, painting) and the mouse input.
 
-import { DragHandler, flushLazyViews, updateDrags, getFocusItem, Item, setDestroyObserver, setFocusItem, setFrameLoop, WheelHandler } from './items.js';
+import { DragHandler, flushLazyViews, updateDrags, getFocusItem, userGestureScope, Item, setDestroyObserver, setFocusItem, setFrameLoop, WheelHandler } from './items.js';
 
 const MAX_PASSES = 10;
 
@@ -69,6 +69,7 @@ export class Scene {
 		this.pressedButton = 0;
 		// The DragHandlers that a press went to: the first one that moves far enough takes the drag.
 		this.dragging = [];
+		this.flickViews = [];
 		this.$cursorCss = '';
 
 		this.frameHandler = null; // (seconds) => void, called before every frame
@@ -181,11 +182,31 @@ export class Scene {
 		}
 	}
 
+	// Qt: a Flickable takes the drag from the item that was pressed in it (a MouseArea gets `canceled`), unless that item prevents stealing.
+	moveFlickViews(x, y) {
+		for (const view of this.flickViews.slice()) {
+			if (view === this.pressed || !this.flickViews.includes(view)) continue;
+			if (this.pressed !== null && (this.pressed.$preventStealing === true || this.pressed.$dragsTarget === true)) return;
+			view.$mouseMoveAt(x, y);
+			if (!view.$flags.dragging) continue;
+			const target = this.pressed;
+			for (const other of this.flickViews) if (other !== view) other.$pressChanged(false);
+			this.flickViews = [view];
+			this.pressed = view;
+			if (target !== null) {
+				if (typeof target.$cancelPress === 'function') target.$cancelPress();
+				else target.$pressChanged(false);
+			}
+		}
+	}
+
 	pointerMove(x, y) {
 		this.moveHandlers(x, y);
+		this.moveFlickViews(x, y);
 		if (this.pressed !== null) this.pressed.$mouseMoveAt(x, y);
 		this.setHovered(this.root.$itemAt(x, y));
-		if (this.hovered !== null && this.hovered !== this.pressed) this.hovered.$mouseMoveAt(x, y);
+		// a view that waits for the drag of the press below it is moved by moveFlickViews only
+		if (this.hovered !== null && this.hovered !== this.pressed && !this.flickViews.includes(this.hovered)) this.hovered.$mouseMoveAt(x, y);
 		this.syncCursor();
 	}
 
@@ -195,6 +216,23 @@ export class Scene {
 		this.pressed = target;
 		this.pressedButton = button;
 		this.dragging = [];
+		this.flickViews = [];
+		let eaten = null;
+		if (button === 0) {
+			for (let p = target === null ? null : target.$parent; p !== null && p !== undefined; p = p.$parent) {
+				if (p.$isFlickView === true && p.$acceptsMouse) {
+					if (p.$mousePressAt(x, y) === true && eaten === null) eaten = p;
+					this.flickViews.push(p);
+				}
+			}
+		}
+		// the press that stopped a flick is the view's: the item below the pointer does not get it
+		if (eaten !== null) {
+			this.flickViews = this.flickViews.filter((view) => view !== eaten);
+			this.pressed = eaten;
+			this.syncCursor();
+			return;
+		}
 		const hits = [];
 		this.root.$handlerItems(x, y, DragHandler, hits);
 		for (const item of hits) {
@@ -207,7 +245,7 @@ export class Scene {
 		if (target !== null) {
 			target.$pressButton = button;
 			target.$pressChanged(true);
-			target.$mousePressAt(x, y);
+			userGestureScope(() => target.$mousePressAt(x, y));
 		}
 		this.syncCursor();
 	}
@@ -217,9 +255,11 @@ export class Scene {
 		this.dragging = [];
 		const target = this.pressed;
 		this.pressed = null;
+		for (const view of this.flickViews) if (view !== target) view.$pressChanged(false);
+		this.flickViews = [];
 		if (target !== null) {
 			target.$pressChanged(false);
-			if (this.root.$itemAt(x, y, false, this.pressedButton) === target) target.$mouseClicked();
+			if (this.root.$itemAt(x, y, false, this.pressedButton) === target) userGestureScope(() => target.$mouseClicked());
 		}
 		this.syncCursor();
 	}
