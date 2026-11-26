@@ -1,11 +1,20 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CUserGroupCollectionControllerComp.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Groups.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 
+
+// STL includes
+#include <vector>
+
+// Qt includes
+#include <QtCore/QMutexLocker>
+#include <QtCore/QUuid>
 
 // ACF includes
 #include <iqt/iqt.h>
 #include <istd/TInterfacePtr.h>
+#include <istd/CChangeGroup.h>
 
 // ImtCore includes
 #include <imtauth/CUserGroupDocumentValidatorComp.h>
@@ -14,11 +23,27 @@
 #include <imtauth/imtauth.h>
 #include <imtauthgql/CAssignmentCollector.h>
 #include <imtauthgql/imtauthgql.h>
+#include <imtbase/imtbase.h>
+#include <imtbase/IIdentifiable.h>
 #include <imtbase/IObjectCollectionIterator.h>
 
 
 namespace imtauthgql
 {
+
+
+/**
+	A group stored under a new identity is no mirror of an external system group:
+	the synchronization of that system would remove it as a vanished mirror.
+*/
+static void ResetToInternalSystem(imtauth::IUserGroupInfo& groupInfo)
+{
+	for (const imtauth::IUserGroupInfo::SystemInfo& systemInfo : groupInfo.GetSystemInfos()){
+		groupInfo.RemoveFromSystem(systemInfo.systemId);
+	}
+
+	groupInfo.AddToSystem(imtauth::IUserGroupInfo::SystemInfo());
+}
 
 
 // protected methods
@@ -60,6 +85,11 @@ bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
 
 	userGroupInfoPtr->SetUsers(CAssignmentCollector::GetDirectIds(groupDataRepresentation.users));
 
+	// The system of a group is not editable: groups created here are internal, LDAP groups are created by the synchronization.
+	if (userGroupInfoPtr->GetSystemInfos().isEmpty()){
+		userGroupInfoPtr->AddToSystem(imtauth::IUserGroupInfo::SystemInfo());
+	}
+
 	const QByteArrayList roleIds = CAssignmentCollector::GetDirectIds(groupDataRepresentation.roles);
 
 	if (!roleIds.isEmpty()){
@@ -89,6 +119,97 @@ bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
 
 
 // reimplemented (sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase)
+
+sdl::V1_0::imtbase::CDuplicateElementsPayload CUserGroupCollectionControllerComp::OnDuplicateElements(
+			const sdl::V1_0::imtbase::CDuplicateElementsGqlRequest& duplicateElementsRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	sdl::V1_0::imtbase::CDuplicateElementsPayload response;
+
+	if (!m_objectCollectionCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CUserGroupCollectionControllerComp");
+		return response;
+	}
+
+	sdl::V1_0::imtbase::DuplicateElementsRequestArguments arguments = duplicateElementsRequest.GetRequestedArguments();
+	QByteArrayList elementIds;
+	if (arguments.input->elementIds.HasValue()){
+		elementIds = arguments.input->elementIds->ToList();
+	}
+
+	QString name;
+	if (arguments.input->name.HasValue()){
+		name = *arguments.input->name;
+	}
+
+	if (elementIds.isEmpty()){
+		errorMessage = QStringLiteral("Unable to duplicate elements. Error: Element-IDs is empty");
+		return response;
+	}
+
+	if (!CheckObjectAccess(gqlRequest, elementIds, imtauth::IDocumentShareInfo::DAL_VIEW, errorMessage)){
+		return response;
+	}
+
+	response.success = false;
+
+	struct Duplicate
+	{
+		QByteArray id;
+		QByteArray typeId;
+		QString name;
+		istd::IChangeableUniquePtr objectPtr;
+	};
+	std::vector<Duplicate> duplicates;
+
+	// Validate every renamed copy as a new object before inserting any of them.
+	for (const QByteArray& elementId : elementIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (!m_objectCollectionCompPtr->GetObjectData(elementId, dataPtr) || !dataPtr.IsValid()){
+			errorMessage = QStringLiteral("Unable to read group to duplicate");
+			return response;
+		}
+
+		Duplicate duplicate;
+		duplicate.objectPtr = dataPtr->CloneMe();
+		if (!duplicate.objectPtr.IsValid()){
+			errorMessage = QStringLiteral("Unable to clone group to duplicate");
+			return response;
+		}
+
+		duplicate.id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+		duplicate.typeId = m_objectCollectionCompPtr->GetObjectTypeId(elementId);
+		duplicate.name = elementIds.size() == 1 ? name :
+					m_objectCollectionCompPtr->GetElementInfo(elementId, imtbase::ICollectionInfo::EIT_NAME).toString() + QStringLiteral(" Copy");
+		imtbase::SetObjectUuid(duplicate.objectPtr.GetPtr(), duplicate.id);
+
+		auto clonedGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(duplicate.objectPtr.GetPtr());
+		if (clonedGroupInfoPtr != nullptr){
+			clonedGroupInfoPtr->SetId(duplicate.id);
+			clonedGroupInfoPtr->SetName(duplicate.name);
+			ResetToInternalSystem(*clonedGroupInfoPtr);
+		}
+
+		if (!CheckObjectData(gqlRequest, QByteArray(), *duplicate.objectPtr.GetPtr(), errorMessage)){
+			return response;
+		}
+		duplicates.push_back(std::move(duplicate));
+	}
+
+	istd::CChangeGroup changeGroup(m_objectCollectionCompPtr.GetPtr());
+	for (const Duplicate& duplicate : duplicates){
+		if (m_objectCollectionCompPtr->InsertNewObject(duplicate.typeId, duplicate.name, QString(), duplicate.objectPtr.GetPtr(), duplicate.id).isEmpty()){
+			errorMessage = QStringLiteral("Unable to insert duplicated group");
+			return response;
+		}
+	}
+
+	response.success = true;
+
+	return response;
+}
+
 
 sdl::V1_0::imtbase::CVisualStatus CUserGroupCollectionControllerComp::OnGetObjectVisualStatus(
 			const sdl::V1_0::imtbase::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
@@ -143,6 +264,18 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CUserGroupCollectionControllerCom
 			sdl::V1_0::imtbase::CElementMetaInfo elementMetaInfo;
 		
 			imtsdl::TElementList<sdl::V1_0::imtbase::CParameter> infoParams;
+
+			QStringList sourceNames;
+			for (const imtauth::IUserGroupInfo::SystemInfo& systemInfo : userGroupInfoPtr->GetSystemInfos()){
+				sourceNames << (systemInfo.systemName.isEmpty() ? QStringLiteral("Internal") : systemInfo.systemName);
+			}
+
+			sdl::V1_0::imtbase::CParameter sourceParameter;
+			sourceParameter.id = QByteArrayLiteral("Source");
+			sourceParameter.typeId = QByteArrayLiteral("Text");
+			sourceParameter.name = QStringLiteral("Source");
+			sourceParameter.data = sourceNames.isEmpty() ? QStringLiteral("Internal") : sourceNames.join(QStringLiteral(", "));
+			infoParams << sourceParameter;
 
 			sdl::V1_0::imtbase::CParameter parentGroupsParameter;
 			parentGroupsParameter.id = QByteArrayLiteral("ParentGroups");
@@ -285,6 +418,29 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 		representationObject.description = QString(userGroupInfoPtr->GetDescription());
 	}
 
+	if (requestInfo.items.isSystemIdRequested){
+		QByteArrayList systemIdList;
+		for (const imtauth::IUserGroupInfo::SystemInfo& systemInfo : userGroupInfoPtr->GetSystemInfos()){
+			systemIdList << systemInfo.systemId;
+		}
+
+		representationObject.systemId = QByteArray(systemIdList.join(';'));
+	}
+
+	if (requestInfo.items.isSystemNameRequested){
+		QStringList systemNameList;
+		for (const imtauth::IUserGroupInfo::SystemInfo& systemInfo : userGroupInfoPtr->GetSystemInfos()){
+			if (systemInfo.systemName.isEmpty()){
+				systemNameList << QT_TR_NOOP("Internal");
+			}
+			else{
+				systemNameList << systemInfo.systemName;
+			}
+		}
+
+		representationObject.systemName = QString(systemNameList.join(';'));
+	}
+
 	if (requestInfo.items.isAddedRequested){
 		QDateTime addedTime = objectCollectionIterator.GetElementInfo("Added").toDateTime();
 		addedTime.setTimeZone(QTimeZone::utc());
@@ -391,6 +547,25 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 	collector.CollectGroup(*userGroupInfoPtr, userGroupInfoPtr->GetObjectUuid(), productId);
 	collector.FillGroup(representationPayload);
 
+	imtsdl::TElementList<sdl::V1_0::imtauth::CGroupSystemInfo> systemInfoList;
+	for (const imtauth::IUserGroupInfo::SystemInfo& systemInfo : userGroupInfoPtr->GetSystemInfos()){
+		sdl::V1_0::imtauth::CGroupSystemInfo info;
+
+		info.id = QByteArray(systemInfo.systemId);
+
+		if (systemInfo.systemId.isEmpty()){
+			info.name = QStringLiteral("Internal");
+		}
+		else{
+			info.name = QString(systemInfo.systemName);
+		}
+
+		info.enabled = bool(systemInfo.enabled);
+
+		systemInfoList << info;
+	}
+	representationPayload.systemInfos = std::move(systemInfoList);
+
 	return true;
 }
 
@@ -482,6 +657,40 @@ bool CUserGroupCollectionControllerComp::CheckObjectData(const imtgql::CGqlReque
 
 	return CheckGroupGrants(gqlRequest, storedGroupPtr, *groupPtr, errorMessage)
 				&& ValidateGroupForTenant(gqlRequest, *groupPtr, objectId, errorMessage);
+}
+
+
+bool CUserGroupCollectionControllerComp::ConvertObject(const istd::IChangeable& source, istd::IChangeable& target, QString& errorMessage) const
+{
+	if (!BaseClass::ConvertObject(source, target, errorMessage)){
+		return false;
+	}
+
+	// An imported group without its own identity is stored under a new ID and therefore belongs to the internal system.
+	// A group keeping its stored ID (e.g. a re-imported LDAP mirror) keeps its system.
+	if (imtbase::GetObjectUuid(&source).isEmpty()){
+		auto targetGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(&target);
+		if (targetGroupInfoPtr != nullptr){
+			ResetToInternalSystem(*targetGroupInfoPtr);
+		}
+	}
+
+	return true;
+}
+
+
+// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
+
+QJsonObject CUserGroupCollectionControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	if (gqlRequest.GetRequestType() != imtgql::IGqlRequest::RT_MUTATION){
+		return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
+	}
+
+	// A group change must not interleave with the read-modify-write of the LDAP group synchronization.
+	QMutexLocker locker(&imtauth::CUserGroupInfo::GetUpdateMutex());
+
+	return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
 }
 
 
@@ -590,5 +799,3 @@ bool CUserGroupCollectionControllerComp::ValidateGroupForTenant(
 
 
 } // namespace imtauth
-
-
