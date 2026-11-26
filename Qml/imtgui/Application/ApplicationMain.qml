@@ -88,9 +88,11 @@ Item {
 			}
 			else if (totalStatus == status.TRY_CONNECTING_TO_APP_SERVER){
 				// The address of the server comes with the client settings, maybe after this state, maybe never (the address is given to the engine).
-				// A web client gives the location of the page (an object): its text is the address
+				// A web client gives the location of the page (an object): the server is its origin, as the address of the client settings
+				// (scheme://host:port); the path of the page is not the address of the server
 				internal.errorMessage = Qt.binding(function(){
-					let serverUrl = String(application.getServerUrl());
+					let serverLocation = application.getServerUrl();
+					let serverUrl = (serverLocation && serverLocation.origin) ? serverLocation.origin : String(serverLocation);
 
 					return (serverUrl.indexOf("://:") >= 0) ? qsTr("Connecting to the server...") : qsTr("Connecting to ") + serverUrl + " ...";
 				})
