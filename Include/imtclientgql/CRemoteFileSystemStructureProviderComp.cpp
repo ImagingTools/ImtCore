@@ -7,7 +7,6 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QDateTime>
-#include <QtCore/QFileInfo>
 
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
@@ -17,6 +16,64 @@
 
 namespace imtclientgql
 {
+namespace
+{
+
+
+// One more attempt after a refused token: the session signs in again for it
+constexpr int s_sessionAttemptCount = 2;
+
+
+// The root of the remote file service has no parent to look it up in
+bool IsRootPath(const QString& path)
+{
+	return path.isEmpty() || path == QStringLiteral("/");
+}
+
+
+QString TrimTrailingSeparators(const QString& path)
+{
+	QString retVal = path;
+	while (retVal.endsWith(QLatin1Char('/'))){
+		retVal.chop(1);
+	}
+
+	return retVal;
+}
+
+
+/**
+	Parent of a path of the remote file service, found by '/' whatever the OS of this side:
+	"/A/B" -> "/A", "/A" -> "/", "C:/A" -> "C:/", "C:/" -> "" (the drives root).
+*/
+QString GetParentPath(const QString& path)
+{
+	const QString trimmedPath = TrimTrailingSeparators(path);
+	const qsizetype separatorIndex = trimmedPath.lastIndexOf(QLatin1Char('/'));
+	if (separatorIndex < 0){
+		return QString();
+	}
+
+	// A root keeps its separator: "/" and a drive root like "C:/"
+	QString parentPath = trimmedPath.left(separatorIndex);
+	if (parentPath.isEmpty() || parentPath.endsWith(QLatin1Char(':'))){
+		return trimmedPath.left(separatorIndex + 1);
+	}
+
+	return parentPath;
+}
+
+
+// Last segment of a path: "/A/B" -> "B", "C:/" -> "C:", "/" -> ""
+QString GetPathName(const QString& path)
+{
+	const QString trimmedPath = TrimTrailingSeparators(path);
+
+	return trimmedPath.mid(trimmedPath.lastIndexOf(QLatin1Char('/')) + 1);
+}
+
+
+} // namespace
 
 
 // public methods
@@ -39,18 +96,27 @@ bool CRemoteFileSystemStructureProviderComp::Stat(
 {
 	entry = FileSystemEntry();
 
-	// Remote Stat via listing of the parent and match, or GetEntries on the path if it is a dir.
-	// Prefer a dedicated lightweight approach: request entries for parent and find the name,
-	// or if path is empty - not applicable.
-	// For remote FS we re-use GetFileSystemEntries on the parent folder and match by path.
-	const QFileInfo pathInfo(path);
-	const QString parentPath = pathInfo.absolutePath();
-	const QString fileName = pathInfo.fileName();
+	// The root is a folder when it can be listed
+	if (IsRootPath(path)){
+		FileSystemQuery query;
+		query.path = path;
 
+		FileSystemListing listing;
+		if (!SendGetEntries(query, listing, error)){
+			return false;
+		}
+
+		entry.name = GetPathName(listing.resolvedPath);
+		entry.path = listing.resolvedPath;
+		entry.type = FileSystemEntry::Type::Dir;
+
+		return true;
+	}
+
+	// Any other path is looked up in the listing of its parent. The parent is found by '/',
+	// not by the rules of the local OS, and the entry only by its whole path as the listing gives it.
 	FileSystemQuery query;
-	query.path = parentPath;
-	query.offset = 0;
-	query.limit = 0;
+	query.path = GetParentPath(path);
 
 	FileSystemListing listing;
 	if (!SendGetEntries(query, listing, error)){
@@ -58,24 +124,11 @@ bool CRemoteFileSystemStructureProviderComp::Stat(
 	}
 
 	for (const FileSystemEntry& candidate : listing.entries){
-		if (candidate.path == path || candidate.name == fileName){
-			// Prefer exact path match; name match as fallback when path formatting differs.
-			if (candidate.path == path || QFileInfo(candidate.path).fileName() == fileName){
-				entry = candidate;
+		if (candidate.path == path){
+			entry = candidate;
 
-				return true;
-			}
+			return true;
 		}
-	}
-
-	// Also allow Stat of the resolved folder itself (path equals listing root).
-	if (listing.resolvedPath == path || (path.isEmpty() && !listing.resolvedPath.isEmpty())){
-		entry.name = QFileInfo(listing.resolvedPath).fileName();
-		entry.path = listing.resolvedPath;
-		entry.type = FileSystemEntry::Type::Dir;
-		entry.size = 0;
-
-		return true;
 	}
 
 	error = QStringLiteral("Path '%1' was not found on the remote file service").arg(path);
@@ -302,24 +355,27 @@ bool CRemoteFileSystemStructureProviderComp::SendRequest(
 		return false;
 	}
 
-	IGqlClient::GqlRequestPtr requestPtr;
-	requestPtr.MoveCastedPtr(gqlRequest.CloneMe());
-	if (!requestPtr.IsValid()){
-		error = QStringLiteral("Unable to clone %1 request").arg(commandId);
-		SendErrorMessage(0, error, "CRemoteFileSystemStructureProviderComp");
+	IGqlClient::GqlResult requestResult;
+	if (m_sessionCompPtr.IsValid()){
+		// After a refused token the session signs in again, and the request goes once more
+		for (int attemptIndex = 0; attemptIndex < s_sessionAttemptCount; ++attemptIndex){
+			const imtgql::IGqlContextSharedPtr contextPtr = m_sessionCompPtr->CreateRequestContext(error);
+			if (!contextPtr.IsValid()){
+				return false;
+			}
 
-		return false;
+			requestResult = SendWithContext(gqlRequest, contextPtr);
+			if (requestResult.errorCategory != IGqlClient::EC_ACCESS_DENIED){
+				break;
+			}
+
+			m_sessionCompPtr->OnTokenRejected(contextPtr->GetToken());
+		}
+	}
+	else{
+		requestResult = SendWithContext(gqlRequest, imtgql::IGqlContextSharedPtr());
 	}
 
-	// Attach current request context when available (auth headers, clientid, etc.).
-	CClientRequestModelHelpers::AttachMissingContext(requestPtr);
-
-	imtbase::IUrlParam* urlParamPtr = nullptr;
-	if (m_urlParamCompPtr.IsValid()){
-		urlParamPtr = m_urlParamCompPtr.GetPtr();
-	}
-
-	const IGqlClient::GqlResult requestResult = m_apiClientCompPtr->SendRequest(requestPtr, urlParamPtr);
 	if (!requestResult){
 		error = requestResult.errorMessage;
 		SendErrorMessage(0, error, "CRemoteFileSystemStructureProviderComp");
@@ -364,6 +420,34 @@ bool CRemoteFileSystemStructureProviderComp::SendRequest(
 	commandData = object;
 
 	return true;
+}
+
+
+IGqlClient::GqlResult CRemoteFileSystemStructureProviderComp::SendWithContext(
+			const imtgql::CGqlRequest& gqlRequest,
+			const imtgql::IGqlContextSharedPtr& contextPtr) const
+{
+	IGqlClient::GqlRequestPtr requestPtr;
+	requestPtr.MoveCastedPtr(gqlRequest.CloneMe());
+	auto* sentRequestPtr = dynamic_cast<imtgql::CGqlRequest*>(requestPtr.GetPtr());
+	if (sentRequestPtr == nullptr){
+		return {{}, IGqlClient::EC_INTERNAL, QStringLiteral("Unable to clone %1 request").arg(QString::fromUtf8(gqlRequest.GetCommandId()))};
+	}
+
+	if (contextPtr.IsValid()){
+		sentRequestPtr->SetGqlContext(contextPtr);
+	}
+	else{
+		// Attach current request context when available (auth headers, clientid, etc.).
+		CClientRequestModelHelpers::AttachMissingContext(requestPtr);
+	}
+
+	imtbase::IUrlParam* urlParamPtr = nullptr;
+	if (m_urlParamCompPtr.IsValid()){
+		urlParamPtr = m_urlParamCompPtr.GetPtr();
+	}
+
+	return m_apiClientCompPtr->SendRequest(requestPtr, urlParamPtr);
 }
 
 

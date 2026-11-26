@@ -17,4 +17,14 @@ private slots:
 	void DownloadLinkWithUrlOnlySurvivesTheWireTest();
 	void DownloadLinkErrorReachesTheCallerTest();
 	void RequestsEveryFieldOfTheLinkTest();
+	void StatListsTheParentFolderTest_data();
+	void StatListsTheParentFolderTest();
+	void StatOfTheRootListsTheRootTest_data();
+	void StatOfTheRootListsTheRootTest();
+	void StatMatchesTheWholePathTest();
+	void SessionContextReplacesTheCallerContextTest();
+	void WithoutSessionTheCallerContextGoesOnTest();
+	void RefusedTokenIsReplacedOnceTest();
+	void TokenRefusedAgainFailsTest();
+	void RefusedSignInSendsNothingTest();
 };

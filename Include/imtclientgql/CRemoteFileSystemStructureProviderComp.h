@@ -12,6 +12,7 @@
 #include <imtfile/IFileSystemStructureProvider.h>
 #include <imtfile/IFileDownloadLinkProvider.h>
 #include <imtclientgql/IGqlClient.h>
+#include <imtclientgql/IRemoteSession.h>
 #include <imtbase/IUrlParam.h>
 #include <imtgql/CGqlRequest.h>
 
@@ -23,6 +24,8 @@ namespace imtclientgql
 /**
 	Remote implementation of IFileSystemStructureProvider and IFileDownloadLinkProvider.
 	Forwards GetEntries/Stat/GetDownloadLink through IGqlClient to a remote FileSystem controller.
+	The requests go with the context of the current request, or with the context of the session
+	with the remote server when 'Session' is set.
  */
 class CRemoteFileSystemStructureProviderComp:
 			virtual public imtfile::IFileSystemStructureProvider,
@@ -37,6 +40,7 @@ public:
 		I_REGISTER_INTERFACE(imtfile::IFileDownloadLinkProvider);
 		I_ASSIGN(m_apiClientCompPtr, "ApiClient", "API client connected to the remote file service", true, "ApiClient");
 		I_ASSIGN(m_urlParamCompPtr, "UrlParam", "Optional URL override for the remote file service", false, "UrlParam");
+		I_ASSIGN(m_sessionCompPtr, "Session", "Session with the remote file service; when set, the requests go with its context instead of the context of the current request", false, "Session");
 	I_END_COMPONENT;
 
 	// reimplemented (imtfile::IFileSystemStructureProvider)
@@ -68,11 +72,18 @@ private:
 				const imtgql::CGqlRequest& gqlRequest,
 				QJsonObject& commandData,
 				QString& error) const;
+	/**
+		Sends a copy of the request with the given context, or with the context of the current request when it is invalid.
+	*/
+	IGqlClient::GqlResult SendWithContext(
+				const imtgql::CGqlRequest& gqlRequest,
+				const imtgql::IGqlContextSharedPtr& contextPtr) const;
 	static imtfile::IFileSystemStructureProvider::FileSystemEntry::Type FromSdlEntryType(int sdlEntryType);
 
 protected:
 	I_REF(imtclientgql::IGqlClient, m_apiClientCompPtr);
 	I_REF(imtbase::IUrlParam, m_urlParamCompPtr);
+	I_REF(imtclientgql::IRemoteSession, m_sessionCompPtr);
 };
 
 

@@ -9,7 +9,10 @@
 #include <icomp/TSimComponentWrap.h>
 #include <itest/CStandardTestExecutor.h>
 #include <imtclientgql/CRemoteFileSystemStructureProviderComp.h>
+#include <imtclientgql/IRemoteSession.h>
+#include <imtgql/CGqlContext.h>
 #include <imtgql/CGqlRequest.h>
+#include <imtgql/CGqlRequestContextManager.h>
 #include <imtgql/CGqlResponse.h>
 
 #include "CFileSystemControllerTest.h"
@@ -19,7 +22,8 @@ namespace
 {
 
 
-// Sends each request as query text to a handler in this process and wraps the answer like the HTTP GraphQL servlet
+// Sends each request as query text to a handler in this process and wraps the answer like the HTTP GraphQL servlet.
+// The tokens of deniedTokens are refused like a server refuses them (HTTP 401).
 class CLoopbackGqlClientComp: public icomp::CComponentBase, virtual public imtclientgql::IGqlClient
 {
 public:
@@ -29,10 +33,21 @@ public:
 	I_END_COMPONENT
 
 	const imtgql::IGqlRequestHandler* handlerPtr = nullptr;
+	QByteArrayList deniedTokens;
 	mutable QByteArray lastQuery;
+	mutable QByteArrayList sentTokens;
+	mutable QByteArrayList sentProductIds;
 
 	GqlResult SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* /*urlParamPtr*/) const override
 	{
+		const imtgql::IGqlContext* contextPtr = requestPtr->GetRequestContext();
+		const QByteArray token = contextPtr != nullptr ? contextPtr->GetToken() : QByteArray();
+		sentTokens.append(token);
+		sentProductIds.append(contextPtr != nullptr ? contextPtr->GetProductId() : QByteArray());
+		if (deniedTokens.contains(token)){
+			return GqlResult{{}, EC_ACCESS_DENIED, QStringLiteral("Unauthorized")};
+		}
+
 		lastQuery = requestPtr->GetQuery();
 
 		imtgql::CGqlRequest serverRequest;
@@ -68,6 +83,41 @@ public:
 };
 
 
+// Gives out a context with the next token of the script, or the sign-in error; records the refused tokens
+class CScriptedSessionComp: public icomp::CComponentBase, virtual public imtclientgql::IRemoteSession
+{
+public:
+	typedef icomp::CComponentBase BaseClass;
+	I_BEGIN_COMPONENT(CScriptedSessionComp)
+		I_REGISTER_INTERFACE(imtclientgql::IRemoteSession);
+	I_END_COMPONENT
+
+	QByteArrayList tokens;
+	QString signInError;
+	QByteArrayList rejectedTokens;
+
+	imtgql::IGqlContextSharedPtr CreateRequestContext(QString& error) override
+	{
+		if (!signInError.isEmpty()){
+			error = signInError;
+
+			return imtgql::IGqlContextSharedPtr();
+		}
+
+		imtgql::IGqlContextUniquePtr contextPtr(new imtgql::CGqlContext);
+		contextPtr->SetToken(tokens.isEmpty() ? QByteArray() : tokens.takeFirst());
+		contextPtr->SetProductId(QByteArrayLiteral("RemoteProduct"));
+
+		return imtgql::IGqlContextSharedPtr::CreateFromUnique(std::move(contextPtr));
+	}
+
+	void OnTokenRejected(const QByteArray& token) override
+	{
+		rejectedTokens.append(token);
+	}
+};
+
+
 // The remote provider, connected through the loopback client to a file system controller with fake providers
 struct CLoopbackFixture
 {
@@ -75,18 +125,42 @@ struct CLoopbackFixture
 	CMockDownloadLinkProvider linkProvider;
 	CTestableFileSystemController controller;
 	icomp::TSimSharedComponentPtr<CLoopbackGqlClientComp> client;
+	icomp::TSimSharedComponentPtr<CScriptedSessionComp> session;
 	icomp::TSimSharedComponentPtr<imtclientgql::CRemoteFileSystemStructureProviderComp> remoteProvider;
 
-	CLoopbackFixture()
+	explicit CLoopbackFixture(bool withSession = false)
 	{
 		controller.SetProvider(&provider);
 		controller.SetDownloadLinkProvider(&linkProvider);
 		client->handlerPtr = &controller;
 		client->InitComponent();
+		session->InitComponent();
 		remoteProvider->SetRef("ApiClient", client);
+		if (withSession){
+			remoteProvider->SetRef("Session", session);
+		}
 		remoteProvider->InitComponent();
 	}
+
+	bool ListRoot(QString& error)
+	{
+		imtfile::IFileSystemStructureProvider::FileSystemQuery query;
+		imtfile::IFileSystemStructureProvider::FileSystemListing listing;
+
+		return remoteProvider->GetEntries(query, listing, error);
+	}
 };
+
+
+imtfile::IFileSystemStructureProvider::FileSystemEntry MakeFolderEntry(const QString& path, const QString& name)
+{
+	imtfile::IFileSystemStructureProvider::FileSystemEntry entry;
+	entry.name = name;
+	entry.path = path;
+	entry.type = imtfile::IFileSystemStructureProvider::FileSystemEntry::Type::Dir;
+
+	return entry;
+}
 
 
 } // namespace
@@ -263,6 +337,159 @@ void CRemoteFileSystemStructureProviderTest::RequestsEveryFieldOfTheLinkTest()
 	QVERIFY(requestInfo.link.isSizeRequested);
 	QVERIFY(requestInfo.link.isSha256Requested);
 	QVERIFY(requestInfo.link.isEtagRequested);
+}
+
+
+void CRemoteFileSystemStructureProviderTest::StatListsTheParentFolderTest_data()
+{
+	QTest::addColumn<QString>("path");
+	QTest::addColumn<QString>("parentPath");
+
+	QTest::newRow("folder") << QStringLiteral("/Releases/Windows/1.2") << QStringLiteral("/Releases/Windows");
+	QTest::newRow("top folder") << QStringLiteral("/Releases") << QStringLiteral("/");
+	QTest::newRow("file on a drive") << QStringLiteral("C:/Data/Setup.exe") << QStringLiteral("C:/Data");
+	QTest::newRow("top folder of a drive") << QStringLiteral("C:/Data") << QStringLiteral("C:/");
+	QTest::newRow("drive") << QStringLiteral("C:/") << QString();
+}
+
+
+// The parent is found by '/' whatever the OS of this side, and the entry by its whole path
+void CRemoteFileSystemStructureProviderTest::StatListsTheParentFolderTest()
+{
+	QFETCH(QString, path);
+	QFETCH(QString, parentPath);
+
+	CLoopbackFixture fixture;
+	fixture.provider.nextListing.resolvedPath = parentPath;
+	fixture.provider.nextListing.entries.append(MakeFolderEntry(path, QStringLiteral("Item")));
+
+	imtfile::IFileSystemStructureProvider::FileSystemEntry entry;
+	QString error;
+	QVERIFY2(fixture.remoteProvider->Stat(path, entry, error), qPrintable(error));
+	QCOMPARE(fixture.provider.lastPath, parentPath);
+	QCOMPARE(entry.path, path);
+}
+
+
+void CRemoteFileSystemStructureProviderTest::StatOfTheRootListsTheRootTest_data()
+{
+	QTest::addColumn<QString>("path");
+
+	QTest::newRow("empty") << QString();
+	QTest::newRow("slash") << QStringLiteral("/");
+}
+
+
+// The root has no parent: it is a folder when it can be listed
+void CRemoteFileSystemStructureProviderTest::StatOfTheRootListsTheRootTest()
+{
+	QFETCH(QString, path);
+
+	CLoopbackFixture fixture;
+	fixture.provider.nextListing.resolvedPath = QStringLiteral("/");
+
+	imtfile::IFileSystemStructureProvider::FileSystemEntry entry;
+	QString error;
+	QVERIFY2(fixture.remoteProvider->Stat(path, entry, error), qPrintable(error));
+	QCOMPARE(fixture.provider.lastPath, path);
+	QCOMPARE(entry.path, QStringLiteral("/"));
+	QCOMPARE(entry.type, imtfile::IFileSystemStructureProvider::FileSystemEntry::Type::Dir);
+}
+
+
+// An entry is found by its whole path exactly: neither by its name alone nor in another letter case
+void CRemoteFileSystemStructureProviderTest::StatMatchesTheWholePathTest()
+{
+	CLoopbackFixture fixture;
+	fixture.provider.nextListing.resolvedPath = QStringLiteral("/Releases");
+	fixture.provider.nextListing.entries.append(MakeFolderEntry(QStringLiteral("/Releases/windows"), QStringLiteral("windows")));
+	fixture.provider.nextListing.entries.append(MakeFolderEntry(QStringLiteral("/Archive/Windows"), QStringLiteral("Windows")));
+
+	imtfile::IFileSystemStructureProvider::FileSystemEntry entry;
+	QString error;
+	QVERIFY(!fixture.remoteProvider->Stat(QStringLiteral("/Releases/Windows"), entry, error));
+	QVERIFY(!error.isEmpty());
+}
+
+
+// With a session the request carries its token and its product, not the context of the request being handled
+void CRemoteFileSystemStructureProviderTest::SessionContextReplacesTheCallerContextTest()
+{
+	CLoopbackFixture fixture(true);
+	fixture.session->tokens = QByteArrayList{QByteArrayLiteral("session-token")};
+
+	imtgql::CGqlContext callerContext;
+	callerContext.SetToken(QByteArrayLiteral("caller-token"));
+	callerContext.SetProductId(QByteArrayLiteral("CallerProduct"));
+	imtgql::CGqlRequestContextManager::SetContext(&callerContext);
+
+	QString error;
+	const bool isListed = fixture.ListRoot(error);
+	imtgql::CGqlRequestContextManager::Clear();
+
+	QVERIFY2(isListed, qPrintable(error));
+	QCOMPARE(fixture.client->sentTokens, QByteArrayList{QByteArrayLiteral("session-token")});
+	QCOMPARE(fixture.client->sentProductIds, QByteArrayList{QByteArrayLiteral("RemoteProduct")});
+}
+
+
+// Without a session the request goes on behalf of the caller, as before
+void CRemoteFileSystemStructureProviderTest::WithoutSessionTheCallerContextGoesOnTest()
+{
+	CLoopbackFixture fixture;
+
+	imtgql::CGqlContext callerContext;
+	callerContext.SetToken(QByteArrayLiteral("caller-token"));
+	imtgql::CGqlRequestContextManager::SetContext(&callerContext);
+
+	QString error;
+	const bool isListed = fixture.ListRoot(error);
+	imtgql::CGqlRequestContextManager::Clear();
+
+	QVERIFY2(isListed, qPrintable(error));
+	QCOMPARE(fixture.client->sentTokens, QByteArrayList{QByteArrayLiteral("caller-token")});
+}
+
+
+// After a refused token the session gives a new one, and the request goes once more
+void CRemoteFileSystemStructureProviderTest::RefusedTokenIsReplacedOnceTest()
+{
+	CLoopbackFixture fixture(true);
+	fixture.session->tokens = QByteArrayList{QByteArrayLiteral("expired-token"), QByteArrayLiteral("new-token")};
+	fixture.client->deniedTokens = QByteArrayList{QByteArrayLiteral("expired-token")};
+
+	QString error;
+	QVERIFY2(fixture.ListRoot(error), qPrintable(error));
+	QCOMPARE(fixture.session->rejectedTokens, QByteArrayList{QByteArrayLiteral("expired-token")});
+	QCOMPARE(fixture.client->sentTokens, (QByteArrayList{QByteArrayLiteral("expired-token"), QByteArrayLiteral("new-token")}));
+}
+
+
+// A server that refuses every token gets the request twice, not again and again
+void CRemoteFileSystemStructureProviderTest::TokenRefusedAgainFailsTest()
+{
+	CLoopbackFixture fixture(true);
+	fixture.session->tokens = QByteArrayList{QByteArrayLiteral("token-1"), QByteArrayLiteral("token-2"), QByteArrayLiteral("token-3")};
+	fixture.client->deniedTokens = fixture.session->tokens;
+
+	QString error;
+	QVERIFY(!fixture.ListRoot(error));
+	QVERIFY(!error.isEmpty());
+	QCOMPARE(fixture.client->sentTokens, (QByteArrayList{QByteArrayLiteral("token-1"), QByteArrayLiteral("token-2")}));
+	QCOMPARE(fixture.session->rejectedTokens, (QByteArrayList{QByteArrayLiteral("token-1"), QByteArrayLiteral("token-2")}));
+}
+
+
+// A refused sign-in: nothing goes to the remote server, and the reason reaches the caller
+void CRemoteFileSystemStructureProviderTest::RefusedSignInSendsNothingTest()
+{
+	CLoopbackFixture fixture(true);
+	fixture.session->signInError = QStringLiteral("The sign-in was refused");
+
+	QString error;
+	QVERIFY(!fixture.ListRoot(error));
+	QCOMPARE(error, QStringLiteral("The sign-in was refused"));
+	QVERIFY(fixture.client->sentTokens.isEmpty());
 }
 
 

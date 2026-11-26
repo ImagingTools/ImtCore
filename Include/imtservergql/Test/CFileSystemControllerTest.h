@@ -20,12 +20,14 @@ public:
 	bool failNext = false;
 	QString failMessage = QStringLiteral("mock failure");
 	FileSystemListing nextListing;
+	mutable QString lastPath;
 
 	virtual bool GetEntries(
-				const FileSystemQuery& /*query*/,
+				const FileSystemQuery& query,
 				FileSystemListing& result,
 				QString& error) const override
 	{
+		lastPath = query.path;
 		if (failNext){
 			error = failMessage;
 			result = FileSystemListing();
