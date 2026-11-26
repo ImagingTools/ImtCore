@@ -93,5 +93,6 @@ private slots:
 	void MissingProviderFailsTest();
 	void ProviderErrorIsPropagatedTest();
 	void HappyPathMapsPayloadTest();
+	void LargeSizesAreNotTruncatedTest();
 	void PermissionDeniedCreateResponseTest();
 };

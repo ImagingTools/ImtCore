@@ -112,6 +112,53 @@ void CFileSystemControllerTest::HappyPathMapsPayloadTest()
 }
 
 
+void CFileSystemControllerTest::LargeSizesAreNotTruncatedTest()
+{
+	const qint64 fileSize = Q_INT64_C(5) * 1024 * 1024 * 1024;
+	const qint64 totalBytes = Q_INT64_C(4) * 1024 * 1024 * 1024 * 1024;
+	const qint64 freeBytes = Q_INT64_C(3) * 1024 * 1024 * 1024 * 1024;
+
+	CMockFileSystemProvider provider;
+	provider.nextListing.resolvedPath = QStringLiteral("/root");
+	provider.nextListing.totalCount = 2;
+
+	imtfile::IFileSystemStructureProvider::FileSystemEntry file;
+	file.name = QStringLiteral("image.iso");
+	file.path = QStringLiteral("/root/image.iso");
+	file.type = imtfile::IFileSystemStructureProvider::FileSystemEntry::Type::File;
+	file.size = fileSize;
+	provider.nextListing.entries.append(file);
+
+	imtfile::IFileSystemStructureProvider::FileSystemEntry drive;
+	drive.name = QStringLiteral("Data (D:)");
+	drive.path = QStringLiteral("D:/");
+	drive.type = imtfile::IFileSystemStructureProvider::FileSystemEntry::Type::Drive;
+	drive.totalBytes = totalBytes;
+	drive.freeBytes = freeBytes;
+	provider.nextListing.entries.append(drive);
+
+	CTestableFileSystemController controller;
+	controller.SetProvider(&provider);
+
+	const imtgql::CGqlRequest request = MakeGetFileSystemEntriesRequest(QStringLiteral("/root"));
+	sdl::V1_0::imtbase::CGetFileSystemEntriesGqlRequest typedRequest(request, true);
+	QString error;
+	const auto payload = controller.OnGetFileSystemEntries(typedRequest, request, error);
+
+	QVERIFY2(error.isEmpty(), error.toUtf8().constData());
+	QVERIFY(payload.entries.has_value());
+	QCOMPARE(payload.entries->size(), 2);
+	QVERIFY(payload.entries->at(0).has_value());
+	QVERIFY(payload.entries->at(0)->size.has_value());
+	QCOMPARE(*payload.entries->at(0)->size, fileSize);
+	QVERIFY(payload.entries->at(1).has_value());
+	QVERIFY(payload.entries->at(1)->totalBytes.has_value());
+	QCOMPARE(*payload.entries->at(1)->totalBytes, totalBytes);
+	QVERIFY(payload.entries->at(1)->freeBytes.has_value());
+	QCOMPARE(*payload.entries->at(1)->freeBytes, freeBytes);
+}
+
+
 void CFileSystemControllerTest::PermissionDeniedCreateResponseTest()
 {
 	CMockFileSystemProvider provider;

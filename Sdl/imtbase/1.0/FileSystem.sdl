@@ -48,13 +48,12 @@ type FileSystemEntry
 	name: String!
 	path: String!
 	entryType: FileSystemEntryType!
-	size: Int
+	# Byte counts are LongLong: files and volumes overflow a 32-bit Int.
+	size: LongLong
 	lastModified: String
-	# Volume capacity, sent for Drive entries only. Double (not Int) because a
-	# byte count of a drive overflows 32 bits; Double holds exact integers well
-	# past any real volume size.
-	totalBytes: Double
-	freeBytes: Double
+	# Volume capacity, sent for Drive entries only.
+	totalBytes: LongLong
+	freeBytes: LongLong
 }
 
 type GetFileSystemEntriesPayload

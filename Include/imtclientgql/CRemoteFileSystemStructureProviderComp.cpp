@@ -191,13 +191,6 @@ bool CRemoteFileSystemStructureProviderComp::SendGetEntries(
 		return false;
 	}
 
-	const QStringList errorMessages = responsePtr->GetErrorMessageList();
-	if (!errorMessages.isEmpty()){
-		error = errorMessages.first();
-
-		return false;
-	}
-
 	const QJsonDocument document = QJsonDocument::fromJson(responsePtr->GetResponseData());
 	if (!document.isObject()){
 		error = QStringLiteral("Remote file service returned an invalid response");
@@ -275,10 +268,10 @@ bool CRemoteFileSystemStructureProviderComp::SendGetEntries(
 				entry.lastModified = QDateTime::fromString(*sdlEntry.lastModified, Qt::ISODate);
 			}
 			if (sdlEntry.totalBytes.has_value()){
-				entry.totalBytes = static_cast<qint64>(*sdlEntry.totalBytes);
+				entry.totalBytes = *sdlEntry.totalBytes;
 			}
 			if (sdlEntry.freeBytes.has_value()){
-				entry.freeBytes = static_cast<qint64>(*sdlEntry.freeBytes);
+				entry.freeBytes = *sdlEntry.freeBytes;
 			}
 			result.entries.append(entry);
 		}
