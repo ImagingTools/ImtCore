@@ -3,6 +3,7 @@
 
 
 // Qt includes
+#include <QtCore/QMap>
 #include <QtSql/QSqlRecord>
 #include <QtSql/QSqlResult>
 
@@ -21,12 +22,14 @@ class CDuckSqlDriver;
 	QSqlResult implementation over the DuckDB C API.
 
 	Created by CDuckSqlDriver::createResult() so DuckDB query results can be consumed through the
-	regular QSqlQuery API (next(), value(), etc.). The rows of a result are read once, when the
-	query has finished, so that values can be read in any order.
+	regular QSqlQuery API (next(), value(), etc.). Cells are converted on access. Scrollable queries
+	retain native chunks for seeking. Forward-only scans release chunks as the cursor advances.
+	Requesting the exact size reads any remaining chunks and preserves the current position.
 
 	Values keep their Qt type: UUIDs become text without braces, DATE a QDate, TIME a QTime and
-	TIMESTAMP a QDateTime in UTC. A column of a type without a Qt counterpart (INTERVAL, MAP, UNION,
-	BIT, ...) fails the query; cast it in SQL instead.
+	finite timestamps within the Qt range a QDateTime in UTC. Exceptional timestamps and integers
+	wider than the Qt integer range retain their DuckDB text. Columns containing an unsupported
+	type (INTERVAL, MAP, UNION, BIT, ...) must be cast in the query.
 */
 class CDuckSqlResult: public QSqlResult
 {
@@ -39,6 +42,7 @@ protected:
 	virtual bool reset(const QString& sqlQuery) override;
 	virtual bool prepare(const QString& sqlQuery) override;
 	virtual bool exec() override;
+	virtual void detachFromResultSet() override;
 	virtual bool fetch(int index) override;
 	virtual bool fetchFirst() override;
 	virtual bool fetchLast() override;
@@ -49,39 +53,14 @@ protected:
 	virtual QSqlRecord record() const override;
 
 private:
-	/**
-		Reads the outcome of a finished query and destroys \a result.
-		\return false and sets the last error if \a state reports a failure or a column cannot be read.
-	*/
-	bool AcceptResult(duckdb_state state, duckdb_result& result);
-	/**
-		Appends \a count values of \a vector, starting at row \a offset, to \a values. A NULL becomes an invalid QVariant.
-		\return false if \a type, or the type of a nested element, has no Qt counterpart.
-	*/
-	static bool ReadValues(
-				duckdb_vector vector,
-				duckdb_logical_type type,
-				idx_t offset,
-				idx_t count,
-				QVariantList& values);
-	/**
-		ReadValues() for a LIST or ARRAY vector. Every row becomes a QVariantList.
-	*/
-	static bool ReadListValues(
-				duckdb_vector vector,
-				duckdb_logical_type type,
-				idx_t offset,
-				idx_t count,
-				QVariantList& values);
-	/**
-		ReadValues() for a STRUCT vector. Every row becomes a QVariantMap by field name.
-	*/
-	static bool ReadStructValues(
-				duckdb_vector vector,
-				duckdb_logical_type type,
-				idx_t offset,
-				idx_t count,
-				QVariantList& values);
+	bool AcceptResult(duckdb_state state);
+	void ClearResult();
+	void DiscardChunksBefore(idx_t firstRow);
+	bool FetchNextChunk(bool releasePrevious);
+	QVariant CurrentValue(int column) const;
+	static QVariant ReadValue(duckdb_vector vector, duckdb_logical_type type, idx_t row);
+	// Takes ownership of the temporary DuckDB value.
+	static QString ReadValueText(duckdb_value value);
 	/**
 		Reads the value in \a row of the data of a vector of a scalar type.
 	*/
@@ -90,9 +69,9 @@ private:
 				duckdb_logical_type type,
 				idx_t row);
 	/**
-		\return the Qt type values of \a typeId are read as, or an invalid QMetaType if the type has no Qt counterpart.
+		\return the Qt type values of \a type are read as, or an invalid QMetaType if the type has no Qt counterpart.
 	*/
-	static QMetaType ConvertMetaType(duckdb_type typeId);
+	static QMetaType ConvertMetaType(duckdb_logical_type type);
 	/**
 		Translates Qt's Oracle-style ':name' placeholders into DuckDB's '$name' named-parameter syntax,
 		leaving quoted string/identifier literals and '::type' casts untouched.
@@ -108,15 +87,15 @@ private:
 	*/
 	duckdb_result_type m_resultType = DUCKDB_RESULT_TYPE_INVALID;
 	idx_t m_rowsChanged = 0;
-	qsizetype m_rowCount = 0;
-	/**
-		Names and types of the columns, without values.
-	*/
+	duckdb_result m_result{};
 	QSqlRecord m_record;
-	/**
-		Values by column, then by row.
-	*/
-	QList<QVariantList> m_columns;
+	QList<duckdb_logical_type> m_columnTypes;
+	// Keys are the first row indices of the chunks. Chunk sizes may vary.
+	QMap<idx_t, duckdb_data_chunk> m_chunks;
+	idx_t m_fetchedRows = 0;
+	bool m_exhausted = true;
+	duckdb_data_chunk m_currentChunk = nullptr;
+	idx_t m_chunkStart = 0;
 };
 
 

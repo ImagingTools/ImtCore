@@ -3,6 +3,7 @@
 
 
 // STL includes
+#include <climits>
 #include <cmath>
 
 // Qt includes
@@ -31,6 +32,7 @@ CDuckSqlResult::CDuckSqlResult(const CDuckSqlDriver* driverPtr, duckdb_connectio
 
 CDuckSqlResult::~CDuckSqlResult()
 {
+	ClearResult();
 	duckdb_destroy_prepare(&m_preparedStatement);
 }
 
@@ -39,18 +41,18 @@ CDuckSqlResult::~CDuckSqlResult()
 
 bool CDuckSqlResult::reset(const QString& sqlQuery)
 {
-	setActive(false);
-	setAt(QSql::BeforeFirstRow);
+	ClearResult();
 
-	duckdb_result result;
-	const duckdb_state state = duckdb_query(m_connection, sqlQuery.toUtf8().constData(), &result);
+	const duckdb_state state = duckdb_query(m_connection, sqlQuery.toUtf8().constData(), &m_result);
 
-	return AcceptResult(state, result);
+	return AcceptResult(state);
 }
 
 
 bool CDuckSqlResult::prepare(const QString& sqlQuery)
 {
+	ClearResult();
+
 	/**
 		Populates the base class' placeholder-name bookkeeping (used by bindValue()/boundValueNames()).
 	*/
@@ -81,8 +83,7 @@ bool CDuckSqlResult::prepare(const QString& sqlQuery)
 
 bool CDuckSqlResult::exec()
 {
-	setActive(false);
-	setAt(QSql::BeforeFirstRow);
+	ClearResult();
 
 	if (m_preparedStatement == nullptr){
 		setLastError(QSqlError(
@@ -128,17 +129,45 @@ bool CDuckSqlResult::exec()
 		}
 	}
 
-	duckdb_result result;
-	const duckdb_state state = duckdb_execute_prepared(m_preparedStatement, &result);
+	const duckdb_state state = duckdb_execute_prepared(m_preparedStatement, &m_result);
 
-	return AcceptResult(state, result);
+	return AcceptResult(state);
+}
+
+
+void CDuckSqlResult::detachFromResultSet()
+{
+	ClearResult();
 }
 
 
 bool CDuckSqlResult::fetch(int index)
 {
-	if (m_resultType == DUCKDB_RESULT_TYPE_INVALID || index < 0 || index >= m_rowCount){
+	if (index < 0 || !isActive()){
 		return false;
+	}
+
+	const idx_t row = static_cast<idx_t>(index);
+	while (row >= m_fetchedRows){
+		if (!FetchNextChunk(isForwardOnly())){
+			return false;
+		}
+	}
+
+	if (m_currentChunk == nullptr || row < m_chunkStart || row - m_chunkStart >= duckdb_data_chunk_get_size(m_currentChunk)){
+		auto chunk = m_chunks.upperBound(row);
+		if (chunk == m_chunks.begin()){
+			return false;
+		}
+
+		--chunk;
+		m_currentChunk = chunk.value();
+		m_chunkStart = chunk.key();
+
+		// size() can have read ahead while preserving the cursor.
+		if (isForwardOnly()){
+			DiscardChunksBefore(m_chunkStart);
+		}
 	}
 
 	setAt(index);
@@ -155,29 +184,38 @@ bool CDuckSqlResult::fetchFirst()
 
 bool CDuckSqlResult::fetchLast()
 {
-	return fetch(static_cast<int>(m_rowCount) - 1);
+	while (FetchNextChunk(isForwardOnly())){
+	}
+
+	return isActive() && m_fetchedRows > 0 && m_fetchedRows - 1 <= INT_MAX && fetch(static_cast<int>(m_fetchedRows - 1));
 }
 
 
 QVariant CDuckSqlResult::data(int index)
 {
-	if (index < 0 || index >= m_columns.size() || at() < 0 || at() >= m_rowCount){
-		return QVariant();
-	}
-
-	return m_columns.at(index).at(at());
+	return CurrentValue(index);
 }
 
 
 bool CDuckSqlResult::isNull(int index)
 {
-	return !data(index).isValid();
+	if (index < 0 || index >= m_columnTypes.size() || at() < 0 || m_currentChunk == nullptr){
+		return true;
+	}
+
+	duckdb_vector vector = duckdb_data_chunk_get_vector(m_currentChunk, static_cast<idx_t>(index));
+	return !duckdb_validity_row_is_valid(duckdb_vector_get_validity(vector), static_cast<idx_t>(at()) - m_chunkStart)
+			|| duckdb_get_type_id(m_columnTypes.at(index)) == DUCKDB_TYPE_SQLNULL;
 }
 
 
 int CDuckSqlResult::size()
 {
-	return m_resultType == DUCKDB_RESULT_TYPE_INVALID ? -1 : static_cast<int>(m_rowCount);
+	// The C chunk API reports the exact size only after the final chunk.
+	while (FetchNextChunk(false)){
+	}
+
+	return isActive() && m_fetchedRows <= INT_MAX ? static_cast<int>(m_fetchedRows) : -1;
 }
 
 
@@ -191,12 +229,12 @@ QSqlRecord CDuckSqlResult::record() const
 {
 	QSqlRecord recordVal = m_record;
 
-	if (at() < 0 || at() >= m_rowCount){
+	if (at() < 0 || m_currentChunk == nullptr){
 		return recordVal;
 	}
 
-	for (qsizetype i = 0; i < m_columns.size(); ++ i){
-		recordVal.setValue(i, m_columns.at(i).at(at()));
+	for (int i = 0; i < recordVal.count(); ++ i){
+		recordVal.setValue(i, CurrentValue(i));
 	}
 
 	return recordVal;
@@ -205,94 +243,39 @@ QSqlRecord CDuckSqlResult::record() const
 
 // private methods
 
-bool CDuckSqlResult::AcceptResult(duckdb_state state, duckdb_result& result)
+bool CDuckSqlResult::AcceptResult(duckdb_state state)
 {
-	m_resultType = DUCKDB_RESULT_TYPE_INVALID;
-	m_rowsChanged = 0;
-	m_rowCount = 0;
-	m_record.clear();
-	m_columns.clear();
-
 	if (state != DuckDBSuccess){
-		const char* errorPtr = duckdb_result_error(&result);
+		const char* errorPtr = duckdb_result_error(&m_result);
 		const QString errorText = errorPtr != nullptr ? QString::fromUtf8(errorPtr) : QStringLiteral("DuckDB statement could not be executed");
-
-		duckdb_destroy_result(&result);
-
-		setLastError(QSqlError(
-					QStringLiteral("Unable to execute statement"),
-					errorText,
-					QSqlError::StatementError));
+		ClearResult();
+		setLastError(QSqlError(QStringLiteral("Unable to execute statement"), errorText, QSqlError::StatementError));
 
 		return false;
 	}
 
-	/**
-		Fetching the rows turns the result into a streamed one, for which DuckDB no longer reports the changed rows.
-	*/
-	const duckdb_result_type resultType = duckdb_result_return_type(result);
-	const idx_t rowsChanged = duckdb_rows_changed(&result);
-	const idx_t columnCount = duckdb_column_count(&result);
+	const idx_t columnCount = duckdb_column_count(&m_result);
+	for (idx_t i = 0; i < columnCount; ++i){
+		const QString name = QString::fromUtf8(duckdb_column_name(&m_result, i));
+		duckdb_logical_type type = duckdb_column_logical_type(&m_result, i);
+		m_columnTypes.append(type);
 
-	QList<duckdb_logical_type> columnTypes;
-	QSqlRecord record;
-	for (idx_t i = 0; i < columnCount; ++ i){
-		duckdb_logical_type columnType = duckdb_column_logical_type(&result, i);
+		const QMetaType metaType = ConvertMetaType(type);
+		if (!metaType.isValid()){
+			ClearResult();
+			setLastError(QSqlError(QStringLiteral("Unable to read the statement result"),
+						QStringLiteral("Column '%1' has a type without a Qt counterpart. Cast it in the query").arg(name),
+						QSqlError::StatementError));
 
-		columnTypes.append(columnType);
-		record.append(QSqlField(QString::fromUtf8(duckdb_column_name(&result, i)), ConvertMetaType(duckdb_get_type_id(columnType))));
-	}
-
-	QList<QVariantList> columns(static_cast<qsizetype>(columnCount));
-	qsizetype rowCount = 0;
-	QString errorText;
-
-	duckdb_data_chunk chunk = duckdb_fetch_chunk(result);
-	while (chunk != nullptr){
-		const idx_t chunkSize = duckdb_data_chunk_get_size(chunk);
-
-		for (qsizetype i = 0; i < columns.size() && errorText.isEmpty(); ++ i){
-			if (!ReadValues(duckdb_data_chunk_get_vector(chunk, static_cast<idx_t>(i)), columnTypes.at(i), 0, chunkSize, columns[i])){
-				errorText = QStringLiteral("Column '%1' has a type without a Qt counterpart. Cast it in the query").arg(record.fieldName(i));
-			}
+			return false;
 		}
 
-		rowCount += static_cast<qsizetype>(chunkSize);
-
-		duckdb_destroy_data_chunk(&chunk);
-
-		chunk = errorText.isEmpty() ? duckdb_fetch_chunk(result) : nullptr;
+		m_record.append(QSqlField(name, metaType));
 	}
 
-	/**
-		A failure while fetching is reported on the result.
-	*/
-	const char* fetchErrorPtr = duckdb_result_error(&result);
-	if (errorText.isEmpty() && fetchErrorPtr != nullptr){
-		errorText = QString::fromUtf8(fetchErrorPtr);
-	}
-
-	for (duckdb_logical_type columnType : std::as_const(columnTypes)){
-		duckdb_destroy_logical_type(&columnType);
-	}
-
-	duckdb_destroy_result(&result);
-
-	if (!errorText.isEmpty()){
-		setLastError(QSqlError(
-					QStringLiteral("Unable to read the statement result"),
-					errorText,
-					QSqlError::StatementError));
-
-		return false;
-	}
-
-	m_resultType = resultType;
-	m_rowsChanged = rowsChanged;
-	m_rowCount = rowCount;
-	m_record = record;
-	m_columns = columns;
-
+	m_resultType = duckdb_result_return_type(m_result);
+	m_rowsChanged = duckdb_rows_changed(&m_result);
+	m_exhausted = false;
 	setSelect(m_resultType == DUCKDB_RESULT_TYPE_QUERY_RESULT);
 	setActive(true);
 
@@ -300,120 +283,149 @@ bool CDuckSqlResult::AcceptResult(duckdb_state state, duckdb_result& result)
 }
 
 
-bool CDuckSqlResult::ReadValues(
-			duckdb_vector vector,
-			duckdb_logical_type type,
-			idx_t offset,
-			idx_t count,
-			QVariantList& values)
+void CDuckSqlResult::ClearResult()
 {
-	const duckdb_type typeId = duckdb_get_type_id(type);
-	if (!ConvertMetaType(typeId).isValid()){
-		return false;
+	m_currentChunk = nullptr;
+	DiscardChunksBefore(m_fetchedRows);
+
+	for (auto& type : m_columnTypes){
+		duckdb_destroy_logical_type(&type);
+	}
+	m_columnTypes.clear();
+
+	duckdb_destroy_result(&m_result);
+	m_result = {};
+	m_record.clear();
+	m_fetchedRows = 0;
+	m_exhausted = true;
+	m_resultType = DUCKDB_RESULT_TYPE_INVALID;
+	m_rowsChanged = 0;
+	setActive(false);
+	setAt(QSql::BeforeFirstRow);
+}
+
+
+void CDuckSqlResult::DiscardChunksBefore(idx_t firstRow)
+{
+	while (!m_chunks.isEmpty() && m_chunks.firstKey() < firstRow){
+		duckdb_destroy_data_chunk(&m_chunks.first());
+		m_chunks.erase(m_chunks.begin());
+	}
+}
+
+
+bool CDuckSqlResult::FetchNextChunk(bool releasePrevious)
+{
+	while (!m_exhausted){
+		duckdb_data_chunk chunk = duckdb_fetch_chunk(m_result);
+		if (chunk == nullptr){
+			const char* errorPtr = duckdb_result_error(&m_result);
+			if (errorPtr != nullptr){
+				const QString message = QString::fromUtf8(errorPtr);
+				ClearResult();
+				setLastError(QSqlError(QStringLiteral("Unable to fetch rows"), message, QSqlError::StatementError));
+
+				return false;
+			}
+
+			m_exhausted = true;
+			break;
+		}
+
+		const idx_t count = duckdb_data_chunk_get_size(chunk);
+		if (count == 0){
+			duckdb_destroy_data_chunk(&chunk);
+			continue;
+		}
+
+		if (releasePrevious){
+			m_currentChunk = nullptr;
+			DiscardChunksBefore(m_fetchedRows);
+		}
+
+		m_chunks.insert(m_fetchedRows, chunk);
+		m_fetchedRows += count;
+		return true;
 	}
 
+	return false;
+}
+
+
+QVariant CDuckSqlResult::CurrentValue(int column) const
+{
+	if (column < 0 || column >= m_columnTypes.size() || at() < 0 || m_currentChunk == nullptr){
+		return QVariant();
+	}
+
+	duckdb_vector vector = duckdb_data_chunk_get_vector(m_currentChunk, static_cast<idx_t>(column));
+	return ReadValue(vector, m_columnTypes.at(column), static_cast<idx_t>(at()) - m_chunkStart);
+}
+
+
+QVariant CDuckSqlResult::ReadValue(duckdb_vector vector, duckdb_logical_type type, idx_t row)
+{
+	if (!duckdb_validity_row_is_valid(duckdb_vector_get_validity(vector), row)){
+		return QVariant();
+	}
+
+	const duckdb_type typeId = duckdb_get_type_id(type);
 	if (typeId == DUCKDB_TYPE_LIST || typeId == DUCKDB_TYPE_ARRAY){
-		return ReadListValues(vector, type, offset, count, values);
+		const bool isArray = typeId == DUCKDB_TYPE_ARRAY;
+		idx_t offset;
+		idx_t count;
+		duckdb_vector child;
+		duckdb_logical_type childType;
+		if (isArray){
+			count = duckdb_array_type_array_size(type);
+			offset = row * count;
+			child = duckdb_array_vector_get_child(vector);
+			childType = duckdb_array_type_child_type(type);
+		}
+		else{
+			const auto entries = static_cast<const duckdb_list_entry*>(duckdb_vector_get_data(vector));
+			offset = entries[row].offset;
+			count = entries[row].length;
+			child = duckdb_list_vector_get_child(vector);
+			childType = duckdb_list_type_child_type(type);
+		}
+
+		QVariantList retVal;
+		retVal.reserve(static_cast<qsizetype>(count));
+		for (idx_t i = 0; i < count; ++i){
+			retVal.append(ReadValue(child, childType, offset + i));
+		}
+		duckdb_destroy_logical_type(&childType);
+
+		return retVal;
 	}
 
 	if (typeId == DUCKDB_TYPE_STRUCT){
-		return ReadStructValues(vector, type, offset, count, values);
+		QVariantMap retVal;
+		const idx_t count = duckdb_struct_type_child_count(type);
+		for (idx_t i = 0; i < count; ++i){
+			char* name = duckdb_struct_type_child_name(type, i);
+			duckdb_logical_type childType = duckdb_struct_type_child_type(type, i);
+			retVal.insert(QString::fromUtf8(name), ReadValue(duckdb_struct_vector_get_child(vector, i), childType, row));
+			duckdb_destroy_logical_type(&childType);
+			duckdb_free(name);
+		}
+
+		return retVal;
 	}
 
-	const void* dataPtr = duckdb_vector_get_data(vector);
-	uint64_t* validityPtr = duckdb_vector_get_validity(vector);
-
-	for (idx_t row = offset; row < offset + count; ++ row){
-		values.append(duckdb_validity_row_is_valid(validityPtr, row) ? ReadScalarValue(dataPtr, type, row) : QVariant());
-	}
-
-	return true;
+	return ReadScalarValue(duckdb_vector_get_data(vector), type, row);
 }
 
 
-bool CDuckSqlResult::ReadListValues(
-			duckdb_vector vector,
-			duckdb_logical_type type,
-			idx_t offset,
-			idx_t count,
-			QVariantList& values)
+QString CDuckSqlResult::ReadValueText(duckdb_value value)
 {
-	const bool isArray = duckdb_get_type_id(type) == DUCKDB_TYPE_ARRAY;
-
-	duckdb_logical_type childType = isArray ? duckdb_array_type_child_type(type) : duckdb_list_type_child_type(type);
-	const duckdb_vector childVector = isArray ? duckdb_array_vector_get_child(vector) : duckdb_list_vector_get_child(vector);
-	const idx_t arraySize = isArray ? duckdb_array_type_array_size(type) : 0;
-	const auto entriesPtr = static_cast<const duckdb_list_entry*>(duckdb_vector_get_data(vector));
-	uint64_t* validityPtr = duckdb_vector_get_validity(vector);
-
-	bool retVal = true;
-	for (idx_t row = offset; retVal && row < offset + count; ++ row){
-		if (!duckdb_validity_row_is_valid(validityPtr, row)){
-			values.append(QVariant());
-
-			continue;
-		}
-
-		const idx_t childOffset = isArray ? row * arraySize : entriesPtr[row].offset;
-		const idx_t childCount = isArray ? arraySize : entriesPtr[row].length;
-
-		QVariantList list;
-		retVal = ReadValues(childVector, childType, childOffset, childCount, list);
-
-		values.append(QVariant(list));
-	}
-
-	duckdb_destroy_logical_type(&childType);
+	char* text = duckdb_get_varchar(value);
+	const QString retVal = QString::fromUtf8(text);
+	duckdb_free(text);
+	duckdb_destroy_value(&value);
 
 	return retVal;
-}
-
-
-bool CDuckSqlResult::ReadStructValues(
-			duckdb_vector vector,
-			duckdb_logical_type type,
-			idx_t offset,
-			idx_t count,
-			QVariantList& values)
-{
-	const idx_t childCount = duckdb_struct_type_child_count(type);
-
-	QStringList childNames;
-	QList<QVariantList> childValues(static_cast<qsizetype>(childCount));
-
-	bool retVal = true;
-	for (idx_t i = 0; retVal && i < childCount; ++ i){
-		char* childNamePtr = duckdb_struct_type_child_name(type, i);
-		childNames.append(QString::fromUtf8(childNamePtr));
-		duckdb_free(childNamePtr);
-
-		duckdb_logical_type childType = duckdb_struct_type_child_type(type, i);
-		retVal = ReadValues(duckdb_struct_vector_get_child(vector, i), childType, offset, count, childValues[i]);
-		duckdb_destroy_logical_type(&childType);
-	}
-
-	if (!retVal){
-		return false;
-	}
-
-	uint64_t* validityPtr = duckdb_vector_get_validity(vector);
-
-	for (idx_t row = 0; row < count; ++ row){
-		if (!duckdb_validity_row_is_valid(validityPtr, offset + row)){
-			values.append(QVariant());
-
-			continue;
-		}
-
-		QVariantMap map;
-		for (qsizetype i = 0; i < childNames.size(); ++ i){
-			map.insert(childNames.at(i), childValues.at(i).at(static_cast<qsizetype>(row)));
-		}
-
-		values.append(map);
-	}
-
-	return true;
 }
 
 
@@ -495,7 +507,11 @@ QVariant CDuckSqlResult::ReadScalarValue(
 			return static_cast<qlonglong>(static_cast<int64_t>(value.lower));
 		}
 
-		return duckdb_hugeint_to_double(value);
+		if (value.upper == 0){
+			return static_cast<qulonglong>(value.lower);
+		}
+
+		return ReadValueText(duckdb_create_hugeint(value));
 	}
 
 	case DUCKDB_TYPE_UHUGEINT: {
@@ -504,7 +520,7 @@ QVariant CDuckSqlResult::ReadScalarValue(
 			return static_cast<qulonglong>(value.lower);
 		}
 
-		return duckdb_uhugeint_to_double(value);
+		return ReadValueText(duckdb_create_uhugeint(value));
 	}
 
 	case DUCKDB_TYPE_VARCHAR: {
@@ -570,18 +586,42 @@ QVariant CDuckSqlResult::ReadScalarValue(
 		A TIMESTAMP has no time zone. Its wall-clock value is kept and tagged as UTC.
 	*/
 	case DUCKDB_TYPE_TIMESTAMP:
-	case DUCKDB_TYPE_TIMESTAMP_TZ:
-		return QDateTime::fromMSecsSinceEpoch(static_cast<const duckdb_timestamp*>(dataPtr)[row].micros / 1000, QTimeZone::utc());
+	case DUCKDB_TYPE_TIMESTAMP_TZ: {
+		const auto value = static_cast<const duckdb_timestamp*>(dataPtr)[row];
+		if (!duckdb_is_finite_timestamp(value)){
+			return ReadValueText(duckdb_create_timestamp(value));
+		}
 
-	case DUCKDB_TYPE_TIMESTAMP_S:
-		return QDateTime::fromMSecsSinceEpoch(static_cast<const duckdb_timestamp_s*>(dataPtr)[row].seconds * 1000, QTimeZone::utc());
+		return QDateTime::fromMSecsSinceEpoch(value.micros / 1000 - (value.micros % 1000 < 0), QTimeZone::utc());
+	}
 
-	case DUCKDB_TYPE_TIMESTAMP_MS:
-		return QDateTime::fromMSecsSinceEpoch(static_cast<const duckdb_timestamp_ms*>(dataPtr)[row].millis, QTimeZone::utc());
+	case DUCKDB_TYPE_TIMESTAMP_S: {
+		const auto value = static_cast<const duckdb_timestamp_s*>(dataPtr)[row];
+		if (!duckdb_is_finite_timestamp_s(value) || value.seconds > INT64_MAX / 1000 || value.seconds < INT64_MIN / 1000){
+			return ReadValueText(duckdb_create_timestamp_s(value));
+		}
+
+		return QDateTime::fromMSecsSinceEpoch(value.seconds * 1000, QTimeZone::utc());
+	}
+
+	case DUCKDB_TYPE_TIMESTAMP_MS: {
+		const auto value = static_cast<const duckdb_timestamp_ms*>(dataPtr)[row];
+		if (!duckdb_is_finite_timestamp_ms(value)){
+			return ReadValueText(duckdb_create_timestamp_ms(value));
+		}
+
+		return QDateTime::fromMSecsSinceEpoch(value.millis, QTimeZone::utc());
+	}
 
 	case DUCKDB_TYPE_TIMESTAMP_NS:
-	case DUCKDB_TYPE_TIMESTAMP_TZ_NS:
-		return QDateTime::fromMSecsSinceEpoch(static_cast<const duckdb_timestamp_ns*>(dataPtr)[row].nanos / 1000000, QTimeZone::utc());
+	case DUCKDB_TYPE_TIMESTAMP_TZ_NS: {
+		const auto value = static_cast<const duckdb_timestamp_ns*>(dataPtr)[row];
+		if (!duckdb_is_finite_timestamp_ns(value)){
+			return ReadValueText(duckdb_create_timestamp_ns(value));
+		}
+
+		return QDateTime::fromMSecsSinceEpoch(value.nanos / 1000000 - (value.nanos % 1000000 < 0), QTimeZone::utc());
+	}
 
 	/**
 		An untyped NULL keeps the NULL type and has no data.
@@ -592,8 +632,9 @@ QVariant CDuckSqlResult::ReadScalarValue(
 }
 
 
-QMetaType CDuckSqlResult::ConvertMetaType(duckdb_type typeId)
+QMetaType CDuckSqlResult::ConvertMetaType(duckdb_logical_type type)
 {
+	const duckdb_type typeId = duckdb_get_type_id(type);
 	switch (typeId){
 	case DUCKDB_TYPE_BOOLEAN:
 		return QMetaType(QMetaType::Bool);
@@ -607,12 +648,14 @@ QMetaType CDuckSqlResult::ConvertMetaType(duckdb_type typeId)
 
 	case DUCKDB_TYPE_BIGINT:
 	case DUCKDB_TYPE_UINTEGER:
-	case DUCKDB_TYPE_HUGEINT:
 		return QMetaType(QMetaType::LongLong);
 
 	case DUCKDB_TYPE_UBIGINT:
-	case DUCKDB_TYPE_UHUGEINT:
 		return QMetaType(QMetaType::ULongLong);
+
+	case DUCKDB_TYPE_HUGEINT:
+	case DUCKDB_TYPE_UHUGEINT:
+		return QMetaType(QMetaType::QVariant);
 
 	case DUCKDB_TYPE_FLOAT:
 		return QMetaType(QMetaType::Float);
@@ -644,11 +687,25 @@ QMetaType CDuckSqlResult::ConvertMetaType(duckdb_type typeId)
 		return QMetaType(QMetaType::QDateTime);
 
 	case DUCKDB_TYPE_LIST:
-	case DUCKDB_TYPE_ARRAY:
-		return QMetaType(QMetaType::QVariantList);
+	case DUCKDB_TYPE_ARRAY: {
+		duckdb_logical_type child = typeId == DUCKDB_TYPE_ARRAY ? duckdb_array_type_child_type(type) : duckdb_list_type_child_type(type);
+		const bool supported = ConvertMetaType(child).isValid();
+		duckdb_destroy_logical_type(&child);
+		return supported ? QMetaType(QMetaType::QVariantList) : QMetaType();
+	}
 
-	case DUCKDB_TYPE_STRUCT:
+	case DUCKDB_TYPE_STRUCT: {
+		const idx_t count = duckdb_struct_type_child_count(type);
+		for (idx_t i = 0; i < count; ++i){
+			duckdb_logical_type child = duckdb_struct_type_child_type(type, i);
+			const bool supported = ConvertMetaType(child).isValid();
+			duckdb_destroy_logical_type(&child);
+			if (!supported){
+				return QMetaType();
+			}
+		}
 		return QMetaType(QMetaType::QVariantMap);
+	}
 
 	case DUCKDB_TYPE_SQLNULL:
 		return QMetaType(QMetaType::Nullptr);
