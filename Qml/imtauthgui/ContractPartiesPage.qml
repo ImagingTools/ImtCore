@@ -46,7 +46,7 @@ Item {
 			if (facts.stateComment)
 				notes.push(facts.stateComment)
 			if (facts.withdrawAt)
-				notes.push(qsTr("leaves on %1").arg(ContractTexts.dateText(facts.withdrawAt)))
+				notes.push((new Date(facts.withdrawAt) > new Date() ? qsTr("leaves on %1") : qsTr("left on %1")).arg(ContractTexts.dateText(facts.withdrawAt)))
 			rows.push({"id": party.tenantId,
 					   "organization": (party.tenantName || party.tenantId) + (isMe ? " " + qsTr("(you)") : ""),
 					   "role": party.roleName || "",

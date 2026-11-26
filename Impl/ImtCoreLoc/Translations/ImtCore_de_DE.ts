@@ -1193,7 +1193,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-820"/>
         <location line="+822"/>
         <source>New message</source>
-        <translation type="unfinished"></translation>
+        <translation>Neue Nachricht</translation>
     </message>
     <message>
         <location line="-836"/>
@@ -3785,7 +3785,7 @@
         <location line="+16"/>
         <location line="+64"/>
         <source>Save</source>
-        <translation type="unfinished">Speichern</translation>
+        <translation>Speichern</translation>
     </message>
     <message>
         <location line="-670"/>
@@ -3993,7 +3993,7 @@
         <location line="+2"/>
         <location line="+358"/>
         <source>Contract</source>
-        <translation type="unfinished">Vertrag</translation>
+        <translation>Vertrag</translation>
     </message>
     <message>
         <location line="-324"/>
@@ -4801,7 +4801,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <location line="+170"/>
         <source>Parent organization</source>
-        <translation type="unfinished">Übergeordnete Organisation</translation>
+        <translation>Muttergesellschaft</translation>
     </message>
     <message>
         <location line="-236"/>
@@ -4849,7 +4849,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Partner</source>
-        <translation type="unfinished">Partner</translation>
+        <translation>Partner</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -4897,7 +4897,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Customer</source>
-        <translation type="unfinished">Kunde</translation>
+        <translation>Kunde</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5113,7 +5113,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Services</source>
-        <translation type="unfinished">Dienste</translation>
+        <translation>Dienstleistungen</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5337,7 +5337,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-20"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+78"/>
         <source>Message from organization</source>
-        <translation type="unfinished"></translation>
+        <translation>Nachricht von einer Organisation</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5373,7 +5373,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+82"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+44"/>
         <source>Your permissions in &quot;{subject}&quot; were changed</source>
-        <translation type="unfinished"></translation>
+        <translation>Ihre Berechtigungen in „{subject}“ wurden geändert</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5385,7 +5385,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Permissions changed</source>
-        <translation type="unfinished"></translation>
+        <translation>Berechtigungen geändert</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5421,7 +5421,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-46"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-20"/>
         <source>The invitation to &quot;{subject}&quot; was withdrawn</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Einladung zu „{subject}“ wurde zurückgezogen</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5433,7 +5433,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Invitation withdrawn</source>
-        <translation type="unfinished"></translation>
+        <translation>Einladung zurückgezogen</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5445,7 +5445,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+84"/>
         <source>&quot;{partner}&quot; declined the connection request of &quot;{subject}&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>„{partner}“ hat die Verbindungsanfrage von „{subject}“ abgelehnt</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5457,7 +5457,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Connection request rejected</source>
-        <translation type="unfinished">Verbindungsanfrage abgelehnt</translation>
+        <translation>Verbindungsanfrage abgelehnt</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5469,7 +5469,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+28"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-56"/>
         <source>&quot;{partner}&quot; wants to connect to &quot;{subject}&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>„{partner}“ möchte sich mit „{subject}“ verbinden</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5481,7 +5481,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Connection request received</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbindungsanfrage erhalten</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5517,7 +5517,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+24"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <source>&quot;{partner}&quot; left the contract &quot;{subject}&quot;</source>
-        <translation>„{partner}“ ist aus dem Vertrag „{subject}“ ausgetreten</translation>
+        <translation>„{partner}“ hat den Vertrag „{subject}“ verlassen</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5565,7 +5565,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+64"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-10"/>
         <source>The connection of &quot;{subject}&quot; with &quot;{partner}&quot; was removed</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Verbindung von „{subject}“ mit „{partner}“ wurde entfernt</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5577,7 +5577,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Connection removed</source>
-        <translation type="unfinished">Verbindung entfernt</translation>
+        <translation>Verbindung entfernt</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5613,7 +5613,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-40"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-88"/>
         <source>You are now the owner of &quot;{subject}&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Sie sind jetzt Eigentümer von „{subject}“</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5625,7 +5625,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Ownership received</source>
-        <translation type="unfinished"></translation>
+        <translation>Eigentum erhalten</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5637,7 +5637,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-26"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
         <source>New message from &quot;{subject}&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Neue Nachricht von „{subject}“</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -5649,7 +5649,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+48"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
         <source>Organization</source>
-        <translation type="unfinished">Organisation</translation>
+        <translation>Organisation</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5661,7 +5661,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-20"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+66"/>
         <source>You are no longer a member of &quot;{subject}&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Sie sind kein Mitglied von „{subject}“ mehr</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5673,7 +5673,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Membership ended</source>
-        <translation type="unfinished"></translation>
+        <translation>Mitgliedschaft beendet</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5709,7 +5709,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-20"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-14"/>
         <source>&quot;{partner}&quot; accepted the connection request of &quot;{subject}&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>„{partner}“ hat die Verbindungsanfrage von „{subject}“ angenommen</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5721,7 +5721,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Connection request approved</source>
-        <translation type="unfinished">Verbindungsanfrage genehmigt</translation>
+        <translation>Verbindungsanfrage angenommen</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5733,7 +5733,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-82"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-56"/>
         <source>Your organization received permissions by the contract &quot;{subject}&quot;</source>
-        <translation>Ihre Organisation hat Berechtigungen durch den Vertrag „{subject}“ erhalten</translation>
+        <translation>Ihre Organisation hat durch den Vertrag „{subject}“ Berechtigungen erhalten</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5757,7 +5757,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+108"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+42"/>
         <source>{actor} declined the invitation to &quot;{subject}&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>{actor} hat die Einladung zu „{subject}“ abgelehnt</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5769,7 +5769,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Invitation declined</source>
-        <translation type="unfinished">Einladung abgelehnt</translation>
+        <translation>Einladung abgelehnt</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5805,7 +5805,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-56"/>
         <source>{actor} accepted the invitation to &quot;{subject}&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>{actor} hat die Einladung zu „{subject}“ angenommen</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5817,7 +5817,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Invitation accepted</source>
-        <translation type="unfinished">Einladung angenommen</translation>
+        <translation>Einladung angenommen</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5829,7 +5829,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-54"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+18"/>
         <source>A date of the contract &quot;{subject}&quot; is coming</source>
-        <translation>Eine Frist des Vertrags „{subject}“ naht</translation>
+        <translation>Ein Termin des Vertrags „{subject}“ naht</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5877,7 +5877,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-82"/>
         <source>{actor} invited you to &quot;{subject}&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>{actor} hat Sie zu „{subject}“ eingeladen</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5889,7 +5889,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Invitation received</source>
-        <translation type="unfinished"></translation>
+        <translation>Einladung erhalten</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5901,7 +5901,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+8"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+18"/>
         <source>&quot;{partner}&quot; signed the contract &quot;{subject}&quot;</source>
-        <translation>„{partner}“ hat den Vertrag „{subject}“ unterschrieben</translation>
+        <translation>„{partner}“ hat den Vertrag „{subject}“ unterzeichnet</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5925,7 +5925,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+76"/>
         <source>{member} is now the owner of &quot;{subject}&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>{member} ist jetzt Eigentümer von „{subject}“</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5937,7 +5937,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Ownership transferred</source>
-        <translation type="unfinished"></translation>
+        <translation>Eigentum übertragen</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5949,7 +5949,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-32"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-12"/>
         <source>{member} is no longer a member of &quot;{subject}&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>{member} ist kein Mitglied von „{subject}“ mehr</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5961,7 +5961,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Member left</source>
-        <translation type="unfinished"></translation>
+        <translation>Mitglied ausgetreten</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5973,7 +5973,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+44"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-96"/>
         <source>Connection</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbindung</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5985,7 +5985,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-70"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+38"/>
         <source>Connection request</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbindungsanfrage</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -7307,6 +7307,98 @@
         <location line="+2"/>
         <source>SDL code generator</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save the terms of the contract</source>
+        <translation>Vertragsbedingungen speichern</translation>
+    </message>
+    <message>
+        <source>Send the contract to the parties for their answer</source>
+        <translation>Den Vertrag den Parteien zur Antwort senden</translation>
+    </message>
+    <message>
+        <source>Send to the parties</source>
+        <translation>An die Parteien senden</translation>
+    </message>
+    <message>
+        <source>Approve the terms for your organization</source>
+        <translation>Die Bedingungen für Ihre Organisation genehmigen</translation>
+    </message>
+    <message>
+        <source>Approve</source>
+        <translation>Genehmigen</translation>
+    </message>
+    <message>
+        <source>Sign the contract for your organization</source>
+        <translation>Den Vertrag für Ihre Organisation unterzeichnen</translation>
+    </message>
+    <message>
+        <source>Sign</source>
+        <translation>Unterzeichnen</translation>
+    </message>
+    <message>
+        <source>Tell the initiator what to change</source>
+        <translation>Dem Initiator mitteilen, was zu ändern ist</translation>
+    </message>
+    <message>
+        <source>Ask for changes</source>
+        <translation>Änderungen anfordern</translation>
+    </message>
+    <message>
+        <source>Your organization does not conclude the contract</source>
+        <translation>Ihre Organisation schließt den Vertrag nicht ab</translation>
+    </message>
+    <message>
+        <source>Decline</source>
+        <translation>Ablehnen</translation>
+    </message>
+    <message>
+        <source>Withdraw the contract sent to the parties</source>
+        <translation>Den an die Parteien gesendeten Vertrag zurückziehen</translation>
+    </message>
+    <message>
+        <source>Withdraw offer</source>
+        <translation>Angebot zurückziehen</translation>
+    </message>
+    <message>
+        <source>Remove the draft never sent</source>
+        <translation>Den nie gesendeten Entwurf löschen</translation>
+    </message>
+    <message>
+        <source>Remove draft</source>
+        <translation>Entwurf löschen</translation>
+    </message>
+    <message>
+        <source>Your organization leaves the contract after the notice period</source>
+        <translation>Ihre Organisation verlässt den Vertrag nach der Kündigungsfrist</translation>
+    </message>
+    <message>
+        <source>Give notice</source>
+        <translation>Kündigen</translation>
+    </message>
+    <message>
+        <source>Your organization stays in the contract</source>
+        <translation>Ihre Organisation bleibt im Vertrag</translation>
+    </message>
+    <message>
+        <source>Revoke notice</source>
+        <translation>Kündigung zurücknehmen</translation>
+    </message>
+    <message>
+        <source>The contract is not renewed at the end of its period</source>
+        <translation>Der Vertrag wird am Ende seiner Laufzeit nicht verlängert</translation>
+    </message>
+    <message>
+        <source>Stop renewal</source>
+        <translation>Verlängerung beenden</translation>
+    </message>
+    <message>
+        <source>"{partner}" took back the permissions it gave by the contract "{subject}"</source>
+        <translation>„{partner}“ hat die durch den Vertrag „{subject}“ erteilten Berechtigungen zurückgenommen</translation>
+    </message>
+    <message>
+        <source>Contract permissions taken back</source>
+        <translation>Vertragsberechtigungen zurückgenommen</translation>
     </message>
 </context>
 <context>
@@ -9379,7 +9471,7 @@
 <context>
     <name>Calendar</name>
     <message>
-        <location filename="../../../Qml/imtcontrols/Inputs/Calendar.qml" line="+70"/>
+        <location filename="../../../Qml/imtcontrols/Inputs/Calendar.qml" line="+78"/>
         <source>January</source>
         <translation>Januar</translation>
     </message>
@@ -10435,96 +10527,440 @@
 <context>
     <name>ContractAllocationDialog</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/ContractAllocationDialog.qml" line="+32"/>
         <source>Add</source>
-        <translation type="unfinished">Hinzufügen</translation>
+        <translation type="obsolete">Hinzufügen</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location filename="../../../Qml/imtauthgui/ContractAllocationDialog.qml" line="+61"/>
         <source>Cancel</source>
-        <translation type="unfinished">Abbrechen</translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
-        <location line="+100"/>
-        <location line="+3"/>
         <source>%1 gives %2</source>
-        <translation>%1 gibt %2</translation>
+        <translation type="vanished">%1 gibt %2</translation>
     </message>
     <message>
-        <location line="+21"/>
         <source>Parties</source>
-        <translation>Parteien</translation>
+        <translation type="vanished">Parteien</translation>
     </message>
     <message>
-        <location line="+6"/>
         <source>Who gives</source>
-        <translation>Wer gibt</translation>
+        <translation type="vanished">Wer gibt</translation>
     </message>
     <message>
-        <location line="+6"/>
         <source>Product</source>
-        <translation type="unfinished">Produkt</translation>
+        <translation type="obsolete">Produkt</translation>
+    </message>
+    <message>
+        <source>Id of the product</source>
+        <translation type="vanished">Kennung des Produkts</translation>
+    </message>
+    <message>
+        <source>Permissions</source>
+        <translation type="obsolete">Berechtigungen</translation>
+    </message>
+    <message>
+        <source>Ids of the permissions, separated by commas</source>
+        <translation type="vanished">Kennungen der Berechtigungen, durch Kommas getrennt</translation>
+    </message>
+    <message>
+        <source>Valid until</source>
+        <translation type="vanished">Gültig bis</translation>
+    </message>
+    <message>
+        <source>dd.MM.yyyy, empty while the contract is in force</source>
+        <translation type="vanished">TT.MM.JJJJ, leer solange der Vertrag gilt</translation>
+    </message>
+    <message>
+        <location line="-1"/>
+        <source>Give</source>
+        <translation>Erteilen</translation>
+    </message>
+    <message>
+        <location line="+72"/>
+        <source>Choose the party receiving the permissions</source>
+        <translation>Wählen Sie die Partei, die die Berechtigungen erhält</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Id of the product</source>
-        <translation>Kennung des Produkts</translation>
+        <source>To</source>
+        <translation>An</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Choose among the permissions your organization holds. While the contract is in force, %1 gives them to its groups, and their members work in your organization with them.</source>
+        <translation>Wählen Sie aus den Berechtigungen Ihrer Organisation. Solange der Vertrag gilt, gibt %1 sie an seine Gruppen weiter, deren Mitglieder damit in Ihrer Organisation arbeiten.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>the party</source>
+        <translation>die Partei</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Your organization holds no permissions to give. They are chosen on the page Available permissions.</source>
+        <translation>Ihre Organisation hat keine Berechtigungen zu vergeben. Sie werden auf der Seite „Verfügbare Berechtigungen“ gewählt.</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Until</source>
+        <translation>Bis</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Empty: while the contract is in force</source>
+        <translation>Leer: solange der Vertrag gilt</translation>
     </message>
     <message>
         <location line="+6"/>
-        <source>Permissions</source>
-        <translation type="unfinished">Berechtigungen</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Ids of the permissions, separated by commas</source>
-        <translation>Kennungen der Berechtigungen, durch Kommas getrennt</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Valid until</source>
-        <translation>Gültig bis</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>dd.MM.yyyy, empty while the contract is in force</source>
-        <translation>TT.MM.JJJJ, leer solange der Vertrag gilt</translation>
-    </message>
-    <message>
-        <location line="+5"/>
         <source>Comment</source>
-        <translation type="unfinished">Kommentar</translation>
+        <translation>Kommentar</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Optional</source>
-        <translation type="unfinished">Optional</translation>
+        <translation>Optional</translation>
     </message>
     <message>
-        <location line="+6"/>
         <source>Permissions of your organization</source>
-        <translation>Berechtigungen Ihrer Organisation</translation>
+        <translation type="vanished">Berechtigungen Ihrer Organisation</translation>
+    </message>
+</context>
+<context>
+    <name>ContractDialog</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/ContractDialog.qml" line="+20"/>
+        <source>Contract</source>
+        <translation>Vertrag</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Close</source>
+        <translation>Schließen</translation>
+    </message>
+    <message>
+        <location line="+27"/>
+        <source>Unsaved changes</source>
+        <translation>Nicht gespeicherte Änderungen</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>The changes of the terms are not saved. Close the contract and lose them?</source>
+        <translation>Die Änderungen der Bedingungen sind nicht gespeichert. Den Vertrag schließen und sie verwerfen?</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Save</source>
+        <translation>Speichern</translation>
+    </message>
+</context>
+<context>
+    <name>ContractDocumentsPage</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/ContractDocumentsPage.qml" line="+80"/>
+        <source>Yes</source>
+        <translation>Ja</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>No</source>
+        <translation>Nein</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location line="+44"/>
+        <source>Internal</source>
+        <translation>Intern</translation>
+    </message>
+    <message>
+        <location line="-44"/>
+        <source>All parties</source>
+        <translation>Alle Parteien</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Replaced</source>
+        <translation>Ersetzt</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Current</source>
+        <translation>Aktuell</translation>
+    </message>
+    <message>
+        <location line="+25"/>
+        <source>The files of the terms were signed with the contract and stay. An internal document is seen by your organization only.</source>
+        <translation>Die Dateien der Bedingungen wurden mit dem Vertrag unterzeichnet und bleiben. Ein internes Dokument sieht nur Ihre Organisation.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>The shared files are part of the terms: a new one asks the parties again. An internal document is seen by your organization only.</source>
+        <translation>Die gemeinsamen Dateien gehören zu den Bedingungen: Eine neue Datei legt sie den Parteien erneut vor. Ein internes Dokument sieht nur Ihre Organisation.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The initiator attaches the files of the terms. Your organization attaches internal documents, seen by it only.</source>
+        <translation>Die Dateien der Bedingungen fügt der Initiator an. Ihre Organisation fügt interne Dokumente an, die nur sie sieht.</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Seen by your organization only</source>
+        <translation>Nur für Ihre Organisation sichtbar</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Your organization attaches only internal documents now</source>
+        <translation>Ihre Organisation fügt jetzt nur interne Dokumente an</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Attach file</source>
+        <translation>Datei anfügen</translation>
+    </message>
+    <message>
+        <location line="+30"/>
+        <source>File</source>
+        <translation>Datei</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Part of the terms</source>
+        <translation>Teil der Bedingungen</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Added</source>
+        <translation>Hinzugefügt</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>By</source>
+        <translation>Von</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Seen by</source>
+        <translation>Sichtbar für</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>State</source>
+        <translation>Status</translation>
+    </message>
+    <message>
+        <location line="+33"/>
+        <source>New version</source>
+        <translation>Neue Version</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The current version is kept as replaced</source>
+        <translation>Die aktuelle Version bleibt als ersetzt erhalten</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Download</source>
+        <translation>Herunterladen</translation>
+    </message>
+</context>
+<context>
+    <name>ContractJournalPage</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/ContractJournalPage.qml" line="+32"/>
+        <source>internal</source>
+        <translation>intern</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>No entries yet.</source>
+        <translation>Noch keine Einträge.</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Time</source>
+        <translation>Zeit</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Event</source>
+        <translation>Ereignis</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Organization</source>
+        <translation>Organisation</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>User</source>
+        <translation>Benutzer</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Comment</source>
+        <translation>Kommentar</translation>
+    </message>
+</context>
+<context>
+    <name>ContractLinksPage</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/ContractLinksPage.qml" line="+31"/>
+        <source>Not saved yet</source>
+        <translation>Noch nicht gespeichert</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>In force</source>
+        <translation>In Kraft</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Once all parties sign</source>
+        <translation>Sobald alle Parteien unterzeichnen</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Once the contract comes into force</source>
+        <translation>Sobald der Vertrag in Kraft tritt</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Ended</source>
+        <translation>Beendet</translation>
+    </message>
+    <message>
+        <location line="+30"/>
+        <source>The links appear with the parties.</source>
+        <translation>Die Verbindungen entstehen mit den Parteien.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>A link is a pair of parties that work with each other under the contract: every two parties, or the central party with each other one when the type says so. While the contract is in force, Documents lets the two share documents, and permissions are given only within a link (page Permissions). Without a link two parties of the same contract have nothing to do with each other.</source>
+        <translation>Eine Verbindung ist ein Paar von Parteien, die im Rahmen des Vertrags zusammenarbeiten: je zwei Parteien oder, wenn der Typ es vorgibt, die zentrale Partei mit jeder anderen. Solange der Vertrag gilt, teilen die beiden über „Dokumente“ Dokumente, und Berechtigungen werden nur innerhalb einer Verbindung vergeben (Seite „Berechtigungen“). Ohne Verbindung haben zwei Parteien desselben Vertrags nichts miteinander zu tun.</translation>
+    </message>
+    <message>
+        <location line="+26"/>
+        <source>Party</source>
+        <translation>Partei</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location line="+2"/>
+        <source>Its role</source>
+        <translation>Ihre Rolle</translation>
+    </message>
+    <message>
+        <location line="-1"/>
+        <source>Other party</source>
+        <translation>Andere Partei</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Documents</source>
+        <translation>Dokumente</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>State</source>
+        <translation>Status</translation>
+    </message>
+</context>
+<context>
+    <name>ContractPartiesPage</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/ContractPartiesPage.qml" line="+49"/>
+        <source>leaves on %1</source>
+        <translation>scheidet am %1 aus</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>(you)</source>
+        <translation>(Sie)</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Not sent yet</source>
+        <translation>Noch nicht gesendet</translation>
+    </message>
+    <message>
+        <location line="+33"/>
+        <source>Add the other organizations of the contract: a partner from the address book, or, once the draft is saved, any organization by its connection code.</source>
+        <translation>Fügen Sie die anderen Organisationen des Vertrags hinzu: einen Partner aus dem Adressbuch oder, sobald der Entwurf gespeichert ist, jede Organisation über ihren Verbindungscode.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The organizations bound by the contract. Each one signs it for itself: one signature of a user with the right to sign is enough.</source>
+        <translation>Die durch den Vertrag gebundenen Organisationen. Jede unterzeichnet ihn für sich: Eine Unterschrift eines Benutzers mit Unterschriftsrecht genügt.</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>Add party</source>
+        <translation>Partei hinzufügen</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Add by code</source>
+        <translation>Per Code hinzufügen</translation>
+    </message>
+    <message>
+        <location line="+30"/>
+        <source>Organization</source>
+        <translation>Organisation</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location line="+28"/>
+        <source>Role</source>
+        <translation>Rolle</translation>
+    </message>
+    <message>
+        <location line="-27"/>
+        <source>State</source>
+        <translation>Status</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Signed</source>
+        <translation>Unterzeichnet</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Found by</source>
+        <translation>Gefunden über</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Notes</source>
+        <translation>Hinweise</translation>
+    </message>
+    <message>
+        <location line="+32"/>
+        <source>Remove</source>
+        <translation>Entfernen</translation>
+    </message>
+    <message>
+        <source>left on %1</source>
+        <translation>ausgeschieden am %1</translation>
     </message>
 </context>
 <context>
     <name>ContractPartyDialog</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/ContractPartyDialog.qml" line="+35"/>
+        <location filename="../../../Qml/imtauthgui/ContractPartyDialog.qml" line="+36"/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation type="unfinished">Abbrechen</translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
-        <location line="+48"/>
         <source>No role</source>
-        <translation>Keine Rolle</translation>
+        <translation type="vanished">Keine Rolle</translation>
     </message>
     <message>
-        <location line="+39"/>
+        <location line="+73"/>
         <source>The organizations of the address book and the parties of your other contracts.</source>
         <translation>Die Organisationen des Adressbuchs und die Parteien Ihrer anderen Verträge.</translation>
     </message>
@@ -10534,13 +10970,23 @@
         <translation>Noch keine Organisation zum Einladen: Fügen Sie einen Partner zum Adressbuch hinzu oder laden Sie eine Organisation per Code ein.</translation>
     </message>
     <message>
+        <location line="+15"/>
         <location line="+10"/>
-        <location line="+7"/>
         <source>Organization</source>
-        <translation type="unfinished">Organisation</translation>
+        <translation>Organisation</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="-2"/>
+        <source>Choose the organization</source>
+        <translation>Wählen Sie die Organisation</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Enter the code the organization gave you</source>
+        <translation>Geben Sie den Code ein, den Ihnen die Organisation gegeben hat</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>Connection code</source>
         <translation>Verbindungscode</translation>
     </message>
@@ -10550,22 +10996,277 @@
         <translation>Der Code, den Ihnen die Organisation gegeben hat</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+7"/>
+        <source>Choose the role of the organization in the contract</source>
+        <translation>Wählen Sie die Rolle der Organisation im Vertrag</translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Role</source>
-        <translation type="unfinished">Rolle</translation>
+        <translation>Rolle</translation>
+    </message>
+    <message>
+        <source>Signatures needed</source>
+        <translation type="vanished">Benötigte Unterschriften</translation>
+    </message>
+</context>
+<context>
+    <name>ContractPeriodPage</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/ContractPeriodPage.qml" line="+36"/>
+        <source>On the day the last party signs</source>
+        <translation>Am Tag der letzten Unterschrift</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location line="+3"/>
+        <source>On a date</source>
+        <translation>An einem Datum</translation>
+    </message>
+    <message>
+        <location line="-2"/>
+        <source>Never: no end</source>
+        <translation>Nie: unbefristet</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>After a number of days</source>
+        <translation>Nach einer Anzahl von Tagen</translation>
+    </message>
+    <message>
+        <location line="+58"/>
+        <source>The contract comes into force on %1</source>
+        <translation>Der Vertrag tritt am %1 in Kraft</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The contract comes into force on the day the last party signs</source>
+        <translation>Der Vertrag tritt am Tag der letzten Unterschrift in Kraft</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>and runs for %1 days.</source>
+        <translation>und läuft %1 Tage.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>and runs until %1.</source>
+        <translation>und läuft bis zum %1.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>and runs with no end.</source>
+        <translation>und läuft unbefristet.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Then it is renewed for %1 days each time, unless a party stops the renewal %2 days before the end.</source>
+        <translation>Danach verlängert er sich jeweils um %1 Tage, sofern keine Partei die Verlängerung %2 Tage vor dem Ende beendet.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>A party may leave it with a notice of %1 days.</source>
+        <translation>Eine Partei kann ihn mit einer Frist von %1 Tagen kündigen.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>A party may leave it at once.</source>
+        <translation>Eine Partei kann ihn sofort verlassen.</translation>
+    </message>
+    <message>
+        <location line="+63"/>
+        <source>Comes into force</source>
+        <translation>Tritt in Kraft</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Date</source>
+        <translation>Datum</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Ends</source>
+        <translation>Endet</translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <source>Runs for</source>
+        <translation>Laufzeit</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Counted from the day it comes into force</source>
+        <translation>Gerechnet ab dem Tag des Inkrafttretens</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location line="+36"/>
+        <location line="+14"/>
+        <location line="+16"/>
+        <source>days</source>
+        <translation>Tage</translation>
+    </message>
+    <message>
+        <location line="-57"/>
+        <source>Last day</source>
+        <translation>Letzter Tag</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Renewed automatically</source>
+        <translation>Verlängert sich automatisch</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Renewed for</source>
+        <translation>Verlängert um</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>A party stops the renewal at least</source>
+        <translation>Eine Partei beendet die Verlängerung mindestens</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Days before the end</source>
+        <translation>Tage vor dem Ende</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Notice to leave</source>
+        <translation>Kündigungsfrist</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>A party leaves this long after its notice; 0: at once</source>
+        <translation>So lange nach der Kündigung scheidet eine Partei aus; 0: sofort</translation>
+    </message>
+</context>
+<context>
+    <name>ContractPermissionsPage</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/ContractPermissionsPage.qml" line="+62"/>
+        <source>In force</source>
+        <translation>In Kraft</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Once all parties sign</source>
+        <translation>Sobald alle Parteien unterzeichnen</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Once the contract comes into force</source>
+        <translation>Sobald der Vertrag in Kraft tritt</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Not in force</source>
+        <translation>Nicht in Kraft</translation>
     </message>
     <message>
         <location line="+6"/>
-        <source>Signatures needed</source>
-        <translation>Benötigte Unterschriften</translation>
+        <source>Set by receiver</source>
+        <translation>Legt Empfänger fest</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>When in force</source>
+        <translation>Bei Inkrafttreten</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>None yet</source>
+        <translation>Noch keine</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>1 group</source>
+        <translation>1 Gruppe</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>%1 groups</source>
+        <translation>%1 Gruppen</translation>
+    </message>
+    <message>
+        <location line="+44"/>
+        <source>No permissions are given yet.</source>
+        <translation>Es sind noch keine Berechtigungen erteilt.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Each party gives its own permissions to the parties it is linked with, and may take them back at any time. While the contract is in force, the receiver gives them to its groups (button Groups); their members then work in the organization of the giver. Only the receiver sees and chooses its groups.</source>
+        <translation>Jede Partei erteilt ihre eigenen Berechtigungen den Parteien, mit denen sie verbunden ist, und kann sie jederzeit zurücknehmen. Solange der Vertrag gilt, gibt der Empfänger sie an seine Gruppen weiter (Schaltfläche „Gruppen“); deren Mitglieder arbeiten dann in der Organisation des Gebers. Nur der Empfänger sieht und wählt seine Gruppen.</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Give permissions</source>
+        <translation>Berechtigungen erteilen</translation>
+    </message>
+    <message>
+        <location line="+28"/>
+        <source>Gives</source>
+        <translation>Erteilt</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Receives</source>
+        <translation>Erhält</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Permissions</source>
+        <translation>Berechtigungen</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Until</source>
+        <translation>Bis</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location line="+35"/>
+        <source>Groups</source>
+        <translation>Gruppen</translation>
+    </message>
+    <message>
+        <location line="-34"/>
+        <source>State</source>
+        <translation>Status</translation>
+    </message>
+    <message>
+        <location line="+45"/>
+        <source>Take back</source>
+        <translation>Zurücknehmen</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Take back permissions</source>
+        <translation>Berechtigungen zurücknehmen</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Take back these permissions? The members of the other organization lose them at once.</source>
+        <translation>Diese Berechtigungen zurücknehmen? Die Mitglieder der anderen Organisation verlieren sie sofort.</translation>
+    </message>
+    <message>
+        <location line="+25"/>
+        <source>Groups receiving the permissions</source>
+        <translation>Gruppen, die die Berechtigungen erhalten</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Save</source>
+        <translation>Speichern</translation>
     </message>
 </context>
 <context>
     <name>ContractReasonDialog</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/ContractReasonDialog.qml" line="+23"/>
+        <location filename="../../../Qml/imtauthgui/ContractReasonDialog.qml" line="+25"/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -10575,27 +11276,25 @@
     <message>
         <location line="+7"/>
         <source>Cancel</source>
-        <translation type="unfinished">Abbrechen</translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
-        <location line="+60"/>
+        <location line="+57"/>
         <source>Required</source>
-        <translation type="unfinished">Erforderlich</translation>
+        <translation>Erforderlich</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Optional</source>
-        <translation type="unfinished">Optional</translation>
+        <translation>Optional</translation>
     </message>
     <message>
-        <location line="+6"/>
         <source>Terminate on</source>
-        <translation>Beenden zum</translation>
+        <translation type="vanished">Beenden zum</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>dd.MM.yyyy, empty for today</source>
-        <translation>TT.MM.JJJJ, leer für heute</translation>
+        <translation type="vanished">TT.MM.JJJJ, leer für heute</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -10611,45 +11310,126 @@
 <context>
     <name>ContractReferenceDialog</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/ContractReferenceDialog.qml" line="+26"/>
+        <location filename="../../../Qml/imtauthgui/ContractReferenceDialog.qml" line="+27"/>
         <source>Add</source>
-        <translation type="unfinished">Hinzufügen</translation>
+        <translation>Hinzufügen</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation type="unfinished">Abbrechen</translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
-        <location line="+57"/>
+        <location line="+60"/>
         <source>The organization has no other sent contract to refer to.</source>
         <translation>Die Organisation hat keinen anderen gesendeten Vertrag, auf den verwiesen werden kann.</translation>
     </message>
     <message>
-        <location line="+11"/>
-        <source>Contract</source>
-        <translation type="unfinished">Vertrag</translation>
+        <location line="+13"/>
+        <source>Choose the contract</source>
+        <translation>Wählen Sie den Vertrag</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+1"/>
+        <source>Contract</source>
+        <translation>Vertrag</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Choose how the contracts are related</source>
+        <translation>Wählen Sie, wie die Verträge zusammenhängen</translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Reference</source>
         <translation>Verweis</translation>
     </message>
 </context>
 <context>
+    <name>ContractReferencesPage</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/ContractReferencesPage.qml" line="+61"/>
+        <source>A contract replacing another one ends it once concluded; a contract under a framework contract gives no more than it.</source>
+        <translation>Ein Vertrag, der einen anderen ersetzt, beendet ihn mit seinem Abschluss; ein Vertrag unter einem Rahmenvertrag gewährt nicht mehr als dieser.</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Refer to a contract</source>
+        <translation>Auf einen Vertrag verweisen</translation>
+    </message>
+    <message>
+        <location line="+28"/>
+        <source>Reference</source>
+        <translation>Verweis</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Number</source>
+        <translation>Nummer</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Name</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Remove</source>
+        <translation>Entfernen</translation>
+    </message>
+</context>
+<context>
+    <name>ContractRoleSlotDialog</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/ContractRoleSlotDialog.qml" line="+29"/>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Cancel</source>
+        <translation>Abbrechen</translation>
+    </message>
+    <message>
+        <location line="+51"/>
+        <source>Choose the role</source>
+        <translation>Wählen Sie die Rolle</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Role</source>
+        <translation>Rolle</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>At least</source>
+        <translation>Mindestens</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>At most</source>
+        <translation>Höchstens</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>0: any number</source>
+        <translation>0: beliebig viele</translation>
+    </message>
+</context>
+<context>
     <name>ContractSignDialog</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/ContractSignDialog.qml" line="+30"/>
+        <location filename="../../../Qml/imtauthgui/ContractSignDialog.qml" line="+26"/>
         <source>Sign</source>
         <translation>Unterschreiben</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation type="unfinished">Abbrechen</translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
-        <location line="+76"/>
+        <location line="+27"/>
         <source>You sign revision %1 of the terms for your organization. A change of the terms asks for the signatures again.</source>
         <translation>Sie unterschreiben Revision %1 der Bedingungen für Ihre Organisation. Eine Änderung der Bedingungen erfordert erneute Unterschriften.</translation>
     </message>
@@ -10664,29 +11444,105 @@
         <translation>z. B. Geschäftsführer</translation>
     </message>
     <message>
-        <location line="+5"/>
         <source>Signature</source>
-        <translation>Unterschrift</translation>
+        <translation type="vanished">Unterschrift</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Signed copy</source>
-        <translation>Unterschriebenes Exemplar</translation>
+        <translation type="vanished">Unterschriebenes Exemplar</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Id of the signature</source>
-        <translation>Kennung der Signatur</translation>
+        <translation type="vanished">Kennung der Signatur</translation>
+    </message>
+    <message>
+        <source>The id given by the signature service</source>
+        <translation type="vanished">Die vom Signaturdienst vergebene Kennung</translation>
+    </message>
+    <message>
+        <source>Attach the scan of the signed copy to the contract first.</source>
+        <translation type="vanished">Hängen Sie zuerst den Scan des unterschriebenen Exemplars an den Vertrag an.</translation>
+    </message>
+</context>
+<context>
+    <name>ContractStateBar</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/ContractStateBar.qml" line="+30"/>
+        <source>Draft</source>
+        <translation>Entwurf</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Negotiation</source>
+        <translation>Verhandlung</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Signing</source>
+        <translation>Unterzeichnung</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>In force</source>
+        <translation>In Kraft</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>The id given by the signature service</source>
-        <translation>Die vom Signaturdienst vergebene Kennung</translation>
+        <source>Ended</source>
+        <translation>Beendet</translation>
     </message>
     <message>
-        <location line="+8"/>
-        <source>Attach the scan of the signed copy to the contract first.</source>
-        <translation>Hängen Sie zuerst den Scan des unterschriebenen Exemplars an den Vertrag an.</translation>
+        <location line="+150"/>
+        <source>(you)</source>
+        <translation>(Sie)</translation>
+    </message>
+</context>
+<context>
+    <name>ContractTermsPage</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/ContractTermsPage.qml" line="+108"/>
+        <source>Enter the name of the contract</source>
+        <translation>Geben Sie den Namen des Vertrags ein</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Name</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>e.g. Supply agreement</source>
+        <translation>z. B. Liefervertrag</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Type</source>
+        <translation>Typ</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>A type offers its periods, its roles and the links of the parties</source>
+        <translation>Ein Typ gibt seine Fristen, Rollen und Verbindungen der Parteien vor</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Optional: what the contract is about</source>
+        <translation>Optional: worum es im Vertrag geht</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Description</source>
+        <translation>Beschreibung</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Terms</source>
+        <translation>Bedingungen</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>The terms agreed, or attach the main text</source>
+        <translation>Die vereinbarten Bedingungen, oder fügen Sie den Haupttext an</translation>
     </message>
 </context>
 <context>
@@ -10694,7 +11550,7 @@
     <message>
         <location filename="../../../Qml/imtauthgui/ContractTexts.qml" line="+14"/>
         <source>Draft</source>
-        <translation type="unfinished">Entwurf</translation>
+        <translation>Entwurf</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -10709,12 +11565,11 @@
     <message>
         <location line="+2"/>
         <source>Rejected</source>
-        <translation type="unfinished">Abgelehnt</translation>
+        <translation>Abgelehnt</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>Offer expired</source>
-        <translation>Angebot abgelaufen</translation>
+        <translation type="vanished">Angebot abgelaufen</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -10724,19 +11579,19 @@
     <message>
         <location line="+2"/>
         <location line="+22"/>
-        <location line="+77"/>
+        <location line="+50"/>
         <source>Signed</source>
         <translation>Unterschrieben</translation>
     </message>
     <message>
-        <location line="-97"/>
+        <location line="-70"/>
         <source>Active</source>
-        <translation type="unfinished">Aktiv</translation>
+        <translation>Aktiv</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Expired</source>
-        <translation type="unfinished">Abgelaufen</translation>
+        <translation>Abgelaufen</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -10751,7 +11606,7 @@
     <message>
         <location line="+6"/>
         <source>Invited</source>
-        <translation type="unfinished">Eingeladen</translation>
+        <translation>Eingeladen</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -10760,30 +11615,30 @@
     </message>
     <message>
         <location line="+2"/>
-        <location line="+77"/>
+        <location line="+50"/>
         <source>Changes requested</source>
         <translation>Änderungen angefordert</translation>
     </message>
     <message>
-        <location line="-75"/>
-        <location line="+77"/>
+        <location line="-48"/>
+        <location line="+50"/>
         <source>Approved</source>
-        <translation type="unfinished">Genehmigt</translation>
+        <translation>Genehmigt</translation>
     </message>
     <message>
-        <location line="-73"/>
-        <location line="+77"/>
+        <location line="-46"/>
+        <location line="+50"/>
         <source>Declined</source>
-        <translation type="unfinished">Abgelehnt</translation>
+        <translation>Abgelehnt</translation>
     </message>
     <message>
-        <location line="-75"/>
-        <location line="+83"/>
+        <location line="-48"/>
+        <location line="+56"/>
         <source>Notice given</source>
         <translation>Gekündigt</translation>
     </message>
     <message>
-        <location line="-81"/>
+        <location line="-54"/>
         <source>Withdrawn</source>
         <translation>Ausgetreten</translation>
     </message>
@@ -10805,7 +11660,7 @@
     <message>
         <location line="+2"/>
         <source>Directory</source>
-        <translation type="unfinished">Verzeichnis</translation>
+        <translation>Verzeichnis</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -10813,32 +11668,37 @@
         <translation>Partei eines gemeinsamen Vertrags</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+48"/>
+        <source>Permissions given</source>
+        <translation>Berechtigungen erteilt</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Permissions taken back</source>
+        <translation>Berechtigungen zurückgenommen</translation>
+    </message>
+    <message>
         <source>Main text</source>
-        <translation>Haupttext</translation>
+        <translation type="vanished">Haupttext</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>Appendix</source>
-        <translation>Anlage</translation>
+        <translation type="vanished">Anlage</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>Signed copy</source>
-        <translation>Unterschriebenes Exemplar</translation>
+        <translation type="vanished">Unterschriebenes Exemplar</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>Amendment draft</source>
-        <translation>Änderungsentwurf</translation>
+        <translation type="vanished">Änderungsentwurf</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Other</source>
-        <translation type="unfinished">Sonstiges</translation>
+        <translation type="obsolete">Sonstiges</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="-42"/>
         <source>Replaces</source>
         <translation>Ersetzt</translation>
     </message>
@@ -10853,24 +11713,21 @@
         <translation>Bezogen auf</translation>
     </message>
     <message>
-        <location line="+5"/>
         <source>Scan of the signed copy</source>
-        <translation>Scan des unterschriebenen Exemplars</translation>
+        <translation type="vanished">Scan des unterschriebenen Exemplars</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>External electronic signature</source>
-        <translation>Externe elektronische Signatur</translation>
+        <translation type="vanished">Externe elektronische Signatur</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>In the system</source>
-        <translation>Im System</translation>
+        <translation type="vanished">Im System</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Created</source>
-        <translation type="unfinished">Erstellt</translation>
+        <translation>Erstellt</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -10923,37 +11780,31 @@
         <translation>Verlängerung beendet</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>Termination proposed</source>
-        <translation>Beendigung vorgeschlagen</translation>
+        <translation type="vanished">Beendigung vorgeschlagen</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>Termination agreed by a party</source>
-        <translation>Beendigung von einer Partei zugestimmt</translation>
+        <translation type="vanished">Beendigung von einer Partei zugestimmt</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>Termination proposal withdrawn</source>
-        <translation>Beendigungsvorschlag zurückgezogen</translation>
+        <translation type="vanished">Beendigungsvorschlag zurückgezogen</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>Termination agreed</source>
-        <translation>Beendigung vereinbart</translation>
+        <translation type="vanished">Beendigung vereinbart</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>Permissions stopped</source>
-        <translation>Berechtigungen ausgesetzt</translation>
+        <translation type="vanished">Berechtigungen ausgesetzt</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>Permissions resumed</source>
-        <translation>Berechtigungen fortgesetzt</translation>
+        <translation type="vanished">Berechtigungen fortgesetzt</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+6"/>
         <source>Replaced by a new contract</source>
         <translation>Durch einen neuen Vertrag ersetzt</translation>
     </message>
@@ -10973,30 +11824,7 @@
         <translation>Erinnerung gesendet</translation>
     </message>
     <message>
-        <location line="+47"/>
-        <source>not started</source>
-        <translation>nicht begonnen</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>open-ended</source>
-        <translation>unbefristet</translation>
-    </message>
-</context>
-<context>
-    <name>ContractTypeDialog</name>
-    <message>
-        <location filename="../../../Qml/imtauthgui/ContractTypeDialog.qml" line="+31"/>
-        <source>Save</source>
-        <translation type="unfinished">Speichern</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Cancel</source>
-        <translation type="unfinished">Abbrechen</translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+66"/>
         <source>One party linked with every other one</source>
         <translation>Eine Partei mit jeder anderen verbunden</translation>
     </message>
@@ -11011,24 +11839,218 @@
         <translation>Jede Partei mit jeder anderen verbunden</translation>
     </message>
     <message>
-        <location line="+128"/>
-        <source>Name</source>
-        <translation type="unfinished">Name</translation>
+        <location line="+11"/>
+        <source>Yes</source>
+        <translation>Ja</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>No</source>
+        <translation>Nein</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>not started</source>
+        <translation>nicht begonnen</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>open-ended</source>
+        <translation>unbefristet</translation>
+    </message>
+</context>
+<context>
+    <name>ContractTypeDialog</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/ContractTypeDialog.qml" line="+20"/>
+        <source>New type of contracts</source>
+        <translation>Neuer Vertragstyp</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Type of contracts</source>
+        <translation>Vertragstyp</translation>
+    </message>
+    <message>
+        <location line="+28"/>
+        <source>Save</source>
+        <translation>Speichern</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Restore</source>
+        <translation>Wiederherstellen</translation>
     </message>
     <message>
         <location line="+1"/>
+        <source>Cancel</source>
+        <translation>Abbrechen</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Close</source>
+        <translation>Schließen</translation>
+    </message>
+    <message>
+        <source>One party linked with every other one</source>
+        <translation type="vanished">Eine Partei mit jeder anderen verbunden</translation>
+    </message>
+    <message>
+        <source>Chosen by the initiator</source>
+        <translation type="vanished">Vom Initiator gewählt</translation>
+    </message>
+    <message>
+        <source>Every party linked with every other one</source>
+        <translation type="vanished">Jede Partei mit jeder anderen verbunden</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="obsolete">Name</translation>
+    </message>
+    <message>
+        <source>e.g. Supply agreement</source>
+        <translation type="vanished">z. B. Liefervertrag</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="obsolete">Beschreibung</translation>
+    </message>
+    <message>
+        <source>Optional</source>
+        <translation type="obsolete">Optional</translation>
+    </message>
+    <message>
+        <source>Prefix of the numbers</source>
+        <translation type="vanished">Präfix der Nummern</translation>
+    </message>
+    <message>
+        <source>e.g. SUP</source>
+        <translation type="vanished">z. B. LIE</translation>
+    </message>
+    <message>
+        <source>Links</source>
+        <translation type="vanished">Verbindungen</translation>
+    </message>
+    <message>
+        <source>Linked with every other party</source>
+        <translation type="vanished">Mit jeder anderen Partei verbunden</translation>
+    </message>
+    <message>
+        <source>Term, days</source>
+        <translation type="vanished">Laufzeit, Tage</translation>
+    </message>
+    <message>
+        <source>Renewed automatically</source>
+        <translation type="vanished">Automatisch verlängert</translation>
+    </message>
+    <message>
+        <source>Renewal period, days</source>
+        <translation type="vanished">Verlängerungszeitraum, Tage</translation>
+    </message>
+    <message>
+        <source>Stop the renewal at least, days before</source>
+        <translation type="vanished">Verlängerung spätestens beenden, Tage vorher</translation>
+    </message>
+    <message>
+        <source>Notice period, days</source>
+        <translation type="vanished">Kündigungsfrist, Tage</translation>
+    </message>
+    <message>
+        <source>The parties sign in their order</source>
+        <translation type="vanished">Die Parteien unterschreiben der Reihe nach</translation>
+    </message>
+    <message>
+        <source>Signatures of each party</source>
+        <translation type="vanished">Unterschriften jeder Partei</translation>
+    </message>
+    <message>
+        <source>Parties by role (0 - any number)</source>
+        <translation type="vanished">Parteien nach Rolle (0 – beliebige Anzahl)</translation>
+    </message>
+    <message>
+        <source>at least</source>
+        <translation type="vanished">mindestens</translation>
+    </message>
+    <message>
+        <source>at most</source>
+        <translation type="vanished">höchstens</translation>
+    </message>
+    <message>
+        <source>Documents needed before sending</source>
+        <translation type="vanished">Vor dem Senden benötigte Dokumente</translation>
+    </message>
+</context>
+<context>
+    <name>ContractTypeView</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/ContractTypeView.qml" line="+69"/>
+        <source>A system type is the same for every organization and is read only. Create your own type if you need other terms.</source>
+        <translation>Ein Systemtyp ist für alle Organisationen gleich und schreibgeschützt. Legen Sie einen eigenen Typ an, wenn Sie andere Bedingungen brauchen.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>You can read the type but not change it.</source>
+        <translation>Sie können den Typ lesen, aber nicht ändern.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>The type is archived: its contracts keep it, new contracts are not offered it. Restore it to use it again.</source>
+        <translation>Der Typ ist archiviert: Seine Verträge behalten ihn, neuen Verträgen wird er nicht angeboten. Stellen Sie ihn wieder her, um ihn erneut zu verwenden.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>A new contract of this type gets these terms; the initiator can still change them in the contract.</source>
+        <translation>Ein neuer Vertrag dieses Typs erhält diese Bedingungen; der Initiator kann sie im Vertrag noch ändern.</translation>
+    </message>
+    <message>
+        <location line="+79"/>
+        <source>A type needs a name.</source>
+        <translation>Ein Typ braucht einen Namen.</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Choose the role linked with every other party.</source>
+        <translation>Wählen Sie die Rolle, die mit jeder anderen Partei verbunden ist.</translation>
+    </message>
+    <message>
+        <location line="+47"/>
+        <source>General</source>
+        <translation>Allgemein</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Period</source>
+        <translation>Laufzeit</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Parties by role</source>
+        <translation>Parteien nach Rolle</translation>
+    </message>
+    <message>
+        <location line="+79"/>
+        <source>Enter the name of the type</source>
+        <translation>Geben Sie den Namen des Typs ein</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Name</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <location line="+2"/>
         <source>e.g. Supply agreement</source>
         <translation>z. B. Liefervertrag</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+5"/>
         <source>Description</source>
-        <translation type="unfinished">Beschreibung</translation>
+        <translation>Beschreibung</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+2"/>
         <source>Optional</source>
-        <translation type="unfinished">Optional</translation>
+        <translation>Optional</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -11036,9 +12058,9 @@
         <translation>Präfix der Nummern</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+2"/>
         <source>e.g. SUP</source>
-        <translation>z. B. LIE</translation>
+        <translation>z. B. SUP</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -11046,64 +12068,108 @@
         <translation>Verbindungen</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+9"/>
+        <source>Choose the role linked with every other party</source>
+        <translation>Wählen Sie die Rolle, die mit jeder anderen Partei verbunden ist</translation>
+    </message>
+    <message>
+        <location line="+2"/>
         <source>Linked with every other party</source>
         <translation>Mit jeder anderen Partei verbunden</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Term, days</source>
-        <translation>Laufzeit, Tage</translation>
+        <location line="+64"/>
+        <source>Term</source>
+        <translation>Laufzeit</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+1"/>
+        <source>0 for no term</source>
+        <translation>0 für unbefristet</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location line="+16"/>
+        <location line="+11"/>
+        <location line="+10"/>
+        <source>days</source>
+        <translation>Tage</translation>
+    </message>
+    <message>
+        <location line="-31"/>
         <source>Renewed automatically</source>
-        <translation>Automatisch verlängert</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Renewal period, days</source>
-        <translation>Verlängerungszeitraum, Tage</translation>
+        <translation>Verlängert sich automatisch</translation>
     </message>
     <message>
         <location line="+7"/>
-        <source>Stop the renewal at least, days before</source>
-        <translation>Verlängerung spätestens beenden, Tage vorher</translation>
+        <source>Renewal period</source>
+        <translation>Verlängerungszeitraum</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Notice period, days</source>
-        <translation>Kündigungsfrist, Tage</translation>
+        <location line="+10"/>
+        <source>Stop the renewal at least</source>
+        <translation>Verlängerung beenden mindestens</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>The parties sign in their order</source>
-        <translation>Die Parteien unterschreiben der Reihe nach</translation>
+        <location line="+1"/>
+        <source>Days before the end of the term</source>
+        <translation>Tage vor dem Ende der Laufzeit</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Signatures of each party</source>
-        <translation>Unterschriften jeder Partei</translation>
+        <location line="+9"/>
+        <source>Notice period</source>
+        <translation>Kündigungsfrist</translation>
     </message>
     <message>
-        <location line="+7"/>
-        <source>Parties by role (0 - any number)</source>
-        <translation>Parteien nach Rolle (0 – beliebige Anzahl)</translation>
+        <location line="+1"/>
+        <source>A party leaves this long after its notice; 0: at once</source>
+        <translation>So lange nach der Kündigung scheidet eine Partei aus; 0: sofort</translation>
     </message>
     <message>
-        <location line="+27"/>
-        <source>at least</source>
-        <translation>mindestens</translation>
+        <location line="+30"/>
+        <source>Any</source>
+        <translation>Beliebig</translation>
     </message>
     <message>
-        <location line="+17"/>
-        <source>at most</source>
-        <translation>höchstens</translation>
+        <location line="+26"/>
+        <source>How many parties of a role a contract of this type takes. A role without a slot is free.</source>
+        <translation>Wie viele Parteien einer Rolle ein Vertrag dieses Typs aufnimmt. Eine Rolle ohne Vorgabe ist frei.</translation>
     </message>
     <message>
-        <location line="+19"/>
-        <source>Documents needed before sending</source>
-        <translation>Vor dem Senden benötigte Dokumente</translation>
+        <location line="+11"/>
+        <location line="+79"/>
+        <source>Add role</source>
+        <translation>Rolle hinzufügen</translation>
+    </message>
+    <message>
+        <location line="-51"/>
+        <source>Role</source>
+        <translation>Rolle</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>At least</source>
+        <translation>Mindestens</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>At most</source>
+        <translation>Höchstens</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Edit</source>
+        <translation>Bearbeiten</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Remove</source>
+        <translation>Entfernen</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Parties of the role</source>
+        <translation>Parteien der Rolle</translation>
     </message>
 </context>
 <context>
@@ -11153,32 +12219,31 @@
         <translation type="vanished">Gültig bis</translation>
     </message>
     <message>
-        <location filename="../../../Qml/imtauthgui/ContractView.qml" line="+116"/>
+        <location filename="../../../Qml/imtauthgui/ContractView.qml" line="+378"/>
+        <location line="+615"/>
         <source>New contract</source>
         <translation>Neuer Vertrag</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="-598"/>
         <source>Draft</source>
-        <translation type="unfinished">Entwurf</translation>
+        <translation>Entwurf</translation>
     </message>
     <message>
-        <location line="+87"/>
+        <location line="+68"/>
         <source>A contract needs a name.</source>
         <translation>Ein Vertrag benötigt einen Namen.</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Type the dates as dd.MM.yyyy.</source>
-        <translation>Geben Sie die Daten als TT.MM.JJJJ ein.</translation>
+        <translation type="vanished">Geben Sie die Daten als TT.MM.JJJJ ein.</translation>
     </message>
     <message>
-        <location line="+26"/>
         <source>No type</source>
-        <translation>Kein Typ</translation>
+        <translation type="vanished">Kein Typ</translation>
     </message>
     <message>
-        <location line="+275"/>
+        <location line="+398"/>
         <source>The draft was created</source>
         <translation>Der Entwurf wurde erstellt</translation>
     </message>
@@ -11208,39 +12273,36 @@
         <translation>Das Dokument wurde angehängt</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>The internal data were saved</source>
-        <translation>Die internen Daten wurden gespeichert</translation>
+        <translation type="vanished">Die internen Daten wurden gespeichert</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+21"/>
         <source>Done</source>
-        <translation type="unfinished">Fertig</translation>
+        <translation>Fertig</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+35"/>
         <source>The draft was removed</source>
         <translation>Der Entwurf wurde entfernt</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+34"/>
         <source>Document</source>
-        <translation type="unfinished">Dokument</translation>
+        <translation>Dokument</translation>
     </message>
     <message>
-        <location line="+55"/>
         <source>A new draft. The parties see it once it is sent.</source>
-        <translation>Ein neuer Entwurf. Die Parteien sehen ihn, sobald er gesendet ist.</translation>
+        <translation type="vanished">Ein neuer Entwurf. Die Parteien sehen ihn, sobald er gesendet ist.</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+33"/>
         <source>State: %1</source>
         <translation>Status: %1</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>your organization: %1</source>
-        <translation>Ihre Organisation: %1</translation>
+        <translation type="vanished">Ihre Organisation: %1</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -11248,90 +12310,86 @@
         <translation>Revision %1</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="-161"/>
         <source>terminating on %1</source>
         <translation>endet am %1</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+15"/>
         <source>a party asked for changes</source>
         <translation>eine Partei hat Änderungen angefordert</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>some permissions are stopped</source>
-        <translation>einige Berechtigungen sind ausgesetzt</translation>
+        <translation type="vanished">einige Berechtigungen sind ausgesetzt</translation>
     </message>
     <message>
-        <location line="+11"/>
         <source>Termination on %1 proposed by %2: %3</source>
-        <translation>Beendigung zum %1, vorgeschlagen von %2: %3</translation>
+        <translation type="vanished">Beendigung zum %1, vorgeschlagen von %2: %3</translation>
     </message>
     <message>
-        <location line="+13"/>
         <source>Create draft</source>
-        <translation>Entwurf erstellen</translation>
+        <translation type="vanished">Entwurf erstellen</translation>
     </message>
     <message>
-        <location line="+0"/>
         <source>Save terms</source>
-        <translation>Bedingungen speichern</translation>
+        <translation type="vanished">Bedingungen speichern</translation>
     </message>
     <message>
-        <location line="+10"/>
         <source>Send to the parties</source>
-        <translation>An die Parteien senden</translation>
+        <translation type="vanished">An die Parteien senden</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="-571"/>
         <source>Remove draft</source>
         <translation>Entwurf entfernen</translation>
     </message>
     <message>
-        <location line="+9"/>
         <source>Withdraw offer</source>
-        <translation>Angebot zurückziehen</translation>
+        <translation type="vanished">Angebot zurückziehen</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+5"/>
         <source>The parties are told the offer is withdrawn.</source>
         <translation>Die Parteien werden über die Rücknahme des Angebots informiert.</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Withdraw</source>
-        <translation type="unfinished">Zurückziehen</translation>
+        <translation>Zurückziehen</translation>
     </message>
     <message>
-        <location line="+5"/>
         <source>Approve</source>
-        <translation type="unfinished">Genehmigen</translation>
+        <translation type="obsolete">Genehmigen</translation>
     </message>
     <message>
-        <location line="+10"/>
         <source>Sign</source>
-        <translation>Unterschreiben</translation>
+        <translation type="vanished">Unterschreiben</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+961"/>
         <source>Ask for changes</source>
         <translation>Änderungen anfordern</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="-955"/>
         <source>The initiator sees what you ask to change.</source>
         <translation>Der Initiator sieht, was Sie ändern möchten.</translation>
     </message>
     <message>
-        <location line="+0"/>
+        <location line="-11"/>
+        <source>Remove the draft? It was never sent, so the parties do not see it.</source>
+        <translation>Den Entwurf löschen? Er wurde nie gesendet, die Parteien sehen ihn nicht.</translation>
+    </message>
+    <message>
+        <location line="+11"/>
         <source>Ask</source>
         <translation>Anfordern</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <location line="+4"/>
+        <location line="+2"/>
         <source>Decline</source>
-        <translation type="unfinished">Ablehnen</translation>
+        <translation>Ablehnen</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -11339,364 +12397,570 @@
         <translation>Die Organisation schließt den Vertrag nicht.</translation>
     </message>
     <message>
+        <location line="+12"/>
+        <source>Save the changes first: the parties get the saved terms.</source>
+        <translation>Speichern Sie zuerst die Änderungen: Die Parteien erhalten die gespeicherten Bedingungen.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Add at least one more party before sending the contract.</source>
+        <translation>Fügen Sie vor dem Senden mindestens eine weitere Partei hinzu.</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Name the contract, choose its type and add the parties on the page Parties. Save the draft: the parties see the contract only after it is sent.</source>
+        <translation>Benennen Sie den Vertrag, wählen Sie seinen Typ und fügen Sie auf der Seite „Parteien“ die Parteien hinzu. Speichern Sie den Entwurf: Die Parteien sehen den Vertrag erst nach dem Senden.</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>The draft is saved. Check the parties, the links and the permissions, then send the contract to the parties.</source>
+        <translation>Der Entwurf ist gespeichert. Prüfen Sie Parteien, Verbindungen und Berechtigungen und senden Sie dann den Vertrag an die Parteien.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The draft is prepared by the initiator.</source>
+        <translation>Den Entwurf bereitet der Initiator vor.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Changes asked by %1. Change the terms and save: every party is asked again.</source>
+        <translation>Änderungen angefordert von %1. Ändern Sie die Bedingungen und speichern Sie: Alle Parteien werden erneut gefragt.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Read the terms and answer: approve them, sign the contract, or ask for changes.</source>
+        <translation>Lesen Sie die Bedingungen und antworten Sie: Genehmigen Sie sie, unterzeichnen Sie den Vertrag oder fordern Sie Änderungen an.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Your organization approved the terms. Sign the contract to conclude it.</source>
+        <translation>Ihre Organisation hat die Bedingungen genehmigt. Unterzeichnen Sie den Vertrag, um ihn abzuschließen.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Your organization signed. The contract is concluded once every party has signed.</source>
+        <translation>Ihre Organisation hat unterzeichnet. Der Vertrag ist geschlossen, sobald alle Parteien unterzeichnet haben.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Your organization asked for changes. The initiator changes the terms and asks again.</source>
+        <translation>Ihre Organisation hat Änderungen angefordert. Der Initiator ändert die Bedingungen und fragt erneut.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Your organization declined the contract.</source>
+        <translation>Ihre Organisation hat den Vertrag abgelehnt.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The parties are reading the terms.</source>
+        <translation>Die Parteien lesen die Bedingungen.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Your organization left the contract on %1. The other parties go on with it; for your organization it stays in the history.</source>
+        <translation>Ihre Organisation hat den Vertrag am %1 verlassen. Die anderen Parteien führen ihn fort; für Ihre Organisation bleibt er im Verlauf.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Your organization gave notice and leaves the contract on %1. Until then the notice can be revoked.</source>
+        <translation>Ihre Organisation hat gekündigt und verlässt den Vertrag am %1. Bis dahin kann die Kündigung zurückgenommen werden.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>A party gave notice: the contract ends on %1. It is in force until then.</source>
+        <translation>Eine Partei hat gekündigt: Der Vertrag endet am %1. Bis dahin gilt er.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The contract is in force: the links and the permissions given in it work until it ends.</source>
+        <translation>Der Vertrag gilt: Die Verbindungen und die darin erteilten Berechtigungen wirken bis zu seinem Ende.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Your organization declined the contract. The initiator may change the parties and ask again.</source>
+        <translation>Ihre Organisation hat den Vertrag abgelehnt. Der Initiator kann die Parteien ändern und erneut fragen.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Declined by %1. Remove or replace the party on the page Parties and save to ask the parties again, or withdraw the offer.</source>
+        <translation>Abgelehnt von %1. Entfernen oder ersetzen Sie die Partei auf der Seite „Parteien“ und speichern Sie, um erneut zu fragen, oder ziehen Sie das Angebot zurück.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Declined by %1. The initiator decides how to go on.</source>
+        <translation>Abgelehnt von %1. Der Initiator entscheidet über das weitere Vorgehen.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>The initiator withdrew the offer: the contract was not concluded. It stays in the history of the parties.</source>
+        <translation>Der Initiator hat das Angebot zurückgezogen: Der Vertrag wurde nicht geschlossen. Er bleibt im Verlauf der Parteien.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>The contract was not concluded. It stays in the history of the parties.</source>
+        <translation>Der Vertrag wurde nicht geschlossen. Er bleibt im Verlauf der Parteien.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The contract is closed. It stays in the history of the parties.</source>
+        <translation>Der Vertrag ist abgeschlossen. Er bleibt im Verlauf der Parteien.</translation>
+    </message>
+    <message>
+        <location line="+98"/>
+        <source>Correct the fields marked on the page Terms.</source>
+        <translation>Korrigieren Sie die markierten Felder auf der Seite „Bedingungen“.</translation>
+    </message>
+    <message>
+        <location line="+332"/>
+        <source>Your organization leaves the contract at once, without the notice period. The breach is the reason.</source>
+        <translation>Ihre Organisation verlässt den Vertrag sofort, ohne Kündigungsfrist. Grund ist der Verstoß.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Your organization leaves the contract on %1, after the notice period of %2 days. The other parties are told now.</source>
+        <translation>Ihre Organisation verlässt den Vertrag am %1, nach der Kündigungsfrist von %2 Tagen. Die anderen Parteien werden jetzt benachrichtigt.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>The contract has no notice period: your organization leaves it at once.</source>
+        <translation>Der Vertrag hat keine Kündigungsfrist: Ihre Organisation verlässt ihn sofort.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>No two other parties stay linked with each other, so the contract ends then.</source>
+        <translation>Keine zwei anderen Parteien bleiben miteinander verbunden, daher endet der Vertrag dann.</translation>
+    </message>
+    <message>
+        <location line="+39"/>
+        <source>not renewed: a party stopped the renewal</source>
+        <translation>keine Verlängerung: eine Partei hat sie beendet</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>renewed automatically</source>
+        <translation>verlängert sich automatisch</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>%1 leaves on %2</source>
+        <translation>%1 scheidet am %2 aus</translation>
+    </message>
+    <message>
         <location line="+5"/>
-        <location line="+802"/>
+        <source>replaced by another contract on %1</source>
+        <translation>am %1 durch einen anderen Vertrag ersetzt</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>The offer was withdrawn</source>
+        <translation>Das Angebot wurde zurückgezogen</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>The initiator was asked for changes</source>
+        <translation>Der Initiator wurde um Änderungen gebeten</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>The contract was declined</source>
+        <translation>Der Vertrag wurde abgelehnt</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>The notice was given</source>
+        <translation>Die Kündigung wurde ausgesprochen</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>The notice was revoked</source>
+        <translation>Die Kündigung wurde zurückgenommen</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>The contract will not be renewed</source>
+        <translation>Der Vertrag wird nicht verlängert</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>The party was added</source>
+        <translation>Die Partei wurde hinzugefügt</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>The groups were saved</source>
+        <translation>Die Gruppen wurden gespeichert</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>The permissions were given</source>
+        <translation>Die Berechtigungen wurden erteilt</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>The permissions were taken back</source>
+        <translation>Die Berechtigungen wurden zurückgenommen</translation>
+    </message>
+    <message>
+        <location line="+61"/>
+        <location line="+86"/>
+        <source>Another user</source>
+        <translation>Ein anderer Benutzer</translation>
+    </message>
+    <message>
+        <location line="-85"/>
+        <source>%1 changed the contract</source>
+        <translation>%1 hat den Vertrag geändert</translation>
+    </message>
+    <message>
+        <location line="+43"/>
+        <source>unsaved changes</source>
+        <translation>nicht gespeicherte Änderungen</translation>
+    </message>
+    <message>
+        <location line="+41"/>
+        <source>%1 changed the terms meanwhile (revision %2). Your changes are based on revision %3 and cannot be saved: reload the contract and make them again.</source>
+        <translation>%1 hat die Bedingungen inzwischen geändert (Revision %2). Ihre Änderungen beruhen auf Revision %3 und können nicht gespeichert werden: Laden Sie den Vertrag neu und nehmen Sie sie erneut vor.</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Reload</source>
+        <translation>Neu laden</translation>
+    </message>
+    <message>
+        <location line="+28"/>
+        <source>Period</source>
+        <translation>Laufzeit</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Links</source>
+        <translation>Verbindungen</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Permissions</source>
+        <translation>Berechtigungen</translation>
+    </message>
+    <message>
+        <location line="+46"/>
+        <source>There is no partner to add. Add one on the page Partners of the organization, or save the draft and add an organization by its connection code.</source>
+        <translation>Es gibt keinen Partner zum Hinzufügen. Fügen Sie einen auf der Seite „Partner“ der Organisation hinzu, oder speichern Sie den Entwurf und fügen Sie eine Organisation über ihren Verbindungscode hinzu.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>There is no partner to add. Add an organization by its connection code, or add a partner on the page Partners of the organization.</source>
+        <translation>Es gibt keinen Partner zum Hinzufügen. Fügen Sie eine Organisation über ihren Verbindungscode oder einen Partner auf der Seite „Partner“ der Organisation hinzu.</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Save the changes first: a party found by its code is added to the saved terms.</source>
+        <translation>Speichern Sie zuerst die Änderungen: Eine per Code gefundene Partei wird zu den gespeicherten Bedingungen hinzugefügt.</translation>
+    </message>
+    <message>
+        <location line="+32"/>
+        <source>Your organization is linked with no party yet: the permissions are given within a saved link (page Links).</source>
+        <translation>Ihre Organisation ist noch mit keiner Partei verbunden: Berechtigungen werden innerhalb einer gespeicherten Verbindung erteilt (Seite „Verbindungen“).</translation>
+    </message>
+    <message>
+        <location line="+72"/>
+        <source>Withdraw the offer</source>
+        <translation>Angebot zurückziehen</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Decline the contract</source>
+        <translation>Vertrag ablehnen</translation>
+    </message>
+    <message>
+        <location line="+13"/>
         <location line="+2"/>
         <source>Give notice</source>
         <translation>Kündigen</translation>
     </message>
     <message>
-        <location line="-795"/>
         <source>Revoke notice</source>
-        <translation>Kündigung zurücknehmen</translation>
+        <translation type="vanished">Kündigung zurücknehmen</translation>
     </message>
     <message>
-        <location line="+9"/>
         <source>Stop renewal</source>
-        <translation>Verlängerung beenden</translation>
+        <translation type="vanished">Verlängerung beenden</translation>
     </message>
     <message>
-        <location line="+10"/>
-        <location line="+794"/>
         <source>Propose termination</source>
-        <translation>Beendigung vorschlagen</translation>
+        <translation type="vanished">Beendigung vorschlagen</translation>
     </message>
     <message>
-        <location line="-785"/>
         <source>Agree to terminate</source>
-        <translation>Beendigung zustimmen</translation>
+        <translation type="vanished">Beendigung zustimmen</translation>
     </message>
     <message>
-        <location line="+10"/>
         <source>Withdraw termination</source>
-        <translation>Beendigung zurückziehen</translation>
+        <translation type="vanished">Beendigung zurückziehen</translation>
     </message>
     <message>
-        <location line="+9"/>
         <source>Resume permissions</source>
-        <translation>Berechtigungen fortsetzen</translation>
+        <translation type="vanished">Berechtigungen fortsetzen</translation>
     </message>
     <message>
-        <location line="+0"/>
         <source>Stop permissions</source>
-        <translation>Berechtigungen aussetzen</translation>
+        <translation type="vanished">Berechtigungen aussetzen</translation>
     </message>
     <message>
-        <location line="+22"/>
         <source>Name</source>
-        <translation type="unfinished">Name</translation>
+        <translation type="obsolete">Name</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>e.g. Supply agreement</source>
-        <translation>z. B. Liefervertrag</translation>
+        <translation type="vanished">z. B. Liefervertrag</translation>
     </message>
     <message>
-        <location line="+5"/>
         <source>Type</source>
-        <translation type="unfinished">Typ</translation>
+        <translation type="obsolete">Typ</translation>
     </message>
     <message>
-        <location line="+12"/>
         <source>Description</source>
-        <translation>Beschreibung</translation>
+        <translation type="vanished">Beschreibung</translation>
     </message>
     <message>
-        <location line="+8"/>
         <source>The terms agreed, or attach the main text</source>
-        <translation>Die vereinbarten Bedingungen, oder hängen Sie den Haupttext an</translation>
+        <translation type="vanished">Die vereinbarten Bedingungen, oder hängen Sie den Haupttext an</translation>
     </message>
     <message>
-        <location line="+5"/>
         <source>In force from</source>
-        <translation>Gültig ab</translation>
+        <translation type="vanished">Gültig ab</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>dd.MM.yyyy, empty from the conclusion</source>
-        <translation>TT.MM.JJJJ, leer ab Abschluss</translation>
+        <translation type="vanished">TT.MM.JJJJ, leer ab Abschluss</translation>
     </message>
     <message>
-        <location line="+5"/>
         <source>Term, days</source>
-        <translation>Laufzeit, Tage</translation>
+        <translation type="vanished">Laufzeit, Tage</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Valid until</source>
-        <translation>Gültig bis</translation>
+        <translation type="vanished">Gültig bis</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>dd.MM.yyyy, empty for no end</source>
-        <translation>TT.MM.JJJJ, leer für kein Ende</translation>
+        <translation type="vanished">TT.MM.JJJJ, leer für kein Ende</translation>
     </message>
     <message>
-        <location line="+5"/>
         <source>Renewed automatically</source>
-        <translation>Automatisch verlängert</translation>
+        <translation type="vanished">Automatisch verlängert</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Renewal period, days</source>
-        <translation>Verlängerungszeitraum, Tage</translation>
+        <translation type="vanished">Verlängerungszeitraum, Tage</translation>
     </message>
     <message>
-        <location line="+8"/>
         <source>Stop the renewal at least, days before</source>
-        <translation>Verlängerung spätestens beenden, Tage vorher</translation>
+        <translation type="vanished">Verlängerung spätestens beenden, Tage vorher</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Notice period, days</source>
-        <translation>Kündigungsfrist, Tage</translation>
+        <translation type="vanished">Kündigungsfrist, Tage</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Sign until</source>
-        <translation>Unterschreiben bis</translation>
+        <translation type="vanished">Unterschreiben bis</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>dd.MM.yyyy, empty for no deadline</source>
-        <translation>TT.MM.JJJJ, leer für keine Frist</translation>
+        <translation type="vanished">TT.MM.JJJJ, leer für keine Frist</translation>
     </message>
     <message>
-        <location line="+5"/>
         <source>The parties sign in their order</source>
-        <translation>Die Parteien unterschreiben der Reihe nach</translation>
+        <translation type="vanished">Die Parteien unterschreiben der Reihe nach</translation>
     </message>
     <message>
-        <location line="+6"/>
         <source>Value</source>
-        <translation>Wert</translation>
+        <translation type="vanished">Wert</translation>
     </message>
     <message>
-        <location line="+6"/>
         <source>Currency</source>
-        <translation>Währung</translation>
+        <translation type="vanished">Währung</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>e.g. EUR</source>
-        <translation>z. B. EUR</translation>
+        <translation type="vanished">z. B. EUR</translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="-182"/>
         <source>Parties</source>
         <translation>Parteien</translation>
     </message>
     <message>
-        <location line="+11"/>
-        <location line="+558"/>
+        <location line="+139"/>
         <source>Add party</source>
         <translation>Partei hinzufügen</translation>
     </message>
     <message>
-        <location line="-551"/>
         <source>Add by code</source>
-        <translation>Per Code hinzufügen</translation>
+        <translation type="vanished">Per Code hinzufügen</translation>
     </message>
     <message>
-        <location line="+39"/>
         <source>(your organization)</source>
-        <translation>(Ihre Organisation)</translation>
+        <translation type="vanished">(Ihre Organisation)</translation>
     </message>
     <message>
-        <location line="+10"/>
         <source>signatures %1 of %2</source>
-        <translation>Unterschriften %1 von %2</translation>
+        <translation type="vanished">Unterschriften %1 von %2</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>leaves on %1</source>
-        <translation>tritt am %1 aus</translation>
+        <translation type="vanished">tritt am %1 aus</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>its permissions are stopped</source>
-        <translation>ihre Berechtigungen sind ausgesetzt</translation>
+        <translation type="vanished">ihre Berechtigungen sind ausgesetzt</translation>
     </message>
     <message>
-        <location line="+11"/>
         <source>Signed by %1%2 on %3, revision %4</source>
-        <translation>Unterschrieben von %1%2 am %3, Revision %4</translation>
+        <translation type="vanished">Unterschrieben von %1%2 am %3, Revision %4</translation>
     </message>
     <message>
-        <location line="+17"/>
         <source>Role</source>
-        <translation type="unfinished">Rolle</translation>
+        <translation type="obsolete">Rolle</translation>
     </message>
     <message>
-        <location line="+9"/>
-        <location line="+200"/>
-        <location line="+69"/>
         <source>Remove</source>
-        <translation type="unfinished">Entfernen</translation>
+        <translation type="obsolete">Entfernen</translation>
     </message>
     <message>
-        <location line="-255"/>
         <source>Links between the parties</source>
-        <translation>Verbindungen zwischen den Parteien</translation>
+        <translation type="vanished">Verbindungen zwischen den Parteien</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>The links appear with the parties: the parties of a link may exchange messages and documents and give each other permissions.</source>
-        <translation>Die Verbindungen entstehen mit den Parteien: Die Parteien einer Verbindung können Nachrichten und Dokumente austauschen und einander Berechtigungen geben.</translation>
+        <translation type="vanished">Die Verbindungen entstehen mit den Parteien: Die Parteien einer Verbindung können Nachrichten und Dokumente austauschen und einander Berechtigungen geben.</translation>
     </message>
     <message>
-        <location line="+32"/>
         <source>new</source>
-        <translation>neu</translation>
+        <translation type="vanished">neu</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <location line="+110"/>
         <source>in force</source>
-        <translation>in Kraft</translation>
+        <translation type="vanished">in Kraft</translation>
     </message>
     <message>
-        <location line="-97"/>
         <source>Messages</source>
-        <translation>Nachrichten</translation>
+        <translation type="vanished">Nachrichten</translation>
     </message>
     <message>
-        <location line="+10"/>
-        <location line="+219"/>
+        <location line="-133"/>
         <source>Documents</source>
         <translation>Dokumente</translation>
     </message>
     <message>
-        <location line="-197"/>
         <source>Permissions given within the contract</source>
-        <translation>Im Vertrag vergebene Berechtigungen</translation>
+        <translation type="vanished">Im Vertrag vergebene Berechtigungen</translation>
     </message>
     <message>
-        <location line="+8"/>
-        <location line="+450"/>
+        <location line="+210"/>
         <source>Give permissions</source>
         <translation>Berechtigungen vergeben</translation>
     </message>
     <message>
-        <location line="-446"/>
         <source>Save the terms first: the permissions are given within a saved link.</source>
-        <translation>Speichern Sie zuerst die Bedingungen: Berechtigungen werden innerhalb einer gespeicherten Verbindung vergeben.</translation>
+        <translation type="vanished">Speichern Sie zuerst die Bedingungen: Berechtigungen werden innerhalb einer gespeicherten Verbindung vergeben.</translation>
     </message>
     <message>
-        <location line="+16"/>
         <source>No permissions are given. The organization receiving permissions gives them to its groups once the contract is in force.</source>
-        <translation>Es werden keine Berechtigungen vergeben. Die empfangende Organisation gibt sie an ihre Gruppen weiter, sobald der Vertrag gilt.</translation>
+        <translation type="vanished">Es werden keine Berechtigungen vergeben. Die empfangende Organisation gibt sie an ihre Gruppen weiter, sobald der Vertrag gilt.</translation>
     </message>
     <message>
-        <location line="+35"/>
         <source>%1 gives %2</source>
-        <translation>%1 gibt %2</translation>
+        <translation type="vanished">%1 gibt %2</translation>
     </message>
     <message>
-        <location line="+11"/>
         <source>until %1</source>
-        <translation>bis %1</translation>
+        <translation type="vanished">bis %1</translation>
     </message>
     <message numerus="yes">
-        <location line="+2"/>
         <source>given to %n group(s)</source>
-        <translation>
+        <translation type="vanished">
             <numerusform>an %n Gruppe vergeben</numerusform>
             <numerusform>an %n Gruppen vergeben</numerusform>
         </translation>
     </message>
     <message>
-        <location line="+15"/>
         <source>Groups</source>
-        <translation type="unfinished">Gruppen</translation>
+        <translation type="obsolete">Gruppen</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="-214"/>
         <source>Other contracts</source>
         <translation>Andere Verträge</translation>
     </message>
     <message>
-        <location line="+8"/>
-        <location line="+346"/>
+        <location line="+229"/>
         <source>Refer to a contract</source>
         <translation>Auf einen Vertrag verweisen</translation>
     </message>
     <message>
-        <location line="-293"/>
         <source>Replaced by another contract on %1</source>
-        <translation>Am %1 durch einen anderen Vertrag ersetzt</translation>
+        <translation type="vanished">Am %1 durch einen anderen Vertrag ersetzt</translation>
     </message>
     <message>
-        <location line="+35"/>
         <source>Internal</source>
-        <translation type="unfinished">Intern</translation>
+        <translation type="obsolete">Intern</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <location line="+82"/>
         <source>Seen by your organization only</source>
-        <translation>Nur für Ihre Organisation sichtbar</translation>
+        <translation type="vanished">Nur für Ihre Organisation sichtbar</translation>
     </message>
     <message>
-        <location line="-78"/>
         <source>Attach file</source>
-        <translation>Datei anhängen</translation>
+        <translation type="vanished">Datei anhängen</translation>
     </message>
     <message>
-        <location line="+37"/>
-        <location line="+87"/>
         <source>internal</source>
-        <translation>intern</translation>
+        <translation type="vanished">intern</translation>
     </message>
     <message>
-        <location line="-86"/>
         <source>replaced</source>
-        <translation>ersetzt</translation>
+        <translation type="vanished">ersetzt</translation>
     </message>
     <message>
-        <location line="+10"/>
         <source>Download</source>
-        <translation type="unfinished">Download</translation>
+        <translation type="obsolete">Download</translation>
     </message>
     <message>
-        <location line="+13"/>
         <source>Internal data</source>
-        <translation>Interne Daten</translation>
+        <translation type="vanished">Interne Daten</translation>
     </message>
     <message>
-        <location line="+9"/>
         <source>Internal number</source>
-        <translation>Interne Nummer</translation>
+        <translation type="vanished">Interne Nummer</translation>
     </message>
     <message>
-        <location line="+6"/>
         <source>Notes</source>
-        <translation>Notizen</translation>
+        <translation type="vanished">Notizen</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Remind of the deadlines, days before</source>
-        <translation>An Fristen erinnern, Tage vorher</translation>
+        <translation type="vanished">An Fristen erinnern, Tage vorher</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>Save internal data</source>
-        <translation>Interne Daten speichern</translation>
+        <translation type="vanished">Interne Daten speichern</translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="-224"/>
         <source>Journal</source>
         <translation>Journal</translation>
     </message>
     <message>
-        <location line="+34"/>
+        <location line="+132"/>
         <source>Role of the party</source>
         <translation>Rolle der Partei</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+28"/>
         <source>Contract</source>
-        <translation type="unfinished">Vertrag</translation>
+        <translation>Vertrag</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -11704,42 +12968,37 @@
         <translation>Die Organisation tritt mit Ablauf der Kündigungsfrist aus dem Vertrag aus. Die anderen Parteien werden jetzt informiert.</translation>
     </message>
     <message>
-        <location line="+20"/>
         <source>The contract ends on the day once every bound party agrees.</source>
-        <translation>Der Vertrag endet an dem Tag, sobald jede gebundene Partei zustimmt.</translation>
+        <translation type="vanished">Der Vertrag endet an dem Tag, sobald jede gebundene Partei zustimmt.</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Propose</source>
-        <translation>Vorschlagen</translation>
+        <translation type="vanished">Vorschlagen</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+19"/>
         <source>Sign the contract</source>
         <translation>Vertrag unterschreiben</translation>
     </message>
     <message>
-        <location line="+57"/>
         <source>Groups receiving the permissions</source>
-        <translation>Gruppen, die die Berechtigungen erhalten</translation>
+        <translation type="vanished">Gruppen, die die Berechtigungen erhalten</translation>
     </message>
     <message>
-        <location line="+11"/>
         <source>Save</source>
-        <translation type="unfinished">Speichern</translation>
+        <translation type="obsolete">Speichern</translation>
     </message>
     <message>
-        <location line="+47"/>
+        <location line="+46"/>
         <source>Save document</source>
-        <translation type="unfinished">Dokument speichern</translation>
+        <translation>Dokument speichern</translation>
     </message>
     <message>
         <source>Optional description</source>
         <translation type="vanished">Optionale Beschreibung</translation>
     </message>
     <message>
-        <location line="-887"/>
-        <location line="+33"/>
+        <location line="-248"/>
         <source>Terms</source>
         <translation>Bedingungen</translation>
     </message>
@@ -12091,22 +13350,19 @@
 <context>
     <name>DateInput</name>
     <message>
-        <location filename="../../../Qml/imtcontrols/Inputs/DateInput.qml" line="+35"/>
         <source>Wrong date format!</source>
-        <translation>Falsches Datumsformat!</translation>
+        <translation type="vanished">Falsches Datumsformat!</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Invalid month value!</source>
-        <translation>Ungültiger Monatswert!</translation>
+        <translation type="vanished">Ungültiger Monatswert!</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Invalid day value!</source>
-        <translation>Ungültiger Tageswert!</translation>
+        <translation type="vanished">Ungültiger Tageswert!</translation>
     </message>
     <message>
-        <location line="+230"/>
+        <location filename="../../../Qml/imtcontrols/Inputs/DateInput.qml" line="+286"/>
         <source>Date:</source>
         <translation>Datum:</translation>
     </message>
@@ -12175,6 +13431,14 @@
     </message>
 </context>
 <context>
+    <name>DateTimePickerElementView</name>
+    <message>
+        <location filename="../../../Qml/imtgui/View/DateTimePickerElementView.qml" line="+20"/>
+        <source>dd.mm.yyyy</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Decorators</name>
     <message>
         <location filename="../../../Qml/imtcontrols/Base/Decorators.qml" line="+1323"/>
@@ -12186,6 +13450,152 @@
         <location line="+1"/>
         <source>Completed</source>
         <translation>Abgeschlossen</translation>
+    </message>
+</context>
+<context>
+    <name>DirectoryProfileDialog</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/DirectoryProfileDialog.qml" line="+31"/>
+        <source>Add to address book</source>
+        <translation>Zum Adressbuch hinzufügen</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Close</source>
+        <translation>Schließen</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Already in your address book: you can make a contract with it.</source>
+        <translation>Bereits in Ihrem Adressbuch: Sie können mit ihr einen Vertrag schließen.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Your request waits for its answer.</source>
+        <translation>Ihre Anfrage wartet auf Antwort.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>It asked to join your address book: answer the request in the address book.</source>
+        <translation>Sie möchte in Ihr Adressbuch aufgenommen werden: Beantworten Sie die Anfrage im Adressbuch.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Ask it to join your address book. It also accepts contracts from organizations it does not know yet.</source>
+        <translation>Bitten Sie sie, Ihrem Adressbuch beizutreten. Sie nimmt auch Verträge von noch unbekannten Organisationen an.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Ask it to join your address book: after it accepts, you can make contracts with it.</source>
+        <translation>Bitten Sie sie, Ihrem Adressbuch beizutreten: Nach ihrer Zustimmung können Sie Verträge mit ihr schließen.</translation>
+    </message>
+    <message>
+        <location line="+56"/>
+        <source>About</source>
+        <translation>Über</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>The organization tells nothing about itself.</source>
+        <translation>Die Organisation gibt nichts über sich an.</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Offers</source>
+        <translation>Bietet</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>Website</source>
+        <translation>Website</translation>
+    </message>
+</context>
+<context>
+    <name>DirectoryProfileEditDialog</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/DirectoryProfileEditDialog.qml" line="+20"/>
+        <source>Profile in the directory</source>
+        <translation>Profil im Verzeichnis</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Save</source>
+        <translation>Speichern</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Cancel</source>
+        <translation>Abbrechen</translation>
+    </message>
+    <message>
+        <location line="+125"/>
+        <source>The others see this in the search and choose a partner by it. The members and the contracts of the organization stay hidden.</source>
+        <translation>Andere sehen dies in der Suche und wählen danach einen Partner. Die Mitglieder und Verträge der Organisation bleiben verborgen.</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>About the organization</source>
+        <translation>Über die Organisation</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>What the organization does, in a sentence or two</source>
+        <translation>Was die Organisation tut, in ein oder zwei Sätzen</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Industry</source>
+        <translation>Branche</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>e.g. Logistics</source>
+        <translation>z. B. Logistik</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Country</source>
+        <translation>Land</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>e.g. Germany</source>
+        <translation>z. B. Deutschland</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Website</source>
+        <translation>Website</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>e.g. example.com</source>
+        <translation>z. B. example.com</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>https:// is added when the address has no scheme</source>
+        <translation>https:// wird ergänzt, wenn die Adresse kein Schema hat</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>The roles the organization offers, e.g. Supplier: they help the others choose a role for you in a contract.</source>
+        <translation>Die Rollen, die die Organisation anbietet, z. B. Lieferant: Sie helfen anderen, Ihnen in einem Vertrag eine Rolle zu geben.</translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Offered</source>
+        <translation>Angeboten</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Role</source>
+        <translation>Rolle</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Description</source>
+        <translation>Beschreibung</translation>
     </message>
 </context>
 <context>
@@ -12980,13 +14390,21 @@
     </message>
     <message>
         <location line="+3"/>
-        <source>Suspend Permissions</source>
-        <translation>Berechtigungen aussetzen</translation>
+        <source>Give Permissions</source>
+        <translation>Berechtigungen erteilen</translation>
     </message>
     <message>
         <location line="+1"/>
+        <source>Allows giving the permissions of the organization to the other parties of its contracts and taking them back.</source>
+        <translation>Erlaubt, die Berechtigungen der Organisation den anderen Parteien ihrer Verträge zu erteilen und zurückzunehmen.</translation>
+    </message>
+    <message>
+        <source>Suspend Permissions</source>
+        <translation type="vanished">Berechtigungen aussetzen</translation>
+    </message>
+    <message>
         <source>Allows stopping and resuming the permissions the organization gives by a contract.</source>
-        <translation>Erlaubt das Aussetzen und Fortsetzen der Berechtigungen, die die Organisation per Vertrag vergibt.</translation>
+        <translation type="vanished">Erlaubt das Aussetzen und Fortsetzen der Berechtigungen, die die Organisation per Vertrag vergibt.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -13041,7 +14459,7 @@
     <message>
         <location line="+3"/>
         <source>Directory</source>
-        <translation type="unfinished">Verzeichnis</translation>
+        <translation>Verzeichnis</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -13450,13 +14868,13 @@
 <context>
     <name>FileSystemBrowserDialog</name>
     <message>
-        <location filename="../../../Qml/imtguigql/FileSystemBrowserDialog.qml" line="+237"/>
-        <location line="+882"/>
+        <location filename="../../../Qml/imtguigql/FileSystemBrowserDialog.qml" line="+296"/>
+        <location line="+931"/>
         <source>This PC</source>
         <translation>Dieser PC</translation>
     </message>
     <message>
-        <location line="-273"/>
+        <location line="-280"/>
         <source>A file is selected - choose a folder instead</source>
         <translation>Eine Datei ist ausgewählt – wählen Sie stattdessen einen Ordner</translation>
     </message>
@@ -13471,12 +14889,14 @@
         <translation>Auswahl ist hier nicht erlaubt</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+10"/>
+        <location line="+3"/>
         <source>1 item</source>
         <translation>1 Element</translation>
     </message>
     <message>
-        <location line="+0"/>
+        <location line="-2"/>
+        <location line="+2"/>
         <source>%1 items</source>
         <translation>%1 Elemente</translation>
     </message>
@@ -13583,7 +15003,7 @@
         <translation>Mehr laden...</translation>
     </message>
     <message>
-        <location line="+50"/>
+        <location line="+53"/>
         <source>Can&apos;t load this location</source>
         <translation>Dieser Speicherort kann nicht geladen werden</translation>
     </message>
@@ -13603,15 +15023,17 @@
         <translation>Dieser Ordner ist leer</translation>
     </message>
     <message>
+        <location line="+0"/>
         <source>This folder has no subfolders</source>
         <translation>Dieser Ordner enthält keine Unterordner</translation>
     </message>
     <message>
+        <location line="-1008"/>
         <source>This location is outside the start folder</source>
         <translation>Dieser Ort liegt außerhalb des Startordners</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+1022"/>
         <source>Try a different filter, or clear it to see all items</source>
         <translation>Versuchen Sie einen anderen Filter oder entfernen Sie ihn, um alle Elemente anzuzeigen</translation>
     </message>
@@ -13716,7 +15138,7 @@
 <context>
     <name>FilterableSelectGqlDataProvider</name>
     <message>
-        <location filename="../../../Qml/imtguigql/FilterableSelectGqlDataProvider.qml" line="+138"/>
+        <location filename="../../../Qml/imtguigql/FilterableSelectGqlDataProvider.qml" line="+140"/>
         <source>Failed to load items</source>
         <translation>Elemente konnten nicht geladen werden</translation>
     </message>
@@ -13826,7 +15248,7 @@
 <context>
     <name>GqlBasedContractsApiClient</name>
     <message>
-        <location filename="../../../Qml/imtguigql/GqlBasedContractsApiClient.qml" line="+213"/>
+        <location filename="../../../Qml/imtguigql/GqlBasedContractsApiClient.qml" line="+214"/>
         <source>The request failed</source>
         <translation>Die Anfrage ist fehlgeschlagen</translation>
     </message>
@@ -13840,9 +15262,8 @@
         <location line="+17"/>
         <location line="+18"/>
         <location line="+18"/>
-        <location line="+18"/>
         <source>The server returned no data. Please try again.</source>
-        <translation type="unfinished">Der Server hat keine Daten zurückgegeben. Bitte versuchen Sie es erneut.</translation>
+        <translation>Der Server hat keine Daten geliefert. Bitte versuchen Sie es erneut.</translation>
     </message>
 </context>
 <context>
@@ -13859,6 +15280,14 @@
         <location filename="../../../Qml/imtguigql/GqlBasedDataModelProvider.qml" line="+115"/>
         <source>Network error</source>
         <translation>Netzwerkfehler</translation>
+    </message>
+</context>
+<context>
+    <name>GqlBasedDirectoryDataProvider</name>
+    <message>
+        <location filename="../../../Qml/imtguigql/GqlBasedDirectoryDataProvider.qml" line="+63"/>
+        <source>The directory could not be searched</source>
+        <translation>Das Verzeichnis konnte nicht durchsucht werden</translation>
     </message>
 </context>
 <context>
@@ -14793,14 +16222,14 @@
 <context>
     <name>PartnerInviteDialog</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/PartnerInviteDialog.qml" line="+28"/>
+        <location filename="../../../Qml/imtauthgui/PartnerInviteDialog.qml" line="+29"/>
         <source>Send request</source>
         <translation>Anfrage senden</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation type="unfinished">Abbrechen</translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -14813,14 +16242,19 @@
         <translation>Die Anfrage geht an „%1“ aus dem Verzeichnis.</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+18"/>
+        <source>Enter the code the partner gave you</source>
+        <translation>Geben Sie den Code ein, den Ihnen der Partner gegeben hat</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>Partner&apos;s code</source>
         <translation>Code des Partners</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter code...</source>
-        <translation type="unfinished">Code eingeben...</translation>
+        <translation>Code eingeben...</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -14830,7 +16264,7 @@
     <message>
         <location line="+1"/>
         <source>Optional</source>
-        <translation type="unfinished">Optional</translation>
+        <translation>Optional</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -14841,39 +16275,122 @@
 <context>
     <name>PartyRoleDialog</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/PartyRoleDialog.qml" line="+28"/>
+        <location filename="../../../Qml/imtauthgui/PartyRoleDialog.qml" line="+20"/>
+        <source>New role</source>
+        <translation>Neue Rolle</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Role</source>
+        <translation>Rolle</translation>
+    </message>
+    <message>
+        <location line="+28"/>
         <source>Save</source>
-        <translation type="unfinished">Speichern</translation>
+        <translation>Speichern</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Restore</source>
+        <translation>Wiederherstellen</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation type="unfinished">Abbrechen</translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
-        <location line="+38"/>
+        <location line="+0"/>
+        <source>Close</source>
+        <translation>Schließen</translation>
+    </message>
+    <message>
         <source>None</source>
-        <translation type="unfinished">Keine</translation>
+        <translation type="obsolete">Keine</translation>
     </message>
     <message>
-        <location line="+37"/>
         <source>Name</source>
-        <translation type="unfinished">Name</translation>
+        <translation type="obsolete">Name</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>e.g. Distributor</source>
-        <translation>z. B. Händler</translation>
+        <translation type="vanished">z. B. Händler</translation>
     </message>
     <message>
-        <location line="+10"/>
         <source>Description</source>
-        <translation type="unfinished">Beschreibung</translation>
+        <translation type="obsolete">Beschreibung</translation>
+    </message>
+    <message>
+        <source>Optional</source>
+        <translation type="obsolete">Optional</translation>
+    </message>
+    <message>
+        <source>Role of a party</source>
+        <translation type="vanished">Rolle einer Partei</translation>
+    </message>
+    <message>
+        <source>The role an organization has in a contract</source>
+        <translation type="vanished">Die Rolle einer Organisation in einem Vertrag</translation>
+    </message>
+    <message>
+        <source>Role in a link</source>
+        <translation type="vanished">Rolle in einer Verbindung</translation>
+    </message>
+    <message>
+        <source>The role an organization has for another party</source>
+        <translation type="vanished">Die Rolle einer Organisation gegenüber einer anderen Partei</translation>
+    </message>
+    <message>
+        <source>Paired role</source>
+        <translation type="vanished">Gegenrolle</translation>
+    </message>
+</context>
+<context>
+    <name>PartyRoleView</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/PartyRoleView.qml" line="+133"/>
+        <source>A system role is the same for every organization and is read only. Create your own role if you need another one.</source>
+        <translation>Eine Systemrolle ist für alle Organisationen gleich und schreibgeschützt. Legen Sie eine eigene Rolle an, wenn Sie eine andere brauchen.</translation>
     </message>
     <message>
         <location line="+1"/>
+        <source>You can read the role but not change it.</source>
+        <translation>Sie können die Rolle lesen, aber nicht ändern.</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>The role is archived: the contracts keep it, new contracts are not offered it. Restore it to use it again.</source>
+        <translation>Die Rolle ist archiviert: Die Verträge behalten sie, neuen Verträgen wird sie nicht angeboten. Stellen Sie sie wieder her, um sie erneut zu verwenden.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>A role names what an organization is in a contract, e.g. Supplier, or towards the other side of a link, e.g. Customer of a supplier.</source>
+        <translation>Eine Rolle benennt, was eine Organisation in einem Vertrag ist, z. B. Lieferant, oder gegenüber der anderen Seite einer Verbindung, z. B. Kunde eines Lieferanten.</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Enter the name of the role</source>
+        <translation>Geben Sie den Namen der Rolle ein</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Name</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>e.g. Distributor</source>
+        <translation>z. B. Distributor</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Description</source>
+        <translation>Beschreibung</translation>
+    </message>
+    <message>
+        <location line="+2"/>
         <source>Optional</source>
-        <translation type="unfinished">Optional</translation>
+        <translation>Optional</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -14882,23 +16399,33 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>The role an organization has in a contract</source>
-        <translation>Die Rolle einer Organisation in einem Vertrag</translation>
+        <source>Offered when a party is added to a contract</source>
+        <translation>Wird angeboten, wenn eine Partei einem Vertrag hinzugefügt wird</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+6"/>
         <source>Role in a link</source>
         <translation>Rolle in einer Verbindung</translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>The role an organization has for another party</source>
-        <translation>Die Rolle einer Organisation gegenüber einer anderen Partei</translation>
+        <location line="+2"/>
+        <source>Offered for the sides of a link between two parties</source>
+        <translation>Wird für die Seiten einer Verbindung zwischen zwei Parteien angeboten</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+1"/>
+        <source>A role is used for a party, in a link or both: turn one of them on</source>
+        <translation>Eine Rolle gilt für eine Partei, in einer Verbindung oder beides: Schalten Sie eine davon ein</translation>
+    </message>
+    <message>
+        <location line="+7"/>
         <source>Paired role</source>
         <translation>Gegenrolle</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The role of the other side of a link, e.g. Customer for Supplier; the role itself for a symmetric one, e.g. Partner</source>
+        <translation>Die Rolle der anderen Seite einer Verbindung, z. B. Kunde zu Lieferant; bei einer symmetrischen Rolle sie selbst, z. B. Partner</translation>
     </message>
 </context>
 <context>
@@ -15270,12 +16797,12 @@
     </message>
     <message>
         <location line="+37"/>
-        <location line="+320"/>
+        <location line="+321"/>
         <source>No permissions match the filter.</source>
         <translation>Keine Berechtigungen entsprechen dem Filter.</translation>
     </message>
     <message>
-        <location line="-320"/>
+        <location line="-321"/>
         <source>No permissions are selected.</source>
         <translation>Es sind keine Berechtigungen ausgewählt.</translation>
     </message>
@@ -15290,7 +16817,7 @@
         <translation>Berechtigung</translation>
     </message>
     <message>
-        <location line="+255"/>
+        <location line="+256"/>
         <source>Select a permission to see its path, source and requirements</source>
         <translation>Wählen Sie eine Berechtigung aus, um ihren Pfad, ihre Quelle und ihre Anforderungen zu sehen</translation>
     </message>
@@ -17820,7 +19347,7 @@ Fehler: 0</translation>
 <context>
     <name>SimpleCollectionPage</name>
     <message>
-        <location filename="../../../Qml/imtdocgui/SimpleCollectionPage.qml" line="+128"/>
+        <location filename="../../../Qml/imtdocgui/SimpleCollectionPage.qml" line="+132"/>
         <source>Are you sure you want to delete &quot;%1&quot;? This action cannot be undone.</source>
         <translation>Möchten Sie „%1“ wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.</translation>
     </message>
@@ -17830,7 +19357,7 @@ Fehler: 0</translation>
         <translation>Möchten Sie %1 ausgewählte(s) Element(e) wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.</translation>
     </message>
     <message>
-        <location line="+149"/>
+        <location line="+171"/>
         <source>Create %1</source>
         <translation>%1 erstellen</translation>
     </message>
@@ -17851,12 +19378,12 @@ Fehler: 0</translation>
         <translation>%1 löschen</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+30"/>
         <source>Create New %1</source>
         <translation>Neu: %1 erstellen</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+24"/>
         <source>Edit %1</source>
         <translation>%1 bearbeiten</translation>
     </message>
@@ -18681,137 +20208,262 @@ Alle Beziehungen zu dieser Organisation werden ebenfalls entfernt.</translation>
 <context>
     <name>TenantConnectionCodePage</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/TenantConnectionCodePage.qml" line="+79"/>
         <source>Connection Code</source>
+        <translation type="vanished">Verbindungscode</translation>
+    </message>
+    <message>
+        <source>Share this code with other organizations so they can send you a connection request.</source>
+        <translation type="vanished">Teilen Sie diesen Code mit anderen Organisationen, damit diese Ihnen eine Verbindungsanfrage senden können.</translation>
+    </message>
+    <message>
+        <location filename="../../../Qml/imtauthgui/TenantConnectionCodePage.qml" line="+54"/>
+        <source>The code was copied</source>
+        <translation>Der Code wurde kopiert</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Change the connection code</source>
+        <translation>Verbindungscode ändern</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The organizations that have the old code cannot use it any more. Change the code?</source>
+        <translation>Organisationen mit dem alten Code können ihn nicht mehr verwenden. Den Code ändern?</translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>The code was changed. Give the new one to the organizations that should connect.</source>
+        <translation>Der Code wurde geändert. Geben Sie den neuen an die Organisationen weiter, die sich verbinden sollen.</translation>
+    </message>
+    <message>
+        <location line="+47"/>
+        <source>Connection code</source>
         <translation>Verbindungscode</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>Share this code with other organizations so they can send you a connection request.</source>
-        <translation>Teilen Sie diesen Code mit anderen Organisationen, damit diese Ihnen eine Verbindungsanfrage senden können.</translation>
+        <location line="+6"/>
+        <source>Give the code to an organization you know: with it, it sends your organization a request to join the address book.</source>
+        <translation>Geben Sie den Code einer Organisation, die Sie kennen: Damit sendet sie Ihrer Organisation eine Anfrage zur Aufnahme ins Adressbuch.</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+9"/>
+        <source>Your code</source>
+        <translation>Ihr Code</translation>
+    </message>
+    <message>
+        <location line="+7"/>
         <source>Loading...</source>
         <translation>Wird geladen...</translation>
     </message>
     <message>
-        <location line="+57"/>
-        <source>Copied!</source>
-        <translation>Kopiert!</translation>
+        <location line="+11"/>
+        <source>Copy the code</source>
+        <translation>Code kopieren</translation>
     </message>
     <message>
-        <location line="+12"/>
-        <source>Regenerate Code</source>
-        <translation>Code neu generieren</translation>
+        <location line="+10"/>
+        <source>Change code</source>
+        <translation>Code ändern</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>Regenerate Connection Code</source>
-        <translation>Verbindungscode neu generieren</translation>
+        <location line="+11"/>
+        <source>Connecting by code</source>
+        <translation>Verbindung per Code</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Organizations can send a request by this code</source>
+        <translation>Organisationen können mit diesem Code eine Anfrage senden</translation>
     </message>
     <message>
         <location line="+1"/>
+        <source>Nobody can send a request by the code now</source>
+        <translation>Derzeit kann niemand mit dem Code eine Anfrage senden</translation>
+    </message>
+    <message>
+        <source>Copied!</source>
+        <translation type="vanished">Kopiert!</translation>
+    </message>
+    <message>
+        <source>Regenerate Code</source>
+        <translation type="vanished">Code neu generieren</translation>
+    </message>
+    <message>
+        <source>Regenerate Connection Code</source>
+        <translation type="vanished">Verbindungscode neu generieren</translation>
+    </message>
+    <message>
         <source>Are you sure you want to regenerate the connection code? The old code will stop working.</source>
-        <translation>Möchten Sie den Verbindungscode wirklich neu generieren? Der alte Code funktioniert dann nicht mehr.</translation>
+        <translation type="vanished">Möchten Sie den Verbindungscode wirklich neu generieren? Der alte Code funktioniert dann nicht mehr.</translation>
     </message>
     <message>
-        <location line="+19"/>
         <source>Access</source>
-        <translation>Zugriff</translation>
+        <translation type="vanished">Zugriff</translation>
     </message>
     <message>
-        <location line="+29"/>
         <source>Allow other organizations to connect by code</source>
-        <translation>Anderen Organisationen die Verbindung per Code erlauben</translation>
+        <translation type="vanished">Anderen Organisationen die Verbindung per Code erlauben</translation>
     </message>
     <message>
-        <location line="+28"/>
         <source>When disabled, other organizations cannot send you connection requests using your code.</source>
-        <translation>Wenn deaktiviert, können andere Organisationen Ihnen mit Ihrem Code keine Verbindungsanfragen senden.</translation>
+        <translation type="vanished">Wenn deaktiviert, können andere Organisationen Ihnen mit Ihrem Code keine Verbindungsanfragen senden.</translation>
     </message>
 </context>
 <context>
     <name>TenantContractCatalogsPage</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/TenantContractCatalogsPage.qml" line="+71"/>
         <source>party and link</source>
-        <translation>Partei und Verbindung</translation>
+        <translation type="vanished">Partei und Verbindung</translation>
+    </message>
+    <message>
+        <source>party</source>
+        <translation type="vanished">Partei</translation>
+    </message>
+    <message>
+        <source>link</source>
+        <translation type="vanished">Verbindung</translation>
+    </message>
+    <message>
+        <source>Saved</source>
+        <translation type="obsolete">Gespeichert</translation>
+    </message>
+    <message>
+        <source>Show archived</source>
+        <translation type="vanished">Archivierte anzeigen</translation>
+    </message>
+    <message>
+        <source>Roles of the parties</source>
+        <translation type="vanished">Rollen der Parteien</translation>
+    </message>
+    <message>
+        <source>Add role</source>
+        <translation type="vanished">Rolle hinzufügen</translation>
+    </message>
+    <message>
+        <source>system</source>
+        <translation type="vanished">System</translation>
+    </message>
+    <message>
+        <source>archived</source>
+        <translation type="vanished">archiviert</translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation type="obsolete">Bearbeiten</translation>
+    </message>
+    <message>
+        <source>Restore</source>
+        <translation type="obsolete">Wiederherstellen</translation>
+    </message>
+    <message>
+        <source>Archive</source>
+        <translation type="vanished">Archivieren</translation>
+    </message>
+    <message>
+        <source>Types of contracts</source>
+        <translation type="vanished">Vertragstypen</translation>
+    </message>
+    <message>
+        <source>Add type</source>
+        <translation type="vanished">Typ hinzufügen</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <translation type="vanished">
+            <numerusform>%n Tag</numerusform>
+            <numerusform>%n Tage</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>no term</source>
+        <translation type="vanished">ohne Laufzeit</translation>
+    </message>
+    <message>
+        <source>renewed automatically</source>
+        <translation type="vanished">automatisch verlängert</translation>
+    </message>
+    <message>
+        <source>signed in order</source>
+        <translation type="vanished">der Reihe nach unterschrieben</translation>
+    </message>
+    <message>
+        <source>Edit role</source>
+        <translation type="vanished">Rolle bearbeiten</translation>
+    </message>
+    <message>
+        <source>Edit type</source>
+        <translation type="vanished">Typ bearbeiten</translation>
+    </message>
+</context>
+<context>
+    <name>TenantContractTypesPage</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/TenantContractTypesPage.qml" line="+20"/>
+        <source>Type of contracts</source>
+        <translation>Vertragstyp</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>party</source>
-        <translation>Partei</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>link</source>
-        <translation>Verbindung</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Saved</source>
-        <translation type="unfinished">Gespeichert</translation>
-    </message>
-    <message>
-        <location line="+23"/>
-        <source>Show archived</source>
-        <translation>Archivierte anzeigen</translation>
-    </message>
-    <message>
-        <location line="+16"/>
-        <source>Roles of the parties</source>
-        <translation>Rollen der Parteien</translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <location line="+179"/>
-        <source>Add role</source>
-        <translation>Rolle hinzufügen</translation>
-    </message>
-    <message>
-        <location line="-145"/>
-        <location line="+94"/>
-        <source>system</source>
-        <translation>System</translation>
-    </message>
-    <message>
-        <location line="-93"/>
-        <location line="+94"/>
-        <source>archived</source>
-        <translation>archiviert</translation>
-    </message>
-    <message>
-        <location line="-70"/>
-        <location line="+96"/>
-        <source>Edit</source>
-        <translation type="unfinished">Bearbeiten</translation>
-    </message>
-    <message>
-        <location line="-88"/>
-        <location line="+96"/>
-        <source>Restore</source>
-        <translation type="unfinished">Wiederherstellen</translation>
-    </message>
-    <message>
-        <location line="-96"/>
-        <location line="+96"/>
-        <source>Archive</source>
-        <translation>Archivieren</translation>
-    </message>
-    <message>
-        <location line="-78"/>
         <source>Types of contracts</source>
         <translation>Vertragstypen</translation>
     </message>
     <message>
-        <location line="+8"/>
-        <location line="+99"/>
-        <source>Add type</source>
-        <translation>Typ hinzufügen</translation>
+        <location line="+1"/>
+        <source>+ New type</source>
+        <translation>+ Neuer Typ</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>A type offers a new contract its periods, the roles of the parties, the links between them and the documents it needs.</source>
+        <translation>Ein Typ gibt einem neuen Vertrag seine Fristen, die Rollen der Parteien und die Verbindungen zwischen ihnen vor.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>No types yet.</source>
+        <translation>Noch keine Typen.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Archive type</source>
+        <translation>Typ archivieren</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Archive types</source>
+        <translation>Typen archivieren</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Name</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Prefix</source>
+        <translation>Präfix</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Term</source>
+        <translation>Laufzeit</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Renewal</source>
+        <translation>Verlängerung</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Owner</source>
+        <translation>Eigentümer</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>State</source>
+        <translation>Status</translation>
     </message>
     <message numerus="yes">
-        <location line="-55"/>
+        <location line="+41"/>
         <source>%n day(s)</source>
         <translation>
             <numerusform>%n Tag</numerusform>
@@ -18820,28 +20472,58 @@ Alle Beziehungen zu dieser Organisation werden ebenfalls entfernt.</translation>
     </message>
     <message>
         <location line="+0"/>
-        <source>no term</source>
-        <translation>ohne Laufzeit</translation>
+        <source>No term</source>
+        <translation>Unbefristet</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>renewed automatically</source>
-        <translation>automatisch verlängert</translation>
+        <source>Automatic</source>
+        <translation>Automatisch</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>No</source>
+        <translation>Nein</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>signed in order</source>
-        <translation>der Reihe nach unterschrieben</translation>
+        <source>System</source>
+        <translation>System</translation>
     </message>
     <message>
-        <location line="+40"/>
-        <source>Edit role</source>
-        <translation>Rolle bearbeiten</translation>
+        <location line="+0"/>
+        <source>Organization</source>
+        <translation>Organisation</translation>
     </message>
     <message>
-        <location line="+13"/>
-        <source>Edit type</source>
-        <translation>Typ bearbeiten</translation>
+        <location line="+1"/>
+        <source>Archived</source>
+        <translation>Archiviert</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>In use</source>
+        <translation>In Verwendung</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>The system types stay, and archived types are archived already. Only the own types of the organization are archived.</source>
+        <translation>Die Systemtypen bleiben, archivierte Typen sind bereits archiviert. Archiviert werden nur die eigenen Typen der Organisation.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Archive &quot;%1&quot;? The contracts of this type keep it; it is not offered for new contracts.</source>
+        <translation>„%1“ archivieren? Die Verträge dieses Typs behalten ihn; für neue Verträge wird er nicht angeboten.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Archive %1 selected type(s)? The contracts of these types keep them; they are not offered for new contracts.</source>
+        <translation>%1 ausgewählte(n) Typ(en) archivieren? Die Verträge dieser Typen behalten sie; für neue Verträge werden sie nicht angeboten.</translation>
+    </message>
+    <message>
+        <location line="+24"/>
+        <source>The type was saved</source>
+        <translation>Der Typ wurde gespeichert</translation>
     </message>
 </context>
 <context>
@@ -18867,9 +20549,13 @@ Alle Beziehungen zu dieser Organisation werden ebenfalls entfernt.</translation>
         <translation>Die Vereinbarungen der Organisation mit anderen Organisationen: die Parteien, ihre Rollen, die Berechtigungen, die sie einander geben, und die Dokumente.</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>No contracts yet.</source>
-        <translation>Noch keine Verträge.</translation>
+        <translation type="vanished">Noch keine Verträge.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>No contracts yet. Press &quot;+ New contract&quot;, add a partner as a party, agree on the terms and sign. A partner is added on the page Address book.</source>
+        <translation>Noch keine Verträge. Klicken Sie auf „+ Neuer Vertrag“, fügen Sie einen Partner als Partei hinzu, einigen Sie sich auf die Bedingungen und unterzeichnen Sie. Einen Partner fügen Sie auf der Seite „Adressbuch“ hinzu.</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -18879,7 +20565,7 @@ Alle Beziehungen zu dieser Organisation werden ebenfalls entfernt.</translation>
     <message>
         <location line="+0"/>
         <source>Name</source>
-        <translation type="unfinished">Name</translation>
+        <translation>Name</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -18889,7 +20575,7 @@ Alle Beziehungen zu dieser Organisation werden ebenfalls entfernt.</translation>
     <message>
         <location line="+0"/>
         <source>State</source>
-        <translation type="unfinished">Zustand</translation>
+        <translation>Status</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -18897,12 +20583,12 @@ Alle Beziehungen zu dieser Organisation werden ebenfalls entfernt.</translation>
         <translation>Zeitraum</translation>
     </message>
     <message>
-        <location line="+42"/>
+        <location line="+45"/>
         <source>your signature is awaited</source>
         <translation>Ihre Unterschrift wird erwartet</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+3"/>
         <source>your answer is awaited</source>
         <translation>Ihre Antwort wird erwartet</translation>
     </message>
@@ -18949,7 +20635,7 @@ Alle Beziehungen zu dieser Organisation werden ebenfalls entfernt.</translation>
         <translation type="vanished">Status: %1   Bereich: %2</translation>
     </message>
     <message>
-        <location line="-12"/>
+        <location line="-13"/>
         <location line="+2"/>
         <source>Draft</source>
         <translation>Entwurf</translation>
@@ -19037,101 +20723,283 @@ Alle Beziehungen zu dieser Organisation werden ebenfalls entfernt.</translation>
 <context>
     <name>TenantDirectoryPage</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/TenantDirectoryPage.qml" line="+110"/>
+        <source>The profile was saved</source>
+        <translation type="vanished">Das Profil wurde gespeichert</translation>
+    </message>
+    <message>
+        <source>The request was sent to the organization</source>
+        <translation type="vanished">Die Anfrage wurde an die Organisation gesendet</translation>
+    </message>
+    <message>
+        <source>Profile in the directory</source>
+        <translation type="vanished">Profil im Verzeichnis</translation>
+    </message>
+    <message>
+        <source>A listed organization is found by the others. Its members and contracts stay hidden.</source>
+        <translation type="vanished">Eine gelistete Organisation wird von anderen gefunden. Ihre Mitglieder und Verträge bleiben verborgen.</translation>
+    </message>
+    <message>
+        <source>Listed in the directory</source>
+        <translation type="vanished">Im Verzeichnis gelistet</translation>
+    </message>
+    <message>
+        <source>Accept contracts from unknown organizations</source>
+        <translation type="vanished">Verträge von unbekannten Organisationen annehmen</translation>
+    </message>
+    <message>
+        <source>An organization not in the address book may invite yours to a contract</source>
+        <translation type="vanished">Eine Organisation außerhalb des Adressbuchs darf Ihre zu einem Vertrag einladen</translation>
+    </message>
+    <message>
+        <source>About the organization</source>
+        <translation type="vanished">Über die Organisation</translation>
+    </message>
+    <message>
+        <source>Industry</source>
+        <translation type="vanished">Branche</translation>
+    </message>
+    <message>
+        <source>Country</source>
+        <translation type="obsolete">Land</translation>
+    </message>
+    <message>
+        <source>Website</source>
+        <translation type="vanished">Website</translation>
+    </message>
+    <message>
+        <source>Roles the organization offers</source>
+        <translation type="vanished">Rollen, die die Organisation anbietet</translation>
+    </message>
+    <message>
+        <source>Save profile</source>
+        <translation type="vanished">Profil speichern</translation>
+    </message>
+    <message>
+        <source>Find an organization</source>
+        <translation type="vanished">Organisation suchen</translation>
+    </message>
+    <message>
+        <source>Name or description</source>
+        <translation type="vanished">Name oder Beschreibung</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="vanished">Suchen</translation>
+    </message>
+    <message>
+        <source>No organizations found.</source>
+        <translation type="vanished">Keine Organisationen gefunden.</translation>
+    </message>
+    <message>
+        <source>offers: %1</source>
+        <translation type="vanished">bietet: %1</translation>
+    </message>
+    <message>
+        <source>Add to address book</source>
+        <translation type="vanished">Zum Adressbuch hinzufügen</translation>
+    </message>
+</context>
+<context>
+    <name>TenantDirectoryProfileSection</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/TenantDirectoryProfileSection.qml" line="+117"/>
+        <source>The server returned no data.</source>
+        <translation>Der Server hat keine Daten geliefert.</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Your organization is shown in the directory</source>
+        <translation>Ihre Organisation wird im Verzeichnis angezeigt</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The settings of the directory were saved</source>
+        <translation>Die Verzeichniseinstellungen wurden gespeichert</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>The profile was saved</source>
         <translation>Das Profil wurde gespeichert</translation>
     </message>
     <message>
-        <location line="+14"/>
-        <source>The request was sent to the organization</source>
-        <translation>Die Anfrage wurde an die Organisation gesendet</translation>
-    </message>
-    <message>
-        <location line="+24"/>
-        <source>Profile in the directory</source>
-        <translation>Profil im Verzeichnis</translation>
+        <location line="+18"/>
+        <source>Directory of the organizations</source>
+        <translation>Verzeichnis der Organisationen</translation>
     </message>
     <message>
         <location line="+5"/>
-        <source>A listed organization is found by the others. Its members and contracts stay hidden.</source>
-        <translation>Eine gelistete Organisation wird von anderen gefunden. Ihre Mitglieder und Verträge bleiben verborgen.</translation>
+        <source>A listed organization is found by the others on their page Find an organization. Only this profile is shown: the members and the contracts stay hidden.</source>
+        <translation>Eine gelistete Organisation finden andere auf ihrer Seite „Organisation finden“. Nur dieses Profil wird angezeigt: Mitglieder und Verträge bleiben verborgen.</translation>
     </message>
     <message>
-        <location line="+11"/>
-        <source>Listed in the directory</source>
-        <translation>Im Verzeichnis gelistet</translation>
+        <location line="+31"/>
+        <source>The profile of the organization could not be read: %1</source>
+        <translation>Das Profil der Organisation konnte nicht gelesen werden: %1</translation>
     </message>
     <message>
         <location line="+6"/>
-        <source>Accept contracts from unknown organizations</source>
-        <translation>Verträge von unbekannten Organisationen annehmen</translation>
+        <source>Try again</source>
+        <translation>Erneut versuchen</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>Show in the directory</source>
+        <translation>Im Verzeichnis anzeigen</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>The others find you by the name &quot;%1&quot;</source>
+        <translation>Andere finden Sie unter dem Namen „%1“</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>The others find you in the search</source>
+        <translation>Andere finden Sie in der Suche</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>An organization not in the address book may invite yours to a contract</source>
-        <translation>Eine Organisation außerhalb des Adressbuchs darf Ihre zu einem Vertrag einladen</translation>
+        <source>Now the others cannot find you in the search</source>
+        <translation>Jetzt können andere Sie nicht in der Suche finden</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>About the organization</source>
-        <translation>Über die Organisation</translation>
+        <location line="+9"/>
+        <source>Contracts from unknown organizations</source>
+        <translation>Verträge von unbekannten Organisationen</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+1"/>
+        <source>Also organizations outside your address book</source>
+        <translation>Auch von Organisationen außerhalb Ihres Adressbuchs</translation>
+    </message>
+    <message>
+        <location line="+50"/>
+        <source>Found in the search</source>
+        <translation>In der Suche auffindbar</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Hidden from the search</source>
+        <translation>In der Suche verborgen</translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>No description yet.</source>
+        <translation>Noch keine Beschreibung.</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Offers: %1</source>
+        <translation>Bietet: %1</translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Tell the others about your organization: what it does, its industry and the roles it offers. An empty profile is hard to choose.</source>
+        <translation>Erzählen Sie anderen von Ihrer Organisation: was sie tut, ihre Branche und die angebotenen Rollen. Ein leeres Profil wird selten gewählt.</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>Edit profile</source>
+        <translation>Profil bearbeiten</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Fill in the profile</source>
+        <translation>Profil ausfüllen</translation>
+    </message>
+</context>
+<context>
+    <name>TenantDirectorySearchPage</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/TenantDirectorySearchPage.qml" line="+21"/>
+        <location line="+23"/>
+        <source>Organization</source>
+        <translation>Organisation</translation>
+    </message>
+    <message>
+        <location line="-22"/>
+        <source>Organizations</source>
+        <translation>Organisationen</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Find an organization</source>
+        <translation>Organisation finden</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The organizations listed in the directory. Type a part of the name, the description or the industry; open one to see its profile and ask it to join your address book.</source>
+        <translation>Die im Verzeichnis gelisteten Organisationen. Geben Sie einen Teil des Namens, der Beschreibung oder der Branche ein; öffnen Sie eine, um ihr Profil zu sehen und sie in Ihr Adressbuch einzuladen.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Name, description or industry</source>
+        <translation>Name, Beschreibung oder Branche</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Type a part of the name of an organization to find it.</source>
+        <translation>Geben Sie einen Teil des Namens einer Organisation ein, um sie zu finden.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>No organization found. Try another text, or invite a partner by its connection code in the address book.</source>
+        <translation>Keine Organisation gefunden. Versuchen Sie einen anderen Text oder laden Sie einen Partner per Verbindungscode im Adressbuch ein.</translation>
+    </message>
+    <message>
+        <location line="+16"/>
         <source>Industry</source>
         <translation>Branche</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <location line="+67"/>
+        <location line="+0"/>
         <source>Country</source>
-        <translation type="unfinished">Land</translation>
+        <translation>Land</translation>
     </message>
     <message>
-        <location line="-61"/>
-        <source>Website</source>
-        <translation>Website</translation>
+        <location line="+0"/>
+        <source>For you</source>
+        <translation>Für Sie</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Roles the organization offers</source>
-        <translation>Rollen, die die Organisation anbietet</translation>
+        <location line="+58"/>
+        <source>In your address book</source>
+        <translation>In Ihrem Adressbuch</translation>
     </message>
     <message>
-        <location line="+27"/>
-        <source>Save profile</source>
-        <translation>Profil speichern</translation>
+        <location line="+2"/>
+        <source>Request sent</source>
+        <translation>Anfrage gesendet</translation>
     </message>
     <message>
-        <location line="+9"/>
-        <source>Find an organization</source>
-        <translation>Organisation suchen</translation>
+        <location line="+2"/>
+        <source>Asks to join yours</source>
+        <translation>Möchte in Ihres</translation>
     </message>
     <message>
-        <location line="+10"/>
-        <source>Name or description</source>
-        <translation>Name oder Beschreibung</translation>
+        <location line="+39"/>
+        <source>The request was sent. The organization joins your address book once it accepts.</source>
+        <translation>Die Anfrage wurde gesendet. Die Organisation wird in Ihr Adressbuch aufgenommen, sobald sie zustimmt.</translation>
     </message>
     <message>
-        <location line="+16"/>
-        <source>Search</source>
-        <translation>Suchen</translation>
+        <location line="+20"/>
+        <source>Set up your profile</source>
+        <translation>Richten Sie Ihr Profil ein</translation>
     </message>
     <message>
-        <location line="+9"/>
-        <source>No organizations found.</source>
-        <translation>Keine Organisationen gefunden.</translation>
+        <location line="+18"/>
+        <source>Profile</source>
+        <translation>Profil</translation>
     </message>
     <message>
-        <location line="+42"/>
-        <source>offers: %1</source>
-        <translation>bietet: %1</translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <location line="+17"/>
+        <location line="+19"/>
+        <location line="+62"/>
         <source>Add to address book</source>
         <translation>Zum Adressbuch hinzufügen</translation>
+    </message>
+    <message>
+        <location line="-14"/>
+        <source>Profile of the organization</source>
+        <translation>Profil der Organisation</translation>
     </message>
 </context>
 <context>
@@ -19318,9 +21186,8 @@ Alle Beziehungen zu dieser Organisation werden ebenfalls entfernt.</translation>
         <translation type="vanished">Beziehungen</translation>
     </message>
     <message>
-        <location line="+17"/>
         <source>Connection Code</source>
-        <translation>Verbindungscode</translation>
+        <translation type="vanished">Verbindungscode</translation>
     </message>
     <message>
         <source>Connect Organization</source>
@@ -19335,9 +21202,9 @@ Alle Beziehungen zu dieser Organisation werden ebenfalls entfernt.</translation>
         <translation type="vanished">Vorschläge</translation>
     </message>
     <message>
-        <location line="-30"/>
+        <location line="-13"/>
         <source>Organization</source>
-        <translation type="unfinished">Organisation</translation>
+        <translation>Organisation</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -19350,37 +21217,64 @@ Alle Beziehungen zu dieser Organisation werden ebenfalls entfernt.</translation>
         <translation>Mitglieder und Einladungen</translation>
     </message>
     <message>
-        <location line="+17"/>
         <source>External links</source>
-        <translation>Externe Verbindungen</translation>
+        <translation type="vanished">Externe Verbindungen</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+15"/>
         <source>Partners</source>
         <translation>Partner</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+2"/>
+        <source>Address book</source>
+        <translation>Adressbuch</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Find an organization</source>
+        <translation>Organisation finden</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>How others find you</source>
+        <translation>Wie andere Sie finden</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Shared documents</source>
+        <translation>Geteilte Dokumente</translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <location line="+2"/>
         <source>Contracts</source>
         <translation>Verträge</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>Roles and types of contracts</source>
-        <translation>Rollen und Vertragstypen</translation>
+        <translation type="vanished">Rollen und Vertragstypen</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>Directory</source>
-        <translation type="unfinished">Verzeichnis</translation>
+        <translation type="obsolete">Verzeichnis</translation>
+    </message>
+    <message>
+        <source>Shared Documents</source>
+        <translation type="vanished">Freigegebene Dokumente</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Shared Documents</source>
-        <translation>Freigegebene Dokumente</translation>
+        <source>Types of contracts</source>
+        <translation>Vertragstypen</translation>
     </message>
     <message>
-        <location line="+103"/>
+        <location line="+1"/>
+        <source>Roles of the parties</source>
+        <translation>Rollen der Parteien</translation>
+    </message>
+    <message>
+        <location line="+138"/>
         <source>Invitation created successfully</source>
         <translation>Einladung erfolgreich erstellt</translation>
     </message>
@@ -19545,7 +21439,7 @@ Alle Beziehungen zu dieser Organisation werden ebenfalls entfernt.</translation>
         <translation>Verwalten Sie die Mitglieder der Organisation. Hier erstellte Benutzer werden automatisch Mitglieder.</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+28"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
@@ -19877,7 +21771,7 @@ Alle Beziehungen zu dieser Organisation werden ebenfalls entfernt.</translation>
 <context>
     <name>TenantPartnersPage</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/TenantPartnersPage.qml" line="+92"/>
+        <location filename="../../../Qml/imtauthgui/TenantPartnersPage.qml" line="+96"/>
         <source>The request was sent to the partner</source>
         <translation>Die Anfrage wurde an den Partner gesendet</translation>
     </message>
@@ -19923,9 +21817,13 @@ Alle Beziehungen zu dieser Organisation werden ebenfalls entfernt.</translation>
         <translation>Im Adressbuch</translation>
     </message>
     <message>
-        <location line="+105"/>
         <source>Partners</source>
-        <translation>Partner</translation>
+        <translation type="vanished">Partner</translation>
+    </message>
+    <message>
+        <location line="+116"/>
+        <source>Address book</source>
+        <translation>Adressbuch</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -19933,8 +21831,13 @@ Alle Beziehungen zu dieser Organisation werden ebenfalls entfernt.</translation>
         <translation>Das Adressbuch der Organisation. Die Bedingungen der Zusammenarbeit mit einem Partner werden in einem Vertrag vereinbart.</translation>
     </message>
     <message>
-        <location line="+12"/>
-        <location line="+100"/>
+        <location line="+14"/>
+        <source>Find in the directory</source>
+        <translation>Im Verzeichnis suchen</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <location line="+101"/>
         <source>Invite partner</source>
         <translation>Partner einladen</translation>
     </message>
@@ -19946,37 +21849,37 @@ Alle Beziehungen zu dieser Organisation werden ebenfalls entfernt.</translation>
     <message>
         <location line="+20"/>
         <source>Partner</source>
-        <translation type="unfinished">Partner</translation>
+        <translation>Partner</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Message</source>
-        <translation type="unfinished">Meldung</translation>
+        <translation>Nachricht</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>State</source>
-        <translation type="unfinished">Zustand</translation>
+        <translation>Status</translation>
     </message>
     <message>
         <location line="+25"/>
         <source>Accept</source>
-        <translation type="unfinished">Annehmen</translation>
+        <translation>Annehmen</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Decline</source>
-        <translation type="unfinished">Ablehnen</translation>
+        <translation>Ablehnen</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Withdraw</source>
-        <translation type="unfinished">Zurückziehen</translation>
+        <translation>Zurückziehen</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Remove</source>
-        <translation type="unfinished">Entfernen</translation>
+        <translation>Entfernen</translation>
     </message>
     <message>
         <location line="+34"/>
@@ -19987,6 +21890,124 @@ Alle Beziehungen zu dieser Organisation werden ebenfalls entfernt.</translation>
         <location line="+1"/>
         <source>Remove &quot;%1&quot; from the address book? The contracts with this organization stay in force.</source>
         <translation>„%1“ aus dem Adressbuch entfernen? Die Verträge mit dieser Organisation bleiben in Kraft.</translation>
+    </message>
+</context>
+<context>
+    <name>TenantPartyRolesPage</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/TenantPartyRolesPage.qml" line="+20"/>
+        <source>Role</source>
+        <translation>Rolle</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Roles of the parties</source>
+        <translation>Rollen der Parteien</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>+ New role</source>
+        <translation>+ Neue Rolle</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The roles an organization has in a contract and towards another party. The system roles are given to every organization.</source>
+        <translation>Die Rollen einer Organisation in einem Vertrag und gegenüber einer anderen Partei. Die Systemrollen hat jede Organisation.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>No roles yet.</source>
+        <translation>Noch keine Rollen.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Archive role</source>
+        <translation>Rolle archivieren</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Archive roles</source>
+        <translation>Rollen archivieren</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Name</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Used for</source>
+        <translation>Verwendet für</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Paired role</source>
+        <translation>Gegenrolle</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Owner</source>
+        <translation>Eigentümer</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>State</source>
+        <translation>Status</translation>
+    </message>
+    <message>
+        <location line="+36"/>
+        <source>Party and link</source>
+        <translation>Partei und Verbindung</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Party</source>
+        <translation>Partei</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Link</source>
+        <translation>Verbindung</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>System</source>
+        <translation>System</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Organization</source>
+        <translation>Organisation</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Archived</source>
+        <translation>Archiviert</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>In use</source>
+        <translation>In Verwendung</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>The system roles stay, and archived roles are archived already. Only the own roles of the organization are archived.</source>
+        <translation>Die Systemrollen bleiben, archivierte Rollen sind bereits archiviert. Archiviert werden nur die eigenen Rollen der Organisation.</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Archive &quot;%1&quot;? The contracts using it keep it; it is not offered for new contracts.</source>
+        <translation>„%1“ archivieren? Die Verträge, die sie verwenden, behalten sie; für neue Verträge wird sie nicht angeboten.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Archive %1 selected role(s)? The contracts using them keep them; they are not offered for new contracts.</source>
+        <translation>%1 ausgewählte Rolle(n) archivieren? Die Verträge, die sie verwenden, behalten sie; für neue Verträge werden sie nicht angeboten.</translation>
+    </message>
+    <message>
+        <location line="+24"/>
+        <source>The role was saved</source>
+        <translation>Die Rolle wurde gespeichert</translation>
     </message>
 </context>
 <context>
@@ -20908,14 +22929,13 @@ Alle Beziehungen zu dieser Organisation werden ebenfalls entfernt.</translation>
 <context>
     <name>TimeInput</name>
     <message>
-        <location filename="../../../Qml/imtcontrols/Inputs/TimeInput.qml" line="+154"/>
+        <location filename="../../../Qml/imtcontrols/Inputs/TimeInput.qml" line="+152"/>
         <source>Time:</source>
         <translation>Uhrzeit:</translation>
     </message>
     <message>
-        <location line="+87"/>
         <source>Wrong time format!</source>
-        <translation>Falsches Uhrzeitformat!</translation>
+        <translation type="vanished">Falsches Uhrzeitformat!</translation>
     </message>
 </context>
 <context>
@@ -20978,11 +22998,11 @@ Alle Beziehungen zu dieser Organisation werden ebenfalls entfernt.</translation>
     </message>
     <message>
         <source>This folder has no subfolders</source>
-        <translation>Dieser Ordner enthält keine Unterordner</translation>
+        <translation type="vanished">Dieser Ordner enthält keine Unterordner</translation>
     </message>
     <message>
         <source>This location is outside the start folder</source>
-        <translation>Dieser Ort liegt außerhalb des Startordners</translation>
+        <translation type="vanished">Dieser Ort liegt außerhalb des Startordners</translation>
     </message>
     <message>
         <location line="+1"/>
