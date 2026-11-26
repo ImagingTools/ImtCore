@@ -2216,10 +2216,7 @@ function textWidth(info, text) {
 	return width;
 }
 
-// The lines of a paragraph in a width, broken as in Qt (measured) by the kind of wrapMode (wrapKind): 'word' at the spaces only, a word
-// wider than the line goes out of it; 'boundary' at the spaces, and a word wider than the line from a line of its own between its
-// characters; 'anywhere' every line is filled up to the width, between the characters of a word too. The space of a break is in no line.
-function wrapParagraphLines(info, para, limit, mode = 'word') {
+function wrapParagraphLines(info, para, limit) {
 	if (para === '') return [''];
 	const space = info.advance(' ');
 	const words = para.split(' ');
@@ -2228,37 +2225,18 @@ function wrapParagraphLines(info, para, limit, mode = 'word') {
 	let line = 0;
 	for (const word of words) {
 		const wordWidth = textWidth(info, word);
-		if (current !== '' && line + space + wordWidth <= limit) {
-			current += ` ${word}`;
-			line += space + wordWidth;
-			continue;
-		}
-		if (mode === 'word' || (mode === 'boundary' && wordWidth <= limit)) {
-			if (current !== '') lines.push(current);
+		if (current === '') {
 			current = word;
 			line = wordWidth;
 			continue;
 		}
-		// The word is broken between its characters: on the same line after the space (anywhere) or from the next line (boundary)
-		let gap = current !== '' && mode === 'anywhere';
-		if (current !== '' && !gap) {
+		if (line + space + wordWidth > limit) {
 			lines.push(current);
-			current = '';
-			line = 0;
-		}
-		for (const ch of word) {
-			const width = info.advance(ch);
-			if (current !== '' && line + (gap ? space : 0) + width > limit) {
-				lines.push(current);
-				current = '';
-				line = 0;
-			} else if (gap) {
-				current += ' ';
-				line += space;
-			}
-			gap = false;
-			current += ch;
-			line += width;
+			current = word;
+			line = wordWidth;
+		} else {
+			current += ` ${word}`;
+			line += space + wordWidth;
 		}
 	}
 	if (current !== '' || lines.length === 0) lines.push(current);
@@ -2269,13 +2247,12 @@ function wrapParagraph(info, para, limit) {
 	return wrapParagraphLines(info, para, limit).map((line) => textWidth(info, line));
 }
 
-// wrap: the kind of wrapMode (wrapKind)
 function blockLines(info, text, wrap, limit) {
 	const paras = text.split('\n');
 	const lines = [];
 	for (const para of paras) {
-		if (wrap === 'none') lines.push(para);
-		else lines.push(...wrapParagraphLines(info, para, limit, wrap));
+		if (!wrap) lines.push(para);
+		else lines.push(...wrapParagraphLines(info, para, limit));
 	}
 	return lines.length > 0 ? lines : [''];
 }
@@ -2336,13 +2313,6 @@ function elidedText(info, text, limit, mode) {
 function wraps(mode) {
 	if (typeof mode === 'number') return mode === 1 || mode === 3 || mode === 4;
 	return mode === 'WordWrap' || mode === 'Wrap' || mode === 'WrapAnywhere' || mode === 'WrapAtWordBoundaryOrAnywhere';
-}
-
-// How a wrapMode breaks the lines of a plain text: 'none', 'word' (WordWrap), 'anywhere' (WrapAnywhere) or 'boundary' (Wrap).
-function wrapKind(mode) {
-	if (!wraps(mode)) return 'none';
-	if (mode === 1 || mode === 'WordWrap') return 'word';
-	return mode === 3 || mode === 'WrapAnywhere' ? 'anywhere' : 'boundary';
 }
 
 class FontGroup {
@@ -2521,9 +2491,9 @@ export class Text extends Item {
 		const rich = false;
 		const source = this.$text;
 		const explicit = this.$layoutWidth();
-		const wrap = explicit > 0 ? wrapKind(this.$wrap) : 'none';
-		const limit = wrap !== 'none' ? explicit : Infinity;
-		const elideLimit = !rich && wrap === 'none' && (this.$elide === 0 || this.$elide === 1 || this.$elide === 2) ? explicit : 0;
+		const wrap = explicit > 0 && wraps(this.$wrap);
+		const limit = wrap ? explicit : Infinity;
+		const elideLimit = !rich && !wrap && (this.$elide === 0 || this.$elide === 1 || this.$elide === 2) ? explicit : 0;
 		if (
 			lay !== null &&
 			lay.version === fonts.version &&
@@ -2678,8 +2648,8 @@ export class Text extends Item {
 		// The width that the anchors give (`anchors.left` and `anchors.right`) wraps the text like a `width` does.
 		const explicit = this.$layoutWidth();
 		const wrap = explicit > 0 && wraps(this.$wrap);
-		const natural = blockMetrics(info, source, 'none', Infinity);
-		const laid = wrap ? blockMetrics(info, source, wrapKind(this.$wrap), explicit) : natural;
+		const natural = blockMetrics(info, source, false, Infinity);
+		const laid = wrap ? blockMetrics(info, source, true, explicit) : natural;
 		let contentWidth = laid.max;
 		if (!rich && !wrap && this.$elide !== 3 && this.$elide !== 'ElideNone' && explicit > 0 && natural.max > explicit + ELIDE_SLACK) contentWidth = textWidth(info, elidedText(info, source, explicit, this.$elide));
 		if (rich && explicit > 0) contentWidth = Math.max(explicit, laid.max);
