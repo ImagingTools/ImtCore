@@ -3,10 +3,12 @@
 
 
 // Qt includes
-#include <QtCore/QString>
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QTimer>
+#include <QtCore/QtMath>
+#include <QtCore/QSettings>
 #include <QtQml/QQmlApplicationEngine>
-#include <QtQuick/QQuickWindow>
+#include <QtQml/QQmlComponent>
 
 // ACF includes
 #include <istd/TDelPtr.h>
@@ -19,6 +21,9 @@ void qt_mac_set_menubar_icons(bool enable);
 
 namespace imtqml
 {
+
+
+const QByteArray CQuickApplicationComp::s_settingsGroup = QByteArrayLiteral("MainWindow");
 
 
 // public methods
@@ -79,45 +84,147 @@ int CQuickApplicationComp::Execute(int argc, char** argv)
 			engine->addImportPath("qrc:/qml");
 
 			QObject::connect(engine.GetPtr(), &QQmlApplicationEngine::quit, &QGuiApplication::quit);
-			engine->load(QUrl("qrc:/qml/MainWindow.qml"));
 
-			imtqml::IQuickObject* quickObjectPtr = m_mainQuickCompPtr.GetPtr();
-			if (quickObjectPtr != nullptr){
-				QList<QObject*> rootObjects = engine->rootObjects();
-				if (!rootObjects.isEmpty()){
-					QObject* root = rootObjects[0];
-					Q_ASSERT(root != nullptr);
+			// Fixed-size splash window, shown while the main QML tree is being created. It is used only if the splash component is connected:
+			imtqml::IQuickObject* splashQuickPtr = m_splashCompPtr.GetPtr();
+			bool isCustomSplash = false;
+			bool isSplashShown = false;
+			QElapsedTimer splashTimer;
+			QQuickWindow* hostWindowPtr = nullptr;
+			if (splashQuickPtr != nullptr){
+				QQmlComponent hostComponent(engine.GetPtr(), QUrl("qrc:/imtqml/SplashHostWindow.qml"));
+				hostWindowPtr = qobject_cast<QQuickWindow*>(hostComponent.create());
+			}
 
-					QQuickWindow* window = qobject_cast<QQuickWindow*>(root);
-					if (window != nullptr){
-						if (m_windowWidthAttrPtr.IsValid()){
-							window->setWidth(*m_windowWidthAttrPtr);
-						}
-						if (m_windowHeightAttrPtr.IsValid()){
-							window->setHeight(*m_windowHeightAttrPtr);
-						}
-						if (m_minimumWindowWidthAttrPtr.IsValid()){
-							window->setMinimumWidth(*m_minimumWindowWidthAttrPtr);
-						}
-						if (m_minimumWindowHeightAttrPtr.IsValid()){
-							window->setMinimumHeight(*m_minimumWindowHeightAttrPtr);
-						}
-						if (m_visibilityAttrPtr.IsValid()){
-							window->setVisibility(QWindow::Visibility(*m_visibilityAttrPtr));
-						}
-						window->setWindowState(Qt::WindowMaximized); // Qt::WindowActive
-						window->setIcon(QGuiApplication::windowIcon());
-						window->setTitle(QGuiApplication::applicationName());
-						QQuickItem* mainItem = window->contentItem();
-						if (mainItem != nullptr){
-							quickObjectPtr->CreateQuickItem(mainItem);
-						}
+			if (hostWindowPtr != nullptr){
+				if (splashQuickPtr->CreateQuickItem(hostWindowPtr->contentItem()) && splashQuickPtr->GetQuickItem() != nullptr){
+					QQuickItem* splashItemPtr = splashQuickPtr->GetQuickItem();
+					isCustomSplash = true;
+
+					if (splashItemPtr->implicitWidth() > 0 && splashItemPtr->implicitHeight() > 0){
+						const QSize splashSize(qCeil(splashItemPtr->implicitWidth()), qCeil(splashItemPtr->implicitHeight()));
+						hostWindowPtr->setMinimumSize(splashSize);
+						hostWindowPtr->setMaximumSize(splashSize);
+						hostWindowPtr->resize(splashSize);
 					}
+					splashItemPtr->setSize(QSizeF(hostWindowPtr->width(), hostWindowPtr->height()));
+					hostWindowPtr->show();
+					splashTimer.start();
+					isSplashShown = true;
+				}
+				else{
+					qWarning() << "Unable to create the splash item";
 				}
 			}
-			else{
+
+			auto releaseSplash = [&](){
+				if (isCustomSplash){
+					splashQuickPtr->DestroyQuickItem();
+				}
+				delete hostWindowPtr;
+				hostWindowPtr = nullptr;
+			};
+			QGuiApplication::processEvents();
+
+			QQmlComponent mainComponent(engine.GetPtr(), QUrl("qrc:/qml/MainWindow.qml"), QQmlComponent::Asynchronous);
+			QEventLoop loop;
+			if (mainComponent.isLoading()){
+				QObject::connect(&mainComponent, &QQmlComponent::statusChanged, &loop, &QEventLoop::quit);
+				loop.exec();
+			}
+
+			QObject* root = nullptr;
+			CLoopIncubator incubator(loop);
+			if (mainComponent.isReady()){
+				mainComponent.create(incubator);
+				if (incubator.isLoading()){
+					loop.exec();
+				}
+				root = incubator.object();
+			}
+			if (root != nullptr){
+				root->setParent(engine.GetPtr());
+			}
+
+			imtqml::IQuickObject* quickObjectPtr = m_mainQuickCompPtr.GetPtr();
+			if (quickObjectPtr == nullptr){
+				releaseSplash();
 				return -1;
 			}
+
+			if (root != nullptr){
+				QQuickWindow* window = qobject_cast<QQuickWindow*>(root);
+				if (window != nullptr){
+					window->setOpacity(0);
+					if (m_windowWidthAttrPtr.IsValid()){
+						window->setWidth(*m_windowWidthAttrPtr);
+					}
+					if (m_windowHeightAttrPtr.IsValid()){
+						window->setHeight(*m_windowHeightAttrPtr);
+					}
+					if (m_minimumWindowWidthAttrPtr.IsValid()){
+						window->setMinimumWidth(*m_minimumWindowWidthAttrPtr);
+					}
+					if (m_minimumWindowHeightAttrPtr.IsValid()){
+						window->setMinimumHeight(*m_minimumWindowHeightAttrPtr);
+					}
+					if (m_visibilityAttrPtr.IsValid()){
+						window->setVisibility(QWindow::Visibility(*m_visibilityAttrPtr));
+					}
+					window->setWindowState(Qt::WindowMaximized);
+					window->setIcon(QGuiApplication::windowIcon());
+					window->setTitle(QGuiApplication::applicationName());
+
+					// Apply saved window geometry:
+					QSettings settings;
+					settings.beginGroup(QString::fromLatin1(s_settingsGroup));
+					if (settings.contains("geometry")){
+						const QRect geometry = settings.value("geometry").toRect();
+						window->setWindowState(Qt::WindowNoState);
+						if (geometry.isValid()){
+							window->setGeometry(geometry);
+						}
+						if (settings.value("maximized", true).toBool()){
+							window->setWindowState(Qt::WindowMaximized);
+						}
+					}
+					settings.endGroup();
+
+					QObject::connect(qApp, &QCoreApplication::aboutToQuit, window, [window](){
+						QSettings settings;
+						settings.beginGroup(QString::fromLatin1(s_settingsGroup));
+						const bool maximized = window->windowState() & Qt::WindowMaximized;
+						settings.setValue("maximized", maximized);
+						if (!maximized){
+							settings.setValue("geometry", window->geometry());
+						}
+						settings.endGroup();
+					});
+
+					// Keep the splash visible for the minimum time (events are processed, so the splash stays animated):
+					if (isSplashShown && m_minSplashTimeAttrPtr.IsValid()){
+						const qint64 remainingMs = qint64(*m_minSplashTimeAttrPtr) - splashTimer.elapsed();
+						if (remainingMs > 0){
+							QEventLoop waitLoop;
+							QTimer::singleShot(int(remainingMs), &waitLoop, &QEventLoop::quit);
+							waitLoop.exec();
+						}
+					}
+
+					window->show();
+					QGuiApplication::processEvents();
+
+					QQuickItem* mainItem = window->contentItem();
+					if (mainItem != nullptr){
+						quickObjectPtr->CreateQuickItem(mainItem);
+					}
+					QGuiApplication::processEvents();
+					window->setOpacity(1);
+					window->requestUpdate();
+				}
+			}
+
+			releaseSplash();
 		}
 
 		HideSplashScreen();
@@ -157,7 +264,7 @@ void CQuickApplicationComp::OnEventLoopStarted()
 	m_runtimeStatus.SetRuntimeStatus(ibase::IRuntimeStatusProvider::RS_RUNNING);
 
 	InitializeComponents();
-	
+
 	Q_ASSERT(qApp->startingUp() == false);
 }
 

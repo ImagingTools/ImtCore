@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6560" Description="ACF"/>
-            <Version Id="1" Number="2449" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6637" Description="ACF"/>
+            <Version Id="1" Number="2463" Description="ACF-Solutions"/>
             <Version Id="1023" Number="396033" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -68,6 +68,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="SettingsRepresentationController" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="LocalSettings"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SplashScreen" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SplashScreen"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="VersionInfo"/>
@@ -139,6 +142,18 @@
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="VersionInfo"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SplashScreen" PackageId="ImtQmlPck" ComponentId="StandartSplashScreenQuick">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ClientApplication/ApplicationInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowProductName" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

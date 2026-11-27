@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/imtqml">
+        <file alias="SplashHostWindow.qml">Resources/SplashHostWindow.qml</file>
+    </qresource>
+</RCC>

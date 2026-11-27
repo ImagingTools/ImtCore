@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6560" Description="ACF"/>
-            <Version Id="1" Number="2449" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6637" Description="ACF"/>
+            <Version Id="1" Number="2463" Description="ACF-Solutions"/>
             <Version Id="1023" Number="396033" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -15,6 +15,7 @@
         <Element ComponentName="GraphQLClientEngine" X="200" Y="700" Note=""/>
         <Element ComponentName="ImtCoreQmlInitializer" X="400" Y="500" Note=""/>
         <Element ComponentName="LocalSettings" X="725" Y="175" Note=""/>
+        <Element ComponentName="SplashScreen" X="525" Y="600" Note=""/>
         <Element ComponentName="VersionInfo" X="1025" Y="175" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>

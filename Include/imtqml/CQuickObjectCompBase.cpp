@@ -7,6 +7,7 @@
 #include <QtQml/QQmlEngine>
 #include <QtQml/QQmlComponent>
 #include <QtQml/QQmlContext>
+#include <QtQuick/QQuickWindow>
 
 
 namespace imtqml
@@ -46,6 +47,9 @@ bool CQuickObjectCompBase::CreateQuickItem(QQuickItem* parentPtr)
 	}
 
 	QQmlEngine* engine = qmlEngine(parentPtr);
+	if (engine == nullptr && parentPtr->window() != nullptr){
+		engine = qmlEngine(parentPtr->window());
+	}
 	if (engine != nullptr){
 		InitializeEngine(*engine);
 

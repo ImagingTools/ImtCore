@@ -2,8 +2,15 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QByteArray>
+#include <QtCore/QEventLoop>
+#include <QtQml/QQmlIncubator>
+#include <QtQuick/QQuickWindow>
+
 // ImtCore includes
 #include <imtqml/CQuickApplicationCompBase.h>
+#include <imtqml/IQuickObject.h>
 
 
 namespace imtqml
@@ -26,6 +33,8 @@ public:
 		I_ASSIGN(m_minimumWindowWidthAttrPtr, "MinimumWindowWidth", "Minimum window width", false, 800);
 		I_ASSIGN(m_minimumWindowHeightAttrPtr, "MinimumWindowHeight", "Minimum window height", false, 600);
 		I_ASSIGN(m_visibilityAttrPtr, "Visibility", "The screen-occupation state of the window:\n0 - Hidden;\n1 - AutomaticVisibility;\n2 - Windowed;\n3 - Minimized;\n4 - Maximized;\n5 - FullScreen", false, 1);
+		I_ASSIGN(m_splashCompPtr, "SplashScreen", "Splash QML object (root must be an Item) shown in a fixed-size window while the main UI is loading. If not set, no splash is shown", false, "SplashScreen");
+		I_ASSIGN(m_minSplashTimeAttrPtr, "MinSplashTime", "Minimum time in milliseconds the splash is shown before the main window appears", false, 3000);
 	I_END_COMPONENT;
 
 	CQuickApplicationComp();
@@ -39,6 +48,40 @@ public:
 	virtual QString GetHelpText() const override;
 
 protected:
+	/**
+		Helper used to wait for the asynchronous creation of the main QML window.
+		The incubator quits the given event loop as soon as the object is ready or the creation has failed.
+		The created window is hidden, so that it is not shown before it is fully configured.
+	**/
+	class CLoopIncubator: public QQmlIncubator
+	{
+	public:
+		explicit CLoopIncubator(QEventLoop& loop)
+			:QQmlIncubator(QQmlIncubator::Asynchronous),
+			m_loop(loop)
+		{
+		}
+
+	protected:
+		// reimplemented (QQmlIncubator)
+		virtual void statusChanged(Status status) override
+		{
+			if (status == Ready || status == Error){
+				QQuickWindow* windowPtr = qobject_cast<QQuickWindow*>(object());
+				if (windowPtr != nullptr){
+					windowPtr->setVisible(false);
+				}
+
+				m_loop.quit();
+			}
+		}
+
+	private:
+		QEventLoop& m_loop;
+	};
+
+	static const QByteArray s_settingsGroup;
+
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentDestroyed() override;
 
@@ -53,6 +96,8 @@ protected:
 	I_ATTR(int, m_minimumWindowWidthAttrPtr);
 	I_ATTR(int, m_minimumWindowHeightAttrPtr);
 	I_ATTR(int, m_visibilityAttrPtr);
+	I_REF(imtqml::IQuickObject, m_splashCompPtr);
+	I_ATTR(int, m_minSplashTimeAttrPtr);
 };
 
 

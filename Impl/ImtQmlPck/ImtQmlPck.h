@@ -10,6 +10,7 @@
 #include <imtqml/CQuickApplicationComp.h>
 #include <imtqml/CGqlQuickObjectComp.h>
 #include <imtqml/CGuiQuickWrapComp.h>
+#include <imtqml/CStandartSplashScreenQuickComp.h>
 #include <imtqml/CClientUserContextComp.h>
 #include <imtqml/CDataModelBridgeDemultiplexer.h>
 #include <imtqml/CDocumentServiceBridge.h>
@@ -31,6 +32,7 @@ namespace ImtQmlPck
 typedef imtqml::CQuickApplicationComp QuickApplication;
 typedef imtqml::CGqlQuickObjectComp QuickObject;
 typedef imtqml::CGuiQuickWrapComp GuiQuickWrap;
+typedef imtqml::CStandartSplashScreenQuickComp StandartSplashScreenQuick;
 typedef imtqml::CClientUserContextComp ClientUserContext;
 typedef imtqml::CGqlClientBridge GqlClientBridge;
 typedef imtqml::CDocumentServiceBridge DocumentServiceBridge;
