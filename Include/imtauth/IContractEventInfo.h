@@ -10,6 +10,11 @@
 #include <iser/IObject.h>
 #include <istd/TSmartPtr.h>
 
+// <windows.h> maps GetUserName to GetUserNameW, which breaks linking against the library built without it
+#ifdef GetUserName
+#undef GetUserName
+#endif
+
 
 namespace imtauth
 {
