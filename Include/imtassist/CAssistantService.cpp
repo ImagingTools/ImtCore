@@ -711,10 +711,18 @@ CAssistantService::StepResult CAssistantService::ProcessActionCall(
 		return SR_FINISHED;
 	}
 
+	// IDs of 9 letters and digits are accepted by every supported provider API.
+	QByteArray callId = reply.callId;
+	if (callId.isEmpty() || (callId.size() > 128)){
+		callId = QUuid::createUuid().toByteArray(QUuid::Id128).left(9);
+	}
+
 	IAssistantProvider::Message callMessage;
 	callMessage.role = IAssistantProvider::Message::R_ASSISTANT;
 	callMessage.actionId = actionId;
 	callMessage.data = reply.parameters;
+	callMessage.callId = callId;
+	callMessage.providerState = reply.providerState;
 	providerMessages.append(callMessage);
 
 	if (actionPtr->GetActionKind() == IAssistantAction::AK_READ){
@@ -729,6 +737,8 @@ CAssistantService::StepResult CAssistantService::ProcessActionCall(
 			error.SetActionId(actionId);
 			messages.append(error);
 
+			AppendFailedToolResult(providerMessages, actionId, callId, code);
+
 			return SR_FINISHED;
 		}
 
@@ -738,6 +748,8 @@ CAssistantService::StepResult CAssistantService::ProcessActionCall(
 			CAssistantMessage error = CreateError(context, conversationId, "ActionFailed", "The function returned an invalid result.");
 			error.SetActionId(actionId);
 			messages.append(error);
+
+			AppendFailedToolResult(providerMessages, actionId, callId, "ActionFailed");
 
 			return SR_FINISHED;
 		}
@@ -770,6 +782,7 @@ CAssistantService::StepResult CAssistantService::ProcessActionCall(
 		IAssistantProvider::Message toolMessage;
 		toolMessage.role = IAssistantProvider::Message::R_TOOL_RESULT;
 		toolMessage.actionId = actionId;
+		toolMessage.callId = callId;
 		toolMessage.data = result.data;
 		providerMessages.append(toolMessage);
 
@@ -787,6 +800,8 @@ CAssistantService::StepResult CAssistantService::ProcessActionCall(
 		error.SetActionId(actionId);
 		messages.append(error);
 
+		AppendFailedToolResult(providerMessages, actionId, callId, code);
+
 		return SR_FINISHED;
 	}
 
@@ -800,6 +815,8 @@ CAssistantService::StepResult CAssistantService::ProcessActionCall(
 	QByteArray previewId = m_previewStore.AddPreview(context, preview);
 	if (previewId.isEmpty() || !m_previewStore.GetPreview(previewId, context, preview)){
 		messages.append(CreateError(context, conversationId, "InvalidContext", "The request has no authenticated user."));
+
+		AppendFailedToolResult(providerMessages, actionId, callId, "InvalidContext");
 
 		return SR_FINISHED;
 	}
@@ -823,10 +840,27 @@ CAssistantService::StepResult CAssistantService::ProcessActionCall(
 	IAssistantProvider::Message toolMessage;
 	toolMessage.role = IAssistantProvider::Message::R_TOOL_RESULT;
 	toolMessage.actionId = actionId;
+	toolMessage.callId = callId;
 	toolMessage.data["status"] = QStringLiteral("waitingForUserConfirmation");
 	providerMessages.append(toolMessage);
 
 	return SR_FINISHED;
+}
+
+
+void CAssistantService::AppendFailedToolResult(
+			IAssistantProvider::Messages& providerMessages,
+			const QByteArray& actionId,
+			const QByteArray& callId,
+			const QByteArray& code)
+{
+	IAssistantProvider::Message toolMessage;
+	toolMessage.role = IAssistantProvider::Message::R_TOOL_RESULT;
+	toolMessage.actionId = actionId;
+	toolMessage.callId = callId;
+	toolMessage.data["status"] = QStringLiteral("failed");
+	toolMessage.data["code"] = QString::fromUtf8(code);
+	providerMessages.append(toolMessage);
 }
 
 
@@ -854,7 +888,7 @@ IAssistantProvider::ToolDescriptions CAssistantService::CreateToolDescriptions()
 		tool.actionId = actionId;
 		tool.description = actionPtr->GetDescription();
 		tool.isChanging = (actionPtr->GetActionKind() == IAssistantAction::AK_CHANGE);
-		tool.parameterSchema = actionPtr->GetParameterSchema().ToJson();
+		tool.parameterSchema = actionPtr->GetParameterSchema().ToJsonSchema();
 		retVal.append(tool);
 	}
 

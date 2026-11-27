@@ -79,7 +79,7 @@ declare_target_dependencies(imt3dgui				Acf::iqtgui imt3dview Qt${QT_VERSION_MAJ
 declare_target_dependencies(imt3dview				imt3d imt3dgui)
 declare_target_dependencies(imtaccount				imtbase Acf::iimg)
 declare_target_dependencies(imtapp					Acf::ifile)
-declare_target_dependencies(imtassist				Acf::istd Acf::icomp Acf::ilog Qt${QT_VERSION_MAJOR}::Core)
+declare_target_dependencies(imtassist				Acf::istd Acf::icomp Acf::ilog Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Network)
 declare_target_dependencies(imtassistgql			imtassist imtservergql)
 declare_target_dependencies(imtauth					imtdoc imtlic imtmail Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Svg)
 declare_target_dependencies(imtauthdb				imtdb imtgql Qt${QT_VERSION_MAJOR}::Sql)

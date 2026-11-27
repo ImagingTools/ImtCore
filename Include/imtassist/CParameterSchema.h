@@ -116,6 +116,13 @@ public:
 	*/
 	QJsonObject ToJson() const;
 
+	/**
+		Describe the schema as JSON Schema of an object, as used for the tool definitions of model providers.
+		\param useAdditionalProperties  Forbid unknown fields with \c additionalProperties; some
+		                                 providers (Gemini) do not accept this keyword.
+	*/
+	QJsonObject ToJsonSchema(bool useAdditionalProperties = true) const;
+
 private:
 	bool ValidateField(const Field& field, const QJsonValue& value, QString* errorPtr) const;
 

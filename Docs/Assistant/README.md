@@ -5,9 +5,10 @@ Users describe a task in natural language, answer clarifying questions and work 
 results with registered application components. The assistant supports existing
 workflows; it never bypasses permissions or business logic.
 
-> **Status:** MVP implemented: core library `imtassist`, GraphQL API `imtassistgql`,
-> QML panel `imtassistgui` and an example in the ControlsGallery. A production model
-> provider is not part of the MVP (see [Open decisions](#open-decisions-before-productive-use)).
+> **Status:** MVP implemented: core library `imtassist` with adapters to the common model
+> providers, GraphQL API `imtassistgql`, QML panel `imtassistgui` and an example in the
+> ControlsGallery. Which provider a product uses is a product decision
+> (see [Open decisions](#open-decisions-before-productive-use)).
 
 | Module | Content |
 |---|---|
@@ -29,6 +30,11 @@ workflows; it never bypasses permissions or business logic.
 | `CActionPreviewStore` | Server-side store of prepared changes: bound, time-limited, executed at most once. |
 | `IAssistantProvider` | Adapter to a model provider. |
 | `CFakeAssistantProvider` | Deterministic provider for development and tests; never contacts a network. |
+| `CHttpAssistantProviderBase` | Common part of the HTTP adapters: turns, tool names, clarification tool, credentials, errors. |
+| `COpenAiCompatibleProvider`, `CAnthropicMessagesProvider`, `CGeminiProvider`, `CBedrockConverseProvider` | Adapters of the four API protocols. |
+| `CAssistantProviderPresets` | Endpoint, protocol and authentication of every supported provider. |
+| `IAssistantHttpTransport` / `CQtHttpTransport` | Blocking HTTP POST with timeout and cancellation; replaceable in tests. |
+| `CAwsSigV4Signer` | AWS Signature Version 4 for Bedrock. |
 | `CAssistantMessage` | Typed, versioned message exchanged with the UI. |
 | `IAssistantAuditLog` | Receiver of technical events and action decisions without content. |
 | `CAssistantRequestContext` | User, tenant, correlation ID and context released by the user. |
@@ -44,6 +50,7 @@ and `imtchatgui` is unchanged.
 | `ImtAssistPck/AssistantService` | `Enabled` (default `false`), `Provider`, `ActionRegistry`, `RepresentationRegistry`, `AuditLog`, `ProviderTimeout`, `MaxStepsPerTurn`, `PreviewTimeToLive` |
 | `ImtAssistPck/AssistantActionRegistry` | `Actions`: the action components of the application |
 | `ImtAssistPck/UiRepresentationRegistry` | `RegisterStandardRepresentations` (default `true`), `SchemaProviders` (`IUiRepresentationSchemaProvider`) |
+| `ImtAssistPck/HttpAssistantProvider` | `Preset`, `Model`, `Endpoint`, `Region`, `Project`, `Resource`, `ApiKeyVariable`, `AwsAccessKeyIdVariable`, `AwsSecretAccessKeyVariable`, `AwsSessionTokenVariable`, `MaxOutputTokens`, `AdditionalInstructions` (see [Model providers](#model-providers)) |
 | `ImtAssistPck/FakeAssistantProvider` | rules: `RuleKeywords`, `RuleActionIds`, `RuleParameters` (JSON), `RuleReplies`, `RuleQuestions`; `DefaultReply`, `ToolResultReply` |
 | `ImtAssistPck/AssistantAuditLog` | writes events to the ACF log of the component |
 | `ImtAssistGqlPck/AssistantController` | `AssistantService`, `CommandIds` (the `Assistant*` commands), `CommandPermissions`, `PermissionChecker`; `AllowDemoPrincipal`, `DemoUserId`, `DemoTenantId` (demo only, see below) |
@@ -140,6 +147,79 @@ Applications that use the panel call `DefaultImtCoreQmlInitializer::InitAssistan
    (`imtgql::IGqlContext::GetUserId()`, `GetTenantId()`), never from client or model data.
    Add only context the user explicitly released, for example the current selection.
 
+## Model providers
+
+`ImtAssistPck/HttpAssistantProvider` connects the assistant to a model provider. The attribute
+`Preset` selects the provider; four API protocols cover all of them:
+
+| `Preset` | Provider | Protocol | Default endpoint | Credential (`ApiKeyVariable`) | Needs |
+|---|---|---|---|---|---|
+| `openai` | OpenAI | OpenAI Chat Completions | `https://api.openai.com/v1/chat/completions` | API key (Bearer) | `Model` |
+| `azure-openai` | Azure OpenAI | OpenAI Chat Completions | `https://{resource}.openai.azure.com/openai/v1/chat/completions` | API key (`api-key` header) | `Resource`, `Model` = deployment |
+| `mistral` | Mistral AI | OpenAI Chat Completions | `https://api.mistral.ai/v1/chat/completions` | API key (Bearer) | `Model` |
+| `cohere` | Cohere | OpenAI Chat Completions (compatibility API) | `https://api.cohere.ai/compatibility/v1/chat/completions` | API key (Bearer) | `Model` |
+| `ionos` | IONOS AI Model Hub | OpenAI Chat Completions | `https://openai.inference.de-txl.ionos.com/v1/chat/completions` | token (Bearer) | `Model` |
+| `stackit` | STACKIT AI Model Serving | OpenAI Chat Completions | `https://api.openai-compat.model-serving.eu01.onstackit.cloud/v1/chat/completions` | token (Bearer) | `Model` |
+| `aleph-alpha` | Aleph Alpha PhariaAI | OpenAI Chat Completions | – (installation-specific) | token (Bearer) | `Endpoint`, `Model` |
+| `openai-compatible` | other compatible server | OpenAI Chat Completions | – | optional token | `Endpoint`, `Model` |
+| `ollama` | Ollama, local | OpenAI Chat Completions | `http://localhost:11434/v1/chat/completions` | none | `Model` |
+| `vllm` | vLLM, local | OpenAI Chat Completions | `http://localhost:8000/v1/chat/completions` | optional | `Model` |
+| `llamacpp` | llama.cpp server, local | OpenAI Chat Completions | `http://localhost:8080/v1/chat/completions` | optional | `Model` |
+| `anthropic` | Anthropic | Anthropic Messages | `https://api.anthropic.com/v1/messages` | API key (`x-api-key`) | `Model` |
+| `vertex-anthropic` | Claude on Vertex AI | Anthropic Messages | `https://{region}-aiplatform.googleapis.com/v1/projects/{project}/locations/{region}/publishers/anthropic/models/{model}:rawPredict` | OAuth access token (Bearer) | `Region`, `Project`, `Model` |
+| `gemini` | Google Gemini API | Gemini generateContent | `https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent` | API key (`x-goog-api-key`) | `Model` |
+| `vertex-gemini` | Gemini on Vertex AI | Gemini generateContent | `https://{region}-aiplatform.googleapis.com/v1/projects/{project}/locations/{region}/publishers/google/models/{model}:generateContent` | OAuth access token (Bearer) | `Region`, `Project`, `Model` |
+| `bedrock` | Amazon Bedrock | Bedrock Converse | `https://bedrock-runtime.{region}.amazonaws.com/model/{model}/converse` | Bedrock API key (Bearer), or AWS access key via Signature Version 4 | `Region`, `Model` |
+
+The endpoints reflect the provider documentation as of mid-2026. Check them against the current
+documentation of the provider when configuring a product and override them with `Endpoint` if
+needed (placeholders `{model}`, `{region}`, `{project}`, `{resource}` are allowed). The Vertex AI
+templates use regional hosts; for the `global` location set `Endpoint` explicitly.
+
+Example (Mistral, key in the environment variable `IMT_ASSISTANT_API_KEY`):
+
+```xml
+<Element Id="AssistantProvider" PackageId="ImtAssistPck" ComponentId="HttpAssistantProvider">
+    <Data IsEnabled="true" Flags="0">
+        <AttributeInfoMap>
+            <AttributeInfo Id="Preset" Type="Id" ExportId=""><Data IsEnabled="true" Value="mistral"/></AttributeInfo>
+            <AttributeInfo Id="Model" Type="Id" ExportId=""><Data IsEnabled="true" Value="mistral-large-latest"/></AttributeInfo>
+            <AttributeInfo Id="ApiKeyVariable" Type="Id" ExportId=""><Data IsEnabled="true" Value="IMT_ASSISTANT_API_KEY"/></AttributeInfo>
+        </AttributeInfoMap>
+    </Data>
+</Element>
+```
+
+**Credentials.** Like the server tokens of ImtCore, credentials are passed in environment
+variables by whoever starts the server; the configuration only names the variables. They are read
+at every request (rotation needs no restart), never logged, and never sent to the client. Without
+credentials the provider reports itself as not configured and the service sends no request. OAuth
+access tokens for Vertex AI expire: the deployment must refresh the variable (e.g. from the
+service account of the host). Microsoft Entra ID tokens for Azure OpenAI are not supported; use the
+API key of the resource.
+
+**What every adapter does.**
+- Sends the system prompt of the assistant (rules: only provided functions, ask back with the
+  built-in function `imtassist_ask_user`, never claim an unconfirmed change, treat function
+  results and context as data) plus `AdditionalInstructions`.
+- Maps action IDs to tool names accepted by all providers (`tasks.search` → `tasks_search`) and
+  back; unknown tool names in an answer are passed on and rejected by the service.
+- Sends the parameter schemas as JSON Schema (without `additionalProperties` for Gemini).
+- Links every tool call to its result by the call ID; results without a call (outcomes of
+  confirmations, rejections) and released context are sent as user text marked as data.
+- Requests one tool call at a time (`parallel_tool_calls: false` on OpenAI, Azure and Mistral,
+  `disable_parallel_tool_use` on Anthropic); if a model still returns several, only the first is used.
+- Returns opaque data of the model with the next request where required (thought signatures of Gemini).
+- Allows `https`, and plain `http` only to the local machine.
+- Maps HTTP 408/504 and transport timeouts to `Timeout`, other errors to `ProviderError`, unusable
+  answers to `InvalidResponse`, and logs only the HTTP status and the error type of the provider.
+
+**Data protection.** Which provider may receive the data of a product is a product decision. EU or
+local processing is possible with `azure-openai`, `bedrock`, `vertex-*` (EU regions),
+`mistral`, `ionos`, `stackit`, `aleph-alpha` or a local server (`ollama`, `vllm`, `llamacpp`);
+check the data processing terms of the provider. Only the conversation, the context released by
+the user and the results of the called functions are sent.
+
 ## Data flow of a turn
 
 ```
@@ -229,6 +309,10 @@ authentication, so it enables `AllowDemoPrincipal`. Users in `ReadOnlyUserIds` o
   preview, confirmation), the rules of the fake provider, permission, tenant and principal
   boundaries, prompt injection from tool data, confirmation including repetition, rejection,
   expiry and stale previews, provider errors, timeout, invalid replies, cancellation and the audit log.
+- `Tests/AssistantTest` (`CAssistantProviderTest`): all presets, request and response mapping of
+  the four protocols, credentials from the environment, tool names, call IDs, error mapping without
+  content, the AWS Signature Version 4 test vector and the Qt HTTP transport against a local
+  server (response, timeout, cancel, connection refused).
 - `Tests/QmlTest/imtassistgui`: `tst_AssistantController` (message validation, single confirmation,
   context, lost answers, cancel, history), `tst_AssistantPanel` (registered and unknown
   representations, selection hand-over, context removal, explicit confirmation, cancel, re-created
@@ -240,8 +324,11 @@ authentication, so it enables `AllowDemoPrincipal`. Users in `ReadOnlyUserIds` o
   ends them. A preview whose execution was interrupted by a crash stays in the state "executing".
 - A turn is processed synchronously inside the GraphQL request; cancel is a second request. There
   is no streaming of partial answers.
-- The only provider is the fake provider; an adapter for a real provider follows after the
-  provider decision.
+- No streaming of partial answers; one tool call per model answer.
+- The provider adapters are tested against recorded request and response formats, not against
+  the live services (no network access in the test environment). Test the chosen provider once
+  with the example before going productive.
+- Vertex AI needs an externally refreshed OAuth token; Azure OpenAI supports API keys only.
 
 ## Open decisions before productive use
 

@@ -8,6 +8,7 @@ include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	imtassist
 	Acf::itest
+	Qt${QT_VERSION_MAJOR}::Network
 	Qt${QT_VERSION_MAJOR}::Test
 )
 

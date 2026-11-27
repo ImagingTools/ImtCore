@@ -36,6 +36,11 @@ I_EXPORT_COMPONENT(
 			"Assistant AI Provider Fake Test");
 
 I_EXPORT_COMPONENT(
+			HttpAssistantProvider,
+			"Model provider over HTTP: OpenAI, Azure OpenAI, Mistral, Cohere, IONOS, STACKIT, Aleph Alpha, Anthropic, Gemini, Vertex AI, Bedrock, Ollama, vLLM, llama.cpp",
+			"Assistant AI Provider HTTP OpenAI Anthropic Gemini Bedrock Mistral");
+
+I_EXPORT_COMPONENT(
 			AssistantAuditLog,
 			"Writes assistant audit events without content to the log",
 			"Assistant AI Audit Log");

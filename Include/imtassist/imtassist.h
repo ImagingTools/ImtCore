@@ -19,7 +19,8 @@
 	- Action registry with versioned parameter schemas, classified as reading or changing
 	- Changing actions are split into preparation (bound, time-limited preview) and
 	  execution after an explicit confirmation of exactly this preview
-	- Provider adapter interface with a deterministic fake provider for tests
+	- Provider adapter interface with a deterministic fake provider for tests, and HTTP adapters
+	  for OpenAI-compatible APIs, Anthropic, Gemini and Amazon Bedrock with presets of the common providers
 	- Registry of known UI representation types; unknown types are rejected
 	- Typed, versioned messages exchanged with the UI
 	- Disabled by default: without enabling and a configured provider no provider call is made

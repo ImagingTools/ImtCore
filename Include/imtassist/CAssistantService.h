@@ -101,6 +101,11 @@ private:
 				const IAssistantProvider::Reply& reply,
 				IAssistantProvider::Messages& providerMessages,
 				AssistantMessages& messages);
+	static void AppendFailedToolResult(
+				IAssistantProvider::Messages& providerMessages,
+				const QByteArray& actionId,
+				const QByteArray& callId,
+				const QByteArray& code);
 	IAssistantProvider::ToolDescriptions CreateToolDescriptions() const;
 	CAssistantMessage CreateError(
 				const CAssistantRequestContext& context,

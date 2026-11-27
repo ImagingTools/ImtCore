@@ -269,6 +269,83 @@ QJsonObject CParameterSchema::ToJson() const
 }
 
 
+QJsonObject CParameterSchema::ToJsonSchema(bool useAdditionalProperties) const
+{
+	QJsonObject properties;
+	QJsonArray required;
+
+	for (const Field& field: m_fields){
+		QJsonObject property;
+		if (!field.description.isEmpty()){
+			property["description"] = field.description;
+		}
+
+		switch (field.type){
+		case FT_STRING:
+			property["type"] = QStringLiteral("string");
+			property["maxLength"] = field.maxLength;
+			break;
+
+		case FT_ID:
+			property["type"] = QStringLiteral("string");
+			property["minLength"] = 1;
+			property["maxLength"] = field.maxLength;
+			break;
+
+		case FT_ENUM:
+			property["type"] = QStringLiteral("string");
+			property["enum"] = QJsonArray::fromStringList(field.enumValues);
+			break;
+
+		case FT_INTEGER:
+			property["type"] = QStringLiteral("integer");
+			property["minimum"] = double(field.minValue);
+			property["maximum"] = double(field.maxValue);
+			break;
+
+		case FT_BOOLEAN:
+			property["type"] = QStringLiteral("boolean");
+			break;
+
+		case FT_STRING_LIST:
+			{
+				QJsonObject items;
+				items["type"] = QStringLiteral("string");
+				property["type"] = QStringLiteral("array");
+				property["items"] = items;
+				property["maxItems"] = field.maxItems;
+			}
+			break;
+
+		case FT_OBJECT_LIST:
+			property["type"] = QStringLiteral("array");
+			property["items"] = field.itemSchemaPtr ? field.itemSchemaPtr->ToJsonSchema(useAdditionalProperties) : QJsonObject();
+			property["maxItems"] = field.maxItems;
+			break;
+		}
+
+		properties[field.name] = property;
+
+		if (field.isRequired){
+			required.append(field.name);
+		}
+	}
+
+	QJsonObject retVal;
+	retVal["type"] = QStringLiteral("object");
+	retVal["properties"] = properties;
+	if (!required.isEmpty()){
+		retVal["required"] = required;
+	}
+
+	if (useAdditionalProperties){
+		retVal["additionalProperties"] = false;
+	}
+
+	return retVal;
+}
+
+
 // private methods
 
 bool CParameterSchema::ValidateField(const Field& field, const QJsonValue& value, QString* errorPtr) const
