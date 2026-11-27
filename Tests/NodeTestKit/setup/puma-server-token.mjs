@@ -43,7 +43,11 @@ function Log(message)
 }
 
 
-async function Request(query, token)
+/**
+	The operation is named by the caller and not cut out of the query: the query holds the passwords, and a message made
+	from it would leak them into the log.
+*/
+async function Request(operation, query, token)
 {
 	const headers = { 'Content-Type': 'application/json', 'productid': productId };
 	if (token !== undefined){
@@ -53,7 +57,7 @@ async function Request(query, token)
 	const response = await fetch(graphqlUrl, { method: 'POST', headers, body: JSON.stringify({ query }) });
 	const json = await response.json();
 	if (json.errors !== undefined){
-		throw new Error(`${query.match(/\w+(?=\s*\()/)?.[0]} failed: ${JSON.stringify(json.errors)}`);
+		throw new Error(`${operation} failed: ${JSON.stringify(json.errors)}`);
 	}
 
 	return json.data;
@@ -62,24 +66,24 @@ async function Request(query, token)
 
 async function Main()
 {
-	const created = await Request(`mutation { CreateSuperuser(input: { name: "Super User", mail: ${JSON.stringify(variables.suMail)}, password: ${JSON.stringify(variables.suPassword)} }) { success message } }`);
+	const created = await Request('CreateSuperuser', `mutation { CreateSuperuser(input: { name: "Super User", mail: ${JSON.stringify(variables.suMail)}, password: ${JSON.stringify(variables.suPassword)} }) { success message } }`);
 	if (!created.CreateSuperuser.success){
 		throw new Error(`CreateSuperuser failed: ${created.CreateSuperuser.message}`);
 	}
 
-	const login = await Request(`query { Authorization(input: { login: "su", password: ${JSON.stringify(variables.suPassword)}, productId: "${productId}" }) { token } }`);
+	const login = await Request('Authorization', `query { Authorization(input: { login: "su", password: ${JSON.stringify(variables.suPassword)}, productId: "${productId}" }) { token } }`);
 	const superuserToken = login.Authorization.token;
 
 	const permissions = viewPermissions.map((permission) => `{ id: "${permission}", direct: true }`).join(', ');
-	const role = await Request(`mutation { RoleAdd(input: { id: "", typeId: "Role", productId: "${productId}", name: "Server reader", description: "",
+	const role = await Request('RoleAdd', `mutation { RoleAdd(input: { id: "", typeId: "Role", productId: "${productId}", name: "Server reader", description: "",
 		item: { id: "", roleId: "server_reader", productId: "${productId}", name: "Server reader", description: "Reads the users, groups and roles", permissions: [${permissions}] } }) { id } }`, superuserToken);
 
-	const user = await Request(`mutation { UserAdd(input: { id: "", typeId: "User", productId: "${productId}", name: "${options.user}", description: "",
+	const user = await Request('UserAdd', `mutation { UserAdd(input: { id: "", typeId: "User", productId: "${productId}", name: "${options.user}", description: "",
 		item: { id: "", productId: "${productId}", username: "${options.user}", name: "${options.user}", password: ${JSON.stringify(`${variables.suPassword}-server`)}, email: "${options.user}@${productId.toLowerCase()}.test", enabled: true,
 		roles: [{ id: "${role.RoleAdd.id}", direct: true }] } }) { id } }`, superuserToken);
 
 	const scopes = viewPermissions.map((permission) => `"${permission}"`).join(', ');
-	const token = await Request(`mutation { CreateToken(input: { userId: "${user.UserAdd.id}", productId: "${productId}", name: "${options.user}",
+	const token = await Request('CreateToken', `mutation { CreateToken(input: { userId: "${user.UserAdd.id}", productId: "${productId}", name: "${options.user}",
 		description: "Reads the users, groups and roles", scopes: [${scopes}] }) { token success message } }`, superuserToken);
 	if (!token.CreateToken.success || !token.CreateToken.token){
 		throw new Error(`CreateToken failed: ${token.CreateToken.message}`);
