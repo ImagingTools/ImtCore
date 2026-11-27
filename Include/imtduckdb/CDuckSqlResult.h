@@ -53,13 +53,37 @@ protected:
 	virtual QSqlRecord record() const override;
 
 private:
+	/**
+		Validates the query outcome and declared column types, including nested types, before any rows are fetched.
+		\return true if the result is ready to read. On failure, releases the result and sets the SQL error.
+	*/
 	bool AcceptResult(duckdb_state state);
+	/**
+		Releases the result, chunks and column types and resets the cursor. Keeps the prepared statement for reuse.
+	*/
 	void ClearResult();
+	/**
+		Releases cached chunks whose first row precedes \a firstRow. The caller must drop any cursor into those chunks.
+	*/
 	void DiscardChunksBefore(idx_t firstRow);
+	/**
+		Fetches and stores the next non-empty native chunk. If \a releasePrevious is true, releases older chunks
+		after a successful fetch. Pass false when reading ahead for size() to preserve the current row.
+		\return true if a chunk was stored, or false at end of result or after reporting a fetch error.
+	*/
 	bool FetchNextChunk(bool releasePrevious);
+	/**
+		Converts \a column of the current row on demand, or returns an invalid QVariant if the cursor or column is invalid.
+	*/
 	QVariant CurrentValue(int column) const;
+	/**
+		Converts the value at \a row in a vector with a validated logical \a type. SQL NULL becomes an invalid QVariant.
+		LIST and ARRAY become QVariantList, and STRUCT becomes QVariantMap keyed by field name.
+	*/
 	static QVariant ReadValue(duckdb_vector vector, duckdb_logical_type type, idx_t row);
-	// Takes ownership of the temporary DuckDB value.
+	/**
+		Copies DuckDB's text representation and releases both the returned C string and the temporary \a value.
+	*/
 	static QString ReadValueText(duckdb_value value);
 	/**
 		Reads the value in \a row of the data of a vector of a scalar type.
@@ -69,7 +93,7 @@ private:
 				duckdb_logical_type type,
 				idx_t row);
 	/**
-		\return the Qt type values of \a type are read as, or an invalid QMetaType if the type has no Qt counterpart.
+		\return the Qt field type, or an invalid QMetaType if \a type or any nested member is unsupported.
 	*/
 	static QMetaType ConvertMetaType(duckdb_logical_type type);
 	/**
