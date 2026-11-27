@@ -2889,6 +2889,10 @@ export class Canvas extends Item {
 		this.$paintedHeight = -1;
 		this.$context = null;
 		this.$measureContext = null;
+		this.$images = new Map(); // address -> 'loading', 'ready' or 'error'
+		this.$pictures = new Map();
+		this.$drawWaits = new Set(); // addresses drawImage waits for
+		this.$announced = new Set(); // addresses loadImage() was called with: imageLoaded is sent for them
 		this.$renderTarget = 0; // Canvas.Image
 		this.$renderStrategy = 0; // Canvas.Immediate
 		this.$declareSignal('paint', []);
@@ -2900,15 +2904,26 @@ export class Canvas extends Item {
 	// The picture is kept for `createPattern(url, ...)`; the engine finds it from the address like the one of an Image.
 	loadImage(src) {
 		const url = toStr(src);
-		if (this.$images === undefined) {
-			this.$images = new Map();
-			this.$pictures = new Map();
-		}
 		const state = this.$images.get(url);
+		if (state !== 'ready') this.$announced.add(url);
 		if (state === 'ready' || state === 'loading') return;
 		this.$images.set(url, 'loading');
 		this.$painted = false;
 		this.$ensurePainted();
+		this.$requestPicture(url);
+	}
+
+	// drawImage() of an address that is not loaded: as in Qt the picture shows without a loadImage() call, here one paint later.
+	$drawRequest(url) {
+		const state = this.$images.get(url);
+		if (state === 'ready' || state === 'error') return;
+		this.$drawWaits.add(url);
+		if (state === 'loading') return;
+		this.$images.set(url, 'loading');
+		this.$requestPicture(url);
+	}
+
+	$requestPicture(url) {
 		const canvas = this;
 		hooks.loadImage(
 			{
@@ -2921,11 +2936,13 @@ export class Canvas extends Item {
 					if (canvas.$images.get(url) !== 'loading') return;
 					if (status === 3) {
 						canvas.$images.set(url, 'error');
+						canvas.$drawWaits.delete(url);
 						return;
 					}
 					if (picture !== null) canvas.$pictures.set(url, picture);
 					canvas.$images.set(url, 'ready');
-					canvas.$emit('imageLoaded');
+					if (canvas.$drawWaits.delete(url)) canvas.requestPaint();
+					if (canvas.$announced.delete(url)) canvas.$emit('imageLoaded');
 				},
 			},
 			url,
@@ -2933,18 +2950,16 @@ export class Canvas extends Item {
 	}
 
 	unloadImage(src) {
-		if (this.$images !== undefined) {
-			this.$images.delete(toStr(src));
-			this.$pictures.delete(toStr(src));
-		}
+		this.$images.delete(toStr(src));
+		this.$pictures.delete(toStr(src));
 	}
 
 	isImageLoaded(src) {
-		return this.$images !== undefined && this.$images.get(toStr(src)) === 'ready';
+		return this.$images.get(toStr(src)) === 'ready';
 	}
 
 	isImageLoading(src) {
-		return this.$images !== undefined && this.$images.get(toStr(src)) === 'loading';
+		return this.$images.get(toStr(src)) === 'loading';
 	}
 
 	// Inside onPaint this is the recording context. Outside of it (e.g. a hidden canvas used only
@@ -2970,7 +2985,7 @@ export class Canvas extends Item {
 		this.$cmds = [];
 		const signal = this.$sigs.get('paint');
 		if (signal.handlers.length > 0) {
-			this.$context = new CanvasContext(this.$aw, this.$ah, this.$cmds, this.$pictures === undefined ? null : this.$pictures);
+			this.$context = new CanvasContext(this.$aw, this.$ah, this.$cmds, this.$pictures, (url) => this.$drawRequest(url));
 			try {
 				this.$emit('paint');
 			} finally {
