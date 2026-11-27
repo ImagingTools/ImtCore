@@ -5,11 +5,11 @@
 // STL includes
 #include <memory>
 
+// 3rdParty includes
+#include <duckdb.h>
+
 // ImtCore includes
 #include <imtduckdb/IDuckAppender.h>
-
-// 3rdParty includes
-#include <duckdb.hpp>
 
 
 namespace imtduckdb
@@ -17,25 +17,29 @@ namespace imtduckdb
 
 
 /**
-	IDuckAppender implementation backed directly by duckdb::Appender.
+	IDuckAppender implementation backed directly by a DuckDB appender.
 
-	Constructing a duckdb::Appender and every operation on it can throw (unknown table, type
-	mismatch, ...); this class converts all of that into GetLastError() + bool return values so
-	callers never have to deal with DuckDB exceptions directly.
+	Every call of the DuckDB appender reports failure through its state, and the error text is read
+	from the appender into GetLastError(), so callers only deal with bool return values.
 */
 class CDuckAppender: public IDuckAppender
 {
 public:
 	/**
 		Creates an appender for \a tableName (optionally schema-qualified via \a schemaName).
-		\return nullptr if the duckdb::Appender could not be constructed (e.g. unknown table);
+		\return nullptr if the DuckDB appender could not be created (e.g. unknown table);
 				in that case, \a errorMessagePtr (if not null) is filled with the error text.
 	*/
 	static std::unique_ptr<IDuckAppender> Create(
-				duckdb::Connection& connection,
+				duckdb_connection connection,
 				const QString& tableName,
 				const QString& schemaName = QString(),
 				QString* errorMessagePtr = nullptr);
+
+	/**
+		Flushes the rows that were not flushed yet, as closing does, and destroys the DuckDB appender.
+	*/
+	virtual ~CDuckAppender() override;
 
 	// reimplemented (IDuckAppender)
 	virtual bool AppendRow(const QVariantList& rowValues) override;
@@ -44,10 +48,15 @@ public:
 	virtual QString GetLastError() const override;
 
 private:
-	explicit CDuckAppender(std::unique_ptr<duckdb::Appender> appenderPtr);
+	explicit CDuckAppender(duckdb_appender appender);
+
+	/**
+		Reads the error of the last failed call of \a appender.
+	*/
+	static QString GetAppenderError(duckdb_appender appender);
 
 private:
-	std::unique_ptr<duckdb::Appender> m_appenderPtr;
+	duckdb_appender m_appender;
 	QString m_lastError;
 	bool m_closed = false;
 };

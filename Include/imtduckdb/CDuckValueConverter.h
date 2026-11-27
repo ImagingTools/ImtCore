@@ -6,7 +6,7 @@
 #include <QtCore/QVariant>
 
 // 3rdParty includes
-#include <duckdb.hpp>
+#include <duckdb.h>
 
 
 namespace imtduckdb
@@ -14,17 +14,18 @@ namespace imtduckdb
 
 
 /**
-	Shared QVariant <-> duckdb::Value conversion, used by both CDuckSqlResult (bound query
+	Shared QVariant -> DuckDB value conversion, used by both CDuckSqlResult (bound query
 	parameters) and CDuckAppender (bulk row appends) so the two code paths cannot drift apart.
 */
 class CDuckValueConverter
 {
 public:
 	/**
-		Converts \a value to a duckdb::Value. A null QVariant becomes a duckdb NULL value, and a QVariantList or
-		QStringList becomes a LIST of its converted items. May throw when the items of a list cannot share a type.
+		Converts \a value to a DuckDB value, which the caller destroys with duckdb_destroy_value(). A null QVariant
+		becomes a NULL value, and a QVariantList or QStringList becomes a LIST of its converted items.
+		\return nullptr if the value cannot be converted, e.g. when the items of a list cannot share a type.
 	*/
-	static duckdb::Value ToDuckDbValue(const QVariant& value);
+	static duckdb_value ToDuckDbValue(const QVariant& value);
 };
 
 

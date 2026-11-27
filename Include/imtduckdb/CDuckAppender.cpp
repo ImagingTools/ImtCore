@@ -10,34 +10,47 @@ namespace imtduckdb
 {
 
 
-CDuckAppender::CDuckAppender(std::unique_ptr<duckdb::Appender> appenderPtr)
-	:m_appenderPtr(std::move(appenderPtr))
+CDuckAppender::CDuckAppender(duckdb_appender appender)
+	:m_appender(appender)
 {
+}
+
+
+CDuckAppender::~CDuckAppender()
+{
+	duckdb_appender_destroy(&m_appender);
 }
 
 
 // public static methods
 
 std::unique_ptr<IDuckAppender> CDuckAppender::Create(
-			duckdb::Connection& connection,
+			duckdb_connection connection,
 			const QString& tableName,
 			const QString& schemaName,
 			QString* errorMessagePtr)
 {
-	try{
-		std::unique_ptr<duckdb::Appender> appenderPtr = schemaName.isEmpty()
-					? std::make_unique<duckdb::Appender>(connection, tableName.toStdString())
-					: std::make_unique<duckdb::Appender>(connection, schemaName.toStdString(), tableName.toStdString());
+	const QByteArray table = tableName.toUtf8();
+	const QByteArray schema = schemaName.toUtf8();
 
-		return std::unique_ptr<IDuckAppender>(new CDuckAppender(std::move(appenderPtr)));
+	duckdb_appender appender = nullptr;
+	const duckdb_state state = duckdb_appender_create_ext(
+				connection,
+				nullptr,
+				schemaName.isEmpty() ? nullptr : schema.constData(),
+				table.constData(),
+				&appender);
+	if (state == DuckDBSuccess){
+		return std::unique_ptr<IDuckAppender>(new CDuckAppender(appender));
 	}
-	catch (const std::exception& exception){
-		if (errorMessagePtr != nullptr){
-			*errorMessagePtr = exception.what();
-		}
 
-		return nullptr;
+	if (errorMessagePtr != nullptr){
+		*errorMessagePtr = GetAppenderError(appender);
 	}
+
+	duckdb_appender_destroy(&appender);
+
+	return nullptr;
 }
 
 
@@ -51,17 +64,27 @@ bool CDuckAppender::AppendRow(const QVariantList& rowValues)
 		return false;
 	}
 
-	try{
-		m_appenderPtr->BeginRow();
+	for (const QVariant& value : rowValues){
+		duckdb_value duckValue = CDuckValueConverter::ToDuckDbValue(value);
+		if (duckValue == nullptr){
+			m_lastError = QStringLiteral("Value '%1' cannot be converted to a DuckDB value").arg(value.toString());
 
-		for (const QVariant& value : rowValues){
-			m_appenderPtr->Append(CDuckValueConverter::ToDuckDbValue(value));
+			return false;
 		}
 
-		m_appenderPtr->EndRow();
+		const duckdb_state state = duckdb_append_value(m_appender, duckValue);
+
+		duckdb_destroy_value(&duckValue);
+
+		if (state != DuckDBSuccess){
+			m_lastError = GetAppenderError(m_appender);
+
+			return false;
+		}
 	}
-	catch (const std::exception& exception){
-		m_lastError = exception.what();
+
+	if (duckdb_appender_end_row(m_appender) != DuckDBSuccess){
+		m_lastError = GetAppenderError(m_appender);
 
 		return false;
 	}
@@ -78,11 +101,8 @@ bool CDuckAppender::Flush()
 		return false;
 	}
 
-	try{
-		m_appenderPtr->Flush();
-	}
-	catch (const std::exception& exception){
-		m_lastError = exception.what();
+	if (duckdb_appender_flush(m_appender) != DuckDBSuccess){
+		m_lastError = GetAppenderError(m_appender);
 
 		return false;
 	}
@@ -99,11 +119,8 @@ bool CDuckAppender::Close()
 
 	m_closed = true;
 
-	try{
-		m_appenderPtr->Close();
-	}
-	catch (const std::exception& exception){
-		m_lastError = exception.what();
+	if (duckdb_appender_close(m_appender) != DuckDBSuccess){
+		m_lastError = GetAppenderError(m_appender);
 
 		return false;
 	}
@@ -115,6 +132,23 @@ bool CDuckAppender::Close()
 QString CDuckAppender::GetLastError() const
 {
 	return m_lastError;
+}
+
+
+// private static methods
+
+QString CDuckAppender::GetAppenderError(duckdb_appender appender)
+{
+	duckdb_error_data errorData = duckdb_appender_error_data(appender);
+
+	QString retVal = QString::fromUtf8(duckdb_error_data_message(errorData));
+	if (retVal.isEmpty()){
+		retVal = QStringLiteral("DuckDB appender failed");
+	}
+
+	duckdb_destroy_error_data(&errorData);
+
+	return retVal;
 }
 
 

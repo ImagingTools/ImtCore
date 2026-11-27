@@ -4,55 +4,60 @@
 
 // Qt includes
 #include <QtCore/QDateTime>
+#include <QtCore/QList>
 #include <QtCore/QUuid>
+#include <QtCore/QtEndian>
 
 
 namespace imtduckdb
 {
 
 
-duckdb::Value CDuckValueConverter::ToDuckDbValue(const QVariant& value)
+duckdb_value CDuckValueConverter::ToDuckDbValue(const QVariant& value)
 {
 	if (value.isNull()){
-		return duckdb::Value();
+		return duckdb_create_null_value();
 	}
+
+	QByteArray text;
 
 	switch (value.typeId()){
 	case QMetaType::Bool:
-		return duckdb::Value::BOOLEAN(value.toBool());
+		return duckdb_create_bool(value.toBool());
 
 	case QMetaType::Int:
-		return duckdb::Value::INTEGER(value.toInt());
+		return duckdb_create_int32(value.toInt());
 
 	case QMetaType::UInt:
-		return duckdb::Value::UINTEGER(value.toUInt());
+		return duckdb_create_uint32(value.toUInt());
 
 	case QMetaType::LongLong:
-		return duckdb::Value::BIGINT(value.toLongLong());
+		return duckdb_create_int64(value.toLongLong());
 
 	case QMetaType::ULongLong:
-		return duckdb::Value::UBIGINT(value.toULongLong());
+		return duckdb_create_uint64(value.toULongLong());
 
 	case QMetaType::Double:
-		return duckdb::Value::DOUBLE(value.toDouble());
+		return duckdb_create_double(value.toDouble());
 
-	case QMetaType::QUuid:
-		return duckdb::Value::UUID(value.toUuid().toString(QUuid::WithoutBraces).toStdString());
+	/**
+		DuckDB takes the 128 bits of the UUID in big-endian order, upper half first.
+	*/
+	case QMetaType::QUuid: {
+		const QByteArray bytes = value.toUuid().toRfc4122();
+
+		duckdb_uhugeint uuid;
+		uuid.upper = qFromBigEndian<quint64>(bytes.constData());
+		uuid.lower = qFromBigEndian<quint64>(bytes.constData() + 8);
+
+		return duckdb_create_uuid(uuid);
+	}
 
 	case QMetaType::QByteArray: {
 		const QByteArray bytes = value.toByteArray();
-		return duckdb::Value::BLOB(reinterpret_cast<duckdb::const_data_ptr_t>(bytes.constData()), static_cast<duckdb::idx_t>(bytes.size()));
+
+		return duckdb_create_blob(reinterpret_cast<const uint8_t*>(bytes.constData()), static_cast<idx_t>(bytes.size()));
 	}
-
-	/**
-		DuckDB implicitly casts VARCHAR values to the expected target type, so ISO-formatted text
-		is used here instead of hand-rolling duckdb's internal epoch-based date/time types.
-	*/
-	case QMetaType::QDateTime:
-		return duckdb::Value(value.toDateTime().toString(Qt::ISODateWithMs).toStdString());
-
-	case QMetaType::QDate:
-		return duckdb::Value(value.toDate().toString(Qt::ISODate).toStdString());
 
 	/**
 		The element type follows the values, so a list of QUuid is a UUID[]. The appender and the parameter binding
@@ -60,24 +65,56 @@ duckdb::Value CDuckValueConverter::ToDuckDbValue(const QVariant& value)
 	*/
 	case QMetaType::QVariantList:
 	case QMetaType::QStringList: {
-		duckdb::vector<duckdb::Value> children;
-		for (const QVariant& item : value.toList()){
-			children.push_back(ToDuckDbValue(item));
+		const QVariantList items = value.toList();
+
+		QList<duckdb_value> children;
+		children.reserve(items.size());
+		for (const QVariant& item : items){
+			children.append(ToDuckDbValue(item));
 		}
 
 		/**
-			An empty list has no element to take the type from, and nothing to cast either.
+			An empty list has no element to take the type from, and nothing to cast either. DuckDB rejects a null
+			array of values even for an empty list, hence the placeholder.
 		*/
-		if (children.empty()){
-			return duckdb::Value::LIST(duckdb::LogicalType::VARCHAR, std::move(children));
+		duckdb_logical_type emptyListType = children.isEmpty() ? duckdb_create_logical_type(DUCKDB_TYPE_VARCHAR) : nullptr;
+		duckdb_value noValue = nullptr;
+
+		duckdb_value retVal = nullptr;
+		if (!children.contains(nullptr)){
+			retVal = duckdb_create_list_value(
+						children.isEmpty() ? emptyListType : duckdb_get_value_type(children.first()),
+						children.isEmpty() ? &noValue : children.data(),
+						static_cast<idx_t>(children.size()));
 		}
 
-		return duckdb::Value::LIST(std::move(children));
+		for (duckdb_value child : std::as_const(children)){
+			duckdb_destroy_value(&child);
+		}
+
+		duckdb_destroy_logical_type(&emptyListType);
+
+		return retVal;
 	}
 
+	/**
+		DuckDB implicitly casts VARCHAR values to the expected target type, so ISO-formatted text
+		is used here instead of hand-rolling DuckDB's internal epoch-based date/time types.
+	*/
+	case QMetaType::QDateTime:
+		text = value.toDateTime().toString(Qt::ISODateWithMs).toUtf8();
+		break;
+
+	case QMetaType::QDate:
+		text = value.toDate().toString(Qt::ISODate).toUtf8();
+		break;
+
 	default:
-		return duckdb::Value(value.toString().toStdString());
+		text = value.toString().toUtf8();
+		break;
 	}
+
+	return duckdb_create_varchar_length(text.constData(), static_cast<idx_t>(text.size()));
 }
 
 

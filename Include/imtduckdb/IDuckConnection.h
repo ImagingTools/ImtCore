@@ -18,9 +18,9 @@ namespace imtduckdb
 
 
 /**
-	An exclusively-owned duckdb::Connection exposed as a full database engine.
+	An exclusively-owned DuckDB connection exposed as a full database engine.
 
-	duckdb::Connection is not thread-safe, but duckdb::DuckDB is: concurrent workers each take their
+	A DuckDB connection is not thread-safe, but the database is: concurrent workers each take their
 	own IDuckConnection and run in parallel under DuckDB's MVCC (writers do not block readers)
 	instead of serializing on the shared connection of CDuckDatabaseEngineComp. Everything a cache
 	builder needs - DDL, bulk append, table swap - is available here so that an entire rebuild can
