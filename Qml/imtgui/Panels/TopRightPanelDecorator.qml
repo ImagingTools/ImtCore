@@ -8,18 +8,26 @@ import imtcontrols 1.0
 DecoratorBase {
     id: topRightPanelDecorator;
 
-    // The bell gets its own place after the user panel and the preference button
-    implicitWidth: notificationBellLoader.active ? Style.sizeHintBXS + Style.buttonWidthM + Style.marginM : Style.sizeHintBXS;
+    // The bell and the assistant get their own places after the user panel and the preference button
+    implicitWidth: Style.sizeHintBXS + (notificationBellLoader.active ? Style.buttonWidthM + Style.marginM : 0) + (assistantButtonLoader.active ? Style.buttonWidthM + Style.marginM : 0);
 
     Component.onCompleted: {
         onLogout();
 
         Events.subscribeEvent("NotificationCenterActiveChanged", topRightPanelDecorator.onNotificationCenterActiveChanged);
         Events.sendEvent("NotificationCenterStateRequested");
+
+        Events.subscribeEvent("AssistantStateChanged", topRightPanelDecorator.onAssistantStateChanged);
+        Events.sendEvent("AssistantStateRequested");
     }
 
     Component.onDestruction: {
         Events.unSubscribeEvent("NotificationCenterActiveChanged", topRightPanelDecorator.onNotificationCenterActiveChanged);
+        Events.unSubscribeEvent("AssistantStateChanged", topRightPanelDecorator.onAssistantStateChanged);
+    }
+
+    function onAssistantStateChanged(state){
+        assistantButtonLoader.active = state.active;
     }
 
     function onNotificationCenterActiveChanged(active){
@@ -93,5 +101,17 @@ DecoratorBase {
 
         active: false;
         source: "qrc:/qml/imtnotifygui/NotificationBell.qml";
+    }
+
+    // Loaded by URL only while the assistant is enabled for the organization: applications without it do not need imtassistgui
+    Loader {
+        id: assistantButtonLoader;
+
+        anchors.right: notificationBellLoader.active ? notificationBellLoader.left : parent.right;
+        anchors.rightMargin: Style.marginM;
+        anchors.verticalCenter: parent ? parent.verticalCenter : undefined;
+
+        active: false;
+        source: "qrc:/qml/imtassistgui/AssistantButton.qml";
     }
 }

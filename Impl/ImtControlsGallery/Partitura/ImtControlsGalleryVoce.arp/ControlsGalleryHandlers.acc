@@ -131,6 +131,7 @@
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
+                                <Value>AssistantGetStatus</Value>
                                 <Value>AssistantStartConversation</Value>
                                 <Value>AssistantSendMessage</Value>
                                 <Value>AssistantConfirmPreview</Value>

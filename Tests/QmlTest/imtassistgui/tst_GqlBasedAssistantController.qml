@@ -48,6 +48,22 @@ TestCase {
 		return controller
 	}
 
+	function test_statusIsRequested(){
+		GqlTestTransport.queueResponse("AssistantGetStatus", response("AssistantGetStatus", {"available": true}))
+
+		let controller = createTemporaryObject(controllerComp, testCase)
+		controller.checkAvailability()
+
+		let request = waitForCommand("AssistantGetStatus")
+		compare(request.requestType, "query")
+		tryCompare(controller, "available", true, 5000)
+
+		GqlTestTransport.queueStatus("AssistantGetStatus", 500)
+		controller.checkAvailability()
+		tryCompare(controller, "available", false, 5000)
+		compare(controller.messagesModel.count, 0)
+	}
+
 	function test_messageWithContextIsSentAndAnswered(){
 		let controller = startedController()
 

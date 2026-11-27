@@ -19,6 +19,8 @@ QtObject {
 	id: root
 
 	property string conversationId: ""
+	// Whether the assistant is enabled for the organization of the session (AssistantGetStatus).
+	property bool available: false
 	property bool busy: false
 	property string busyCommand: ""
 	readonly property int formatVersion: 1
@@ -43,11 +45,24 @@ QtObject {
 	readonly property var knownKinds: ["userText", "assistantText", "clarification", "actionResult", "actionPreview", "actionExecuted", "status", "error"]
 
 	signal messagesAppended()
+	signal availabilityChecked(bool available)
 
 	// Transport, implemented by a derived controller.
 	function sendRequest(commandId, input){
 		console.warn("AssistantController: no transport for", commandId)
 		root.handleError(commandId, "")
+	}
+
+	/**
+		Ask the server whether the assistant is enabled for the organization of the session.
+	*/
+	function checkAvailability(){
+		root.sendRequest("AssistantGetStatus", {})
+	}
+
+	function handleStatus(isAvailable){
+		root.available = isAvailable === true
+		root.availabilityChecked(root.available)
 	}
 
 	function startConversation(){
@@ -252,6 +267,12 @@ QtObject {
 
 	// Called by the transport if a command failed without an answer.
 	function handleError(commandId, message){
+		if (commandId === "AssistantGetStatus"){
+			root.handleStatus(false)
+
+			return
+		}
+
 		if (commandId === "AssistantCancelRequest" || commandId === "AssistantCloseConversation" || commandId === "AssistantGetHistory"){
 			return
 		}

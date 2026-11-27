@@ -31,6 +31,11 @@ Rectangle {
 	property AssistantController controller: null
 	property string title: qsTr("Assistant")
 
+	// Show a close button in the header, e.g. in the side panel of the application.
+	property bool closable: false
+
+	signal closeRequested()
+
 	/**
 		Registry of the components for structured results. The standard list is registered by default.
 	*/
@@ -107,7 +112,7 @@ Rectangle {
 		Button {
 			id: newConversationButton
 			objectName: "AssistantNewConversation"
-			anchors.right: parent.right
+			anchors.right: closeButton.visible ? closeButton.left : parent.right
 			anchors.rightMargin: Style.marginM
 			anchors.verticalCenter: parent.verticalCenter
 			text: qsTr("New conversation")
@@ -116,6 +121,23 @@ Rectangle {
 			onClicked: {
 				assistantPanel.controller.newConversation()
 				assistantPanel.focusInput()
+			}
+		}
+
+		ToolButton {
+			id: closeButton
+			objectName: "AssistantClose"
+			anchors.right: parent.right
+			anchors.rightMargin: Style.marginM
+			anchors.verticalCenter: parent.verticalCenter
+			width: Style.buttonWidthM
+			height: width
+			visible: assistantPanel.closable
+			tooltipText: qsTr("Close")
+			iconSource: "qrc:/" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+
+			onClicked: {
+				assistantPanel.closeRequested()
 			}
 		}
 	}

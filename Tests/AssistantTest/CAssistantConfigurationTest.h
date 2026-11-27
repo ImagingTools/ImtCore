@@ -27,6 +27,7 @@ private slots:
 	void testStore_TenantsAreIsolated();
 	void testService_EnabledPerTenant();
 	void testTenantProvider_NotConfiguredTenant();
+	void testTenantProvider_UsesConfigurationOfTenant();
 };
 
 

@@ -13,8 +13,9 @@ workflows; it never bypasses permissions or business logic.
 | Module | Content |
 |---|---|
 | `Include/imtassist` | Core library and ACF components |
-| `Include/imtassistgql` | GraphQL controller |
-| `Qml/imtassistgui` | QML panel, controller contract, GraphQL controller, standard representations |
+| `Include/imtassistgql` | GraphQL controllers, administration actions |
+| `Include/imtassistdb` | SQL storage of the configurations of the organizations |
+| `Qml/imtassistgui` | QML panel, assistant of the application (center, button, side panel), page of the administration, controller contract, GraphQL controller, standard representations |
 | `Impl/ImtAssistPck`, `Impl/ImtAssistGqlPck` | Component packages |
 | `Impl/ImtControlsGallery` | Example: demo tasks, actions, configuration and the page "Assistant" |
 
@@ -47,14 +48,16 @@ and `imtchatgui` is unchanged.
 
 | Component | Attributes |
 |---|---|
-| `ImtAssistPck/AssistantService` | `Enabled` (default `false`), `EnabledParam` (server setting), `Provider`, `ActionRegistry`, `RepresentationRegistry`, `AuditLog`, `ProviderTimeout`, `MaxStepsPerTurn`, `PreviewTimeToLive` |
+| `ImtAssistPck/AssistantService` | `Enabled` (default `false`), `EnabledParam` (server setting), `TenantPolicy` (e.g. `AssistantConfigurationStore`), `Provider`, `ActionRegistry`, `RepresentationRegistry`, `AuditLog`, `ProviderTimeout`, `MaxStepsPerTurn`, `PreviewTimeToLive` |
 | `ImtAssistPck/AssistantActionRegistry` | `Actions`: the action components of the application |
 | `ImtAssistPck/UiRepresentationRegistry` | `RegisterStandardRepresentations` (default `true`), `SchemaProviders` (`IUiRepresentationSchemaProvider`) |
-| `ImtAssistPck/HttpAssistantProvider` | `Preset`, `Model`, `Endpoint`, `Region`, `Project`, `Resource`, `ApiKeyVariable`, `AwsAccessKeyIdVariable`, `AwsSecretAccessKeyVariable`, `AwsSessionTokenVariable`, `MaxOutputTokens`, `AdditionalInstructions` (see [Model providers](#model-providers)); the `...Param` references to the [server settings](#server-settings) |
+| `ImtAssistPck/HttpAssistantProvider` | `Preset`, `Model`, `Endpoint`, `Region`, `Project`, `Resource`, `ApiKeyVariable`, `AwsAccessKeyIdVariable`, `AwsSecretAccessKeyVariable`, `AwsSessionTokenVariable`, `MaxOutputTokens`, `AdditionalInstructions` (see [Model providers](#model-providers)); the `...Param` references to settings of the server |
 | `ImtAssistPck/AssistantProviderList` | – (the presets as options for the provider selection) |
 | `ImtAssistPck/FakeAssistantProvider` | rules: `RuleKeywords`, `RuleActionIds`, `RuleParameters` (JSON), `RuleReplies`, `RuleQuestions`; `DefaultReply`, `ToolResultReply` |
 | `ImtAssistPck/AssistantAuditLog` | writes events to the ACF log of the component |
 | `ImtAssistGqlPck/AssistantController` | `AssistantService`, `CommandIds` (the `Assistant*` commands), `CommandPermissions`, `PermissionChecker`; `AllowDemoPrincipal`, `DemoUserId`, `DemoTenantId` (demo only, see below) |
+| `ImtAssistPck/AssistantConfiguration`, `AssistantConfigurationStore`, `TenantAssistantProvider`, `ImtAssistGqlPck/AssistantConfigurationController`, `AssistantConfigurationDatabaseDelegate` | see [Configuration per organization](#configuration-per-organization-administration) |
+| `ImtAssistGqlPck/AdministrationSearchAction` (`Kind`: `users`, `groups`, `roles`), `AdministrationAddUserToGroupAction` | `RequestHandlers`, see [Administration actions](#administration-actions) |
 
 Add the controller to the `SlaveGqlHandlers` of the GraphQL servlet and gate the commands
 with `CommandPermissions` like any other command of the application.
@@ -65,6 +68,7 @@ All commands take an `input` object. `messagesJson` is a JSON array of [messages
 
 | Command | Input | Output |
 |---|---|---|
+| `AssistantGetStatus` (query) | – | `available`: the assistant is enabled for the organization of the session |
 | `AssistantStartConversation` (mutation) | – | `conversationId`, `messagesJson` |
 | `AssistantSendMessage` (mutation) | `conversationId`, `text`, `contextItems` [{`kind`, `label`, `dataJson`}] | `conversationId`, `messagesJson` |
 | `AssistantConfirmPreview` (mutation) | `previewId` | `messagesJson` |
@@ -228,51 +232,128 @@ local processing is possible with `azure-openai`, `bedrock`, `vertex-*` (EU regi
 check the data processing terms of the provider. Only the conversation, the context released by
 the user and the results of the called functions are sent.
 
-## Server settings
+## Configuration per organization (administration)
 
-The provider can be configured in the server settings, like the LDAP or session settings of
-PumaServer: the composite `ImtAssistVoce/AssistantSettings` is a `ComposedParamsSet` named
-`Assistant` that the server adds to its `Preferences`. It is stored with the other server settings
-(`FileAutoPersistence`) and shown by the generic settings editor of the server configurator.
+The assistant is configured per organization (tenant) by its administrators, on the page
+**Administration → Assistant**, next to users, roles and groups. Every organization chooses its
+own provider, model and API key and enables the assistant for its members.
 
-| Setting (parameter ID) | Type | Overrides |
+| Part | Content |
+|---|---|
+| `imtassist::IAssistantConfiguration` / `CAssistantConfiguration` | `TenantId`, `Enabled`, `PresetId`, `Model`, `Endpoint`, `Region`, `Project`, `Resource`, protected API key, `MaxOutputTokens`, `AdditionalInstructions`, `UpdatedAt` |
+| `ImtAssistPck/AssistantConfigurationStore` | Store in an object collection (object ID = tenant ID) and the **policy of the server**: `AllowedPresets` (default: all providers with a fixed public endpoint, i.e. not `openai-compatible`, `ollama`, `vllm`, `llamacpp`), `AllowCustomEndpoints` (default `false`), `SecretProtector`, `CacheTimeToLive` (10 s). Also the tenant policy of the service. |
+| `ImtAssistPck/TenantAssistantProvider` | Provider that reads the configuration of the tenant of every request. `AllowServerCredentials` (default `false`): only then the environment variables of the server are used for tenants without own key. `AdditionalInstructions` of the product come before those of the tenant. |
+| `ImtAssistGqlPck/AssistantConfigurationDatabaseDelegate`, `imtassistdb` | Table `AssistantConfigurations` (SQLite, PostgreSQL); call `Init::InitAssistantDb()` in the server |
+| `ImtAssistGqlPck/AssistantConfigurationController` | `AssistantGetConfiguration`, `AssistantSetConfiguration` |
+| `imtassistgui/AssistantSettingsPage` | The page of the administration |
+
+**Rules of the configuration**
+
+- The tenant is always the one of the session, never one of the input.
+- Reading needs `/Administration/Assistant/View`, changing `/Administration/Assistant/Edit`
+  (attributes `ViewPermission`, `EditPermission`). The controller checks them itself, also when the
+  composite has no `CommandPermissions`. The page is shown with `/Administration/Assistant/ViewPage`.
+- The API key is sent once when it is entered, stored only protected by the secret protector of the
+  server (without a protector no key is stored) and never returned: the page only shows whether a key
+  is stored. `apiKeyChange` is `keep`, `set` or `clear`.
+- A custom endpoint makes the server send requests to an address chosen by the organization; it is
+  refused unless the operator sets `AllowCustomEndpoints`. Region, project and resource are parts of
+  the host name of the provider and must not contain dots.
+- The policy is checked again at every request: a configuration that the server no longer allows is
+  not used.
+- The assistant answers an organization only if it is enabled server-wide (`AssistantService/Enabled`)
+  **and** in the configuration of the organization (`AssistantService/TenantPolicy`).
+
+| Command | Input | Output |
 |---|---|---|
-| `AssistantEnabled` | `EnableableParam`, default off | `AssistantService/Enabled` |
-| `Provider` | `SelectionParam` with the list of all presets (`ImtAssistPck/AssistantProviderList`) | `HttpAssistantProvider/Preset` |
-| `Model`, `Endpoint`, `Region`, `Project`, `Resource` | `TextParam` | the attributes of the same name |
-| `ApiKey` | `ImtCryptPck/ProtectedTextParam` (secret) | `HttpAssistantProvider/ApiKeyVariable` |
-| `MaxOutputTokens` | `TextParam`, default `1024` | `MaxOutputTokens` |
-| `AdditionalInstructions` | `TextParam` | `AdditionalInstructions` |
+| `AssistantGetConfiguration` (query) | – | `configurationJson`: the configuration without key, `hasApiKey`, `allowsCustomEndpoint`, `presets` [{`id`, `name`, `needsRegion`, `needsProject`, `needsResource`, `needsEndpoint`, `needsApiKey`, `credentialHint`}] |
+| `AssistantSetConfiguration` (mutation) | `enabled`, `presetId`, `model`, `endpoint`, `region`, `project`, `resource`, `maxOutputTokens`, `additionalInstructions`, `apiKeyChange`, `apiKey` | `success`, `errorMessage`, `configurationJson` |
 
-An empty or unset setting falls back to the attribute, so a server without the settings works as
-before. The provider reads the settings at every request; a change takes effect without restart.
+The attributes and `...Param` references of `HttpAssistantProvider` remain for servers that use one
+provider for all organizations.
 
-**The API key** is a secret parameter (`imtcrypt::ISecretTextParam`):
-- it is stored protected by `ImtCryptPck/SystemSecretProtector` (on Windows the data protection
-  API binds it to the account of the server; elsewhere it is stored as is and the settings file
-  must be readable by the server account only, as for the other server secrets). If it cannot be
-  protected, it is not stored at all;
-- it is never sent to the settings editor: `ImtServerAppPck/SecretTextParamRepresentationController`
-  shows a placeholder for a stored key, keeps the key when the placeholder comes back, removes it
-  when the field is emptied and replaces it otherwise. The plain `TextParamRepresentationController`
-  ignores secret parameters, so without the secret controller the field is not shown (fail closed);
-- without a key in the settings, the environment variable of `ApiKeyVariable` is used.
+## One assistant, several entry points
 
-**Integration into a server** (example: the structure of PumaServer):
+The application has **one** assistant with one conversation (`imtassistgui/AssistantCenter`):
 
-1. `PumaSettings.acc`: add an element `AssistantSettings` (`ImtAssistVoce/AssistantSettings`), add
-   `AssistantSettings/Assistant` to `Preferences/Parameters` with the ID `Assistant` and the name
-   `AI assistant`, and export the parameters (`AssistantEnabled`, `Provider`, `Model`, `ApiKey`,
-   `Endpoint`, `Region`, `Project`, `Resource`, `MaxOutputTokens`, `AdditionalInstructions`).
-2. `PumaSettingsRepresentation.acc`: add an element `SecretTextParamRepresentation`
-   (`ImtServerAppPck/SecretTextParamRepresentationController`) to
-   `SettingsRepresentation/ParamRepresentationControllers`. The controllers for `EnableableParam`,
-   `SelectionParam` and `TextParam` are already there.
-3. Server composition (e.g. `PumaServerBase.acc`): reference the settings from the components, e.g.
-   `AssistantService/EnabledParam = PumaSettings/AssistantEnabled`,
-   `AssistantProvider/ProviderParam = PumaSettings/Provider`, `ModelParam = PumaSettings/Model`,
-   `ApiKeyParam = PumaSettings/ApiKey` and so on for `EndpointParam`, `RegionParam`,
-   `ProjectParam`, `ResourceParam`, `MaxOutputTokensParam`, `AdditionalInstructionsParam`.
+- **Button in the top panel** (`AssistantButton`, in `TopRightPanelDecorator`): opens and closes the
+  side panel. It is shown only while the assistant is enabled for the organization of the session
+  (`AssistantGetStatus`).
+- **Side panel** (`AssistantDrawer`, in `ThumbnailDecorator`): beside the pages, so the user sees the
+  data while the assistant prepares a change. Closing it keeps the conversation.
+- **Contextual entry points**: a page opens the same panel with its context, without importing
+  `imtassistgui`:
+
+  ```qml
+  Events.sendEvent("OpenAssistant", [{"kind": "administration", "label": qsTr("Administration: Users"),
+                                      "data": {"page": "Administration/Users", "selectedIds": ["…"]}}])
+  ```
+
+  The context is shown in the panel, can be removed and is sent only with the next message. The
+  administration has the button **Ask the assistant** below its pages.
+
+The functions of the assistant do not depend on the entry point: it can use every registered action
+the user may use, on every page. The context only says what the user means.
+
+The center checks the availability at login and at a tenant switch and ends the conversation at
+logout and at a tenant switch. The top panel and the side panel are loaded by URL only while the
+assistant is active, so applications without the assistant do not need `imtassistgui`.
+
+## Administration actions
+
+Shared actions for every server with the user administration of ImtCore (`ImtAssistGqlPck`):
+
+| Action | Kind | Calls | Permission |
+|---|---|---|---|
+| `administration.searchUsers` | read | `UsersList` | `/Administration/Users/View` |
+| `administration.searchGroups` | read | `GroupsList` | `/Administration/Groups/View` |
+| `administration.searchRoles` | read | `RolesList` | `/Administration/Roles/View` |
+| `administration.addUserToGroup` | change | `GroupItem`, `UserItem`, `GroupUpdate` | `/Administration/Groups/Edit/Change` |
+
+The actions call the **existing GraphQL handlers of the application** (attribute `RequestHandlers`)
+with the GraphQL context of the user's request (`CAssistantRequestContext::GetTransportContext()`,
+set by `AssistantController`). The handlers check permissions, grants and the isolation of the
+organization exactly as for the user interface, so the assistant can do nothing the user could not
+do. Values of the model are passed only as GraphQL variables, never in the query text. Without the
+context of the user (e.g. a demo principal) the actions refuse.
+
+Search results contain IDs, names and logins, no e-mail addresses. `addUserToGroup` shows the user,
+the group and the effect before anything is changed; the group is written with its direct
+assignments plus the user, and a group changed since the preview is not overwritten (`stale`).
+
+## Integration into a server product
+
+`Partitura/ImtAssistVoce.arp` has two composites:
+
+- `AssistantConfigurationSqlRepository`: the SQL collection of the configurations (like the other
+  repositories of `ImtUserAdministrationVoce`).
+- `TenantAssistant`: store, tenant provider, service, the administration actions and the two GraphQL
+  controllers `AssistantController` and `ConfigurationController`. Exported attributes:
+  `ConfigurationCollection`, `SecretProtector`, `RequestHandlers`, `AllowedPresets`,
+  `AllowCustomEndpoints`, `AllowServerCredentials`, `AdditionalInstructions`, `Enabled`, `Log`.
+
+Steps for a server (Puma is the template; ProLife, Agentino, Dogma and Claire follow it):
+
+1. Server: add `AssistantConfigurationSqlRepository` next to the other repositories, add
+   `TenantAssistant` with `ConfigurationCollection` = the repository, `SecretProtector` = the secret
+   protector of the server, `RequestHandlers` = the GraphQL handlers of users, groups and roles; add
+   `TenantAssistant/AssistantController` and `TenantAssistant/ConfigurationController` to the GraphQL
+   handlers of the servlet. Call `Init::InitAssistantDb()`.
+2. Permissions of the product: add the feature `Assistant` below `Administration` with `ViewPage`,
+   `View` and `Edit` (`ViewPage` requires `View`, `Edit` requires `View`), and grant them to the
+   administrator roles.
+3. Client: link `imtassistguiqml`, call `InitAssistantQml()` and set the transport once, e.g. in the
+   main QML file:
+
+   ```qml
+   GqlBasedAssistantController { id: assistantController }
+   Component.onCompleted: { AssistantCenter.controller = assistantController }
+   ```
+
+   The top panel, the side panel and the page **Assistant** of the administration appear by
+   themselves.
+4. Optional: own actions of the product in the action registry, own entry points with
+   `OpenAssistant`.
 
 ## Data flow of a turn
 
@@ -300,7 +381,8 @@ User confirms ──► ConfirmPreview(context, previewId)
 
 ## Security boundaries
 
-- **Disabled by default.** Without `SetEnabled(true)` and a configured provider no request is sent to a provider.
+- **Disabled by default.** Without `SetEnabled(true)` and a configured provider no request is sent to a provider. With a tenant policy, an organization also has to enable the assistant in its administration.
+- **Rights of the user.** The administration actions run the existing GraphQL commands with the context of the user; the assistant never has more rights than the user.
 - **Identity from the session only.** User and tenant come from the authenticated session. Unknown parameters such as `userId` or `tenantId` proposed by the model are rejected by the schema.
 - **Only registered actions.** Unknown actions are rejected; there is no shell, database or generic function execution.
 - **Untrusted model and tool data.** Replies, tool results and released context are validated before use and passed to the provider as data, never as instructions. The provider can only propose changes; it cannot confirm them, because confirmation is a separate call from the user.
@@ -365,6 +447,14 @@ authentication, so it enables `AllowDemoPrincipal`. Users in `ReadOnlyUserIds` o
   expiry and stale previews, provider errors, timeout, invalid replies, cancellation and the audit log.
 - `Tests/AssistantTest` (`CAssistantSettingsTest`): provider list, settings overriding attributes,
   changes without restart, enabling by the setting, protected storage of the API key.
+- `Tests/AssistantTest` (`CAssistantConfigurationTest`): configuration per organization: serialization,
+  default disabled, protected key (keep, set, clear, no protector), policy of the server (presets,
+  endpoints, host parts, limits), isolation of the organizations, enabling per organization in the
+  service, provider without configuration or credentials.
+- `Tests/AssistantTest` (`CAssistantAdministrationActionTest`): the administration actions against a
+  GraphQL handler of the test: context of the user, filter and limit, no e-mail addresses, refusal
+  without context, permission or for another user or tenant, preview and application of
+  `addUserToGroup`, already a member, stale group, refusal of the handler.
 - `Tests/AssistantTest` (`CAssistantProviderTest`): all presets, request and response mapping of
   the four protocols, credentials from the environment, tool names, call IDs, error mapping without
   content, the AWS Signature Version 4 test vector and the imtrest-based HTTP transport against a local
@@ -372,7 +462,10 @@ authentication, so it enables `AllowDemoPrincipal`. Users in `ReadOnlyUserIds` o
 - `Tests/QmlTest/imtassistgui`: `tst_AssistantController` (message validation, single confirmation,
   context, lost answers, cancel, history), `tst_AssistantPanel` (registered and unknown
   representations, selection hand-over, context removal, explicit confirmation, cancel, re-created
-  panel) and `tst_GqlBasedAssistantController` (requests and answers through `GqlTestTransport`).
+  panel), `tst_GqlBasedAssistantController` (requests and answers through `GqlTestTransport`),
+  `tst_AssistantCenter` (availability, entry points with context, panel, end of the conversation) and
+  `tst_AssistantSettingsPage` (loading without key, saving with keep, set and clear of the key, refusal,
+  read-only).
 
 ## Known limitations
 

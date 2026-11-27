@@ -130,12 +130,8 @@ bool CGqlAssistantActionCompBase::ExecuteGql(
 		QString handlerError;
 		const QJsonObject response = handlerPtr->CreateResponse(request, handlerError);
 		if (response.isEmpty() || response.contains(QStringLiteral("errors"))){
-			errorMessage = handlerError.isEmpty()
-						? response.value(QStringLiteral("errors")).toObject().value(QStringLiteral("message")).toString()
-						: handlerError;
-			if (errorMessage.isEmpty()){
-				errorMessage = QStringLiteral("The command '%1' failed").arg(QString::fromUtf8(commandId));
-			}
+			// The text of the handler may contain names or values; the handler logs it itself.
+			errorMessage = QStringLiteral("The command '%1' was refused or failed").arg(QString::fromUtf8(commandId));
 
 			return false;
 		}

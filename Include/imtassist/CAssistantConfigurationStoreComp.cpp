@@ -6,6 +6,7 @@
 #include <QtCore/QMutexLocker>
 
 // ImtCore includes
+#include <imtauth/CollectionSelection.h>
 #include <imtassist/CAssistantProviderPresets.h>
 
 
@@ -359,8 +360,15 @@ IAssistantConfigurationUniquePtr CAssistantConfigurationStoreComp::ReadConfigura
 		return retVal;
 	}
 
-	if (m_collectionCompPtr->GetElementIds().contains(tenantId)){
-		// Stored, but not readable: never fall back to a default that could overwrite it.
+	// Selected by the indexed column; a failed selection or a stored but unreadable configuration
+	// never falls back to a default that could overwrite it.
+	bool isRead = true;
+	const QByteArrayList ids = imtauth::CollectionSelection::SelectIds(
+				*m_collectionCompPtr,
+				imtauth::CollectionSelection::ColumnEquals("TenantId", tenantId),
+				{QByteArrayLiteral("TenantId")},
+				&isRead);
+	if (!isRead || ids.contains(tenantId)){
 		SendErrorMessage(0, QStringLiteral("The assistant configuration of the organization '%1' could not be read").arg(QString::fromUtf8(tenantId)), "AssistantConfigurationStore");
 
 		return nullptr;

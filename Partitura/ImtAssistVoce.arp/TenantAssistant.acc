@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6637" Description="ACF"/>
+            <Version Id="1" Number="2463" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="396033" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description>AI assistant of a server with configuration per tenant in the administration and the shared administration actions. Export: the GraphQL handlers AssistantController and ConfigurationController. Needs ConfigurationCollection (e.g. AssistantConfigurationSqlRepository), SecretProtector and RequestHandlers (the GraphQL handlers of the application for the actions).</Description>
+    <Keywords>Assistant AI Tenant Administration Server</Keywords>
+    <ElementsList>
+        <Element Id="ActionRegistry" PackageId="ImtAssistPck" ComponentId="AssistantActionRegistry">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Actions" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>SearchUsers</Value>
+                                <Value>SearchGroups</Value>
+                                <Value>SearchRoles</Value>
+                                <Value>AddUserToGroup</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="AddUserToGroup" PackageId="ImtAssistGqlPck" ComponentId="AdministrationAddUserToGroupAction">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="GroupTypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Group"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestHandlers" Type="Reference[]" ExportId="RequestHandlers">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="AssistantConfiguration" PackageId="ImtAssistPck" ComponentId="AssistantConfiguration">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="AssistantController" PackageId="ImtAssistGqlPck" ComponentId="AssistantController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AllowDemoPrincipal" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AssistantService" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="AssistantService"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>AssistantGetStatus</Value>
+                                <Value>AssistantStartConversation</Value>
+                                <Value>AssistantSendMessage</Value>
+                                <Value>AssistantConfirmPreview</Value>
+                                <Value>AssistantRejectPreview</Value>
+                                <Value>AssistantCancelRequest</Value>
+                                <Value>AssistantGetHistory</Value>
+                                <Value>AssistantCloseConversation</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="AssistantService" PackageId="ImtAssistPck" ComponentId="AssistantService">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ActionRegistry" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ActionRegistry"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AuditLog" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="AuditLog"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Enabled" Type="Boolean" ExportId="Enabled">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Provider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Provider"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RepresentationRegistry" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RepresentationRegistry"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantPolicy" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConfigurationStore"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="AuditLog" PackageId="ImtAssistPck" ComponentId="AssistantAuditLog">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ConfigurationController" PackageId="ImtAssistGqlPck" ComponentId="AssistantConfigurationController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>AssistantGetConfiguration</Value>
+                                <Value>AssistantSetConfiguration</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ConfigurationStore" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConfigurationStore"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EditPermission" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="/Administration/Assistant/Edit"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ViewPermission" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="/Administration/Assistant/View"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ConfigurationStore" PackageId="ImtAssistPck" ComponentId="AssistantConfigurationStore">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AllowCustomEndpoints" Type="Boolean" ExportId="AllowCustomEndpoints">
+                        <Data IsEnabled="true" Value="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AllowedPresets" Type="Id[]" ExportId="AllowedPresets">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CacheTimeToLive" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="10"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ConfigurationCollection" Type="Reference" ExportId="ConfigurationCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ConfigurationFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="AssistantConfiguration"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SecretProtector" Type="Reference" ExportId="SecretProtector">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Provider" PackageId="ImtAssistPck" ComponentId="TenantAssistantProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AdditionalInstructions" Type="Text" ExportId="AdditionalInstructions">
+                        <Data IsEnabled="true" Value=""/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AllowServerCredentials" Type="Boolean" ExportId="AllowServerCredentials">
+                        <Data IsEnabled="true" Value="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ConfigurationStore" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConfigurationStore"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RepresentationRegistry" PackageId="ImtAssistPck" ComponentId="UiRepresentationRegistry">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="RegisterStandardRepresentations" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SearchGroups" PackageId="ImtAssistGqlPck" ComponentId="AdministrationSearchAction">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Kind" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="groups"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestHandlers" Type="Reference[]" ExportId="RequestHandlers">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SearchRoles" PackageId="ImtAssistGqlPck" ComponentId="AdministrationSearchAction">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Kind" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="roles"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestHandlers" Type="Reference[]" ExportId="RequestHandlers">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SearchUsers" PackageId="ImtAssistGqlPck" ComponentId="AdministrationSearchAction">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Kind" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="users"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestHandlers" Type="Reference[]" ExportId="RequestHandlers">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtassist::IAssistantActionRegistry" ComponentId="ActionRegistry"/>
+        <Interface InterfaceId="imtassist::IAssistantConfigurationStore" ComponentId="ConfigurationStore"/>
+        <Interface InterfaceId="imtassist::IAssistantService" ComponentId="AssistantService"/>
+        <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="AssistantController"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="ActionRegistry" ComponentId="ActionRegistry"/>
+        <Component ExportedId="AssistantController" ComponentId="AssistantController"/>
+        <Component ExportedId="AssistantService" ComponentId="AssistantService"/>
+        <Component ExportedId="ConfigurationController" ComponentId="ConfigurationController"/>
+        <Component ExportedId="ConfigurationStore" ComponentId="ConfigurationStore"/>
+    </ExportedComponents>
+</Acf>

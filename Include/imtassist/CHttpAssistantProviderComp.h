@@ -22,7 +22,7 @@ namespace imtassist
 
 	The attribute \c Preset selects the provider (see CAssistantProviderPresets and
 	Docs/Assistant/README.md). Every attribute can be overridden by a setting of the server
-	(the \c ...Param references, e.g. from the composite ImtAssistVoce/AssistantSettings);
+	(the \c ...Param references, e.g. parameters of the server settings);
 	a setting that is not set or empty falls back to the attribute. Settings are read at
 	every request, so a change in the server settings takes effect without restart.
 

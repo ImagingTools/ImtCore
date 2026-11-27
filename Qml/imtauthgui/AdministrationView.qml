@@ -22,13 +22,54 @@ Item {
 		permissionPath: administrationContainer.permissionPath
 	}
 
+	// The application has the assistant (imtassistgui AssistantCenter answers its state); the page "Assistant" configures it
+	property bool assistantSupported: false
+	// The assistant of the application is enabled for the organization
+	property bool assistantActive: false
+
 	Component.onCompleted: {
 		Events.subscribeEvent("OnLocalizationChanged", administrationContainer.onLocalizationChanged);
+		Events.subscribeEvent("AssistantStateChanged", administrationContainer.onAssistantStateChanged);
 		apiClient.setRolePermissionsTenantId(apiClient.tenantId);
+		Events.sendEvent("AssistantStateRequested");
 	}
 
 	Component.onDestruction: {
 		Events.unSubscribeEvent("OnLocalizationChanged", administrationContainer.onLocalizationChanged);
+		Events.unSubscribeEvent("AssistantStateChanged", administrationContainer.onAssistantStateChanged);
+	}
+
+	function onAssistantStateChanged(state){
+		administrationContainer.assistantActive = state.active;
+
+		if (!administrationContainer.assistantSupported){
+			administrationContainer.assistantSupported = true;
+			multiPageView.updateModel();
+		}
+	}
+
+	/**
+		Open the assistant of the application with the current sub-page and its selection as context.
+		The context is shown in the assistant and sent only with the next message of the user.
+	*/
+	function openAssistant(){
+		let index = multiPageView.currentIndex;
+		if (index < 0 || index >= multiPageView.pagesModel.count){
+			Events.sendEvent("OpenAssistant", []);
+
+			return;
+		}
+
+		let pageId = multiPageView.pagesModel.get(index).id;
+		let pageName = multiPageView.pagesModel.get(index).name;
+		let data = {"page": "Administration/" + pageId};
+
+		let page = multiPageView.getPageById(pageId);
+		if (page && page.collectionView){
+			data["selectedIds"] = page.collectionView.getSelectedIds();
+		}
+
+		Events.sendEvent("OpenAssistant", [{"kind": "administration", "label": qsTr("Administration: %1").arg(pageName), "data": data}]);
 	}
 
 	Connections {
@@ -60,6 +101,7 @@ Item {
 		updatePageName("Roles", qsTr("Roles"));
 		updatePageName("Users", qsTr("Users"));
 		updatePageName("Groups", qsTr("Groups"));
+		updatePageName("Assistant", qsTr("Assistant"));
 
 		onCustomPagesLocalizationChanged();
 	}
@@ -145,6 +187,15 @@ Item {
 			productId: administrationContainer.productId;
 			documentManager: administrationContainer.apiClient.groupDocumentManager;
 			contentColor: Style.baseColor;
+		}
+	}
+
+	// Loaded by URL: applications without the assistant do not need imtassistgui
+	Component {
+		id: assistantSettingsComp;
+
+		Loader {
+			source: "qrc:/qml/imtassistgui/AssistantSettingsPage.qml";
 		}
 	}
 
@@ -240,6 +291,26 @@ Item {
 			multiPageView.addPage(pageId, pageName, pageComp, pageIcon);
 		}
 
+		Button {
+			id: assistantButton;
+			objectName: "AdministrationAssistantButton";
+
+			anchors.left: parent.left;
+			anchors.leftMargin: Style.marginM;
+			anchors.bottom: parent.bottom;
+			anchors.bottomMargin: Style.marginM;
+			z: 1;
+
+			width: multiPageView.panelWidth - 2 * Style.marginM;
+			visible: administrationContainer.assistantActive;
+			text: multiPageView.compact ? "" : qsTr("Ask the assistant");
+			iconSource: "qrc:/" + Style.getIconPath("Icons/Magic", Icon.State.On, Icon.Mode.Normal);
+
+			onClicked: {
+				administrationContainer.openAssistant();
+			}
+		}
+
 		function updateModel(){
 			multiPageView.block = true;
 			multiPageView.clear();
@@ -247,6 +318,10 @@ Item {
 			addSubPage("Roles", qsTr("Roles"), roleCollectionComp, "Icons/Role")
 			addSubPage("Users", qsTr("Users"), userCollectionComp, "Icons/Account")
 			addSubPage("Groups", qsTr("Groups"), userGroupCollectionComp, "Icons/MultipleUser")
+
+			if (administrationContainer.assistantSupported){
+				addSubPage("Assistant", qsTr("Assistant"), assistantSettingsComp, "Icons/Magic")
+			}
 
 			// Products add their own sub-pages here, so the initial sub-page is chosen among all of them.
 			administrationContainer.multiPageUpdated();

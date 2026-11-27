@@ -129,12 +129,8 @@ bool SetConfiguration(
 			const QByteArray& apiKey = QByteArray())
 {
 	QString error;
-	const bool retVal = fixture.store->SetConfiguration(configuration, change, apiKey, error);
-	if (!retVal){
-		qDebug() << "SetConfiguration refused:" << error;
-	}
 
-	return retVal;
+	return fixture.store->SetConfiguration(configuration, change, apiKey, error);
 }
 
 
@@ -452,6 +448,52 @@ void CAssistantConfigurationTest::testTenantProvider_NotConfiguredTenant()
 
 	service.SetTenantPolicy(nullptr);
 	service.SetProvider(nullptr);
+}
+
+
+void CAssistantConfigurationTest::testTenantProvider_UsesConfigurationOfTenant()
+{
+	// A cancelled request shows whether the provider would be called, without network access:
+	// RS_CANCELED for a configured provider, RS_NOT_CONFIGURED otherwise.
+	CCancellationToken canceledToken;
+	canceledToken.Cancel();
+
+	StoreFixture fixture;
+	QVERIFY(SetConfiguration(fixture, CreateConfiguration(s_tenantA), IAssistantConfigurationStore::AKC_SET, s_apiKey));
+	QVERIFY(SetConfiguration(fixture, CreateConfiguration(s_tenantB)));
+
+	TenantProvider provider;
+	provider.SetRef("ConfigurationStore", fixture.store);
+	provider.SetBoolAttr("AllowServerCredentials", false);
+	provider.SetIdAttr("ApiKeyVariable", "IMT_ASSISTANT_TEST_KEY");
+	provider.InitComponent();
+
+	qputenv("IMT_ASSISTANT_TEST_KEY", "server-key");
+
+	IAssistantProvider::Request request;
+	request.tenantId = s_tenantA;
+	QCOMPARE(provider.Complete(request, canceledToken).status, IAssistantProvider::RS_CANCELED);
+
+	// Tenant B has no key of its own, and the key of the server is not allowed.
+	request.tenantId = s_tenantB;
+	QCOMPARE(provider.Complete(request, canceledToken).status, IAssistantProvider::RS_NOT_CONFIGURED);
+
+	// Disabled by its administration, tenant A is not served although it has a key.
+	QVERIFY(SetConfiguration(fixture, CreateConfiguration(s_tenantA, "openai", false)));
+	request.tenantId = s_tenantA;
+	QCOMPARE(provider.Complete(request, canceledToken).status, IAssistantProvider::RS_NOT_CONFIGURED);
+
+	// With server credentials allowed, tenant B uses the key of the server.
+	TenantProvider sharedProvider;
+	sharedProvider.SetRef("ConfigurationStore", fixture.store);
+	sharedProvider.SetBoolAttr("AllowServerCredentials", true);
+	sharedProvider.SetIdAttr("ApiKeyVariable", "IMT_ASSISTANT_TEST_KEY");
+	sharedProvider.InitComponent();
+
+	request.tenantId = s_tenantB;
+	QCOMPARE(sharedProvider.Complete(request, canceledToken).status, IAssistantProvider::RS_CANCELED);
+
+	qunsetenv("IMT_ASSISTANT_TEST_KEY");
 }
 
 

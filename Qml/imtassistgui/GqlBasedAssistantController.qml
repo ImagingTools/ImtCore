@@ -19,7 +19,10 @@ AssistantController {
 
 	// reimplemented (AssistantController)
 	function sendRequest(commandId, input){
-		if (commandId === "AssistantStartConversation"){
+		if (commandId === "AssistantGetStatus"){
+			statusSender.send(input)
+		}
+		else if (commandId === "AssistantStartConversation"){
 			startSender.send(input)
 		}
 		else if (commandId === "AssistantSendMessage"){
@@ -86,6 +89,25 @@ AssistantController {
 		}
 
 		return ""
+	}
+
+	property GqlRequestSender statusSender: GqlRequestSender {
+		requestType: 0
+		gqlCommandId: "AssistantGetStatus"
+		permissionPath: root.permissionPath
+
+		function createQueryParams(query, params){
+			query.AddParam(root.createInput(params))
+			query.AddField(Gql.GqlObject("available"))
+		}
+
+		function onResult(data){
+			root.handleStatus(data && data.containsKey("available") && data.getData("available") === true)
+		}
+
+		function onError(message, type){
+			root.handleError("AssistantGetStatus", message)
+		}
 	}
 
 	property GqlRequestSender startSender: GqlRequestSender {

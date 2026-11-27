@@ -1,9 +1,13 @@
 module imtassistgui
 
+singleton AssistantCenter 1.0 AssistantCenter.qml
+AssistantButton 1.0 AssistantButton.qml
 AssistantController 1.0 AssistantController.qml
+AssistantDrawer 1.0 AssistantDrawer.qml
 AssistantMessageDelegate 1.0 AssistantMessageDelegate.qml
 AssistantPanel 1.0 AssistantPanel.qml
 AssistantPreviewCard 1.0 AssistantPreviewCard.qml
 AssistantRepresentationRegistry 1.0 AssistantRepresentationRegistry.qml
 AssistantSelectableList 1.0 AssistantSelectableList.qml
+AssistantSettingsPage 1.0 AssistantSettingsPage.qml
 GqlBasedAssistantController 1.0 GqlBasedAssistantController.qml

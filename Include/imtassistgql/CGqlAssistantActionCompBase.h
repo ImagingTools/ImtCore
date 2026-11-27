@@ -77,7 +77,7 @@ protected:
 		Execute a GraphQL request with the context of the user.
 		User input is passed only in \c variables, never in the query text.
 		\param data			Payload of the command.
-		\param errorMessage	Error of the handler, for the log; not shown to the user as is.
+		\param errorMessage	Technical error for the log, without the text of the handler.
 	*/
 	bool ExecuteGql(
 				const imtassist::CAssistantRequestContext& context,
