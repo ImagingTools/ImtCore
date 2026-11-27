@@ -99,16 +99,18 @@ function createGlobalSetup({
       // latency. These are ceilings on a fast path, so raising them doesn't slow a warm login.
       await waitForStable(page, { timeout: 30000, quietMs: 600 });
       await login(page, user.login, user.password);
+      // JQML v4 keeps the same Settings under a "qml/" prefix.
       await page.waitForFunction(
-        (key) => {
-          try {
-            const raw = localStorage.getItem(key);
-            return !!raw && JSON.parse(raw).length > 0;
-          } catch {
-            return false;
-          }
-        },
-        tokenStorageKey,
+        (keys) =>
+          keys.some((key) => {
+            try {
+              const raw = localStorage.getItem(key);
+              return !!raw && JSON.parse(raw).length > 0;
+            } catch {
+              return false;
+            }
+          }),
+        [tokenStorageKey, `qml/${tokenStorageKey}`],
         { timeout: 45000 }
       );
     } finally {

@@ -102,7 +102,7 @@ class ComboBox {
     } catch (_) {
       return 0;
     }
-    const count = await this.page.locator('[objectName="PopupMenuDialog"] [objectName="MouseArea"][visible]').count();
+    const count = await gui.dom.locate(this.page, '[objectName="PopupMenuDialog"] [objectName="MouseArea"][visible]').count();
     await this.page.keyboard.press('Escape');
     await gui.waitForStable(this.page);
     return count;
@@ -247,7 +247,7 @@ class Table {
   /** Number of rows currently in the DOM (regardless of visibility). */
   rowCount() {
     const prefix = this.scope.length ? `${gui.dom.selectorForPath(this.scope)} ` : '';
-    return this.page.locator(`${prefix}[objectName^="TableRow_"]`).count();
+    return gui.dom.locate(this.page, `${prefix}[objectName^="TableRow_"]`).count();
   }
   /**
    * Number of currently VISIBLE rows. An empty collection is NOT detectable via rowCount(): the table
@@ -256,7 +256,7 @@ class Table {
    */
   visibleRowCount() {
     const prefix = this.scope.length ? `${gui.dom.selectorForPath(this.scope)} ` : '';
-    return this.page.locator(`${prefix}[objectName^="TableRow_"][visible]`).count();
+    return gui.dom.locate(this.page, `${prefix}[objectName^="TableRow_"][visible]`).count();
   }
   /**
    * Whether this collection has data rows for the current user, tolerating slow first-render. Polls for
@@ -277,7 +277,11 @@ class Table {
    * header's x, which needs the column on screen and survives a narrower table.
    * @returns {Promise<string[]>}
    */
-  headerOrder() {
+  async headerOrder() {
+    if (await gui.dom.isQml(this.page)) {
+      const names = await gui.dom.locate(this.page, '[objectName="TableHeaders"]').first().locator('[visible]').run('names');
+      return names.filter((name) => name && name !== 'MouseArea');
+    }
     return this.page.evaluate(() => {
       const headers = document.querySelector('[objectName="TableHeaders"]');
       if (!headers) return [];
@@ -293,8 +297,11 @@ class Table {
    * @param {string} headerId
    * @returns {Promise<string[]>}
    */
-  columnValues(headerId) {
+  async columnValues(headerId) {
     const prefix = this.scope.length ? `${gui.dom.selectorForPath(this.scope)} ` : '';
+    if (await gui.dom.isQml(this.page)) {
+      return gui.dom.locate(this.page, `${prefix}[objectName^="TableRow_"][visible]`).run('cellTexts', { cell: headerId });
+    }
     return this.page.evaluate(
       ({ prefix, headerId }) =>
         Array.from(document.querySelectorAll(`${prefix}[objectName^="TableRow_"][visible]`))
@@ -397,7 +404,7 @@ class TableConfigDialog {
   }
   /** How many columns the dialog lists. Throws on zero, which means the list did not render. */
   async rowCount() {
-    const count = await this.page.locator('[objectName^="ColumnRow_"]').count();
+    const count = await gui.dom.locate(this.page, '[objectName^="ColumnRow_"]').count();
     if (count === 0) {
       throw new Error('GUI table-configuration dialog lists no columns - it did not render, or its rows are not named');
     }
@@ -408,7 +415,17 @@ class TableConfigDialog {
    * reorder be asserted without applying it (an Apply persists per-user and leaks to other tests).
    * @returns {Promise<string[]>}
    */
-  columnNames() {
+  async columnNames() {
+    if (await gui.dom.isQml(this.page)) {
+      const index = (name) => parseInt(name.split('_')[1], 10);
+      const rows = (await gui.dom.locate(this.page, '[objectName^="ColumnRow_"]').run('names')).sort((a, b) => index(a) - index(b));
+      const titles = [];
+      for (const row of rows) {
+        const title = gui.dom.locate(this.page, `[objectName="${gui.dom.cssEscape(row)}"] [objectName="ColumnRowTitle"]`).first();
+        titles.push((await title.count()) > 0 ? ((await title.textContent()) || '').trim() : '');
+      }
+      return titles;
+    }
     return this.page.evaluate(() =>
       Array.from(document.querySelectorAll('[objectName^="ColumnRow_"]'))
         .sort((a, b) => {
@@ -509,7 +526,7 @@ class TreeExplorer {
 
   /** Number of rows currently rendered at this level. */
   rowCount() {
-    return this.page.locator(`${gui.dom.selectorForPath(this.root)} [objectName^="ExplorerRow_"][visible]`).count();
+    return gui.dom.locate(this.page, `${gui.dom.selectorForPath(this.root)} [objectName^="ExplorerRow_"][visible]`).count();
   }
 
   /** Whether this level has rows, tolerating a slow first render (same contract as Table.hasRows). */
@@ -599,7 +616,10 @@ class TreeExplorer {
   }
 
   /** The breadcrumb trail, root first. */
-  breadcrumbs() {
+  async breadcrumbs() {
+    if (await gui.dom.isQml(this.page)) {
+      return gui.dom.byPathAnyVisibility(this.page, this.root).locator('[objectName^="Breadcrumb_"][visible]').run('texts');
+    }
     return this.page.evaluate((selector) => {
       const scope = document.querySelector(selector);
       if (!scope) return [];
@@ -639,7 +659,7 @@ class CheckableListPanel {
   }
 
   rowCount() {
-    return this.page.locator(`${gui.dom.selectorForPath(this.root)} [objectName^="PanelRow_"][visible]`).count();
+    return gui.dom.locate(this.page, `${gui.dom.selectorForPath(this.root)} [objectName^="PanelRow_"][visible]`).count();
   }
 
   /** Whether the panel lists anything, tolerating a slow first render. */
@@ -658,7 +678,10 @@ class CheckableListPanel {
   }
 
   /** The visible row titles, top to bottom. */
-  rowTitles() {
+  async rowTitles() {
+    if (await gui.dom.isQml(this.page)) {
+      return gui.dom.byPathAnyVisibility(this.page, this.root).locator('[objectName="PanelRowTitle"][visible]').run('texts');
+    }
     return this.page.evaluate((selector) => {
       const scope = document.querySelector(selector);
       if (!scope) return [];

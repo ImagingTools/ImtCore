@@ -5,6 +5,7 @@
 
 const { expect } = require('@playwright/test');
 const dom = require('./dom');
+const { playwrightLocator } = require('./qml');
 const { waitForStable } = require('./stability');
 
 // A screenshot is the only assertion that compares EVERY pixel, so it settles harder than an action
@@ -132,7 +133,15 @@ async function checkElementScreenshot(page, path, name, mask) {
 
     const locator = dom.byPath(page, path);
     await locator.waitFor({ state: 'visible' });
-    await expect(locator).toHaveScreenshot(`${name}.png`, { threshold: THRESHOLD, maxDiffPixels: MAX_DIFF_PIXELS });
+    if (await dom.isQml(page)) {
+      // JQML v4 draws everything on one canvas: the element is the part of the page inside its box.
+      await locator.scrollIntoViewIfNeeded();
+      const clip = await locator.boundingBox();
+      if (!clip) throw new Error(`checkElementScreenshot: [${path.join(' > ')}] has no box`);
+      await expect(page).toHaveScreenshot(`${name}.png`, { clip, threshold: THRESHOLD, maxDiffPixels: MAX_DIFF_PIXELS });
+      return;
+    }
+    await expect(playwrightLocator(locator)).toHaveScreenshot(`${name}.png`, { threshold: THRESHOLD, maxDiffPixels: MAX_DIFF_PIXELS });
   } finally {
     for (const h of handles) await removeMask(page, h).catch(() => {});
   }
@@ -203,13 +212,19 @@ async function removeMask(page, id) {
  *   day-of-month), so the mask doesn't leave a different-sized sliver exposed each time.
  */
 async function masksForPrefix(page, objectNamePrefix, padding = 3, fixedWidth) {
-  const rects = await page.evaluate((prefix) => {
+  const rects = (await dom.isQml(page))
+    ? await dom.locate(page, `[objectName^="${dom.cssEscape(objectNamePrefix)}"][visible]`).run('boxes')
+    : await masksForPrefixDom(page, objectNamePrefix);
+  return rects.map((r) => ({ ...r, padding, ...(fixedWidth !== undefined ? { fixedWidth } : {}) }));
+}
+
+function masksForPrefixDom(page, objectNamePrefix) {
+  return page.evaluate((prefix) => {
     return Array.from(document.querySelectorAll(`[objectName^="${prefix}"][visible]`))
       .map((el) => el.getBoundingClientRect())
       .filter((r) => r.width > 0 && r.height > 0)
       .map((r) => ({ x: r.x, y: r.y, width: r.width, height: r.height }));
   }, objectNamePrefix);
-  return rects.map((r) => ({ ...r, padding, ...(fixedWidth !== undefined ? { fixedWidth } : {}) }));
 }
 
 module.exports = {
