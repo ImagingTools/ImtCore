@@ -676,6 +676,12 @@
         <Element Id="ContractManager" PackageId="ImtAuthPck" ComponentId="ContractManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="PermissionTree" Type="Reference" ExportId="ContractPermissionTree">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SnapshotCollection" Type="Reference" ExportId="SnapshotRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ConnectionManager" Type="Reference" ExportId="TenantConnectionRequestManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

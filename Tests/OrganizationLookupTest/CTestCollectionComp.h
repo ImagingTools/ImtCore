@@ -144,6 +144,9 @@ public:
 		I_REGISTER_INTERFACE(imtauth::ITenantRelationshipProvider);
 	I_END_COMPONENT;
 
+	// The relationships are kept for this product only, as the contracts are
+	static const inline QByteArray s_productId = QByteArrayLiteral("ProLife");
+
 	void AddRelationship(const QByteArray& tenantId, const QByteArray& otherTenantId, const QDateTime& relatedSince = QDateTime(), bool isEffective = true);
 	void SetReadable(bool isReadable);
 	/// The relationships are answered, but the read is reported incomplete, e.g. part of their history is missing.
@@ -151,7 +154,7 @@ public:
 	int GetReadCount() const;
 
 	// reimplemented (imtauth::ITenantRelationshipProvider)
-	virtual imtauth::RelatedTenantInfos GetRelatedTenants(const QByteArray& tenantId, QString* tenantNamePtr = nullptr, bool* isReadPtr = nullptr) const override;
+	virtual imtauth::RelatedTenantInfos GetRelatedTenants(const QByteArray& tenantId, const QByteArray& productId, QString* tenantNamePtr = nullptr, bool* isReadPtr = nullptr) const override;
 
 private:
 	struct Relationship

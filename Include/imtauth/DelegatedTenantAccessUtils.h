@@ -28,7 +28,8 @@ inline bool HasDelegatedTenantAccess(
 		const ITenantMembershipManager& membershipManager,
 		const IDelegatedAccess* delegatedAccessPtr,
 		const QByteArray& userId,
-		const QByteArray& targetTenantId)
+		const QByteArray& targetTenantId,
+		const QByteArray& productId)
 {
 	ITenantInfoUniquePtr tenantPtr = tenantManager.GetTenant(targetTenantId);
 	if (tenantPtr.IsValid() && (tenantPtr->GetOwnerId() == userId || tenantPtr->GetCreatorId() == userId)){
@@ -39,7 +40,7 @@ inline bool HasDelegatedTenantAccess(
 		return true;
 	}
 
-	return delegatedAccessPtr != nullptr && delegatedAccessPtr->HasDelegatedAccess(userId, targetTenantId);
+	return delegatedAccessPtr != nullptr && delegatedAccessPtr->HasDelegatedAccess(userId, targetTenantId, productId);
 }
 
 

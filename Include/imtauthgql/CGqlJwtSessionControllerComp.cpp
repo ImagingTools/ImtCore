@@ -6,6 +6,7 @@
 #include <iser/CJsonMemWriteArchive.h>
 
 // ImtCore includes
+#include <imtgql/imtgql.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Sessions.h>
 #include <imtauth/ITenantInfo.h>
 #include <imtauth/IUserInfo.h>
@@ -445,7 +446,7 @@ sdl::V1_0::imtauth::CCreateNewSessionPayload CGqlJwtSessionControllerComp::OnCre
 		}
 
 		QString tenantError;
-		if (!CanUseTenant(userId, tenantId, tenantError)){
+		if (!CanUseTenant(userId, tenantId, imtgql::GetRequestProductId(gqlRequest), tenantError)){
 			response.ok = false;
 			response.errorMessage = tenantError;
 			return response;
@@ -497,7 +498,7 @@ sdl::V1_0::imtauth::CSelectTenantPayload CGqlJwtSessionControllerComp::OnSelectT
 
 	if (!tenantId.isEmpty()){
 		QString tenantError;
-		if (!CanUseTenant(userId, tenantId, tenantError)){
+		if (!CanUseTenant(userId, tenantId, imtgql::GetRequestProductId(gqlRequest), tenantError)){
 			response.ok = false;
 			response.errorMessage = tenantError;
 			return response;
@@ -687,6 +688,7 @@ QByteArray CGqlJwtSessionControllerComp::GetAuthenticatedUserId(const ::imtgql::
 bool CGqlJwtSessionControllerComp::CanUseTenant(
 			const QByteArray& userId,
 			const QByteArray& tenantId,
+			const QByteArray& productId,
 			QString& errorMessage) const
 {
 	if (tenantId.isEmpty()){
@@ -726,7 +728,7 @@ bool CGqlJwtSessionControllerComp::CanUseTenant(
 	}
 
 	// Permissions given to the user by the contracts of the organization
-	if (m_delegatedAccessCompPtr.IsValid() && m_delegatedAccessCompPtr->HasDelegatedAccess(userId, tenantId)){
+	if (m_delegatedAccessCompPtr.IsValid() && m_delegatedAccessCompPtr->HasDelegatedAccess(userId, tenantId, productId)){
 		return true;
 	}
 

@@ -47,7 +47,7 @@ QByteArray CDocumentShareManagerComp::ShareDocument(const IDocumentShareInfo& sh
 	else{
 		// An incomplete history gives a start too late, and the existing share would be taken for one of an earlier relationship
 		bool isRelationshipRead = false;
-		const RelatedTenantInfos relatedTenants = m_relationshipProviderCompPtr->GetRelatedTenants(ownerTenantId, &ownerTenantName, &isRelationshipRead);
+		const RelatedTenantInfos relatedTenants = m_relationshipProviderCompPtr->GetRelatedTenants(ownerTenantId, *m_productIdAttrPtr, &ownerTenantName, &isRelationshipRead);
 		bool isRelated = false;
 		QByteArrayList sharingContractIds;
 		for (const RelatedTenantInfo& relatedTenant : relatedTenants){
@@ -311,7 +311,7 @@ int CDocumentShareManagerComp::ReadRelatedTenants(const QByteArray& tenantId, QB
 	}
 
 	bool isRead = false;
-	const RelatedTenantInfos relatedTenants = m_relationshipProviderCompPtr->GetRelatedTenants(tenantId, nullptr, &isRead);
+	const RelatedTenantInfos relatedTenants = m_relationshipProviderCompPtr->GetRelatedTenants(tenantId, *m_productIdAttrPtr, nullptr, &isRead);
 
 	// An unreadable answer is not an ended relationship; the requester gets no shares, without affecting the others
 	if (!isRead){

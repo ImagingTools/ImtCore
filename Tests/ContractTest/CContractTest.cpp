@@ -285,7 +285,7 @@ void CContractTest::testAllocation_InForceOnItsLinkWhileTheGrantorIsBound()
 	allocation.linkId = "AB";
 	allocation.grantorTenantId = "A";
 	allocation.granteeTenantId = "B";
-	allocation.productId = "Product";
+
 	allocation.permissionIds = {"Read"};
 	allocation.validUntil = Day(20);
 	contract.SetAllocations({allocation});
@@ -366,7 +366,7 @@ void CContractTest::testContentHash_IgnoresOrderAndProgress()
 	allocation.linkId = "AB";
 	allocation.grantorTenantId = "A";
 	allocation.granteeTenantId = "B";
-	allocation.productId = "Product";
+
 	allocation.permissionIds = {"Read"};
 	reordered.SetAllocations({allocation});
 	QCOMPARE(imtauth::ComputeContractContentHash(reordered), hash);
@@ -409,6 +409,7 @@ void CContractTest::testContractInfo_SerializeRoundTrip()
 {
 	imtauth::CContractInfo source;
 	FillContract(source, true);
+	source.SetProductId("ProLife");
 	source.SetTermDays(365);
 	source.SetAutoRenew(true);
 	source.SetRenewalPeriodDays(365);
@@ -433,6 +434,13 @@ void CContractTest::testContractInfo_SerializeRoundTrip()
 	iser::CMemoryReadArchive readArchive(writeArchive.GetBuffer(), writeArchive.GetBufferSize());
 	QVERIFY(target.Serialize(readArchive));
 	QVERIFY(target.IsEqual(source));
+	QCOMPARE(target.GetProductId(), QByteArray("ProLife"));
+	imtauth::CContractInfo copied;
+	QVERIFY(copied.CopyFrom(source));
+	QCOMPARE(copied.GetProductId(), QByteArray("ProLife"));
+	copied.SetProductId("Puma");
+	QVERIFY(!copied.IsEqual(source));
+	QCOMPARE(imtauth::ComputeContractContentHash(copied), imtauth::ComputeContractContentHash(source));
 	QCOMPARE(target.GetAllocations().first().permissionIds, QByteArrayList({"Read", "Write"}));
 	QCOMPARE(int(target.GetReferences().first().type), int(imtauth::IContractInfo::RT_FRAMEWORK));
 	QCOMPARE(imtauth::ComputeContractContentHash(target), imtauth::ComputeContractContentHash(source));
@@ -457,7 +465,7 @@ void CContractTest::testContractTypeInfo_SerializeRoundTrip()
 	imtauth::IContractTypeInfo::AllocationTemplate allocationTemplate;
 	allocationTemplate.grantorRoleId = "supplier";
 	allocationTemplate.granteeRoleId = "customer";
-	allocationTemplate.productId = "ProLife";
+
 	allocationTemplate.permissionIds = {"Read", "Write"};
 	source.SetAllocationTemplates({allocationTemplate});
 

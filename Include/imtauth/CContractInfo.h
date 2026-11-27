@@ -19,6 +19,8 @@ public:
 	// reimplemented (imtauth::IContractInfo)
 	virtual QByteArray GetContractId() const override;
 	virtual void SetContractId(const QByteArray& value) override;
+	virtual QByteArray GetProductId() const override;
+	virtual void SetProductId(const QByteArray& value) override;
 	virtual QString GetNumber() const override;
 	virtual void SetNumber(const QString& value) override;
 	virtual QString GetName() const override;
@@ -95,6 +97,7 @@ public:
 
 protected:
 	QByteArray m_contractId;
+	QByteArray m_productId;
 	QString m_number;
 	QString m_name;
 	QString m_description;

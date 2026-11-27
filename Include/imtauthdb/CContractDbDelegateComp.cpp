@@ -34,6 +34,7 @@ bool CContractDbDelegateComp::GetColumns(const istd::IChangeable& object, Column
 	}
 
 	columns.append({QStringLiteral("InitiatorTenantId"), IdLiteral(contractPtr->GetInitiatorTenantId())});
+	columns.append({QStringLiteral("ProductId"), IdLiteral(contractPtr->GetProductId())});
 	columns.append({QStringLiteral("Number"), TextLiteral(contractPtr->GetNumber())});
 	columns.append({QStringLiteral("Name"), TextLiteral(contractPtr->GetName())});
 	columns.append({QStringLiteral("State"), NumberLiteral(int(imtauth::ComputeContractState(*contractPtr, QDateTime::currentDateTimeUtc()).state))});
@@ -70,10 +71,16 @@ QString CContractDbDelegateComp::CreateDependentStatements(const QByteArray& obj
 
 QString CContractDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
 {
+	QStringList conditions;
+	iprm::TParamsPtr<iprm::ITextParam> productParamPtr(&filterParams, "ProductId", false);
+	if (productParamPtr.IsValid() && !productParamPtr->GetText().isEmpty()){
+		conditions.append(QStringLiteral(R"("ProductId" = %1)").arg(TextLiteral(productParamPtr->GetText())));
+	}
+
 	iprm::TParamsPtr<iprm::ITextParam> partyParamPtr(&filterParams, "PartyTenantId", false);
 	if (partyParamPtr.IsValid() && !partyParamPtr->GetText().isEmpty()){
-		return QStringLiteral(R"("Id" IN (SELECT "ContractId" FROM "%1" WHERE "TenantId" = %2))")
-					.arg(QString::fromUtf8(*m_partiesTableNameAttrPtr), TextLiteral(partyParamPtr->GetText()));
+		conditions.append(QStringLiteral(R"("Id" IN (SELECT "ContractId" FROM "%1" WHERE "TenantId" = %2))")
+					.arg(QString::fromUtf8(*m_partiesTableNameAttrPtr), TextLiteral(partyParamPtr->GetText())));
 	}
 
 	// The states stored with the contracts, as numbers separated by commas
@@ -89,11 +96,16 @@ QString CContractDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParam
 		}
 
 		if (!states.isEmpty()){
-			return QStringLiteral(R"("State" IN (%1))").arg(states.join(QLatin1Char(',')));
+			conditions.append(QStringLiteral(R"("State" IN (%1))").arg(states.join(QLatin1Char(','))));
 		}
 	}
 
-	return BaseClass::CreateAdditionalFiltersQuery(filterParams);
+	const QString baseFilter = BaseClass::CreateAdditionalFiltersQuery(filterParams);
+	if (!baseFilter.isEmpty()){
+		conditions.append(baseFilter);
+	}
+
+	return conditions.join(QStringLiteral(" AND "));
 }
 
 

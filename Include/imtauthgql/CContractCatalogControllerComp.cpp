@@ -3,7 +3,9 @@
 
 
 // ImtCore includes
-#include <imtauthgql/ContractGqlUtils.h>
+#include <imtbase/imtbase.h>
+#include <imtsdl/imtsdl.h>
+#include <imtsdl/TElementList.h>
 #include <imtauthgql/TenantAccess.h>
 #include <imtgql/IGqlContext.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/ContractCatalogs.h>
@@ -64,14 +66,14 @@ sdlauth::CGetPartyRolesPayload CContractCatalogControllerComp::OnGetPartyRoles(
 
 		sdlauth::CPartyRole roleData;
 		roleData.roleId = rolePtr->GetRoleId();
-		roleData.name = isSystem ? TranslateSystemText(m_translationManagerCompPtr.GetPtr(), rolePtr->GetName(), languageId) : rolePtr->GetName();
-		roleData.description = isSystem ? TranslateSystemText(m_translationManagerCompPtr.GetPtr(), rolePtr->GetDescription(), languageId) : rolePtr->GetDescription();
+		roleData.name = isSystem ? imtbase::TranslateAttributeText(m_translationManagerCompPtr.GetPtr(), rolePtr->GetName(), languageId) : rolePtr->GetName();
+		roleData.description = isSystem ? imtbase::TranslateAttributeText(m_translationManagerCompPtr.GetPtr(), rolePtr->GetDescription(), languageId) : rolePtr->GetDescription();
 		roleData.ownerTenantId = rolePtr->GetOwnerTenantId();
 		roleData.isPartyRole = (rolePtr->GetApplicability() & imtauth::IPartyRoleInfo::RA_PARTY) != 0;
 		roleData.isLinkRole = (rolePtr->GetApplicability() & imtauth::IPartyRoleInfo::RA_LINK) != 0;
 		roleData.pairedRoleId = rolePtr->GetPairedRoleId();
 		roleData.templateProductId = rolePtr->GetTemplateProductId();
-		roleData.templatePermissionIds = ToElementList(rolePtr->GetTemplatePermissionIds());
+		roleData.templatePermissionIds = imtsdl::ToElementList(rolePtr->GetTemplatePermissionIds());
 		roleData.isArchived = rolePtr->IsArchived();
 		roleData.isSystem = isSystem;
 		response.roles->push_back(roleData);
@@ -115,11 +117,11 @@ sdlauth::CGetContractTypesPayload CContractCatalogControllerComp::OnGetContractT
 
 		sdlauth::CContractType typeData;
 		typeData.typeId = typePtr->GetTypeId();
-		typeData.name = isSystem ? TranslateSystemText(m_translationManagerCompPtr.GetPtr(), typePtr->GetName(), languageId) : typePtr->GetName();
-		typeData.description = isSystem ? TranslateSystemText(m_translationManagerCompPtr.GetPtr(), typePtr->GetDescription(), languageId) : typePtr->GetDescription();
+		typeData.name = isSystem ? imtbase::TranslateAttributeText(m_translationManagerCompPtr.GetPtr(), typePtr->GetName(), languageId) : typePtr->GetName();
+		typeData.description = isSystem ? imtbase::TranslateAttributeText(m_translationManagerCompPtr.GetPtr(), typePtr->GetDescription(), languageId) : typePtr->GetDescription();
 		typeData.ownerTenantId = typePtr->GetOwnerTenantId();
 		typeData.numberPrefix = typePtr->GetNumberPrefix();
-		typeData.linkScheme = ConvertEnum<sdlauth::ContractLinkScheme>(typePtr->GetLinkScheme());
+		typeData.linkScheme = imtsdl::ConvertEnum<sdlauth::ContractLinkScheme>(typePtr->GetLinkScheme());
 		typeData.starRoleId = typePtr->GetStarRoleId();
 		typeData.termDays = typePtr->GetTermDays();
 		typeData.autoRenew = typePtr->IsAutoRenew();
@@ -144,7 +146,7 @@ sdlauth::CGetContractTypesPayload CContractCatalogControllerComp::OnGetContractT
 			templateData.grantorRoleId = allocationTemplate.grantorRoleId;
 			templateData.granteeRoleId = allocationTemplate.granteeRoleId;
 			templateData.productId = allocationTemplate.productId;
-			templateData.permissionIds = ToElementList(allocationTemplate.permissionIds);
+			templateData.permissionIds = imtsdl::ToElementList(allocationTemplate.permissionIds);
 			typeData.allocationTemplates->push_back(templateData);
 		}
 
@@ -197,7 +199,7 @@ sdlauth::CCatalogCommandPayload CContractCatalogControllerComp::OnSavePartyRole(
 	rolePtr->SetApplicability(applicability);
 	rolePtr->SetPairedRoleId(input.pairedRoleId.value_or(QByteArray()));
 	rolePtr->SetTemplateProductId(input.templateProductId.value_or(QByteArray()));
-	rolePtr->SetTemplatePermissionIds(FromElementList(input.templatePermissionIds));
+	rolePtr->SetTemplatePermissionIds(imtsdl::FromElementList(input.templatePermissionIds));
 
 	QByteArray roleId = rolePtr->GetRoleId();
 	if (roleId.isEmpty()){
@@ -279,7 +281,7 @@ sdlauth::CCatalogCommandPayload CContractCatalogControllerComp::OnSaveContractTy
 	typePtr->SetDescription(input.description.value_or(QString()));
 	typePtr->SetOwnerTenantId(tenantId);
 	typePtr->SetNumberPrefix(input.numberPrefix.value_or(QString()));
-	typePtr->SetLinkScheme(input.linkScheme ? ConvertEnum<imtauth::IContractTypeInfo::LinkScheme>(*input.linkScheme) : imtauth::IContractTypeInfo::LS_MANUAL);
+	typePtr->SetLinkScheme(input.linkScheme ? imtsdl::ConvertEnum<imtauth::IContractTypeInfo::LinkScheme>(*input.linkScheme) : imtauth::IContractTypeInfo::LS_MANUAL);
 	typePtr->SetStarRoleId(input.starRoleId.value_or(QByteArray()));
 	typePtr->SetTermDays(input.termDays.value_or(0));
 	typePtr->SetAutoRenew(input.autoRenew.value_or(false));
@@ -310,7 +312,7 @@ sdlauth::CCatalogCommandPayload CContractCatalogControllerComp::OnSaveContractTy
 				allocationTemplate.grantorRoleId = item->grantorRoleId.value_or(QByteArray());
 				allocationTemplate.granteeRoleId = item->granteeRoleId.value_or(QByteArray());
 				allocationTemplate.productId = item->productId.value_or(QByteArray());
-				allocationTemplate.permissionIds = FromElementList(item->permissionIds);
+				allocationTemplate.permissionIds = imtsdl::FromElementList(item->permissionIds);
 				allocationTemplates.append(allocationTemplate);
 			}
 		}

@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS "TenantContracts" (
 	"Id" TEXT PRIMARY KEY,
 	"InitiatorTenantId" TEXT NOT NULL,
+	"ProductId" TEXT NOT NULL,
 	"Number" TEXT,
 	"Name" TEXT,
 	"State" INTEGER NOT NULL DEFAULT 0,
@@ -9,6 +10,8 @@ CREATE TABLE IF NOT EXISTS "TenantContracts" (
 	"UpdatedAt" TIMESTAMP,
 	"Data" TEXT
 );
+
+CREATE INDEX IF NOT EXISTS "IdxTenantContractsProductId" ON "TenantContracts" ("ProductId");
 
 CREATE INDEX IF NOT EXISTS "IdxTenantContractsInitiatorTenantId" ON "TenantContracts" ("InitiatorTenantId");
 

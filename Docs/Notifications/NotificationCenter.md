@@ -13,6 +13,8 @@ A notification is stored, so a user who is offline sees it after the next login.
 
 ## Where it runs
 
+Contract notifications belong to the immutable `ProductId` of the contract. They appear only in that product's inbox, including reminders. The responsible active member receives them; if that member is absent or inactive, the owner receives them. The actor receives no notification about their own action. Group withdrawal uses the same product as delivery. `OnContractNotification` is restricted to sessions of that product and party; `OnContractsChanged` carries `productId` and goes only to that product's server, so another product's caches stay unchanged; the server must present its server token, a product server without one keeps its caches until they expire. Other organization events may still have no product and remain visible across products.
+
 There is **one** notification center: on the authorization server (Puma). A product server forwards the inbox commands of its clients and relays the subscription, as it does for the tenant commands, and sends its own notifications to Puma with the account of the server.
 
 ```

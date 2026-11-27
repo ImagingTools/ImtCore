@@ -135,7 +135,6 @@ type ContractAllocation {
 	linkId: ID!
 	grantorTenantId: ID!
 	granteeTenantId: ID!
-	productId: ID!
 	permissionIds: [ID]
 	validFrom: String
 	validUntil: String
@@ -176,6 +175,8 @@ type ContractRoleSlot {
 }
 
 type Contract {
+	isReadOnly: Boolean
+	productId: ID!
 	id: ID!
 	number: String
 	name: String
@@ -221,6 +222,8 @@ type Contract {
 }
 
 type ContractListItem {
+	isReadOnly: Boolean
+	productId: ID!
 	id: ID!
 	number: String
 	name: String
@@ -366,7 +369,6 @@ input GiveContractPermissionsInput {
 	tenantId: ID!
 	contractId: ID!
 	granteeTenantId: ID!
-	productId: ID!
 	permissionIds: [ID]
 	validUntil: String
 	comment: String
@@ -466,6 +468,7 @@ input ContractNotificationSubscriptionInput {
 
 # A contract changed: the servers of the products drop what they computed for the access of their sessions
 type ContractsChangedNotification {
+	productId: ID!
 	contractId: ID!
 }
 

@@ -55,6 +55,8 @@ static const inline QString s_connectionRemoved = QStringLiteral("ConnectionRemo
 static const inline QString s_messageCreated = QStringLiteral("MessageCreated");
 static const inline QString s_messageStatusChanged = QStringLiteral("MessageStatusChanged");
 static const inline QString s_contractId = QStringLiteral("contractId");
+// The product a contract is for
+static const inline QString s_productId = QStringLiteral("productId");
 // The organizations a contract event is for, a list of ids
 static const inline QString s_recipientTenantIds = QStringLiteral("recipientTenantIds");
 // Every change of a contract, for all its parties

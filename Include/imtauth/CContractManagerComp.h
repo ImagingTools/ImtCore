@@ -14,6 +14,7 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
+#include <imtauth/CContractManagerProductScopeComp.h>
 #include <imtauth/IContractManager.h>
 #include <imtauth/IContractTypeCatalog.h>
 #include <imtauth/IPartyRoleCatalog.h>
@@ -34,11 +35,11 @@ namespace imtauth
 	It is the only writer of them, so it keeps what it read until it writes it again.
 */
 class CContractManagerComp:
-			public ilog::CLoggerComponentBase,
+			public CContractManagerProductScopeComp,
 			virtual public IContractManager
 {
 public:
-	typedef ilog::CLoggerComponentBase BaseClass;
+	typedef CContractManagerProductScopeComp BaseClass;
 
 	I_BEGIN_COMPONENT(CContractManagerComp);
 		I_REGISTER_INTERFACE(IContractManager);
@@ -61,8 +62,8 @@ public:
 
 	// reimplemented (imtauth::IContractProvider)
 	virtual IContractInfoUniquePtr GetContract(const QByteArray& contractId) const override;
-	virtual ContractInfoList GetContractsOfParty(const QByteArray& tenantId, bool* isReadPtr = nullptr) const override;
-	virtual ContractInfoList GetContractsOfPair(const QByteArray& tenantId, const QByteArray& otherTenantId, bool* isReadPtr = nullptr) const override;
+	virtual ContractInfoList GetContractsOfParty(const QByteArray& tenantId, const QByteArray& productId, bool* isReadPtr = nullptr) const override;
+	virtual ContractInfoList GetContractsOfPair(const QByteArray& tenantId, const QByteArray& otherTenantId, const QByteArray& productId, bool* isReadPtr = nullptr) const override;
 	virtual ContractInfoList GetOpenContracts(bool* isReadPtr = nullptr) const override;
 	virtual IContractPartyPrivateInfoUniquePtr GetPrivateInfo(const QByteArray& contractId, const QByteArray& tenantId) const override;
 	virtual ContractEventInfoList GetEvents(const QByteArray& contractId, const QByteArray& tenantId, bool* isReadPtr = nullptr) const override;
@@ -184,8 +185,8 @@ private:
 	/**
 		How the initiator knows an organization: false when it does not.
 	*/
-	bool FindChannel(const QByteArray& initiatorTenantId, const QByteArray& tenantId, IContractInfo::PartyChannel& channel) const;
-	bool HasCommonContract(const QByteArray& tenantId, const QByteArray& otherTenantId) const;
+	bool FindChannel(const QByteArray& initiatorTenantId, const QByteArray& tenantId, const QByteArray& productId, IContractInfo::PartyChannel& channel) const;
+	bool HasCommonContract(const QByteArray& tenantId, const QByteArray& otherTenantId, const QByteArray& productId) const;
 	bool CheckInvitationLimit(const QByteArray& initiatorTenantId, int unknownCount, QString& errorMessage);
 	void RecordInvitations(const QByteArray& initiatorTenantId, int unknownCount);
 	/// The name of a role usable by the initiator, empty when it is not

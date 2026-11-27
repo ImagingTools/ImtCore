@@ -73,7 +73,8 @@ inline bool Send(
 			const QByteArray& groupKey = QByteArray(),
 			istd::IInformationProvider::InformationCategory severity = istd::IInformationProvider::IC_INFO,
 			const imtnotify::ObjectLinkInfo& actor = imtnotify::ObjectLinkInfo(),
-			const imtnotify::NotificationArguments& arguments = imtnotify::NotificationArguments())
+			const imtnotify::NotificationArguments& arguments = imtnotify::NotificationArguments(),
+			const QByteArray& productId = QByteArray())
 {
 	if (senderPtr == nullptr || userId.isEmpty()){
 		return false;
@@ -81,6 +82,7 @@ inline bool Send(
 
 	imtnotify::INotificationSender::Audience audience;
 	audience.tenantId = tenantId;
+	audience.productId = productId;
 	audience.userIds = {userId};
 
 	imtnotify::INotificationSender::Message message;
@@ -147,7 +149,7 @@ inline imtnotify::ObjectLinkInfo RequestUserLink(const imtbase::IObjectCollectio
 /**
 	Withdraw a group from every inbox of the tenant.
 */
-inline bool Withdraw(imtnotify::INotificationSender* senderPtr, const QByteArray& tenantId, const QByteArray& groupKey)
+inline bool Withdraw(imtnotify::INotificationSender* senderPtr, const QByteArray& tenantId, const QByteArray& groupKey, const QByteArray& productId = QByteArray())
 {
 	if (senderPtr == nullptr){
 		return false;
@@ -155,6 +157,7 @@ inline bool Withdraw(imtnotify::INotificationSender* senderPtr, const QByteArray
 
 	imtnotify::INotificationSender::Audience audience;
 	audience.tenantId = tenantId;
+	audience.productId = productId;
 
 	return senderPtr->Withdraw(audience, groupKey);
 }

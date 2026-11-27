@@ -12,6 +12,7 @@
 #include <iprm/CIdParam.h>
 
 // ImtCore includes
+#include <imtgql/imtgql.h>
 #include <imtauth/CUserInfo.h>
 #include <imtbase/COperationContext.h>
 #include <imtbase/CObjectCollection.h>
@@ -206,7 +207,7 @@ sdl::V1_0::imtauth::CGetUserOrganizationsPayload CProfileControllerComp::OnGetUs
 	}
 
 	if (!userId.isEmpty()){
-		response.organizations = CreateOrganizationList(userId);
+		response.organizations = CreateOrganizationList(userId, imtgql::GetRequestProductId(gqlRequest));
 	}
 
 	return response;
@@ -214,7 +215,7 @@ sdl::V1_0::imtauth::CGetUserOrganizationsPayload CProfileControllerComp::OnGetUs
 
 
 imtsdl::TElementList<sdl::V1_0::imtauth::CProfileTenantInfo> CProfileControllerComp::CreateOrganizationList(
-			const QByteArray& userId) const
+			const QByteArray& userId, const QByteArray& productId) const
 {
 	imtsdl::TElementList<sdl::V1_0::imtauth::CProfileTenantInfo> organizationList;
 
@@ -289,7 +290,7 @@ imtsdl::TElementList<sdl::V1_0::imtauth::CProfileTenantInfo> CProfileControllerC
 
 	// Organizations that give the user permissions by their contracts
 	if (m_delegatedAccessCompPtr.IsValid()){
-		for (const QByteArray& delegatingTenantId : m_delegatedAccessCompPtr->GetDelegatingTenantIds(userId)){
+		for (const QByteArray& delegatingTenantId : m_delegatedAccessCompPtr->GetDelegatingTenantIds(userId, productId)){
 			if (directTenantIds.contains(delegatingTenantId)){
 				continue;
 			}

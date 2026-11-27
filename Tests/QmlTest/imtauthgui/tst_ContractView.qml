@@ -196,6 +196,44 @@ TestCase {
 		return view
 	}
 
+	function test_aForeignProductContractIsReadOnly(){
+		let client = createTemporaryObject(contractsClientComp, testCase)
+		let view = createView(client, "c1")
+		let contract = testCase.editableContract(1)
+		contract.productId = "OtherProduct"
+		contract.isReadOnly = true
+		client.contract = contract
+		client.contractReceived("c1")
+		verify(!view.canEdit)
+		verify(!view.canApprove)
+		verify(!view.canSign)
+		verify(!view.canGive)
+		verify(!view.canDistribute)
+		verify(!view.isEditable)
+	}
+
+	// The product column is for a list with contracts of other products only
+	function test_theProductColumnShowsOnlyWithOtherProducts(){
+		let client = createTemporaryObject(contractsClientComp, testCase)
+		let component = Qt.createComponent("qrc:/qml/imtauthgui/TenantContractsPage.qml")
+		compare(component.status, Component.Ready, component.errorString())
+		let page = createTemporaryObject(component, testCase, {"contractsApiClient": client})
+		verify(page !== null)
+
+		client.contracts = [{"id": "c1", "productId": "ProLife", "name": "Own"}]
+		client.contractsReceived()
+		verify(!page.hasOtherProducts)
+		compare(page.columnIds.indexOf("productId"), -1)
+		compare(page.columnIds.length, page.columnNames.length)
+
+		client.contracts = [{"id": "c1", "productId": "Puma", "name": "Own"}, {"id": "c2", "productId": "ProLife", "name": "Other", "isReadOnly": true}]
+		client.contractsReceived()
+		verify(page.hasOtherProducts)
+		compare(page.columnIds.indexOf("productId"), 2)
+		compare(page.columnNames[2], "Product")
+		compare(page.columnIds.length, page.columnNames.length)
+	}
+
 	// The card knows its unsaved changes; a save sends the revision they are based on
 	function test_anEditMakesTheCardDirty(){
 		let client = createTemporaryObject(contractsClientComp, testCase)

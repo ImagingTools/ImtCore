@@ -33,8 +33,11 @@ SimpleCollectionPage {
 	editPermissionIds: ["/OrganizationManagement/Contracts/View"]
 	deletePermissionIds: ["/OrganizationManagement/Contracts/Edit"]
 
-	columnIds: ["number", "name", "partyNames", "stateText", "period"]
-	columnNames: [qsTr("Number"), qsTr("Name"), qsTr("Parties"), qsTr("State"), qsTr("Period")]
+	// The product is shown only when the list has contracts of other products, read only
+	property bool hasOtherProducts: false
+
+	columnIds: contractsPage.hasOtherProducts ? ["number", "name", "productId", "partyNames", "stateText", "period"] : ["number", "name", "partyNames", "stateText", "period"]
+	columnNames: contractsPage.hasOtherProducts ? [qsTr("Number"), qsTr("Name"), qsTr("Product"), qsTr("Parties"), qsTr("State"), qsTr("Period")] : [qsTr("Number"), qsTr("Name"), qsTr("Parties"), qsTr("State"), qsTr("Period")]
 
 	listModel: contractsPage.__rows
 
@@ -89,6 +92,8 @@ SimpleCollectionPage {
 	function __rowOf(contract) {
 		var row = {}
 		row.id = contract.id
+		row.productId = contract.productId || ""
+		row.isReadOnly = contract.isReadOnly === true
 		row.number = contract.number || qsTr("Draft")
 		row.name = contract.name || ""
 		row.title = contract.number ? contract.number + " " + (contract.name || "") : (contract.name || qsTr("Draft"))
@@ -116,13 +121,17 @@ SimpleCollectionPage {
 			var contracts = contractsPage.contractsApiClient.contracts || []
 			var waiting = []
 			var others = []
+			var hasOtherProducts = false
 			for (var i = 0; i < contracts.length; i++) {
 				var row = contractsPage.__rowOf(contracts[i])
+				if (row.isReadOnly)
+					hasOtherProducts = true
 				if (row.isWaiting)
 					waiting.push(row)
 				else
 					others.push(row)
 			}
+			contractsPage.hasOtherProducts = hasOtherProducts
 			contractsPage.__rows = waiting.concat(others)
 			if (contractsPage.visible && contractsPage.contractToOpenId !== "") {
 				var contractId = contractsPage.contractToOpenId

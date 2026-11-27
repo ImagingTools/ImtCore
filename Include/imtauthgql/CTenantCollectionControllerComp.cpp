@@ -12,6 +12,7 @@
 #include <iprm/CTextParam.h>
 
 // ImtCore includes
+#include <imtgql/imtgql.h>
 #include <imtauth/ITenantInfo.h>
 #include <imtauth/imtauth.h>
 #include <imtgql/IGqlContext.h>
@@ -151,7 +152,7 @@ void CTenantCollectionControllerComp::SetAdditionalFilters(
 
 	// The organizations giving the user permissions by their contracts are related to it as delegated
 	if (m_delegatedAccessCompPtr.IsValid() && userId != s_noUserId){
-		const QByteArrayList delegatingTenantIds = m_delegatedAccessCompPtr->GetDelegatingTenantIds(userId);
+		const QByteArrayList delegatingTenantIds = m_delegatedAccessCompPtr->GetDelegatingTenantIds(userId, imtgql::GetRequestProductId(gqlRequest));
 		if (!delegatingTenantIds.isEmpty()){
 			iprm::CTextParam* tenantIdsParamPtr = new iprm::CTextParam();
 			tenantIdsParamPtr->SetText(QString::fromUtf8(delegatingTenantIds.join(',')));

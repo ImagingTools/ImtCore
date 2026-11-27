@@ -32,7 +32,7 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (imtauth::ITenantRelationshipProvider)
-	virtual RelatedTenantInfos GetRelatedTenants(const QByteArray& tenantId, QString* tenantNamePtr = nullptr, bool* isReadPtr = nullptr) const override;
+	virtual RelatedTenantInfos GetRelatedTenants(const QByteArray& tenantId, const QByteArray& productId, QString* tenantNamePtr = nullptr, bool* isReadPtr = nullptr) const override;
 
 private:
 	I_REF(IContractProvider, m_contractProviderCompPtr);

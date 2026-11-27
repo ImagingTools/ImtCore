@@ -58,7 +58,7 @@ protected:
 				QString& errorMessage) const override;
 private:
 	imtsdl::TElementList<sdl::V1_0::imtauth::CProfileTenantInfo> CreateOrganizationList(
-				const QByteArray& userId) const;
+				const QByteArray& userId, const QByteArray& productId) const;
 protected:
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_roleCollectionCompPtr);

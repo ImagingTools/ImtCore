@@ -3,7 +3,8 @@
 
 
 // ImtCore includes
-#include <imtauthgql/ContractGqlUtils.h>
+#include <imtsdl/imtsdl.h>
+#include <imtsdl/TElementList.h>
 #include <imtauthgql/TenantAccess.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantDirectory.h>
 
@@ -27,11 +28,11 @@ sdlauth::CDirectoryProfile CreateProfileData(const imtauth::ITenantDirectoryProf
 	retVal.isListed = profile.IsListed();
 	retVal.acceptsInvitationsFromUnknown = profile.IsAcceptingInvitationsFromUnknown();
 	retVal.description = profile.GetDescription();
-	retVal.offeredRoleIds = ToElementList(profile.GetOfferedRoleIds());
+	retVal.offeredRoleIds = imtsdl::ToElementList(profile.GetOfferedRoleIds());
 	retVal.industry = profile.GetIndustry();
 	retVal.country = profile.GetCountry();
 	retVal.website = profile.GetWebsite();
-	retVal.updatedAt = ToSdlTime(profile.GetUpdatedAt());
+	retVal.updatedAt = imtsdl::ToSdlTime(profile.GetUpdatedAt());
 
 	return retVal;
 }
@@ -104,7 +105,7 @@ sdlauth::CSetDirectoryProfilePayload CTenantDirectoryControllerComp::OnSetDirect
 	profilePtr->SetListed(input.isListed.value_or(false));
 	profilePtr->SetAcceptingInvitationsFromUnknown(input.acceptsInvitationsFromUnknown.value_or(false));
 	profilePtr->SetDescription(input.description.value_or(QString()).trimmed());
-	profilePtr->SetOfferedRoleIds(FromElementList(input.offeredRoleIds));
+	profilePtr->SetOfferedRoleIds(imtsdl::FromElementList(input.offeredRoleIds));
 	profilePtr->SetIndustry(input.industry.value_or(QString()).trimmed());
 	profilePtr->SetCountry(input.country.value_or(QString()).trimmed());
 	profilePtr->SetWebsite(input.website.value_or(QString()).trimmed());

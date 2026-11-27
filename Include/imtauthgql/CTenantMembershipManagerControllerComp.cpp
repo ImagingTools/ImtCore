@@ -5,6 +5,7 @@
 #include <QtCore/QSet>
 
 // ImtCore includes
+#include <imtgql/imtgql.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantMemberships.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Permissions.h>
 #include <imtauth/ITenantInfo.h>
@@ -1123,7 +1124,7 @@ bool CTenantMembershipManagerControllerComp::CanViewOrganizationData(
 				*m_membershipManagerCompPtr.GetPtr(),
 				m_delegatedAccessCompPtr.IsValid() ? m_delegatedAccessCompPtr.GetPtr() : nullptr,
 				userId,
-				tenantId)
+				tenantId, imtgql::GetRequestProductId(gqlRequest))
 				&& HoldsOrganizationPermission(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), userId, tenantId, permission);
 }
 

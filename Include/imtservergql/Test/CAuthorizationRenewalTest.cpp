@@ -799,14 +799,14 @@ public:
 		}
 		return isRead ? permissionIds : QByteArrayList();
 	}
-	QByteArrayList GetDelegatingTenantIds(const QByteArray&, bool* isReadPtr) const override
+	QByteArrayList GetDelegatingTenantIds(const QByteArray&, const QByteArray&, bool* isReadPtr) const override
 	{
 		if (isReadPtr != nullptr){
 			*isReadPtr = IsRead();
 		}
 		return QByteArrayList();
 	}
-	bool HasDelegatedAccess(const QByteArray&, const QByteArray&, bool* isReadPtr) const override
+	bool HasDelegatedAccess(const QByteArray&, const QByteArray&, const QByteArray&, bool* isReadPtr) const override
 	{
 		const bool isRead = IsRead();
 		if (isReadPtr != nullptr){

@@ -230,10 +230,6 @@ bool SerializeAllocation(iser::IArchive& archive, IContractInfo::Allocation& ite
 	retVal = retVal && archive.Process(item.granteeTenantId);
 	retVal = retVal && archive.EndTag(granteeTenantIdTag);
 
-	iser::CArchiveTag productIdTag("ProductId", "Product ID", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(productIdTag);
-	retVal = retVal && archive.Process(item.productId);
-	retVal = retVal && archive.EndTag(productIdTag);
 
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, item.permissionIds, "PermissionIds", "PermissionId");
 
@@ -444,7 +440,6 @@ bool IContractInfo::Allocation::operator==(const Allocation& other) const
 				&& linkId == other.linkId
 				&& grantorTenantId == other.grantorTenantId
 				&& granteeTenantId == other.granteeTenantId
-				&& productId == other.productId
 				&& permissionIds == other.permissionIds
 				&& validFrom == other.validFrom
 				&& validUntil == other.validUntil
@@ -532,6 +527,18 @@ QByteArray CContractInfo::GetContractId() const
 void CContractInfo::SetContractId(const QByteArray& value)
 {
 	AssignValue(*this, m_contractId, value);
+}
+
+
+QByteArray CContractInfo::GetProductId() const
+{
+	return m_productId;
+}
+
+
+void CContractInfo::SetProductId(const QByteArray& value)
+{
+	AssignValue(*this, m_productId, value);
 }
 
 
@@ -932,6 +939,11 @@ bool CContractInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_contractId);
 	retVal = retVal && archive.EndTag(contractIdTag);
 
+	iser::CArchiveTag productIdTag("ProductId", "Product ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(productIdTag);
+	retVal = retVal && archive.Process(m_productId);
+	retVal = retVal && archive.EndTag(productIdTag);
+
 	iser::CArchiveTag numberTag("Number", "Number", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(numberTag);
 	retVal = retVal && archive.Process(m_number);
@@ -1168,6 +1180,7 @@ bool CContractInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode
 	istd::CChangeNotifier notifier(this);
 
 	m_contractId = sourcePtr->GetContractId();
+	m_productId = sourcePtr->GetProductId();
 	m_number = sourcePtr->GetNumber();
 	m_name = sourcePtr->GetName();
 	m_description = sourcePtr->GetDescription();
@@ -1213,6 +1226,7 @@ bool CContractInfo::IsEqual(const IChangeable& object) const
 	}
 
 	return m_contractId == otherPtr->GetContractId()
+				&& m_productId == otherPtr->GetProductId()
 				&& m_number == otherPtr->GetNumber()
 				&& m_name == otherPtr->GetName()
 				&& m_description == otherPtr->GetDescription()
@@ -1264,6 +1278,7 @@ bool CContractInfo::ResetData(CompatibilityMode /*mode*/)
 	istd::CChangeNotifier notifier(this);
 
 	m_contractId = QByteArray();
+	m_productId = QByteArray();
 	m_number = QString();
 	m_name = QString();
 	m_description = QString();

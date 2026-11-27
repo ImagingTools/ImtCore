@@ -14,6 +14,7 @@
 #include <iqt/iqt.h>
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtgql/IGqlContext.h>
@@ -293,20 +294,6 @@ inline sdl::V1_0::imtnotify::CUserNotification GetSdlNotification(const QByteArr
 
 
 /**
-	A text of an .acc file in the language of the client: the texts of the attributes are translated in the context
-	"Attribute".
-*/
-inline QString TranslateAttributeText(const QString& text, const iqt::ITranslationManager* translationManagerPtr, const QByteArray& languageId)
-{
-	if (translationManagerPtr == nullptr || text.isEmpty()){
-		return text;
-	}
-
-	return QString::fromUtf8(iqt::GetTranslation(translationManagerPtr, text.toUtf8(), languageId, QByteArrayLiteral("Attribute")));
-}
-
-
-/**
 	The message of a type in the language of the client. A translation that is not valid or uses other values than the
 	message is replaced by the message, and the reason is added to the errors.
 */
@@ -317,7 +304,7 @@ inline QString TranslateMessage(
 			QStringList& errors)
 {
 	const QString message = typeInfo.GetMessage();
-	const QString translation = TranslateAttributeText(message, translationManagerPtr, languageId);
+	const QString translation = imtbase::TranslateAttributeText(translationManagerPtr, message, languageId);
 	if (translation == message){
 		return message;
 	}
@@ -353,7 +340,7 @@ inline sdl::V1_0::imtnotify::CNotificationTypeInfo CreateTypeInfo(
 {
 	sdl::V1_0::imtnotify::CNotificationTypeInfo retVal;
 	retVal.id = typeInfo.GetTypeId();
-	retVal.name = TranslateAttributeText(typeInfo.GetName(), translationManagerPtr, languageId);
+	retVal.name = imtbase::TranslateAttributeText(translationManagerPtr, typeInfo.GetName(), languageId);
 	retVal.icon = typeInfo.GetIconPath();
 	retVal.message = TranslateMessage(typeInfo, translationManagerPtr, languageId, errors);
 

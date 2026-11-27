@@ -49,8 +49,8 @@ public:
 				const QByteArray& targetTenantId,
 				const QByteArray& productId,
 				bool* isReadPtr = nullptr) const override;
-	virtual QByteArrayList GetDelegatingTenantIds(const QByteArray& userId, bool* isReadPtr = nullptr) const override;
-	virtual bool HasDelegatedAccess(const QByteArray& userId, const QByteArray& targetTenantId, bool* isReadPtr = nullptr) const override;
+	virtual QByteArrayList GetDelegatingTenantIds(const QByteArray& userId, const QByteArray& productId, bool* isReadPtr = nullptr) const override;
+	virtual bool HasDelegatedAccess(const QByteArray& userId, const QByteArray& targetTenantId, const QByteArray& productId, bool* isReadPtr = nullptr) const override;
 
 private:
 	/**
@@ -65,7 +65,7 @@ private:
 		each with the permissions its grantor holds now only; an allocation of none of them is not visited.
 		\param grantorTenantId An empty one visits the allocations of every grantor.
 	*/
-	bool VisitUserAllocations(const QByteArray& userId, const QByteArray& grantorTenantId, const AllocationVisitor& visitor) const;
+	bool VisitUserAllocations(const QByteArray& userId, const QByteArray& grantorTenantId, const QByteArray& productId, const AllocationVisitor& visitor) const;
 
 private:
 	I_REF(IContractProvider, m_contractProviderCompPtr);

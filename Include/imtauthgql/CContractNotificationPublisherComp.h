@@ -57,8 +57,8 @@ protected:
 	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
 private:
-	void PushChange(const QByteArray& contractId, const QByteArrayList& tenantIds, const QByteArray& userId, const QString& userName) const;
-	void PushChangeToProductServers(const QByteArray& contractId) const;
+	void PushChange(const QByteArray& contractId, const QByteArray& productId, const QByteArrayList& tenantIds, const QByteArray& userId, const QString& userName) const;
+	void PushChangeToProductServers(const QByteArray& contractId, const QByteArray& productId) const;
 	void Execute(const ContractNotificationPlan::Plan& plan, const imtauth::IContractInfo& contract) const;
 	QString FindTenantName(const QByteArray& tenantId) const;
 	QString GetPushCommandId() const;

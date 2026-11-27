@@ -147,7 +147,6 @@ public:
 		QByteArray linkId;
 		QByteArray grantorTenantId;
 		QByteArray granteeTenantId;
-		QByteArray productId;
 		QByteArrayList permissionIds;
 		QDateTime validFrom;
 		QDateTime validUntil;
@@ -211,6 +210,8 @@ public:
 
 	virtual QByteArray GetContractId() const = 0;
 	virtual void SetContractId(const QByteArray& value) = 0;
+	virtual QByteArray GetProductId() const = 0;
+	virtual void SetProductId(const QByteArray& value) = 0;
 
 	virtual QString GetNumber() const = 0;
 	virtual void SetNumber(const QString& value) = 0;

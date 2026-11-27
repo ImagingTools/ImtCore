@@ -32,11 +32,7 @@ QByteArrayList CContractDelegatedAccessComp::GetDelegatedPermissions(
 		return retVal;
 	}
 
-	const bool isRead = VisitUserAllocations(userId, targetTenantId, [&](const IContractInfo::Allocation& allocation){
-		if (allocation.productId != productId){
-			return;
-		}
-
+	const bool isRead = VisitUserAllocations(userId, targetTenantId, productId, [&](const IContractInfo::Allocation& allocation){
 		for (const QByteArray& permissionId : allocation.permissionIds){
 			if (!retVal.contains(permissionId)){
 				retVal.append(permissionId);
@@ -52,10 +48,10 @@ QByteArrayList CContractDelegatedAccessComp::GetDelegatedPermissions(
 }
 
 
-QByteArrayList CContractDelegatedAccessComp::GetDelegatingTenantIds(const QByteArray& userId, bool* isReadPtr) const
+QByteArrayList CContractDelegatedAccessComp::GetDelegatingTenantIds(const QByteArray& userId, const QByteArray& productId, bool* isReadPtr) const
 {
 	QByteArrayList retVal;
-	const bool isRead = VisitUserAllocations(userId, QByteArray(), [&](const IContractInfo::Allocation& allocation){
+	const bool isRead = VisitUserAllocations(userId, QByteArray(), productId, [&](const IContractInfo::Allocation& allocation){
 		if (!retVal.contains(allocation.grantorTenantId)){
 			retVal.append(allocation.grantorTenantId);
 		}
@@ -69,10 +65,10 @@ QByteArrayList CContractDelegatedAccessComp::GetDelegatingTenantIds(const QByteA
 }
 
 
-bool CContractDelegatedAccessComp::HasDelegatedAccess(const QByteArray& userId, const QByteArray& targetTenantId, bool* isReadPtr) const
+bool CContractDelegatedAccessComp::HasDelegatedAccess(const QByteArray& userId, const QByteArray& targetTenantId, const QByteArray& productId, bool* isReadPtr) const
 {
 	bool hasAccess = false;
-	const bool isRead = !targetTenantId.isEmpty() && VisitUserAllocations(userId, targetTenantId, [&hasAccess](const IContractInfo::Allocation& /*allocation*/){
+	const bool isRead = !targetTenantId.isEmpty() && VisitUserAllocations(userId, targetTenantId, productId, [&hasAccess](const IContractInfo::Allocation& /*allocation*/){
 		hasAccess = true;
 	});
 
@@ -145,8 +141,12 @@ bool CContractDelegatedAccessComp::ReadUserScope(const QByteArray& userId, QByte
 }
 
 
-bool CContractDelegatedAccessComp::VisitUserAllocations(const QByteArray& userId, const QByteArray& grantorTenantId, const AllocationVisitor& visitor) const
+bool CContractDelegatedAccessComp::VisitUserAllocations(const QByteArray& userId, const QByteArray& grantorTenantId, const QByteArray& productId, const AllocationVisitor& visitor) const
 {
+	if (productId.isEmpty()){
+		return false;
+	}
+
 	QByteArrayList homeTenantIds;
 	QSet<QByteArray> groupIds;
 	bool isRead = ReadUserScope(userId, homeTenantIds, groupIds);
@@ -163,11 +163,15 @@ bool CContractDelegatedAccessComp::VisitUserAllocations(const QByteArray& userId
 
 		bool areContractsRead = false;
 		const ContractInfoList contracts = grantorTenantId.isEmpty()
-					? m_contractProviderCompPtr->GetContractsOfParty(homeTenantId, &areContractsRead)
-					: m_contractProviderCompPtr->GetContractsOfPair(homeTenantId, grantorTenantId, &areContractsRead);
+					? m_contractProviderCompPtr->GetContractsOfParty(homeTenantId, productId, &areContractsRead)
+					: m_contractProviderCompPtr->GetContractsOfPair(homeTenantId, grantorTenantId, productId, &areContractsRead);
 		isRead = isRead && areContractsRead;
 
 		for (const IContractInfoSharedPtr& contractPtr : contracts){
+			if (!contractPtr.IsValid() || contractPtr->GetProductId() != productId){
+				continue;
+			}
+
 			IContractPartyPrivateInfoUniquePtr privateInfoPtr;
 			for (const IContractInfo::Allocation& allocation : contractPtr->GetAllocations()){
 				if (allocation.granteeTenantId != homeTenantId || (!grantorTenantId.isEmpty() && allocation.grantorTenantId != grantorTenantId)){

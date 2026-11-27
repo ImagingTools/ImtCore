@@ -57,6 +57,9 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ProductId" Type="Id" ExportId="ProductId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="RelationshipProvider" Type="Reference" ExportId="RelationshipProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

@@ -15,8 +15,15 @@ namespace imtauth
 
 // reimplemented (imtauth::ITenantRelationshipProvider)
 
-RelatedTenantInfos CContractRelationshipProviderComp::GetRelatedTenants(const QByteArray& tenantId, QString* tenantNamePtr, bool* isReadPtr) const
+RelatedTenantInfos CContractRelationshipProviderComp::GetRelatedTenants(const QByteArray& tenantId, const QByteArray& productId, QString* tenantNamePtr, bool* isReadPtr) const
 {
+	if (productId.isEmpty()){
+		if (isReadPtr != nullptr){
+			*isReadPtr = false;
+		}
+		return RelatedTenantInfos();
+	}
+
 	struct PartnerLinks
 	{
 		RelatedTenantInfo info;
@@ -25,7 +32,7 @@ RelatedTenantInfos CContractRelationshipProviderComp::GetRelatedTenants(const QB
 	};
 
 	bool isRead = false;
-	const ContractInfoList contracts = m_contractProviderCompPtr->GetContractsOfParty(tenantId, &isRead);
+	const ContractInfoList contracts = m_contractProviderCompPtr->GetContractsOfParty(tenantId, productId, &isRead);
 	if (isReadPtr != nullptr){
 		*isReadPtr = isRead;
 	}
@@ -33,6 +40,10 @@ RelatedTenantInfos CContractRelationshipProviderComp::GetRelatedTenants(const QB
 	const QDateTime now = QDateTime::currentDateTimeUtc();
 	QMap<QByteArray, PartnerLinks> partners;
 	for (const IContractInfoSharedPtr& contractPtr : contracts){
+		if (!contractPtr.IsValid() || contractPtr->GetProductId() != productId){
+			continue;
+		}
+
 		const IContractInfo::Parties parties = contractPtr->GetParties();
 		for (const IContractInfo::Link& link : contractPtr->GetLinks()){
 			if (link.tenantAId != tenantId && link.tenantBId != tenantId){

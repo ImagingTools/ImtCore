@@ -31,13 +31,13 @@ public:
 		The contracts the organization is a party of; a draft only for its initiator.
 		\param isReadPtr [optional] False when the contracts could not be read completely.
 	*/
-	virtual ContractInfoList GetContractsOfParty(const QByteArray& tenantId, bool* isReadPtr = nullptr) const = 0;
+	virtual ContractInfoList GetContractsOfParty(const QByteArray& tenantId, const QByteArray& productId, bool* isReadPtr = nullptr) const = 0;
 
 	/**
 		The sent contracts with a link of the two organizations.
 		\param isReadPtr [optional] False when the contracts could not be read completely.
 	*/
-	virtual ContractInfoList GetContractsOfPair(const QByteArray& tenantId, const QByteArray& otherTenantId, bool* isReadPtr = nullptr) const = 0;
+	virtual ContractInfoList GetContractsOfPair(const QByteArray& tenantId, const QByteArray& otherTenantId, const QByteArray& productId, bool* isReadPtr = nullptr) const = 0;
 
 	/**
 		The contracts that did not end: negotiated, signed or in force.

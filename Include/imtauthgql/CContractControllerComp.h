@@ -170,7 +170,7 @@ private:
 	/**
 		The contract the organization takes part in, as it sees it; null when it is no party.
 	*/
-	imtauth::IContractInfoUniquePtr ReadPartyContract(const QByteArray& contractId, const QByteArray& tenantId) const;
+	imtauth::IContractInfoUniquePtr ReadPartyContract(const QByteArray& contractId, const QByteArray& tenantId, const QByteArray& productId) const;
 
 	bool CreateDraft(const sdl::V1_0::imtauth::CContractDraftInput& input, imtauth::IContractInfo& draft, QString& errorMessage) const;
 	sdl::V1_0::imtauth::CContract CreateContractData(const imtauth::IContractInfo& contract, const QByteArray& languageId) const;

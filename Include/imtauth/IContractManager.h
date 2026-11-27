@@ -21,6 +21,7 @@ struct ContractActor
 	QByteArray tenantId;
 	QByteArray userId;
 	QString userName;
+	QByteArray productId;
 };
 
 

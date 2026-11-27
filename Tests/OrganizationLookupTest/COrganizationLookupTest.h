@@ -17,6 +17,10 @@ class COrganizationLookupTest: public QObject
 	Q_OBJECT
 
 private slots:
+	void testContracts_ProductIsFixedByActor();
+	void testContracts_ForeignProductCommandsAreUnavailable();
+	void testContracts_SelectionAndCacheAreProductScoped();
+	void testContracts_PermissionsMustBelongToProduct();
 	// Memberships
 	void testFindMembership_LoadsOnlyTheCandidate();
 	void testFindMembership_CollectionWithoutFilters_FindsTheRightOne();

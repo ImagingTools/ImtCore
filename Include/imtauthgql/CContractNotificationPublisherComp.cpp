@@ -89,6 +89,7 @@ void CContractNotificationPublisherComp::OnComponentDestroyed()
 void CContractNotificationPublisherComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& changeSet)
 {
 	for (const QVariantMap& event : imtauth::TenantEvent::GetEvents(changeSet)){
+		const QByteArray productId = event.value(imtauth::TenantEvent::s_productId).toByteArray();
 		const QByteArray contractId = event.value(imtauth::TenantEvent::s_contractId).toByteArray();
 		if (contractId.isEmpty()){
 			continue;
@@ -96,11 +97,11 @@ void CContractNotificationPublisherComp::OnModelChanged(int /*modelId*/, const i
 
 		if (event.value(imtauth::TenantEvent::s_type).toString() == imtauth::TenantEvent::s_contractChanged){
 			PushChange(
-						contractId,
+						contractId, productId,
 						ToTenantIds(event.value(imtauth::TenantEvent::s_recipientTenantIds)),
 						event.value(imtauth::TenantEvent::s_userId).toByteArray(),
 						event.value(imtauth::TenantEvent::s_userName).toString());
-			PushChangeToProductServers(contractId);
+			PushChangeToProductServers(contractId, productId);
 
 			continue;
 		}
@@ -123,7 +124,7 @@ void CContractNotificationPublisherComp::OnModelChanged(int /*modelId*/, const i
 
 // private methods
 
-void CContractNotificationPublisherComp::PushChange(const QByteArray& contractId, const QByteArrayList& tenantIds, const QByteArray& userId, const QString& userName) const
+void CContractNotificationPublisherComp::PushChange(const QByteArray& contractId, const QByteArray& productId, const QByteArrayList& tenantIds, const QByteArray& userId, const QString& userName) const
 {
 	const QByteArray commandId = GetPushCommandId().toUtf8();
 
@@ -143,19 +144,20 @@ void CContractNotificationPublisherComp::PushChange(const QByteArray& contractId
 		}
 
 		const QByteArray data = QJsonDocument(jsonObject).toJson(QJsonDocument::Compact);
-		PublishDataFiltered(commandId, data, [tenantId](const imtgql::CGqlRequest& gqlRequest){
+		PublishDataFiltered(commandId, data, [tenantId, productId](const imtgql::CGqlRequest& gqlRequest){
 			const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
 
-			return contextPtr != nullptr && !contextPtr->GetUserId().isEmpty() && contextPtr->GetTenantId() == tenantId;
+			return contextPtr != nullptr && !contextPtr->GetUserId().isEmpty() && contextPtr->GetTenantId() == tenantId && contextPtr->GetProductId() == productId;
 		});
 	}
 }
 
 
-void CContractNotificationPublisherComp::PushChangeToProductServers(const QByteArray& contractId) const
+void CContractNotificationPublisherComp::PushChangeToProductServers(const QByteArray& contractId, const QByteArray& productId) const
 {
 	sdl::V1_0::imtauth::CContractsChangedNotification notification;
 	notification.contractId = contractId;
+	notification.productId = productId;
 
 	QJsonObject jsonObject;
 	if (!notification.WriteToJsonObject(jsonObject)){
@@ -165,14 +167,13 @@ void CContractNotificationPublisherComp::PushChangeToProductServers(const QByteA
 	}
 
 	// The access by a contract may have changed: the servers of the products drop what they keep for their sessions.
-	// A server subscribes with its own token; without server tokens it subscribes anonymously
+	// The token authenticates the product server; a product header alone proves no identity.
 	const QByteArray data = QJsonDocument(jsonObject).toJson(QJsonDocument::Compact);
-	PublishDataFiltered(sdl::V1_0::imtauth::COnContractsChangedGqlRequest::GetCommandId(), data, [](const imtgql::CGqlRequest& gqlRequest){
+	PublishDataFiltered(sdl::V1_0::imtauth::COnContractsChangedGqlRequest::GetCommandId(), data, [productId](const imtgql::CGqlRequest& gqlRequest){
 		const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
 
-		return contextPtr != nullptr
-					&& (contextPtr->GetPrincipalKind() == imtgql::IGqlContext::PK_SERVICE
-								|| (contextPtr->GetUserInfo() == nullptr && contextPtr->GetUserId().isEmpty()));
+		return contextPtr != nullptr && contextPtr->GetProductId() == productId
+					&& contextPtr->GetPrincipalKind() == imtgql::IGqlContext::PK_SERVICE;
 	});
 }
 
@@ -182,7 +183,7 @@ void CContractNotificationPublisherComp::Execute(const ContractNotificationPlan:
 	namespace tn = TenantNotification;
 
 	for (const ContractNotificationPlan::Withdrawal& withdrawal : plan.withdrawals){
-		tn::Withdraw(m_notificationSenderCompPtr.GetPtr(), withdrawal.tenantId, withdrawal.groupKey);
+		tn::Withdraw(m_notificationSenderCompPtr.GetPtr(), withdrawal.tenantId, withdrawal.groupKey, contract.GetProductId());
 	}
 
 	if (plan.deliveries.isEmpty()){
@@ -225,7 +226,7 @@ void CContractNotificationPublisherComp::Execute(const ContractNotificationPlan:
 
 		const QByteArrayList userIds = ContractNotificationPlan::SelectRecipients(tenantPtr->GetOwnerId(), responsibleUserId, isResponsibleMember, actor.id);
 		for (const QByteArray& userId : userIds){
-			tn::Send(m_notificationSenderCompPtr.GetPtr(), userId, delivery.tenantId, delivery.typeId, subject, delivery.groupKey, delivery.severity, actor, arguments);
+			tn::Send(m_notificationSenderCompPtr.GetPtr(), userId, delivery.tenantId, delivery.typeId, subject, delivery.groupKey, delivery.severity, actor, arguments, contract.GetProductId());
 		}
 	}
 }

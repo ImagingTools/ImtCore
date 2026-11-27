@@ -76,9 +76,9 @@ ContractsApiClient {
 					   {"tenantId": tenantId, "contractId": contractId, "reason": reason || "", "isImmediate": isImmediate === true})
 	}
 
-	function givePermissions(tenantId, contractId, granteeTenantId, productId, permissionIds, validUntil, comment) {
+	function givePermissions(tenantId, contractId, granteeTenantId, permissionIds, validUntil, comment) {
 		root.__enqueue(ImtauthContractsSdlCommandIds.s_giveContractPermissions, "contract", root.__giveInputComp,
-					   {"tenantId": tenantId, "contractId": contractId, "granteeTenantId": granteeTenantId, "productId": productId,
+					   {"tenantId": tenantId, "contractId": contractId, "granteeTenantId": granteeTenantId,
 						"permissionIds": permissionIds, "validUntil": validUntil || "", "comment": comment || ""})
 	}
 

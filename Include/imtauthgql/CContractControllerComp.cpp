@@ -8,9 +8,13 @@
 // ImtCore includes
 #include <imtauth/ContractState.h>
 #include <imtauth/IUserInfo.h>
-#include <imtauthgql/ContractGqlUtils.h>
+#include <imtbase/imtbase.h>
+#include <imtsdl/imtsdl.h>
+#include <imtsdl/TElementList.h>
 #include <imtauthgql/TenantAccess.h>
+#include <imtauthgql/imtauthgql.h>
 #include <imtgql/IGqlContext.h>
+#include <imtgql/imtgql.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Contracts.h>
 
 
@@ -19,6 +23,17 @@ namespace imtauthgql
 
 
 namespace sdlauth = sdl::V1_0::imtauth;
+
+
+namespace
+{
+
+QByteArray ReadProductScope(const imtgql::CGqlRequest& request, const QByteArray& productId)
+{
+	return productId == QByteArrayLiteral("Puma") && IsSuperuserRequest(request) ? QByteArray() : productId;
+}
+
+}
 
 
 // protected methods
@@ -44,7 +59,7 @@ sdlauth::CGetContractsPayload CContractControllerComp::OnGetContracts(
 	}
 
 	bool isRead = false;
-	const imtauth::ContractInfoList contracts = m_contractManagerCompPtr->GetContractsOfParty(tenantId, &isRead);
+	const imtauth::ContractInfoList contracts = m_contractManagerCompPtr->GetContractsOfParty(tenantId, ReadProductScope(gqlRequest, actor.productId), &isRead);
 	if (!isRead){
 		response.errorMessage = QStringLiteral("The contracts of the organization could not be read");
 
@@ -53,7 +68,9 @@ sdlauth::CGetContractsPayload CContractControllerComp::OnGetContracts(
 
 	response.contracts.Emplace();
 	for (const imtauth::IContractInfoSharedPtr& contractPtr : contracts){
-		response.contracts->push_back(CreateListItem(*contractPtr, tenantId));
+		sdlauth::CContractListItem item = CreateListItem(*contractPtr, tenantId);
+		item.isReadOnly = contractPtr->GetProductId() != actor.productId;
+		response.contracts->push_back(item);
 	}
 
 	return response;
@@ -79,7 +96,7 @@ sdlauth::CGetContractPayload CContractControllerComp::OnGetContract(
 		return response;
 	}
 
-	imtauth::IContractInfoUniquePtr contractPtr = ReadPartyContract(contractId, tenantId);
+	imtauth::IContractInfoUniquePtr contractPtr = ReadPartyContract(contractId, tenantId, ReadProductScope(gqlRequest, actor.productId));
 	if (!contractPtr.IsValid()){
 		response.errorMessage = QStringLiteral("The organization is not a party of the contract");
 
@@ -89,6 +106,7 @@ sdlauth::CGetContractPayload CContractControllerComp::OnGetContract(
 	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
 	const QByteArray languageId = (contextPtr != nullptr) ? contextPtr->GetLanguageId() : QByteArray();
 	response.contract = CreateContractData(*contractPtr, languageId);
+	response.contract->isReadOnly = contractPtr->GetProductId() != actor.productId;
 
 	imtauth::IContractPartyPrivateInfoUniquePtr privateInfoPtr = m_contractManagerCompPtr->GetPrivateInfo(contractId, tenantId);
 	if (!privateInfoPtr.IsValid()){
@@ -102,7 +120,7 @@ sdlauth::CGetContractPayload CContractControllerComp::OnGetContract(
 	privateData.responsibleUserId = privateInfoPtr->GetResponsibleUserId();
 	privateData.notes = privateInfoPtr->GetNotes();
 	privateData.reminderDays = privateInfoPtr->GetReminderDays();
-	privateData.updatedAt = ToSdlTime(privateInfoPtr->GetUpdatedAt());
+	privateData.updatedAt = imtsdl::ToSdlTime(privateInfoPtr->GetUpdatedAt());
 	privateData.attachments.Emplace();
 	for (const imtauth::IContractInfo::Attachment& attachment : privateInfoPtr->GetAttachments()){
 		sdlauth::CContractAttachment attachmentData;
@@ -113,7 +131,7 @@ sdlauth::CGetContractPayload CContractControllerComp::OnGetContract(
 		attachmentData.contentHash = QString::fromUtf8(attachment.contentHash);
 		attachmentData.addedByTenantId = attachment.addedByTenantId;
 		attachmentData.addedByUserId = attachment.addedByUserId;
-		attachmentData.addedAt = ToSdlTime(attachment.addedAt);
+		attachmentData.addedAt = imtsdl::ToSdlTime(attachment.addedAt);
 		attachmentData.replacesAttachmentId = attachment.replacesAttachmentId;
 		attachmentData.isReplaced = attachment.isReplaced;
 		attachmentData.isInternal = true;
@@ -124,7 +142,7 @@ sdlauth::CGetContractPayload CContractControllerComp::OnGetContract(
 	for (const imtauth::IContractPartyPrivateInfo::AllocationGroups& entry : privateInfoPtr->GetAllocationGroups()){
 		sdlauth::CContractAllocationGroups groupsData;
 		groupsData.allocationId = entry.allocationId;
-		groupsData.groupIds = ToElementList(entry.groupIds);
+		groupsData.groupIds = imtsdl::ToElementList(entry.groupIds);
 		privateData.allocationGroups->push_back(groupsData);
 	}
 
@@ -153,7 +171,7 @@ sdlauth::CGetContractEventsPayload CContractControllerComp::OnGetContractEvents(
 		return response;
 	}
 
-	if (!ReadPartyContract(contractId, tenantId).IsValid()){
+	if (!ReadPartyContract(contractId, tenantId, ReadProductScope(gqlRequest, actor.productId)).IsValid()){
 		response.errorMessage = QStringLiteral("The organization is not a party of the contract");
 
 		return response;
@@ -171,13 +189,13 @@ sdlauth::CGetContractEventsPayload CContractControllerComp::OnGetContractEvents(
 	for (const imtauth::IContractEventInfoSharedPtr& eventPtr : events){
 		sdlauth::CContractEvent eventData;
 		eventData.id = eventPtr->GetEventId();
-		eventData.eventType = ConvertEnum<sdlauth::ContractEventType>(eventPtr->GetEventType());
+		eventData.eventType = imtsdl::ConvertEnum<sdlauth::ContractEventType>(eventPtr->GetEventType());
 		eventData.tenantId = eventPtr->GetTenantId();
 		imtauth::ITenantInfoUniquePtr tenantPtr = eventPtr->GetTenantId().isEmpty() ? nullptr : m_tenantManagerCompPtr->GetTenant(eventPtr->GetTenantId());
 		eventData.tenantName = tenantPtr.IsValid() ? tenantPtr->GetTenantName() : QString();
 		eventData.userId = eventPtr->GetUserId();
 		eventData.userName = eventPtr->GetUserName();
-		eventData.time = ToSdlTime(eventPtr->GetTime());
+		eventData.time = imtsdl::ToSdlTime(eventPtr->GetTime());
 		eventData.revision = eventPtr->GetRevision();
 		eventData.comment = eventPtr->GetComment();
 		eventData.subjectId = eventPtr->GetSubjectId();
@@ -209,7 +227,7 @@ sdlauth::CGetContractAttachmentPayload CContractControllerComp::OnGetContractAtt
 		return response;
 	}
 
-	imtauth::IContractInfoUniquePtr contractPtr = ReadPartyContract(contractId, tenantId);
+	imtauth::IContractInfoUniquePtr contractPtr = ReadPartyContract(contractId, tenantId, ReadProductScope(gqlRequest, actor.productId));
 	if (!contractPtr.IsValid()){
 		response.errorMessage = QStringLiteral("The organization is not a party of the contract");
 
@@ -260,7 +278,7 @@ sdlauth::CGetRelatedTenantsPayload CContractControllerComp::OnGetRelatedTenants(
 
 	QString tenantName;
 	bool isRead = false;
-	const imtauth::RelatedTenantInfos relatedTenants = m_relationshipProviderCompPtr->GetRelatedTenants(tenantId, &tenantName, &isRead);
+	const imtauth::RelatedTenantInfos relatedTenants = m_relationshipProviderCompPtr->GetRelatedTenants(tenantId, imtgql::GetRequestProductId(gqlRequest), &tenantName, &isRead);
 	if (!isRead){
 		response.errorMessage = QStringLiteral("The contracts of the organization could not be read");
 
@@ -274,9 +292,9 @@ sdlauth::CGetRelatedTenantsPayload CContractControllerComp::OnGetRelatedTenants(
 		relatedData.tenantId = relatedTenant.tenantId;
 		relatedData.tenantName = relatedTenant.tenantName;
 		relatedData.isEffective = relatedTenant.isEffective;
-		relatedData.relatedContractIds = ToElementList(relatedTenant.relatedContractIds);
-		relatedData.sharingContractIds = ToElementList(relatedTenant.sharingContractIds);
-		relatedData.relatedSince = ToSdlTime(relatedTenant.relatedSince);
+		relatedData.relatedContractIds = imtsdl::ToElementList(relatedTenant.relatedContractIds);
+		relatedData.sharingContractIds = imtsdl::ToElementList(relatedTenant.sharingContractIds);
+		relatedData.relatedSince = imtsdl::ToSdlTime(relatedTenant.relatedSince);
 		response.relatedTenants->push_back(relatedData);
 	}
 
@@ -325,7 +343,7 @@ sdlauth::CGetContractPartyCandidatesPayload CContractControllerComp::OnGetContra
 	}
 
 	const QDateTime now = QDateTime::currentDateTimeUtc();
-	for (const imtauth::IContractInfoSharedPtr& contractPtr : m_contractManagerCompPtr->GetContractsOfParty(tenantId)){
+	for (const imtauth::IContractInfoSharedPtr& contractPtr : m_contractManagerCompPtr->GetContractsOfParty(tenantId, actor.productId)){
 		const imtauth::ContractState state = imtauth::ComputeContractState(*contractPtr, now).state;
 		if (state == imtauth::CS_SIGNED || state == imtauth::CS_ACTIVE){
 			for (const QByteArray& partyId : imtauth::GetContractPartyTenantIds(*contractPtr)){
@@ -606,9 +624,8 @@ sdlauth::CContractCommandPayload CContractControllerComp::OnGiveContractPermissi
 
 	imtauth::IContractInfo::Allocation allocation;
 	allocation.granteeTenantId = input.granteeTenantId.value_or(QByteArray());
-	allocation.productId = input.productId.value_or(QByteArray());
-	allocation.permissionIds = FromElementList(input.permissionIds);
-	allocation.validUntil = FromSdlTime(input.validUntil);
+	allocation.permissionIds = imtsdl::FromElementList(input.permissionIds);
+	allocation.validUntil = imtsdl::FromSdlTime(input.validUntil);
 	allocation.comment = input.comment.value_or(QString());
 
 	return RunCommand(gqlRequest, input.tenantId.value_or(QByteArray()), contractId, s_giveContractPermissionsPermission, [&](const imtauth::ContractActor& actor, QString& error){
@@ -650,7 +667,7 @@ sdlauth::CContractCommandPayload CContractControllerComp::OnAddContractAttachmen
 		}
 
 		// The file is checked as a party first, so no file of an outsider is stored
-		if (!ReadPartyContract(contractId, actor.tenantId).IsValid()){
+		if (!ReadPartyContract(contractId, actor.tenantId, actor.productId).IsValid()){
 			error = QStringLiteral("The organization is not a party of the contract");
 
 			return false;
@@ -706,7 +723,7 @@ sdlauth::CContractCommandPayload CContractControllerComp::OnSetContractAllocatio
 	const QByteArray contractId = input.contractId.value_or(QByteArray());
 
 	return RunCommand(gqlRequest, input.tenantId.value_or(QByteArray()), contractId, s_distributeContractPermissionsPermission, [&](const imtauth::ContractActor& actor, QString& error){
-		return m_contractManagerCompPtr->SetAllocationGroups(actor, contractId, input.allocationId.value_or(QByteArray()), FromElementList(input.groupIds), error);
+		return m_contractManagerCompPtr->SetAllocationGroups(actor, contractId, input.allocationId.value_or(QByteArray()), imtsdl::FromElementList(input.groupIds), error);
 	});
 }
 
@@ -733,6 +750,7 @@ bool CContractControllerComp::CheckAccess(
 	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
 	actor.tenantId = tenantId;
 	actor.userId = (contextPtr != nullptr) ? contextPtr->GetUserId() : QByteArray();
+	actor.productId = imtgql::GetRequestProductId(gqlRequest);
 	const imtauth::IUserInfo* userInfoPtr = (contextPtr != nullptr) ? contextPtr->GetUserInfo() : nullptr;
 	actor.userName = (userInfoPtr != nullptr) ? userInfoPtr->GetName() : QString();
 
@@ -771,10 +789,10 @@ sdlauth::CContractCommandPayload CContractControllerComp::RunCommand(
 }
 
 
-imtauth::IContractInfoUniquePtr CContractControllerComp::ReadPartyContract(const QByteArray& contractId, const QByteArray& tenantId) const
+imtauth::IContractInfoUniquePtr CContractControllerComp::ReadPartyContract(const QByteArray& contractId, const QByteArray& tenantId, const QByteArray& productId) const
 {
 	imtauth::IContractInfoUniquePtr contractPtr = m_contractManagerCompPtr->GetContract(contractId);
-	if (!contractPtr.IsValid() || imtauth::FindContractParty(contractPtr->GetParties(), tenantId) < 0){
+	if (!contractPtr.IsValid() || (!productId.isEmpty() && contractPtr->GetProductId() != productId) || imtauth::FindContractParty(contractPtr->GetParties(), tenantId) < 0){
 		return nullptr;
 	}
 
@@ -793,9 +811,9 @@ bool CContractControllerComp::CreateDraft(const sdlauth::CContractDraftInput& in
 	draft.SetDescription(input.description.value_or(QString()));
 	draft.SetTerms(input.terms.value_or(QString()));
 	draft.SetTypeId(input.typeId.value_or(QByteArray()));
-	draft.SetEffectiveFrom(FromSdlTime(input.effectiveFrom));
+	draft.SetEffectiveFrom(imtsdl::FromSdlTime(input.effectiveFrom));
 	draft.SetTermDays(input.termDays.value_or(0));
-	draft.SetValidUntil(FromSdlTime(input.validUntil));
+	draft.SetValidUntil(imtsdl::FromSdlTime(input.validUntil));
 	draft.SetAutoRenew(input.autoRenew.value_or(false));
 	draft.SetRenewalPeriodDays(input.renewalPeriodDays.value_or(0));
 	draft.SetRenewalNoticeDays(input.renewalNoticeDays.value_or(0));
@@ -830,8 +848,8 @@ bool CContractControllerComp::CreateDraft(const sdlauth::CContractDraftInput& in
 			link.tenantBId = item->tenantBId.value_or(QByteArray());
 			link.roleAId = item->roleAId.value_or(QByteArray());
 			link.roleBId = item->roleBId.value_or(QByteArray());
-			link.validFrom = FromSdlTime(item->validFrom);
-			link.validUntil = FromSdlTime(item->validUntil);
+			link.validFrom = imtsdl::FromSdlTime(item->validFrom);
+			link.validUntil = imtsdl::FromSdlTime(item->validUntil);
 			link.isMessagingAllowed = item->isMessagingAllowed.value_or(true);
 			link.isSharingAllowed = item->isSharingAllowed.value_or(true);
 			links.append(link);
@@ -849,7 +867,7 @@ bool CContractControllerComp::CreateDraft(const sdlauth::CContractDraftInput& in
 
 			imtauth::IContractInfo::Reference reference;
 			reference.contractId = item->contractId.value_or(QByteArray());
-			reference.type = item->referenceType ? ConvertEnum<imtauth::IContractInfo::ReferenceType>(*item->referenceType) : imtauth::IContractInfo::RT_RELATED;
+			reference.type = item->referenceType ? imtsdl::ConvertEnum<imtauth::IContractInfo::ReferenceType>(*item->referenceType) : imtauth::IContractInfo::RT_RELATED;
 			references.append(reference);
 		}
 	}
@@ -867,6 +885,7 @@ sdlauth::CContract CContractControllerComp::CreateContractData(const imtauth::IC
 
 	sdlauth::CContract retVal;
 	retVal.id = contract.GetContractId();
+	retVal.productId = contract.GetProductId();
 	retVal.number = contract.GetNumber();
 	retVal.name = contract.GetName();
 	retVal.description = contract.GetDescription();
@@ -875,9 +894,9 @@ sdlauth::CContract CContractControllerComp::CreateContractData(const imtauth::IC
 	retVal.typeName = contract.GetTypeName();
 	retVal.initiatorTenantId = contract.GetInitiatorTenantId();
 	retVal.createdByUserId = contract.GetCreatedByUserId();
-	retVal.effectiveFrom = ToSdlTime(contract.GetEffectiveFrom());
+	retVal.effectiveFrom = imtsdl::ToSdlTime(contract.GetEffectiveFrom());
 	retVal.termDays = contract.GetTermDays();
-	retVal.validUntil = ToSdlTime(contract.GetValidUntil());
+	retVal.validUntil = imtsdl::ToSdlTime(contract.GetValidUntil());
 	retVal.autoRenew = contract.IsAutoRenew();
 	retVal.renewalPeriodDays = contract.GetRenewalPeriodDays();
 	retVal.renewalNoticeDays = contract.GetRenewalNoticeDays();
@@ -890,13 +909,13 @@ sdlauth::CContract CContractControllerComp::CreateContractData(const imtauth::IC
 		partyData.tenantName = party.tenantName;
 		partyData.roleId = party.roleId;
 		partyData.roleName = GetRoleName(party.roleId, party.roleName, languageId);
-		partyData.channel = ConvertEnum<sdlauth::ContractPartyChannel>(party.channel);
-		partyData.state = ConvertEnum<sdlauth::ContractPartyState>(party.state);
+		partyData.channel = imtsdl::ConvertEnum<sdlauth::ContractPartyChannel>(party.channel);
+		partyData.state = imtsdl::ConvertEnum<sdlauth::ContractPartyState>(party.state);
 		partyData.stateComment = party.stateComment;
-		partyData.stateChangedAt = ToSdlTime(party.stateChangedAt);
-		partyData.withdrawAt = ToSdlTime(party.withdrawAt);
+		partyData.stateChangedAt = imtsdl::ToSdlTime(party.stateChangedAt);
+		partyData.withdrawAt = imtsdl::ToSdlTime(party.withdrawAt);
 		partyData.withdrawReason = party.withdrawReason;
-		partyData.nonRenewalNoticeAt = ToSdlTime(party.nonRenewalNoticeAt);
+		partyData.nonRenewalNoticeAt = imtsdl::ToSdlTime(party.nonRenewalNoticeAt);
 		partyData.isBound = imtauth::IsPartyBoundAt(contract, party, now);
 		partyData.signatures.Emplace();
 		for (const imtauth::IContractInfo::Signature& signature : party.signatures){
@@ -904,7 +923,7 @@ sdlauth::CContract CContractControllerComp::CreateContractData(const imtauth::IC
 			signatureData.userId = signature.userId;
 			signatureData.userName = signature.userName;
 			signatureData.position = signature.position;
-			signatureData.signedAt = ToSdlTime(signature.signedAt);
+			signatureData.signedAt = imtsdl::ToSdlTime(signature.signedAt);
 			signatureData.revision = signature.revision;
 			signatureData.contentHash = QString::fromUtf8(signature.contentHash);
 			partyData.signatures->push_back(signatureData);
@@ -923,8 +942,8 @@ sdlauth::CContract CContractControllerComp::CreateContractData(const imtauth::IC
 		linkData.roleAName = GetRoleName(link.roleAId, link.roleAName, languageId);
 		linkData.roleBId = link.roleBId;
 		linkData.roleBName = GetRoleName(link.roleBId, link.roleBName, languageId);
-		linkData.validFrom = ToSdlTime(link.validFrom);
-		linkData.validUntil = ToSdlTime(link.validUntil);
+		linkData.validFrom = imtsdl::ToSdlTime(link.validFrom);
+		linkData.validUntil = imtsdl::ToSdlTime(link.validUntil);
 		linkData.isMessagingAllowed = link.isMessagingAllowed;
 		linkData.isSharingAllowed = link.isSharingAllowed;
 		linkData.isInForce = imtauth::IsLinkInForce(contract, link, now);
@@ -938,10 +957,9 @@ sdlauth::CContract CContractControllerComp::CreateContractData(const imtauth::IC
 		allocationData.linkId = allocation.linkId;
 		allocationData.grantorTenantId = allocation.grantorTenantId;
 		allocationData.granteeTenantId = allocation.granteeTenantId;
-		allocationData.productId = allocation.productId;
-		allocationData.permissionIds = ToElementList(allocation.permissionIds);
-		allocationData.validFrom = ToSdlTime(allocation.validFrom);
-		allocationData.validUntil = ToSdlTime(allocation.validUntil);
+		allocationData.permissionIds = imtsdl::ToElementList(allocation.permissionIds);
+		allocationData.validFrom = imtsdl::ToSdlTime(allocation.validFrom);
+		allocationData.validUntil = imtsdl::ToSdlTime(allocation.validUntil);
 		allocationData.comment = allocation.comment;
 		allocationData.isInForce = imtauth::IsAllocationInForce(contract, allocation, now);
 		retVal.allocations->push_back(allocationData);
@@ -951,7 +969,7 @@ sdlauth::CContract CContractControllerComp::CreateContractData(const imtauth::IC
 	for (const imtauth::IContractInfo::Reference& reference : contract.GetReferences()){
 		sdlauth::CContractReference referenceData;
 		referenceData.contractId = reference.contractId;
-		referenceData.referenceType = ConvertEnum<sdlauth::ContractReferenceType>(reference.type);
+		referenceData.referenceType = imtsdl::ConvertEnum<sdlauth::ContractReferenceType>(reference.type);
 		referenceData.contractNumber = reference.contractNumber;
 		referenceData.contractName = reference.contractName;
 		retVal.references->push_back(referenceData);
@@ -967,7 +985,7 @@ sdlauth::CContract CContractControllerComp::CreateContractData(const imtauth::IC
 		attachmentData.contentHash = QString::fromUtf8(attachment.contentHash);
 		attachmentData.addedByTenantId = attachment.addedByTenantId;
 		attachmentData.addedByUserId = attachment.addedByUserId;
-		attachmentData.addedAt = ToSdlTime(attachment.addedAt);
+		attachmentData.addedAt = imtsdl::ToSdlTime(attachment.addedAt);
 		attachmentData.replacesAttachmentId = attachment.replacesAttachmentId;
 		attachmentData.isReplaced = attachment.isReplaced;
 		attachmentData.isInternal = false;
@@ -985,25 +1003,25 @@ sdlauth::CContract CContractControllerComp::CreateContractData(const imtauth::IC
 
 	retVal.revision = contract.GetRevision();
 	retVal.contentHash = QString::fromUtf8(contract.GetContentHash());
-	retVal.submittedAt = ToSdlTime(contract.GetSubmittedAt());
-	retVal.cancelledAt = ToSdlTime(contract.GetCancelledAt());
-	retVal.signedAt = ToSdlTime(contract.GetSignedAt());
-	retVal.terminatedAt = ToSdlTime(contract.GetTerminatedAt());
+	retVal.submittedAt = imtsdl::ToSdlTime(contract.GetSubmittedAt());
+	retVal.cancelledAt = imtsdl::ToSdlTime(contract.GetCancelledAt());
+	retVal.signedAt = imtsdl::ToSdlTime(contract.GetSignedAt());
+	retVal.terminatedAt = imtsdl::ToSdlTime(contract.GetTerminatedAt());
 	retVal.terminationReason = contract.GetTerminationReason();
 
 	retVal.supersededBy = contract.GetSupersededBy();
-	retVal.supersededAt = ToSdlTime(contract.GetSupersededAt());
-	retVal.createdAt = ToSdlTime(contract.GetCreatedAt());
-	retVal.updatedAt = ToSdlTime(contract.GetUpdatedAt());
+	retVal.supersededAt = imtsdl::ToSdlTime(contract.GetSupersededAt());
+	retVal.createdAt = imtsdl::ToSdlTime(contract.GetCreatedAt());
+	retVal.updatedAt = imtsdl::ToSdlTime(contract.GetUpdatedAt());
 
-	retVal.state = ConvertEnum<sdlauth::ContractState>(stateInfo.state);
+	retVal.state = imtsdl::ConvertEnum<sdlauth::ContractState>(stateInfo.state);
 	retVal.isChangesRequested = (stateInfo.flags & imtauth::CSF_CHANGES_REQUESTED) != 0;
 	retVal.isTerminating = (stateInfo.flags & imtauth::CSF_TERMINATING) != 0;
 	retVal.isExpiring = (stateInfo.flags & imtauth::CSF_EXPIRING) != 0;
-	retVal.effectiveStart = ToSdlTime(stateInfo.effectiveStart);
-	retVal.periodEnd = ToSdlTime(stateInfo.periodEnd);
-	retVal.endsAt = ToSdlTime(stateInfo.endsAt);
-	retVal.endedAt = ToSdlTime(stateInfo.endedAt);
+	retVal.effectiveStart = imtsdl::ToSdlTime(stateInfo.effectiveStart);
+	retVal.periodEnd = imtsdl::ToSdlTime(stateInfo.periodEnd);
+	retVal.endsAt = imtsdl::ToSdlTime(stateInfo.endsAt);
+	retVal.endedAt = imtsdl::ToSdlTime(stateInfo.endedAt);
 
 	return retVal;
 }
@@ -1016,18 +1034,19 @@ sdlauth::CContractListItem CContractControllerComp::CreateListItem(const imtauth
 
 	sdlauth::CContractListItem retVal;
 	retVal.id = contract.GetContractId();
+	retVal.productId = contract.GetProductId();
 	retVal.number = contract.GetNumber();
 	retVal.name = contract.GetName();
 	retVal.typeName = contract.GetTypeName();
 	retVal.initiatorTenantId = contract.GetInitiatorTenantId();
-	retVal.state = ConvertEnum<sdlauth::ContractState>(stateInfo.state);
+	retVal.state = imtsdl::ConvertEnum<sdlauth::ContractState>(stateInfo.state);
 	retVal.isChangesRequested = (stateInfo.flags & imtauth::CSF_CHANGES_REQUESTED) != 0;
 	retVal.isTerminating = (stateInfo.flags & imtauth::CSF_TERMINATING) != 0;
 	retVal.isExpiring = (stateInfo.flags & imtauth::CSF_EXPIRING) != 0;
-	retVal.effectiveStart = ToSdlTime(stateInfo.effectiveStart);
-	retVal.periodEnd = ToSdlTime(stateInfo.periodEnd);
-	retVal.endedAt = ToSdlTime(stateInfo.endedAt);
-	retVal.updatedAt = ToSdlTime(contract.GetUpdatedAt());
+	retVal.effectiveStart = imtsdl::ToSdlTime(stateInfo.effectiveStart);
+	retVal.periodEnd = imtsdl::ToSdlTime(stateInfo.periodEnd);
+	retVal.endedAt = imtsdl::ToSdlTime(stateInfo.endedAt);
+	retVal.updatedAt = imtsdl::ToSdlTime(contract.GetUpdatedAt());
 
 	QStringList partyNames;
 	for (const imtauth::IContractInfo::Party& party : parties){
@@ -1036,13 +1055,13 @@ sdlauth::CContractListItem CContractControllerComp::CreateListItem(const imtauth
 		}
 	}
 
-	retVal.partyNames = ToElementList(QList<QString>(partyNames));
+	retVal.partyNames = imtsdl::ToElementList(QList<QString>(partyNames));
 
 	const int partyIndex = imtauth::FindContractParty(parties, tenantId);
 	bool isMyTurn = false;
 	if (partyIndex >= 0){
 		const imtauth::IContractInfo::Party& party = parties[partyIndex];
-		retVal.partyState = ConvertEnum<sdlauth::ContractPartyState>(party.state);
+		retVal.partyState = imtsdl::ConvertEnum<sdlauth::ContractPartyState>(party.state);
 
 		const bool isNegotiated = stateInfo.state == imtauth::CS_NEGOTIATION || stateInfo.state == imtauth::CS_SIGNING;
 		isMyTurn = isNegotiated && (party.state == imtauth::IContractInfo::PS_REVIEWING || party.state == imtauth::IContractInfo::PS_APPROVED);
@@ -1066,7 +1085,7 @@ QString CContractControllerComp::GetRoleName(const QByteArray& roleId, const QSt
 		return storedName;
 	}
 
-	return TranslateSystemText(m_translationManagerCompPtr.GetPtr(), rolePtr->GetName(), languageId);
+	return imtbase::TranslateAttributeText(m_translationManagerCompPtr.GetPtr(), rolePtr->GetName(), languageId);
 }
 
 

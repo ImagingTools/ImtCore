@@ -4,12 +4,17 @@
 
 // ACF includes
 #include <iprm/IIdParam.h>
+#include <iprm/ITextParam.h>
 #include <iprm/TParamsPtr.h>
 #include <ilog/CMessage.h>
 
 // ImtCore includes
 #include <imtbase/imtbase.h>
 #include <imtauth/CDocumentShareInfo.h>
+#include <imtauth/CContractInfo.h>
+#include <imtauth/CContractEventInfo.h>
+#include <imtauth/CContractPartyPrivateInfo.h>
+#include <imtauth/CProductPermissionSnapshot.h>
 #include <imtauth/CPersonalAccessToken.h>
 #include <imtauth/CTenantConnection.h>
 #include <imtauth/CTenantInfo.h>
@@ -210,6 +215,10 @@ imtbase::ICollectionInfo::Ids CTestCollectionComp::GetElementIds(
 
 istd::IChangeableUniquePtr CTestCollectionComp::CreateObjectInstance(const QByteArray& typeId) const
 {
+	if (typeId == "Contract"){ return new imtauth::CIdentifiableContractInfo; }
+	if (typeId == "ContractEvent"){ return new imtauth::CIdentifiableContractEventInfo; }
+	if (typeId == "ContractPartyPrivateInfo"){ return new imtauth::CIdentifiableContractPartyPrivateInfo; }
+	if (typeId == "ProductPermissionSnapshot"){ return new imtauth::CIdentifiableProductPermissionSnapshot; }
 	if (typeId == "TenantMembership"){
 		return new imtauth::CIdentifiableTenantMembership;
 	}
@@ -243,6 +252,21 @@ bool CTestCollectionComp::IsSelected(const QByteArray& objectId, const iprm::IPa
 	DataPtr dataPtr;
 	if (!BaseClass2::GetObjectData(objectId, dataPtr) || !dataPtr.IsValid()){
 		return false;
+	}
+
+	iprm::TParamsPtr<iprm::ITextParam> productPtr(&selectionParams, "ProductId", false);
+	if (productPtr.IsValid() && !productPtr->GetText().isEmpty()){
+		QString value;
+		if (!GetFieldValue(*dataPtr, "ProductId", value) || value != productPtr->GetText()){ return false; }
+	}
+	iprm::TParamsPtr<iprm::ITextParam> partyPtr(&selectionParams, "PartyTenantId", false);
+	if (partyPtr.IsValid()){
+		const imtauth::IContractInfo* contractPtr = dynamic_cast<const imtauth::IContractInfo*>(dataPtr.GetPtr());
+		bool isParty = false;
+		if (contractPtr != nullptr){
+			for (const auto& party : contractPtr->GetParties()){ isParty = isParty || party.tenantId == partyPtr->GetText().toUtf8(); }
+		}
+		if (!isParty){ return false; }
 	}
 
 	iprm::TParamsPtr<iprm::IIdParam> parentTenantIdParamPtr(&selectionParams, "ParentTenantId", false);
@@ -321,7 +345,15 @@ bool CTestCollectionComp::GetFieldValue(const istd::IChangeable& object, const Q
 	QByteArray rawValue;
 	bool isKnown = false;
 
-	if (const imtauth::ITenantMembership* membershipPtr = dynamic_cast<const imtauth::ITenantMembership*>(&object)){
+	if (const imtauth::IContractInfo* contractPtr = dynamic_cast<const imtauth::IContractInfo*>(&object)){
+		isKnown = fieldId == "ProductId";
+		rawValue = contractPtr->GetProductId();
+	}
+	else if (const imtauth::CProductPermissionSnapshot* snapshotPtr = dynamic_cast<const imtauth::CProductPermissionSnapshot*>(&object)){
+		isKnown = fieldId == "ProductId";
+		rawValue = snapshotPtr->GetProductId();
+	}
+	else if (const imtauth::ITenantMembership* membershipPtr = dynamic_cast<const imtauth::ITenantMembership*>(&object)){
 		isKnown = fieldId == "UserId" || fieldId == "TenantId";
 		rawValue = fieldId == "UserId" ? membershipPtr->GetUserId() : membershipPtr->GetTenantId();
 	}
@@ -396,15 +428,16 @@ int CTestRelationshipProviderComp::GetReadCount() const
 
 // reimplemented (imtauth::ITenantRelationshipProvider)
 
-imtauth::RelatedTenantInfos CTestRelationshipProviderComp::GetRelatedTenants(const QByteArray& tenantId, QString* /*tenantNamePtr*/, bool* isReadPtr) const
+imtauth::RelatedTenantInfos CTestRelationshipProviderComp::GetRelatedTenants(const QByteArray& tenantId, const QByteArray& productId, QString* /*tenantNamePtr*/, bool* isReadPtr) const
 {
 	++m_readCount;
+	const bool isOfProduct = productId == s_productId;
 	if (isReadPtr != nullptr){
-		*isReadPtr = m_isReadable && !m_isPartialRead;
+		*isReadPtr = isOfProduct && m_isReadable && !m_isPartialRead;
 	}
 
 	imtauth::RelatedTenantInfos retVal;
-	if (!m_isReadable){
+	if (!isOfProduct || !m_isReadable){
 		return retVal;
 	}
 

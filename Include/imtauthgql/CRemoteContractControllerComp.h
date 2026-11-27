@@ -27,7 +27,7 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (imtauth::ITenantRelationshipProvider)
-	virtual imtauth::RelatedTenantInfos GetRelatedTenants(const QByteArray& tenantId, QString* tenantNamePtr = nullptr, bool* isReadPtr = nullptr) const override;
+	virtual imtauth::RelatedTenantInfos GetRelatedTenants(const QByteArray& tenantId, const QByteArray& productId, QString* tenantNamePtr = nullptr, bool* isReadPtr = nullptr) const override;
 
 protected:
 	// reimplemented (sdl::V1_0::imtauth::CContractsGqlHandlerCompBase)

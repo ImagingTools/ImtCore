@@ -4,6 +4,9 @@
 
 // Qt includes
 #include <QtCore/QSet>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
 #include <QtCore/QUuid>
 
 // STL includes
@@ -18,6 +21,7 @@
 
 // ImtCore includes
 #include <imtauth/CollectionSelection.h>
+#include <imtauth/CProductPermissionSnapshot.h>
 #include <imtauth/ContractState.h>
 #include <imtauth/TenantEvents.h>
 
@@ -89,7 +93,7 @@ IContractInfoUniquePtr CContractManagerComp::GetContract(const QByteArray& contr
 }
 
 
-ContractInfoList CContractManagerComp::GetContractsOfParty(const QByteArray& tenantId, bool* isReadPtr) const
+ContractInfoList CContractManagerComp::GetContractsOfParty(const QByteArray& tenantId, const QByteArray& productId, bool* isReadPtr) const
 {
 	ContractInfoList retVal;
 	if (isReadPtr != nullptr){
@@ -106,7 +110,8 @@ ContractInfoList CContractManagerComp::GetContractsOfParty(const QByteArray& ten
 	{
 		QMutexLocker locker(&m_cacheMutex);
 		generation = m_cacheGeneration;
-		auto cacheIter = m_partyContractIdsCache.constFind(tenantId);
+		const QByteArray cacheKey = tenantId + ":" + productId;
+		auto cacheIter = m_partyContractIdsCache.constFind(cacheKey);
 		if (cacheIter != m_partyContractIdsCache.constEnd()){
 			contractIds = *cacheIter;
 			isCached = true;
@@ -119,6 +124,9 @@ ContractInfoList CContractManagerComp::GetContractsOfParty(const QByteArray& ten
 		partyParam.SetText(QString::fromUtf8(tenantId));
 		iprm::CParamsSet filterParams;
 		filterParams.SetEditableParameter(s_partyFilterParamId, &partyParam);
+		iprm::CTextParam productParam;
+		productParam.SetText(QString::fromUtf8(productId));
+		filterParams.SetEditableParameter("ProductId", &productParam);
 
 		ilog::CMessageContainer readErrors;
 		contractIds = m_contractCollectionCompPtr->GetElementIds(0, -1, &filterParams, &readErrors);
@@ -135,7 +143,8 @@ ContractInfoList CContractManagerComp::GetContractsOfParty(const QByteArray& ten
 		}
 
 		// A collection that does not know the filter gives every contract
-		if (FindContractParty(contractPtr->GetParties(), tenantId) < 0){
+		if (FindContractParty(contractPtr->GetParties(), tenantId) < 0
+				|| (!productId.isEmpty() && contractPtr->GetProductId() != productId)){
 			continue;
 		}
 
@@ -150,7 +159,7 @@ ContractInfoList CContractManagerComp::GetContractsOfParty(const QByteArray& ten
 	if (isRead && !isCached){
 		QMutexLocker locker(&m_cacheMutex);
 		if (m_cacheGeneration == generation){
-			m_partyContractIdsCache.insert(tenantId, partyContractIds);
+			m_partyContractIdsCache.insert(tenantId + ":" + productId, partyContractIds);
 		}
 	}
 
@@ -203,10 +212,10 @@ ContractInfoList CContractManagerComp::GetOpenContracts(bool* isReadPtr) const
 }
 
 
-ContractInfoList CContractManagerComp::GetContractsOfPair(const QByteArray& tenantId, const QByteArray& otherTenantId, bool* isReadPtr) const
+ContractInfoList CContractManagerComp::GetContractsOfPair(const QByteArray& tenantId, const QByteArray& otherTenantId, const QByteArray& productId, bool* isReadPtr) const
 {
 	ContractInfoList retVal;
-	for (const IContractInfoSharedPtr& contractPtr : GetContractsOfParty(tenantId, isReadPtr)){
+	for (const IContractInfoSharedPtr& contractPtr : GetContractsOfParty(tenantId, productId, isReadPtr)){
 		if (contractPtr->GetSubmittedAt().isValid() && FindContractLinkOfPair(contractPtr->GetLinks(), tenantId, otherTenantId) >= 0){
 			retVal.append(contractPtr);
 		}
@@ -265,6 +274,10 @@ QByteArray CContractManagerComp::CreateContract(const ContractActor& actor, cons
 
 		return QByteArray();
 	}
+	if (actor.productId.isEmpty()){
+		errorMessage = QStringLiteral("The product of the contract is required");
+		return QByteArray();
+	}
 
 	IContractInfoUniquePtr contractPtr = m_contractFactoryCompPtr.CreateInstance();
 	if (!contractPtr.IsValid()){
@@ -275,6 +288,7 @@ QByteArray CContractManagerComp::CreateContract(const ContractActor& actor, cons
 
 	const QDateTime now = QDateTime::currentDateTimeUtc();
 	contractPtr->SetContractId(CreateId());
+	contractPtr->SetProductId(actor.productId);
 	contractPtr->SetInitiatorTenantId(actor.tenantId);
 	contractPtr->SetCreatedByUserId(actor.userId);
 	contractPtr->SetCreatedAt(now);
@@ -409,7 +423,7 @@ bool CContractManagerComp::AddPartyByCode(
 		}
 
 		IContractInfo::Party party;
-		if (!FindChannel(contract.GetInitiatorTenantId(), tenantId, party.channel) || IsUnknownChannel(party.channel)){
+		if (!FindChannel(contract.GetInitiatorTenantId(), tenantId, contract.GetProductId(), party.channel) || IsUnknownChannel(party.channel)){
 			ITenantDirectoryProfileUniquePtr profilePtr = m_directoryCompPtr->GetProfile(tenantId);
 			if (!m_connectionManagerCompPtr->GetAllowConnectionsByCode(tenantId) || !profilePtr.IsValid() || !profilePtr->IsAcceptingInvitationsFromUnknown()){
 				error = QStringLiteral("The organization does not accept contracts by its code");
@@ -468,7 +482,7 @@ bool CContractManagerComp::RemoveContract(const ContractActor& actor, const QByt
 	QMutexLocker locker(&m_changeMutex);
 
 	IContractInfoUniquePtr contractPtr = ReadContract(contractId);
-	if (!contractPtr.IsValid()){
+	if (!contractPtr.IsValid() || actor.productId.isEmpty() || contractPtr->GetProductId() != actor.productId){
 		errorMessage = QStringLiteral("The contract could not be read");
 
 		return false;
@@ -507,7 +521,8 @@ bool CContractManagerComp::RemoveContract(const ContractActor& actor, const QByt
 		++m_cacheGeneration;
 		m_contractCache.remove(contractId);
 		for (const QByteArray& tenantId : partyTenantIds){
-			m_partyContractIdsCache.remove(tenantId);
+			m_partyContractIdsCache.remove(tenantId + ":" + contractPtr->GetProductId());
+			m_partyContractIdsCache.remove(tenantId + ":");
 			m_privateInfoCache.remove(GetPrivateInfoKey(contractId, tenantId));
 		}
 	}
@@ -841,7 +856,7 @@ bool CContractManagerComp::GiveAllocation(const ContractActor& actor, const QByt
 	std::sort(newAllocation.permissionIds.begin(), newAllocation.permissionIds.end());
 	newAllocation.permissionIds.erase(std::unique(newAllocation.permissionIds.begin(), newAllocation.permissionIds.end()), newAllocation.permissionIds.end());
 
-	if (newAllocation.productId.isEmpty() || newAllocation.permissionIds.isEmpty()){
+	if (newAllocation.permissionIds.isEmpty()){
 		errorMessage = QStringLiteral("Choose the permissions to give");
 
 		return false;
@@ -941,7 +956,8 @@ bool CContractManagerComp::AddAttachment(
 		QMutexLocker locker(&m_changeMutex);
 
 		IContractInfoUniquePtr contractPtr = ReadContract(contractId);
-		if (!contractPtr.IsValid() || FindContractParty(contractPtr->GetParties(), actor.tenantId) < 0){
+		if (!contractPtr.IsValid() || actor.productId.isEmpty() || contractPtr->GetProductId() != actor.productId
+					|| FindContractParty(contractPtr->GetParties(), actor.tenantId) < 0){
 			errorMessage = QStringLiteral("The organization is not a party of the contract");
 
 			return false;
@@ -1042,7 +1058,8 @@ bool CContractManagerComp::SetPrivateInfo(const ContractActor& actor, const QByt
 	QMutexLocker locker(&m_changeMutex);
 
 	IContractInfoUniquePtr contractPtr = ReadContract(contractId);
-	if (!contractPtr.IsValid() || FindContractParty(contractPtr->GetParties(), actor.tenantId) < 0
+	if (!contractPtr.IsValid() || actor.productId.isEmpty() || contractPtr->GetProductId() != actor.productId
+				|| FindContractParty(contractPtr->GetParties(), actor.tenantId) < 0
 				|| (!contractPtr->GetSubmittedAt().isValid() && contractPtr->GetInitiatorTenantId() != actor.tenantId)){
 		errorMessage = QStringLiteral("The organization is not a party of the contract");
 
@@ -1118,7 +1135,7 @@ bool CContractManagerComp::SetAllocationGroups(
 	QMutexLocker locker(&m_changeMutex);
 
 	IContractInfoUniquePtr contractPtr = ReadContract(contractId);
-	if (!contractPtr.IsValid()){
+	if (!contractPtr.IsValid() || actor.productId.isEmpty() || contractPtr->GetProductId() != actor.productId){
 		errorMessage = QStringLiteral("The contract could not be read");
 
 		return false;
@@ -1219,7 +1236,8 @@ bool CContractManagerComp::ChangeContract(const ContractActor& actor, const QByt
 
 	IContractInfoUniquePtr contractPtr = ReadContract(contractId);
 	IContractInfoUniquePtr previousContractPtr = ReadContract(contractId);
-	if (!contractPtr.IsValid() || !previousContractPtr.IsValid()){
+	if (!contractPtr.IsValid() || !previousContractPtr.IsValid() || actor.productId.isEmpty()
+				|| contractPtr->GetProductId() != actor.productId){
 		errorMessage = QStringLiteral("The contract could not be read");
 
 		return false;
@@ -1341,7 +1359,8 @@ bool CContractManagerComp::StoreContract(const IContractInfo& contract, bool isN
 
 	// The parties of before and after see another list now
 	for (const QByteArray& tenantId : std::as_const(affectedTenantIds)){
-		m_partyContractIdsCache.remove(tenantId);
+		m_partyContractIdsCache.remove(tenantId + ":" + contract.GetProductId());
+		m_partyContractIdsCache.remove(tenantId + ":");
 	}
 
 	if (isStored && cachedPtr.IsValid()){
@@ -1623,7 +1642,7 @@ bool CContractManagerComp::ApplyDraft(const IContractInfo& draft, IContractInfo&
 		}
 		else{
 			// A new party: only an organization the initiator knows
-			if (!FindChannel(initiatorTenantId, draftParty.tenantId, party.channel)){
+			if (!FindChannel(initiatorTenantId, draftParty.tenantId, contract.GetProductId(), party.channel)){
 				errorMessage = QStringLiteral("The organization '%1' is not in the address book of the initiator, not a party of a common contract and not open to contracts of unknown organizations")
 							.arg(QString::fromUtf8(draftParty.tenantId));
 
@@ -1713,7 +1732,7 @@ bool CContractManagerComp::ApplyDraft(const IContractInfo& draft, IContractInfo&
 	IContractInfo::References references;
 	for (IContractInfo::Reference reference : draft.GetReferences()){
 		IContractInfoUniquePtr referencedPtr = ReadContract(reference.contractId);
-		if (!referencedPtr.IsValid() || FindContractParty(referencedPtr->GetParties(), initiatorTenantId) < 0 || !referencedPtr->GetSubmittedAt().isValid()){
+		if (!referencedPtr.IsValid() || referencedPtr->GetProductId() != contract.GetProductId() || FindContractParty(referencedPtr->GetParties(), initiatorTenantId) < 0 || !referencedPtr->GetSubmittedAt().isValid()){
 			errorMessage = QStringLiteral("The referenced contract is not a sent contract of the organization");
 
 			return false;
@@ -1884,7 +1903,7 @@ bool CContractManagerComp::CheckReferences(const IContractInfo& contract, QStrin
 
 	for (const IContractInfo::Reference& reference : contract.GetReferences()){
 		IContractInfoUniquePtr referencedPtr = ReadContract(reference.contractId);
-		if (!referencedPtr.IsValid()){
+		if (!referencedPtr.IsValid() || referencedPtr->GetProductId() != contract.GetProductId()){
 			errorMessage = QStringLiteral("The referenced contract could not be read");
 
 			return false;
@@ -1971,6 +1990,36 @@ bool CContractManagerComp::CheckReferences(const IContractInfo& contract, QStrin
 
 bool CContractManagerComp::CheckAllocationScope(const IContractInfo& contract, const IContractInfo::Allocation& allocation, QString& errorMessage) const
 {
+	QSet<QByteArray> productPermissions;
+	if (m_permissionTreeCompPtr.IsValid() && m_permissionTreeCompPtr->GetProductId() == contract.GetProductId()){
+		const QByteArrayList permissions = imtlic::CollectProductPermissions(*m_permissionTreeCompPtr);
+		productPermissions = QSet<QByteArray>(permissions.begin(), permissions.end());
+	}
+	else{
+		bool isTreeRead = false;
+		imtbase::IObjectCollection::DataPtr snapshotData;
+		const CProductPermissionSnapshot* snapshotPtr = m_snapshotCollectionCompPtr.IsValid()
+					? GetProductPermissionSnapshot(*m_snapshotCollectionCompPtr, contract.GetProductId(), snapshotData, &isTreeRead) : nullptr;
+		const QJsonDocument tree = snapshotPtr != nullptr ? QJsonDocument::fromJson(snapshotPtr->GetTree()) : QJsonDocument();
+		if (!isTreeRead || !tree.isObject()){
+			errorMessage = QStringLiteral("The permission tree of the product could not be read");
+			return false;
+		}
+
+		for (const QJsonValue& group : tree.object().value(QStringLiteral("groups")).toArray()){
+			for (const QJsonValue& entry : group.toObject().value(QStringLiteral("entries")).toArray()){
+				productPermissions.insert(entry.toObject().value(QStringLiteral("permissionId")).toString().toUtf8());
+			}
+		}
+	}
+
+	for (const QByteArray& permissionId : allocation.permissionIds){
+		if (!productPermissions.contains(permissionId)){
+			errorMessage = QStringLiteral("The permission is not part of the contract product");
+			return false;
+		}
+	}
+
 	QSet<QByteArray> scope;
 	for (const QByteArray& permissionId : m_tenantManagerCompPtr->GetTenantPermissions(allocation.grantorTenantId)){
 		scope.insert(permissionId.trimmed());
@@ -2001,7 +2050,7 @@ bool CContractManagerComp::CheckAllocationScope(const IContractInfo& contract, c
 		for (const IContractInfo::Allocation& frameworkAllocation : frameworkPtr->GetAllocations()){
 			if (frameworkAllocation.grantorTenantId == allocation.grantorTenantId
 						&& frameworkAllocation.granteeTenantId == allocation.granteeTenantId
-						&& frameworkAllocation.productId == allocation.productId){
+						&& frameworkPtr->GetProductId() == contract.GetProductId()){
 				for (const QByteArray& permissionId : frameworkAllocation.permissionIds){
 					frameworkPermissions.insert(permissionId);
 				}
@@ -2143,7 +2192,7 @@ void CContractManagerComp::CompleteConclusion(const IContractInfo& contract)
 }
 
 
-bool CContractManagerComp::FindChannel(const QByteArray& initiatorTenantId, const QByteArray& tenantId, IContractInfo::PartyChannel& channel) const
+bool CContractManagerComp::FindChannel(const QByteArray& initiatorTenantId, const QByteArray& tenantId, const QByteArray& productId, IContractInfo::PartyChannel& channel) const
 {
 	if (tenantId == initiatorTenantId){
 		channel = IContractInfo::PC_INITIATOR;
@@ -2157,7 +2206,7 @@ bool CContractManagerComp::FindChannel(const QByteArray& initiatorTenantId, cons
 		return true;
 	}
 
-	if (HasCommonContract(initiatorTenantId, tenantId)){
+	if (HasCommonContract(initiatorTenantId, tenantId, productId)){
 		channel = IContractInfo::PC_CO_PARTY;
 
 		return true;
@@ -2174,10 +2223,10 @@ bool CContractManagerComp::FindChannel(const QByteArray& initiatorTenantId, cons
 }
 
 
-bool CContractManagerComp::HasCommonContract(const QByteArray& tenantId, const QByteArray& otherTenantId) const
+bool CContractManagerComp::HasCommonContract(const QByteArray& tenantId, const QByteArray& otherTenantId, const QByteArray& productId) const
 {
 	const QDateTime now = QDateTime::currentDateTimeUtc();
-	for (const IContractInfoSharedPtr& contractPtr : GetContractsOfParty(tenantId)){
+	for (const IContractInfoSharedPtr& contractPtr : GetContractsOfParty(tenantId, productId)){
 		if (FindContractParty(contractPtr->GetParties(), otherTenantId) >= 0 && IsConcludedState(ComputeContractState(*contractPtr, now).state)){
 			return true;
 		}
@@ -2270,7 +2319,7 @@ QString CContractManagerComp::CreateNumber(const IContractInfo& contract) const
 
 	// The highest number of the year continues; a removed draft never had one
 	int lastNumber = 0;
-	for (const IContractInfoSharedPtr& otherContractPtr : GetContractsOfParty(contract.GetInitiatorTenantId())){
+	for (const IContractInfoSharedPtr& otherContractPtr : GetContractsOfParty(contract.GetInitiatorTenantId(), QByteArray())){
 		if (otherContractPtr->GetInitiatorTenantId() == contract.GetInitiatorTenantId() && otherContractPtr->GetNumber().startsWith(start)){
 			lastNumber = qMax(lastNumber, otherContractPtr->GetNumber().mid(start.size()).toInt());
 		}
@@ -2317,6 +2366,7 @@ QVariantMap CContractManagerComp::CreateTenantEvent(const QString& type, const I
 	return {
 		{TenantEvent::s_type, type},
 		{TenantEvent::s_contractId, contract.GetContractId()},
+		{TenantEvent::s_productId, contract.GetProductId()},
 		{TenantEvent::s_sourceTenantId, actorTenantId},
 		{TenantEvent::s_recipientTenantIds, recipients}};
 }

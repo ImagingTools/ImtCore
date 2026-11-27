@@ -96,6 +96,29 @@ inline void TElementList<T>::FromList(const QList<T>& source)
 }
 
 
+/**
+	A list of the schema made of \a source.
+*/
+template <class T>
+inline TElementList<T> ToElementList(const QList<T>& source)
+{
+	TElementList<T> retVal;
+	retVal.FromList(source);
+
+	return retVal;
+}
+
+
+/**
+	The elements of an optional list of the schema, empty for an unset list.
+*/
+template <class T>
+inline QList<T> FromElementList(const istd::TNullableValue<TElementList<T>>& source)
+{
+	return source ? source->ToList() : QList<T>();
+}
+
+
 }  // namespace imtsdl
 
 

@@ -513,7 +513,7 @@ bool CUserGroupCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequ
 	if (gqlContextPtr != nullptr && m_delegatedAccessCompPtr.IsValid()){
 		const QByteArray userId = gqlContextPtr->GetUserId();
 		const QByteArray currentTenantId = gqlContextPtr->GetTenantId();
-		if (!userId.isEmpty() && !currentTenantId.isEmpty() && m_delegatedAccessCompPtr->HasDelegatedAccess(userId, currentTenantId)){
+		if (!userId.isEmpty() && !currentTenantId.isEmpty() && m_delegatedAccessCompPtr->HasDelegatedAccess(userId, currentTenantId, gqlContextPtr->GetProductId())){
 			return true;
 		}
 	}

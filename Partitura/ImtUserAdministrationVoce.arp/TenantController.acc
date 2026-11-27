@@ -227,6 +227,12 @@
         <Element Id="TenantContractManager" PackageId="ImtUserAdministrationVoce" ComponentId="TenantContractManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ContractPermissionTree" Type="Reference" ExportId="ContractPermissionTree">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SnapshotRepository" Type="Reference" ExportId="SnapshotRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ContractAttachmentRepository" Type="Reference" ExportId="ContractAttachmentRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

@@ -3,7 +3,8 @@
 
 
 // ImtCore includes
-#include <imtauthgql/ContractGqlUtils.h>
+#include <imtsdl/imtsdl.h>
+#include <imtsdl/TElementList.h>
 #include <imtgql/CGqlRequest.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Contracts.h>
 
@@ -16,7 +17,7 @@ namespace imtauthgql
 
 // reimplemented (imtauth::ITenantRelationshipProvider)
 
-imtauth::RelatedTenantInfos CRemoteContractControllerComp::GetRelatedTenants(const QByteArray& tenantId, QString* tenantNamePtr, bool* isReadPtr) const
+imtauth::RelatedTenantInfos CRemoteContractControllerComp::GetRelatedTenants(const QByteArray& tenantId, const QByteArray& productId, QString* tenantNamePtr, bool* isReadPtr) const
 {
 	namespace sdlauth = sdl::V1_0::imtauth;
 
@@ -35,6 +36,13 @@ imtauth::RelatedTenantInfos CRemoteContractControllerComp::GetRelatedTenants(con
 
 	imtgql::CGqlRequest gqlRequest;
 	if (!sdlauth::CGetRelatedTenantsGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		return retVal;
+	}
+
+	// The authorization server answers for the product the request goes with
+	const imtgql::IGqlContext* contextPtr = imtgql::CGqlRequestContextManager::GetContext();
+	const QByteArray contextProductId = (contextPtr != nullptr) ? contextPtr->GetProductId() : QByteArray();
+	if (productId.isEmpty() || (!contextProductId.isEmpty() && contextProductId != productId)){
 		return retVal;
 	}
 
@@ -57,9 +65,9 @@ imtauth::RelatedTenantInfos CRemoteContractControllerComp::GetRelatedTenants(con
 		relatedTenant.tenantId = item->tenantId.value_or(QByteArray());
 		relatedTenant.tenantName = item->tenantName.value_or(QString());
 		relatedTenant.isEffective = item->isEffective.value_or(false);
-		relatedTenant.relatedContractIds = FromElementList(item->relatedContractIds);
-		relatedTenant.sharingContractIds = FromElementList(item->sharingContractIds);
-		relatedTenant.relatedSince = FromSdlTime(item->relatedSince);
+		relatedTenant.relatedContractIds = imtsdl::FromElementList(item->relatedContractIds);
+		relatedTenant.sharingContractIds = imtsdl::FromElementList(item->sharingContractIds);
+		relatedTenant.relatedSince = imtsdl::FromSdlTime(item->relatedSince);
 		if (!relatedTenant.tenantId.isEmpty()){
 			retVal.append(relatedTenant);
 		}

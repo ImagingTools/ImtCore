@@ -36,12 +36,12 @@ public:
 		The organizations the user gets any permission in.
 		\param isReadPtr [optional] False when the contracts, the memberships or the groups could not be read.
 	*/
-	virtual QByteArrayList GetDelegatingTenantIds(const QByteArray& userId, bool* isReadPtr = nullptr) const = 0;
+	virtual QByteArrayList GetDelegatingTenantIds(const QByteArray& userId, const QByteArray& productId, bool* isReadPtr = nullptr) const = 0;
 
 	/**
 		The user gets any permission in the target organization.
 	*/
-	virtual bool HasDelegatedAccess(const QByteArray& userId, const QByteArray& targetTenantId, bool* isReadPtr = nullptr) const = 0;
+	virtual bool HasDelegatedAccess(const QByteArray& userId, const QByteArray& targetTenantId, const QByteArray& productId, bool* isReadPtr = nullptr) const = 0;
 };
 
 

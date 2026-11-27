@@ -94,7 +94,7 @@ ViewBase {
 	signal closeRequested()
 
 	function __can(flag) {
-		return contractView.stateManager ? contractView.stateManager[flag] === true : false
+		return contractView.contract && contractView.contract.isReadOnly ? false : (contractView.stateManager ? contractView.stateManager[flag] === true : false)
 	}
 
 	function setResponsibleUser(userId) {
@@ -712,7 +712,7 @@ ViewBase {
 			return
 		contractView.__busy = true
 		contractView.contractsApiClient.givePermissions(contractView.tenantId, contractView.__currentId, granteeTenantId,
-														AuthorizationController.productId, permissionIds, validUntil, comment)
+														permissionIds, validUntil, comment)
 	}
 
 	function withdrawPermissions(allocationId) {

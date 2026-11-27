@@ -81,7 +81,7 @@ QtObject {
 	function signContract(tenantId, contractId, revision, position) {}
 	function giveNotice(tenantId, contractId, reason, isImmediate) {}
 	// The organization gives its own permissions to a party it is linked with, and takes them back
-	function givePermissions(tenantId, contractId, granteeTenantId, productId, permissionIds, validUntil, comment) {}
+	function givePermissions(tenantId, contractId, granteeTenantId, permissionIds, validUntil, comment) {}
 	function withdrawPermissions(tenantId, contractId, allocationId) {}
 
 	// The data is the Base64 of the file

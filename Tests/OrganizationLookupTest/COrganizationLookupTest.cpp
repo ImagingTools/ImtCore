@@ -18,6 +18,11 @@
 
 // ImtCore includes
 #include <imtauth/CDocumentShareInfo.h>
+#include <imtauth/CContractManagerComp.h>
+#include <imtauth/CContractInfoComp.h>
+#include <imtauth/CContractEventInfoComp.h>
+#include <imtauth/CContractPartyPrivateInfoComp.h>
+#include <imtauth/CProductPermissionSnapshot.h>
 #include <imtauth/CDocumentShareInfoComp.h>
 #include <imtauth/CDocumentShareManagerComp.h>
 #include <imtauth/CPersonalAccessToken.h>
@@ -227,6 +232,7 @@ public:
 		manager->SetRef("RelationshipProvider", relationships);
 		manager->SetBoolAttr("AutoAccept", true);
 		manager->SetIntAttr("RelationshipCacheTimeout", 10);
+		manager->SetIdAttr("ProductId", CTestRelationshipProviderComp::s_productId);
 		manager->InitComponent();
 	}
 
@@ -1438,6 +1444,171 @@ void COrganizationLookupTest::testGetShareOwnerTenantIds_UnreadShareTrustsNoPart
 	fixture.Collection().SetLoadFailingIds({});
 	QCOMPARE(fixture.Manager().GetShareOwnerTenantIds(tenantId), QByteArrayList({partnerId}));
 	QVERIFY(!fixture.StoredShareIds().contains(staleShareId));
+}
+
+
+namespace
+{
+class CContractFixture
+{
+public:
+	CContractFixture()
+	{
+		contracts->InitComponent();
+		privateRecords->InitComponent();
+		events->InitComponent();
+		snapshots->InitComponent();
+		tenantCollection->InitComponent();
+		tenantManager->SetRef("TenantCollection", tenantCollection);
+		tenantManager->SetFactory("TenantFactory", &tenantFactory);
+		tenantManager->InitComponent();
+		imtauth::CIdentifiableTenantInfo tenant;
+		tenant.SetTenantId("11111111-1111-4111-8111-111111111111");
+		tenant.SetTenantPermissions({"/Product/View", "/OtherProduct/Edit"});
+		tenantCollection->AddObject("Tenant", tenant, "11111111-1111-4111-8111-111111111111");
+		manager->SetRef("TenantManager", tenantManager);
+		manager->SetRef("ContractCollection", contracts);
+		manager->SetRef("PrivateInfoCollection", privateRecords);
+		manager->SetRef("EventCollection", events);
+		manager->SetRef("SnapshotCollection", snapshots);
+		manager->SetFactory("ContractFactory", &contractFactory);
+		manager->SetFactory("EventFactory", &eventFactory);
+		manager->SetFactory("PrivateInfoFactory", &privateFactory);
+		manager->InitComponent();
+	}
+
+	QByteArray Add(const QByteArray& productId)
+	{
+		imtauth::CIdentifiableContractInfo contract;
+		contract.SetContractId(NewId());
+		contract.SetProductId(productId);
+		contract.SetInitiatorTenantId("11111111-1111-4111-8111-111111111111");
+		contract.SetRevision(1);
+		imtauth::IContractInfo::Party owner;
+		owner.tenantId = "11111111-1111-4111-8111-111111111111";
+		imtauth::IContractInfo::Party partner;
+		partner.tenantId = "partner";
+		contract.SetParties({owner, partner});
+		imtauth::IContractInfo::Link link;
+		link.linkId = "link";
+		link.tenantAId = "11111111-1111-4111-8111-111111111111";
+		link.tenantBId = "partner";
+		contract.SetLinks({link});
+		return contracts->AddObject("Contract", contract, contract.GetContractId());
+	}
+
+	icomp::TSimSharedComponentPtr<CTestCollectionComp> contracts, privateRecords, events, snapshots, tenantCollection;
+	icomp::TSimSharedComponentPtr<imtauth::CTenantManagerComp> tenantManager;
+	icomp::TSimComponentsFactory<imtauth::CTenantInfoComp> tenantFactory;
+	icomp::TSimComponentsFactory<imtauth::CContractInfoComp> contractFactory;
+	icomp::TSimComponentsFactory<imtauth::CContractEventInfoComp> eventFactory;
+	icomp::TSimComponentsFactory<imtauth::CContractPartyPrivateInfoComp> privateFactory;
+	icomp::TSimSharedComponentPtr<imtauth::CContractManagerComp> manager;
+};
+}
+
+void COrganizationLookupTest::testContracts_ForeignProductCommandsAreUnavailable()
+{
+	CContractFixture fixture;
+	const QByteArray contractId = fixture.Add("ProLife");
+	const imtauth::ContractActor actor = {"11111111-1111-4111-8111-111111111111", "user", QStringLiteral("User"), "Puma"};
+	imtauth::IContractInfo::Allocation allocation;
+	allocation.granteeTenantId = "partner";
+	allocation.permissionIds = {"/Product/View"};
+	imtauth::IContractInfo::Attachment attachment;
+	attachment.attachmentId = "file";
+	attachment.fileName = QStringLiteral("file.txt");
+	using Command = std::function<bool(const QByteArray&, QString&)>;
+	const QList<Command> commands = {
+		[&](const QByteArray& id, QString& e){ imtauth::CContractInfo draft; draft.SetContractId(id); return fixture.manager->UpdateContract(actor, draft, 1, e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->RemoveContract(actor, id, e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->AddPartyByCode(actor, id, 1, "code", QByteArray(), e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->SubmitContract(actor, id, 1, e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->CancelContract(actor, id, QStringLiteral("Reason"), e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->RequestChanges(actor, id, 1, QStringLiteral("Reason"), e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->ApproveContract(actor, id, 1, e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->SignContract(actor, id, 1, {}, e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->DeclineContract(actor, id, QStringLiteral("Reason"), e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->GiveNotice(actor, id, QStringLiteral("Reason"), true, e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->RevokeNotice(actor, id, e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->GiveNonRenewalNotice(actor, id, e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->GiveAllocation(actor, id, allocation, e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->WithdrawAllocation(actor, id, "allocation", e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->SetPrivateInfo(actor, id, {}, e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->SetAllocationGroups(actor, id, "allocation", {}, e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->AddAttachment(actor, id, attachment, true, e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->AddAttachment(actor, id, attachment, false, e); }
+	};
+	for (const Command& command : commands){
+		QString foreignError, missingError;
+		QVERIFY(!command(contractId, foreignError));
+		QVERIFY(!command(NewId(), missingError));
+		QCOMPARE(foreignError, missingError);
+	}
+	QCOMPARE(fixture.manager->GetContract(contractId)->GetRevision(), 1);
+	QVERIFY(fixture.privateRecords->GetElementIds().isEmpty());
+	QVERIFY(fixture.events->GetElementIds().isEmpty());
+}
+
+void COrganizationLookupTest::testContracts_SelectionAndCacheAreProductScoped()
+{
+	for (bool filtered : {true, false}){
+		CContractFixture fixture;
+		const QByteArray p = fixture.Add("ProLife");
+		const QByteArray q = fixture.Add("Puma");
+		fixture.contracts->SetFilterSupported(filtered);
+		bool isRead = false;
+		const auto prolife = fixture.manager->GetContractsOfParty("11111111-1111-4111-8111-111111111111", "ProLife", &isRead);
+		QVERIFY(isRead);
+		QCOMPARE(prolife.size(), 1);
+		QCOMPARE(prolife.first()->GetContractId(), p);
+		const auto puma = fixture.manager->GetContractsOfParty("11111111-1111-4111-8111-111111111111", "Puma", &isRead);
+		QVERIFY(isRead);
+		QCOMPARE(puma.size(), 1);
+		QCOMPARE(puma.first()->GetContractId(), q);
+		QString error;
+		QVERIFY(fixture.manager->RemoveContract({"11111111-1111-4111-8111-111111111111", "user", {}, "ProLife"}, p, error));
+		QVERIFY(fixture.manager->GetContractsOfParty("11111111-1111-4111-8111-111111111111", "ProLife").isEmpty());
+		QCOMPARE(fixture.manager->GetContractsOfParty("11111111-1111-4111-8111-111111111111", "Puma").size(), 1);
+	}
+}
+
+
+void COrganizationLookupTest::testContracts_ProductIsFixedByActor()
+{
+	CContractFixture fixture;
+	const imtauth::ContractActor actor = {"11111111-1111-4111-8111-111111111111", "user", {}, "ProLife"};
+	imtauth::CContractInfo draft;
+	draft.SetName(QStringLiteral("Fixed product"));
+	draft.SetProductId("Puma");
+	QString error;
+	const QByteArray id = fixture.manager->CreateContract(actor, draft, error);
+	QVERIFY2(!id.isEmpty(), qPrintable(error));
+	QCOMPARE(fixture.manager->GetContract(id)->GetProductId(), QByteArray("ProLife"));
+	draft.SetContractId(id);
+	draft.SetName(QStringLiteral("Updated"));
+	QVERIFY2(fixture.manager->UpdateContract(actor, draft, 1, error), qPrintable(error));
+	QCOMPARE(fixture.manager->GetContract(id)->GetProductId(), QByteArray("ProLife"));
+}
+
+void COrganizationLookupTest::testContracts_PermissionsMustBelongToProduct()
+{
+	CContractFixture fixture;
+	const QByteArray id = fixture.Add("ProLife");
+	imtauth::CIdentifiableProductPermissionSnapshot snapshot;
+	snapshot.SetProductId("ProLife");
+	snapshot.SetTree(R"({"groups":[{"entries":[{"permissionId":"/Product/View"}]}]})");
+	QVERIFY(!fixture.snapshots->AddObject("ProductPermissionSnapshot", snapshot, NewId()).isEmpty());
+	imtauth::IContractInfo::Allocation allocation;
+	allocation.granteeTenantId = "partner";
+	allocation.permissionIds = {"/OtherProduct/Edit"};
+	QString error;
+	QVERIFY(!fixture.manager->GiveAllocation({"11111111-1111-4111-8111-111111111111", "user", {}, "ProLife"}, id, allocation, error));
+	QCOMPARE(error, QStringLiteral("The permission is not part of the contract product"));
+	QVERIFY(fixture.manager->GetContract(id)->GetAllocations().isEmpty());
+	allocation.permissionIds = {"/Product/View"};
+	QVERIFY2(fixture.manager->GiveAllocation({"11111111-1111-4111-8111-111111111111", "user", {}, "ProLife"}, id, allocation, error), qPrintable(error));
+	QCOMPARE(fixture.manager->GetContract(id)->GetAllocations().size(), 1);
 }
 
 

@@ -111,7 +111,7 @@ public:
 		\param tenantNamePtr Receives the name of \a tenantId itself, if known.
 		\param isReadPtr Receives false if the relationships could not be read, e.g. for lack of permissions.
 	*/
-	virtual RelatedTenantInfos GetRelatedTenants(const QByteArray& tenantId, QString* tenantNamePtr = nullptr, bool* isReadPtr = nullptr) const = 0;
+	virtual RelatedTenantInfos GetRelatedTenants(const QByteArray& tenantId, const QByteArray& productId, QString* tenantNamePtr = nullptr, bool* isReadPtr = nullptr) const = 0;
 };
 
 

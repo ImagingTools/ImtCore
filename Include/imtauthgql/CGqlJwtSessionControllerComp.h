@@ -98,7 +98,7 @@ protected:
 private:
 	AuthorizationState CheckAuthorizationServer(const ::imtgql::CGqlRequest& gqlRequest, QByteArray& productId, QString& message) const;
 	QByteArray GetAuthenticatedUserId(const ::imtgql::CGqlRequest& gqlRequest) const;
-	bool CanUseTenant(const QByteArray& userId, const QByteArray& tenantId, QString& errorMessage) const;
+	bool CanUseTenant(const QByteArray& userId, const QByteArray& tenantId, const QByteArray& productId, QString& errorMessage) const;
 	bool IsPasswordChangeRequired(const QByteArray& userId) const;
 	sdl::V1_0::imtauth::CUserSession CreateUserSessionData(
 			const imtauth::IJwtSessionController::UserSession& userSession) const;
