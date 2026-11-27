@@ -224,7 +224,8 @@ class FileModel {
                 return
             }
             case 'qmlaliasdef': {
-                let path = m.slice(2).filter(part => typeof part === 'string' && part)
+                // the parser joins the properties after the id (`id.inner.p`): each one is a step of the path
+                let path = m.slice(2).filter(part => typeof part === 'string' && part).flatMap(part => part.split('.'))
                 // info: the tokens of the reference `id.property`
                 let refAt = Array.isArray(m.info) ? tokenAt(m.info[0]) : null
                 el.aliases.push({ name: m[1], path, line: refAt ? refAt.line : el.line, refAt, nameAt: tokenAt(m.nameInfo) })
