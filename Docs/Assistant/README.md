@@ -299,6 +299,46 @@ The center checks the availability at login and at a tenant switch and ends the 
 logout and at a tenant switch. The top panel and the side panel are loaded by URL only while the
 assistant is active, so applications without the assistant do not need `imtassistgui`.
 
+## Knowledge and API: the assistant as an agent
+
+Besides fixed actions, the assistant knows the product and its public API and plans tasks of several
+steps itself, e.g. "find the users without a group, add them to Support and give the group the role
+Operator".
+
+| Part | Content |
+|---|---|
+| Knowledge (`ImtAssistPck/MarkdownKnowledgeBase`) | Markdown documents of the product, split at headings. ImtCore ships `:/AssistantKnowledge/ImtCore` (`Docs/Assistant/Knowledge/Administration.md`, the permission rules, the security documents); a product adds its own directory |
+| `knowledge.search`, `knowledge.read` | Search the sections by words, read a section |
+| API catalog (`ImtAssistGqlPck/AssistantApiCatalog`) | The SDL files of the application (ImtCore ships `:/AssistantApi` with `imtauth` and `imtbase`): commands, types, inputs, enums, comments |
+| `api.listCommands`, `api.describeCommand` | Find commands, read their input and result types |
+| `api.query` | Execute a query with the rights of the user: command, `inputJson`, wanted `fields` |
+| `api.planChanges` | Propose mutations as one plan; the user confirms the whole plan |
+
+**Policy of the product** (attributes of `AssistantApiCatalog`, exported by `TenantAssistant`):
+- queries only from `AllowedQueries`, mutations only from `AllowedMutations` (both empty by default, because
+  some queries have effects, e.g. sending an e-mail); `ForbiddenCommands`;
+- never commands whose names contain a word of authentication or secrets (Password, Token, Session, Login,
+  Logout, Authoriz, Superuser, Secret, Credential, Register), even when listed;
+- fields whose names contain password, token, secret, apikey, privatekey, credential, salt or hash are removed
+  from every result and refused in every input (plus `ForbiddenFields`).
+
+**Calls.** The model never writes GraphQL: it gives the command, the input as JSON and the result fields as
+paths. The request is built from the catalog (unknown fields are refused with the list of the valid ones),
+the values go only into variables, and the request runs through the handlers of the application with the
+GraphQL context of the user. Results are filtered and shortened (100 items per list, 32 KB).
+
+**Plans.** `api.planChanges` takes a summary and up to 20 steps (command, `inputJson`, description). The
+preview shows every step with its command and the data as it will be sent, not only the words of the
+model. After the confirmation the steps run in order and stop at the first failure; the outcome says how
+many steps were applied (no automatic undo). `"$stepN.path"` in an input refers to the result of an earlier
+step, e.g. the ID of a created object. A plan carries no state of its targets: an object changed between the
+preview and the confirmation is written with the data of the plan.
+
+**Knowledge of a product.** Put Markdown documents into a resource directory of the product and set
+`KnowledgeDocuments` of `TenantAssistant` to it and to `:/AssistantKnowledge/ImtCore`. Write them for a reader
+who does not know the product: concepts, rules, typical tasks and the commands they need, especially the
+commands that replace whole objects.
+
 ## Administration actions
 
 Shared actions for every server with the user administration of ImtCore (`ImtAssistGqlPck`):
@@ -330,7 +370,10 @@ assignments plus the user, and a group changed since the preview is not overwrit
 - `TenantAssistant`: store, tenant provider, service, the administration actions and the two GraphQL
   controllers `AssistantController` and `ConfigurationController`. Exported attributes:
   `ConfigurationCollection`, `SecretProtector`, `RequestHandlers`, `AllowedPresets`,
-  `AllowCustomEndpoints`, `AllowServerCredentials`, `AdditionalInstructions`, `Enabled`, `Log`.
+  `AllowCustomEndpoints`, `AllowServerCredentials`, `AdditionalInstructions` (default: how to use knowledge,
+  API and plans), `Enabled`, `MaxStepsPerTurn` (12), `KnowledgeDocuments`, `ApiSchemaPaths`,
+  `AllowedQueries`, `AllowedMutations` (default: users, groups, roles read; groups changed),
+  `ForbiddenCommands`, `ForbiddenFields`, `Log`.
 
 Steps for a server (Puma is the template; ProLife, Agentino, Dogma and Claire follow it):
 
@@ -338,7 +381,8 @@ Steps for a server (Puma is the template; ProLife, Agentino, Dogma and Claire fo
    `TenantAssistant` with `ConfigurationCollection` = the repository, `SecretProtector` = the secret
    protector of the server, `RequestHandlers` = the GraphQL handlers of users, groups and roles; add
    `TenantAssistant/AssistantController` and `TenantAssistant/ConfigurationController` to the GraphQL
-   handlers of the servlet. Call `Init::InitAssistantDb()`.
+   handlers of the servlet. Call `Init::InitAssistantServer()` (or `Q_INIT_RESOURCE(imtassistdb)` and
+   `Q_INIT_RESOURCE(imtassistgql)`).
 2. Permissions of the product: add the feature `Assistant` below `Administration` with `ViewPage`,
    `View` and `Edit` (`ViewPage` requires `View`, `Edit` requires `View`), and grant them to the
    administrator roles. New organizations get the three permissions in their default permission scope
@@ -453,6 +497,10 @@ authentication, so it enables `AllowDemoPrincipal`. Users in `ReadOnlyUserIds` o
   default disabled, protected key (keep, set, clear, no protector), policy of the server (presets,
   endpoints, host parts, limits), isolation of the organizations, enabling per organization in the
   service, provider without configuration or credentials.
+- `Tests/AssistantTest` (`CAssistantAgentTest`): knowledge sections and search, the knowledge actions on
+  `Docs/Assistant/Knowledge`, the catalog of all ImtCore SDL files, the policy, list/describe/query with the
+  context of the user, filtering of secrets, refusals, plans: preview, order, references, stop at the first
+  failure, forbidden commands and fields.
 - `Tests/AssistantTest` (`CAssistantAdministrationActionTest`): the administration actions against a
   GraphQL handler of the test: context of the user, filter and limit, no e-mail addresses, refusal
   without context, permission or for another user or tenant, preview and application of

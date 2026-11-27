@@ -108,6 +108,13 @@ public:
 		Q_INIT_RESOURCE(imtassistdb);
 	}
 
+	// For servers with the assistant: SDL catalog (:/AssistantApi) and knowledge (:/AssistantKnowledge/ImtCore) of imtassistgql
+	static void InitAssistantServer()
+	{
+		Q_INIT_RESOURCE(imtassistdb);
+		Q_INIT_RESOURCE(imtassistgql);
+	}
+
 	static void InitGeoQml()
 	{
 		Q_INIT_RESOURCE(imtgeoguiqml);

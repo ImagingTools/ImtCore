@@ -7,8 +7,8 @@
             <Version Id="1023" Number="396033" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
-    <Description>AI assistant of a server with configuration per tenant in the administration and the shared administration actions. Export: the GraphQL handlers AssistantController and ConfigurationController. Needs ConfigurationCollection (e.g. AssistantConfigurationSqlRepository), SecretProtector and RequestHandlers (the GraphQL handlers of the application for the actions).</Description>
-    <Keywords>Assistant AI Tenant Administration Server</Keywords>
+    <Description>AI assistant of a server: configuration per tenant in the administration, knowledge of the product (KnowledgeDocuments), the public API from the SDL files (ApiSchemaPaths) with the policy AllowedQueries/AllowedMutations/ForbiddenCommands, plans of changes and the shared administration actions. Export: the GraphQL handlers AssistantController and ConfigurationController. Needs ConfigurationCollection, SecretProtector and RequestHandlers (the GraphQL handlers of the application). Call Init::InitAssistantServer().</Description>
+    <Keywords>Assistant AI Tenant Administration Server Knowledge API Agent</Keywords>
     <ElementsList>
         <Element Id="ActionRegistry" PackageId="ImtAssistPck" ComponentId="AssistantActionRegistry">
             <Data IsEnabled="true" Flags="0">
@@ -16,6 +16,12 @@
                     <AttributeInfo Id="Actions" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
+                                <Value>KnowledgeSearch</Value>
+                                <Value>KnowledgeRead</Value>
+                                <Value>ApiList</Value>
+                                <Value>ApiDescribe</Value>
+                                <Value>ApiQuery</Value>
+                                <Value>ApiPlan</Value>
                                 <Value>SearchUsers</Value>
                                 <Value>SearchGroups</Value>
                                 <Value>SearchRoles</Value>
@@ -31,6 +37,117 @@
                 <AttributeInfoMap>
                     <AttributeInfo Id="GroupTypeId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Group"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestHandlers" Type="Reference[]" ExportId="RequestHandlers">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ApiCatalog" PackageId="ImtAssistGqlPck" ComponentId="AssistantApiCatalog">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AllowedMutations" Type="Id[]" ExportId="AllowedMutations">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>GroupAdd</Value>
+                                <Value>GroupUpdate</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AllowedQueries" Type="Id[]" ExportId="AllowedQueries">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>UsersList</Value>
+                                <Value>UserItem</Value>
+                                <Value>GroupsList</Value>
+                                <Value>GroupItem</Value>
+                                <Value>RolesList</Value>
+                                <Value>RoleItem</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ForbiddenCommands" Type="Id[]" ExportId="ForbiddenCommands">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ForbiddenFields" Type="Id[]" ExportId="ForbiddenFields">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SchemaPaths" Type="String[]" ExportId="ApiSchemaPaths">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>:/AssistantApi</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ApiDescribe" PackageId="ImtAssistGqlPck" ComponentId="AssistantApiAction">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiCatalog" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApiCatalog"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Kind" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="describe"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestHandlers" Type="Reference[]" ExportId="RequestHandlers">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ApiList" PackageId="ImtAssistGqlPck" ComponentId="AssistantApiAction">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiCatalog" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApiCatalog"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Kind" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="list"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestHandlers" Type="Reference[]" ExportId="RequestHandlers">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ApiPlan" PackageId="ImtAssistGqlPck" ComponentId="AssistantApiPlanAction">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiCatalog" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApiCatalog"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestHandlers" Type="Reference[]" ExportId="RequestHandlers">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ApiQuery" PackageId="ImtAssistGqlPck" ComponentId="AssistantApiAction">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiCatalog" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApiCatalog"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Kind" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="query"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -89,6 +206,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MaxStepsPerTurn" Type="Integer" ExportId="MaxStepsPerTurn">
+                        <Data IsEnabled="true" Value="12"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Provider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Provider"/>
@@ -164,11 +284,51 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="KnowledgeBase" PackageId="ImtAssistPck" ComponentId="MarkdownKnowledgeBase">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DocumentPaths" Type="String[]" ExportId="KnowledgeDocuments">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>:/AssistantKnowledge/ImtCore</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="KnowledgeRead" PackageId="ImtAssistPck" ComponentId="AssistantKnowledgeAction">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Kind" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="read"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="KnowledgeBase" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="KnowledgeBase"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="KnowledgeSearch" PackageId="ImtAssistPck" ComponentId="AssistantKnowledgeAction">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Kind" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="search"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="KnowledgeBase" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="KnowledgeBase"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="Provider" PackageId="ImtAssistPck" ComponentId="TenantAssistantProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="AdditionalInstructions" Type="Text" ExportId="AdditionalInstructions">
-                        <Data IsEnabled="true" Value=""/>
+                        <Data IsEnabled="true" Value="You are the assistant of the product. To solve a task: understand it with knowledge.search and knowledge.read (concepts, rules, meaning of the API); find the commands with api.listCommands and read them with api.describeCommand; read the current data with api.query; then propose changes as one plan with api.planChanges. Never invent IDs: find them first. Update commands replace the whole object: read it first and send all its values with the change. Prefer few steps; explain the plan in plain words. If a step fails, say what was applied. Ask back when the task is ambiguous."/>
                     </AttributeInfo>
                     <AttributeInfo Id="AllowServerCredentials" Type="Boolean" ExportId="AllowServerCredentials">
                         <Data IsEnabled="true" Value="false"/>
@@ -246,9 +406,11 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="ActionRegistry" ComponentId="ActionRegistry"/>
+        <Component ExportedId="ApiCatalog" ComponentId="ApiCatalog"/>
         <Component ExportedId="AssistantController" ComponentId="AssistantController"/>
         <Component ExportedId="AssistantService" ComponentId="AssistantService"/>
         <Component ExportedId="ConfigurationController" ComponentId="ConfigurationController"/>
         <Component ExportedId="ConfigurationStore" ComponentId="ConfigurationStore"/>
+        <Component ExportedId="KnowledgeBase" ComponentId="KnowledgeBase"/>
     </ExportedComponents>
 </Acf>

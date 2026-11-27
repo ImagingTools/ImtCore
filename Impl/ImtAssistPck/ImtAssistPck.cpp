@@ -65,6 +65,16 @@ I_EXPORT_COMPONENT(
 			"Model provider configured per tenant in the administration",
 			"Assistant AI Provider Tenant Administration");
 
+I_EXPORT_COMPONENT(
+			MarkdownKnowledgeBase,
+			"Knowledge base of the product for the assistant from Markdown files",
+			"Assistant AI Knowledge Documentation Markdown");
+
+I_EXPORT_COMPONENT(
+			AssistantKnowledgeAction,
+			"Assistant actions knowledge.search and knowledge.read on the knowledge base",
+			"Assistant AI Action Knowledge Search Read");
+
 
 } // namespace ImtAssistPck
 

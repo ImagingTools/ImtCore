@@ -40,6 +40,11 @@ Rectangle {
 		let oldValue = change.oldValue === undefined ? "" : String(change.oldValue)
 		let newValue = change.newValue === undefined ? "" : String(change.newValue)
 
+		// A change without a former value, e.g. a step of a plan with the data it sends
+		if (change.oldValue === undefined){
+			return qsTr("%1: %2").arg(field).arg(newValue)
+		}
+
 		return qsTr("%1: %2 → %3").arg(field).arg(oldValue).arg(newValue)
 	}
 

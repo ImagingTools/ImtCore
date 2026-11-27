@@ -8,6 +8,9 @@
 #include <imtassistgql/CAdministrationSearchActionComp.h>
 #include <imtassistgql/CAdministrationAddUserToGroupActionComp.h>
 #include <imtassistdb/CAssistantConfigurationDbDelegateComp.h>
+#include <imtassistgql/CAssistantApiCatalogComp.h>
+#include <imtassistgql/CAssistantApiActionComp.h>
+#include <imtassistgql/CAssistantApiPlanActionComp.h>
 
 
 /**
@@ -22,6 +25,9 @@ typedef imtassistgql::CAssistantConfigurationControllerComp AssistantConfigurati
 typedef imtassistgql::CAdministrationSearchActionComp AdministrationSearchAction;
 typedef imtassistgql::CAdministrationAddUserToGroupActionComp AdministrationAddUserToGroupAction;
 typedef imtassistdb::CAssistantConfigurationDbDelegateComp AssistantConfigurationDatabaseDelegate;
+typedef imtassistgql::CAssistantApiCatalogComp AssistantApiCatalog;
+typedef imtassistgql::CAssistantApiActionComp AssistantApiAction;
+typedef imtassistgql::CAssistantApiPlanActionComp AssistantApiPlanAction;
 
 
 } // namespace ImtAssistGqlPck

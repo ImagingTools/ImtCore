@@ -40,6 +40,21 @@ I_EXPORT_COMPONENT(
 			"SQL delegate of the assistant configurations of the tenants",
 			"Assistant AI Configuration Database SQL Delegate");
 
+I_EXPORT_COMPONENT(
+			AssistantApiCatalog,
+			"Public GraphQL API of the application from its SDL files, with the policy of the product for the assistant",
+			"Assistant AI API Catalog SDL Policy");
+
+I_EXPORT_COMPONENT(
+			AssistantApiAction,
+			"Assistant actions api.listCommands, api.describeCommand and api.query with the rights of the user",
+			"Assistant AI Action API Query");
+
+I_EXPORT_COMPONENT(
+			AssistantApiPlanAction,
+			"Assistant action api.planChanges: a plan of mutations confirmed as a whole",
+			"Assistant AI Action API Plan Changes");
+
 
 } // namespace ImtAssistGqlPck
 

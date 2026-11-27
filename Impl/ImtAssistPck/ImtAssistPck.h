@@ -13,6 +13,8 @@
 #include <imtassist/CAssistantConfigurationComp.h>
 #include <imtassist/CAssistantConfigurationStoreComp.h>
 #include <imtassist/CTenantAssistantProviderComp.h>
+#include <imtassist/CMarkdownKnowledgeBaseComp.h>
+#include <imtassist/CAssistantKnowledgeActionComp.h>
 
 
 /**
@@ -32,6 +34,8 @@ typedef imtassist::CAssistantProviderPresetListComp AssistantProviderList;
 typedef imtassist::CAssistantConfigurationComp AssistantConfiguration;
 typedef imtassist::CAssistantConfigurationStoreComp AssistantConfigurationStore;
 typedef imtassist::CTenantAssistantProviderComp TenantAssistantProvider;
+typedef imtassist::CMarkdownKnowledgeBaseComp MarkdownKnowledgeBase;
+typedef imtassist::CAssistantKnowledgeActionComp AssistantKnowledgeAction;
 
 
 } // namespace ImtAssistPck

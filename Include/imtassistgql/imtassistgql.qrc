@@ -1,0 +1,55 @@
+<RCC>
+    <qresource prefix="/AssistantApi">
+        <file alias="imtauth/Assignments.sdl">../../Sdl/imtauth/1.0/Assignments.sdl</file>
+        <file alias="imtauth/Authorization.sdl">../../Sdl/imtauth/1.0/Authorization.sdl</file>
+        <file alias="imtauth/ConnectedProductCollectionDocumentService.sdl">../../Sdl/imtauth/1.0/ConnectedProductCollectionDocumentService.sdl</file>
+        <file alias="imtauth/ConnectedProducts.sdl">../../Sdl/imtauth/1.0/ConnectedProducts.sdl</file>
+        <file alias="imtauth/ContractCatalogs.sdl">../../Sdl/imtauth/1.0/ContractCatalogs.sdl</file>
+        <file alias="imtauth/Contracts.sdl">../../Sdl/imtauth/1.0/Contracts.sdl</file>
+        <file alias="imtauth/GroupCollectionDocumentService.sdl">../../Sdl/imtauth/1.0/GroupCollectionDocumentService.sdl</file>
+        <file alias="imtauth/Groups.sdl">../../Sdl/imtauth/1.0/Groups.sdl</file>
+        <file alias="imtauth/Permissions.sdl">../../Sdl/imtauth/1.0/Permissions.sdl</file>
+        <file alias="imtauth/PersonalAccessTokens.sdl">../../Sdl/imtauth/1.0/PersonalAccessTokens.sdl</file>
+        <file alias="imtauth/ProductPermissionCatalog.sdl">../../Sdl/imtauth/1.0/ProductPermissionCatalog.sdl</file>
+        <file alias="imtauth/Profile.sdl">../../Sdl/imtauth/1.0/Profile.sdl</file>
+        <file alias="imtauth/RoleCollectionDocumentService.sdl">../../Sdl/imtauth/1.0/RoleCollectionDocumentService.sdl</file>
+        <file alias="imtauth/Roles.sdl">../../Sdl/imtauth/1.0/Roles.sdl</file>
+        <file alias="imtauth/ServerTokens.sdl">../../Sdl/imtauth/1.0/ServerTokens.sdl</file>
+        <file alias="imtauth/Sessions.sdl">../../Sdl/imtauth/1.0/Sessions.sdl</file>
+        <file alias="imtauth/TenantCollectionDocumentService.sdl">../../Sdl/imtauth/1.0/TenantCollectionDocumentService.sdl</file>
+        <file alias="imtauth/TenantDirectory.sdl">../../Sdl/imtauth/1.0/TenantDirectory.sdl</file>
+        <file alias="imtauth/TenantMemberships.sdl">../../Sdl/imtauth/1.0/TenantMemberships.sdl</file>
+        <file alias="imtauth/Tenants.sdl">../../Sdl/imtauth/1.0/Tenants.sdl</file>
+        <file alias="imtauth/UserActions.sdl">../../Sdl/imtauth/1.0/UserActions.sdl</file>
+        <file alias="imtauth/UserCollectionDocumentService.sdl">../../Sdl/imtauth/1.0/UserCollectionDocumentService.sdl</file>
+        <file alias="imtauth/Users.sdl">../../Sdl/imtauth/1.0/Users.sdl</file>
+        <file alias="imtbase/CollectionDocumentService.sdl">../../Sdl/imtbase/1.0/CollectionDocumentService.sdl</file>
+        <file alias="imtbase/CollectionImport.sdl">../../Sdl/imtbase/1.0/CollectionImport.sdl</file>
+        <file alias="imtbase/Commands.sdl">../../Sdl/imtbase/1.0/Commands.sdl</file>
+        <file alias="imtbase/ComplexCollectionFilter.sdl">../../Sdl/imtbase/1.0/ComplexCollectionFilter.sdl</file>
+        <file alias="imtbase/DocumentCollectionFilter.sdl">../../Sdl/imtbase/1.0/DocumentCollectionFilter.sdl</file>
+        <file alias="imtbase/DocumentIdFilter.sdl">../../Sdl/imtbase/1.0/DocumentIdFilter.sdl</file>
+        <file alias="imtbase/DocumentRevision.sdl">../../Sdl/imtbase/1.0/DocumentRevision.sdl</file>
+        <file alias="imtbase/DocumentShares.sdl">../../Sdl/imtbase/1.0/DocumentShares.sdl</file>
+        <file alias="imtbase/FileSystem.sdl">../../Sdl/imtbase/1.0/FileSystem.sdl</file>
+        <file alias="imtbase/FilterableSelect.sdl">../../Sdl/imtbase/1.0/FilterableSelect.sdl</file>
+        <file alias="imtbase/ImtBaseTypes.sdl">../../Sdl/imtbase/1.0/ImtBaseTypes.sdl</file>
+        <file alias="imtbase/ImtCollection.sdl">../../Sdl/imtbase/1.0/ImtCollection.sdl</file>
+        <file alias="imtbase/MimeType.sdl">../../Sdl/imtbase/1.0/MimeType.sdl</file>
+        <file alias="imtbase/ProgressManager.sdl">../../Sdl/imtbase/1.0/ProgressManager.sdl</file>
+        <file alias="imtbase/Search.sdl">../../Sdl/imtbase/1.0/Search.sdl</file>
+        <file alias="imtbase/Settings.sdl">../../Sdl/imtbase/1.0/Settings.sdl</file>
+        <file alias="imtbase/UndoManager.sdl">../../Sdl/imtbase/1.0/UndoManager.sdl</file>
+    </qresource>
+    <qresource prefix="/AssistantKnowledge/ImtCore">
+        <file alias="Administration.md">../../Docs/Assistant/Knowledge/Administration.md</file>
+        <file alias="Permissions-Rules.en.md">../../Docs/Permissions-Rules.en.md</file>
+        <file alias="AccountLockout.md">../../Docs/Security/AccountLockout.md</file>
+        <file alias="ExternalLogin.md">../../Docs/Security/ExternalLogin.md</file>
+        <file alias="LdapGroupSynchronization.md">../../Docs/Security/LdapGroupSynchronization.md</file>
+        <file alias="PasswordPolicy.md">../../Docs/Security/PasswordPolicy.md</file>
+        <file alias="ServerTokens.md">../../Docs/Security/ServerTokens.md</file>
+        <file alias="NotificationCenter.md">../../Docs/Notifications/NotificationCenter.md</file>
+        <file alias="Contracts.ru.md">../../Docs/Organizations/Contracts.ru.md</file>
+    </qresource>
+</RCC>
