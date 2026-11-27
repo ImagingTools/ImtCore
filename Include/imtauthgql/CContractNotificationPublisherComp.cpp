@@ -43,6 +43,16 @@ QByteArrayList ToTenantIds(const QVariant& value)
 
 // reimplemented (imtgql::IGqlSubscriberController)
 
+bool CContractNotificationPublisherComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+{
+	if (gqlRequest.GetCommandId() == sdl::V1_0::imtauth::COnContractsChangedGqlRequest::GetCommandId()){
+		return true;
+	}
+
+	return BaseClass::IsRequestSupported(gqlRequest);
+}
+
+
 bool CContractNotificationPublisherComp::IsOpenFor(SubscriberKind subscriberKind, const imtgql::CGqlRequest& gqlRequest) const
 {
 	// A session hears of the contracts of its own organization only, whatever its permissions
@@ -90,6 +100,7 @@ void CContractNotificationPublisherComp::OnModelChanged(int /*modelId*/, const i
 						ToTenantIds(event.value(imtauth::TenantEvent::s_recipientTenantIds)),
 						event.value(imtauth::TenantEvent::s_userId).toByteArray(),
 						event.value(imtauth::TenantEvent::s_userName).toString());
+			PushChangeToProductServers(contractId);
 
 			continue;
 		}
@@ -138,6 +149,31 @@ void CContractNotificationPublisherComp::PushChange(const QByteArray& contractId
 			return contextPtr != nullptr && !contextPtr->GetUserId().isEmpty() && contextPtr->GetTenantId() == tenantId;
 		});
 	}
+}
+
+
+void CContractNotificationPublisherComp::PushChangeToProductServers(const QByteArray& contractId) const
+{
+	sdl::V1_0::imtauth::CContractsChangedNotification notification;
+	notification.contractId = contractId;
+
+	QJsonObject jsonObject;
+	if (!notification.WriteToJsonObject(jsonObject)){
+		Q_ASSERT(false);
+
+		return;
+	}
+
+	// The access by a contract may have changed: the servers of the products drop what they keep for their sessions.
+	// A server subscribes with its own token; without server tokens it subscribes anonymously
+	const QByteArray data = QJsonDocument(jsonObject).toJson(QJsonDocument::Compact);
+	PublishDataFiltered(sdl::V1_0::imtauth::COnContractsChangedGqlRequest::GetCommandId(), data, [](const imtgql::CGqlRequest& gqlRequest){
+		const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+
+		return contextPtr != nullptr
+					&& (contextPtr->GetPrincipalKind() == imtgql::IGqlContext::PK_SERVICE
+								|| (contextPtr->GetUserInfo() == nullptr && contextPtr->GetUserId().isEmpty()));
+	});
 }
 
 

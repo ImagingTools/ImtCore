@@ -464,6 +464,11 @@ input ContractNotificationSubscriptionInput {
 	userId: ID!
 }
 
+# A contract changed: the servers of the products drop what they computed for the access of their sessions
+type ContractsChangedNotification {
+	contractId: ID!
+}
+
 type Query {
 	GetContracts (input: ContractTenantInput): GetContractsPayload!
 	GetContract (input: ContractIdInput): GetContractPayload!
@@ -496,5 +501,6 @@ type Mutation {
 
 type Subscription {
 	OnContractNotification (input: ContractNotificationSubscriptionInput): ContractNotification!
+	OnContractsChanged: ContractsChangedNotification!
 }
 

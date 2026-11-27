@@ -22,7 +22,8 @@ namespace imtauthgql
 
 /**
 	Tells the parties about their contracts.
-	Every change goes to the sessions of the parties (OnContractNotification), so their views read the contract again.
+	Every change goes to the sessions of the parties (OnContractNotification), so their views read the contract again,
+	and to the servers of the products (OnContractsChanged), so they drop the access they keep for their sessions.
 	The events a party acts on go to the notification center of the user responsible for the contract there, or of
 	its owner (ContractNotificationPlan decides what is told and withdrawn).
 */
@@ -45,6 +46,7 @@ public:
 
 protected:
 	// reimplemented (imtgql::IGqlSubscriberController)
+	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 	virtual bool IsOpenFor(SubscriberKind subscriberKind, const imtgql::CGqlRequest& gqlRequest) const override;
 
 	// reimplemented (icomp::CComponentBase)
@@ -56,6 +58,7 @@ protected:
 
 private:
 	void PushChange(const QByteArray& contractId, const QByteArrayList& tenantIds, const QByteArray& userId, const QString& userName) const;
+	void PushChangeToProductServers(const QByteArray& contractId) const;
 	void Execute(const ContractNotificationPlan::Plan& plan, const imtauth::IContractInfo& contract) const;
 	QString FindTenantName(const QByteArray& tenantId) const;
 	QString GetPushCommandId() const;
