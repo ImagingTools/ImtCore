@@ -173,6 +173,10 @@ SUBDIRS += imtassist
 imtassist.file = ../../Include/imtassist/QMake/imtassist.pro
 imtassist.depends = imtrest
 
+SUBDIRS += imtassistdb
+imtassistdb.file = ../../Include/imtassistdb/QMake/imtassistdb.pro
+imtassistdb.depends = imtassist imtauthdb
+
 SUBDIRS += imtcrypt
 imtcrypt.file = ../../Include/imtcrypt/QMake/imtcrypt.pro
 
@@ -543,7 +547,7 @@ ImtAssistPck.depends = imtassist imtrest imtcom
 
 SUBDIRS += ImtAssistGqlPck
 ImtAssistGqlPck.file = ../../Impl/ImtAssistGqlPck/QMake/ImtAssistGqlPck.pro
-ImtAssistGqlPck.depends = imtassist imtassistgql imtservergql imtserverapp
+ImtAssistGqlPck.depends = imtassist imtassistdb imtassistgql imtservergql imtserverapp
 
 SUBDIRS += ImtChatPck
 ImtChatPck.file = ../../Impl/ImtChatPck/QMake/ImtChatPck.pro

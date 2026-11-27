@@ -8,6 +8,7 @@
 // ImtCore includes
 #include <imtassist/IAssistantService.h>
 #include <imtassist/IAssistantProvider.h>
+#include <imtassist/IAssistantTenantPolicy.h>
 #include <imtassist/IAssistantActionRegistry.h>
 #include <imtassist/IUiRepresentationRegistry.h>
 #include <imtassist/IAssistantAuditLog.h>
@@ -55,6 +56,7 @@ public:
 	bool IsEnabled() const;
 
 	void SetProvider(IAssistantProvider* providerPtr);
+	void SetTenantPolicy(const IAssistantTenantPolicy* policyPtr);
 	void SetActionRegistry(const IAssistantActionRegistry* registryPtr);
 	void SetRepresentationRegistry(const IUiRepresentationRegistry* registryPtr);
 	void SetAuditLog(IAssistantAuditLog* auditLogPtr);
@@ -66,6 +68,7 @@ public:
 	CActionPreviewStore& GetPreviewStore();
 
 	// reimplemented (imtassist::IAssistantService)
+	virtual bool IsAvailable(const CAssistantRequestContext& context) const override;
 	virtual QByteArray StartConversation(const CAssistantRequestContext& context) override;
 	virtual AssistantMessages SendUserMessage(
 				const CAssistantRequestContext& context,
@@ -79,10 +82,16 @@ public:
 
 protected:
 	/**
-		Check whether the assistant is enabled. Called with the internal lock held;
+		Check whether the assistant is enabled server-wide. Called with the internal lock held;
 		an override must not call back into the service.
 	*/
 	virtual bool IsAssistantEnabled() const;
+
+	/**
+		Check whether the assistant is enabled for the tenant: enabled server-wide
+		and allowed by the tenant policy, if one is set. Called with the internal lock held.
+	*/
+	bool IsAssistantEnabledForTenant(const QByteArray& tenantId) const;
 
 private:
 	struct Conversation
@@ -140,6 +149,7 @@ private:
 	mutable QMutex m_mutex;
 	bool m_isEnabled = false;
 	IAssistantProvider* m_providerPtr = nullptr;
+	const IAssistantTenantPolicy* m_tenantPolicyPtr = nullptr;
 	const IAssistantActionRegistry* m_actionRegistryPtr = nullptr;
 	const IUiRepresentationRegistry* m_representationRegistryPtr = nullptr;
 	IAssistantAuditLog* m_auditLogPtr = nullptr;

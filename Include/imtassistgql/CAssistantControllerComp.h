@@ -14,6 +14,8 @@ namespace imtassistgql
 	GraphQL controller of the assistant.
 
 	Commands (all take an \c input object):
+	- \c AssistantGetStatus: no fields; returns \c available, whether the assistant is enabled
+	  for the tenant of the request (used to show or hide the entry points of the assistant);
 	- \c AssistantStartConversation: no fields; returns \c conversationId and \c messagesJson;
 	- \c AssistantSendMessage: \c conversationId, \c text, optional \c contextItems
 	  (list of \c kind, \c label, \c dataJson); returns \c conversationId and \c messagesJson;
@@ -40,6 +42,7 @@ public:
 		I_ASSIGN(m_demoTenantIdAttrPtr, "DemoTenantId", "Tenant ID used for requests without an authenticated user if AllowDemoPrincipal is set", false, "demo-tenant");
 	I_END_COMPONENT;
 
+	static const QByteArray s_getStatusCommandId;
 	static const QByteArray s_startConversationCommandId;
 	static const QByteArray s_sendMessageCommandId;
 	static const QByteArray s_confirmPreviewCommandId;

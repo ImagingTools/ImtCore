@@ -102,6 +102,12 @@ public:
 		Q_INIT_RESOURCE(imtassistguiqml);
 	}
 
+	// For servers that store the assistant configuration of the tenants in a database (imtassistdb)
+	static void InitAssistantDb()
+	{
+		Q_INIT_RESOURCE(imtassistdb);
+	}
+
 	static void InitGeoQml()
 	{
 		Q_INIT_RESOURCE(imtgeoguiqml);

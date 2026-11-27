@@ -7,6 +7,8 @@ include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	imtassist
+	imtassistgql
+	imtbase
 	imtcrypt
 	Acf::itest
 	Qt${QT_VERSION_MAJOR}::Network

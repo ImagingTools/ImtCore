@@ -246,6 +246,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 	if(USE_QTDB)
 		add_subdirectory("${INCLUDE_DIR}/imtauthdb/CMake"	"${AUX_INCLUDE_DIR}/imtauthdb")
+		add_subdirectory("${INCLUDE_DIR}/imtassistdb/CMake"	"${AUX_INCLUDE_DIR}/imtassistdb")
 		add_subdirectory("${INCLUDE_DIR}/imtchat/CMake"		"${AUX_INCLUDE_DIR}/imtchat")
 		add_subdirectory("${INCLUDE_DIR}/imtchatdb/CMake"	"${AUX_INCLUDE_DIR}/imtchatdb")
 		add_subdirectory("${INCLUDE_DIR}/imtcom/CMake"		"${AUX_INCLUDE_DIR}/imtcom")
@@ -565,7 +566,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 			add_dependencies(ImtChatGqlPck imtchat imtchatsdl imtchatgql)
 
 			add_subdirectory("${IMPL_DIR}/ImtAssistGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtAssistGqlPck")
-			add_dependencies(ImtAssistGqlPck imtassist imtassistgql)
+			add_dependencies(ImtAssistGqlPck imtassist imtassistdb imtassistgql)
 
 			add_subdirectory("${IMPL_DIR}/ImtDeskGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtDeskGqlPck")
 			add_dependencies(ImtDeskGqlPck imtdb imtdesk imtdesksdl imtservergql imtdoc imtdeskgql)
@@ -663,7 +664,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 		if(USE_QTDB)
 			add_subdirectory("${TESTS_DIR}/AssistantTest/CMake" "${AUX_INCLUDE_DIR}/AssistantTest")
-			add_dependencies(AssistantTest imtassist imtrest imtcrypt)
+			add_dependencies(AssistantTest imtassist imtassistgql imtrest imtcrypt)
 		endif()
 
 		add_subdirectory("${TESTS_DIR}/UserAccountStateTest/CMake" "${AUX_INCLUDE_DIR}/UserAccountStateTest")

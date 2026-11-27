@@ -50,6 +50,21 @@ I_EXPORT_COMPONENT(
 			"Writes assistant audit events without content to the log",
 			"Assistant AI Audit Log");
 
+I_EXPORT_COMPONENT(
+			AssistantConfiguration,
+			"Assistant configuration of a tenant: provider, model, protected API key, enabling",
+			"Assistant AI Configuration Tenant");
+
+I_EXPORT_COMPONENT(
+			AssistantConfigurationStore,
+			"Assistant configurations of the tenants in an object collection, with the policy of the server; tenant policy of the assistant service",
+			"Assistant AI Configuration Store Tenant Policy");
+
+I_EXPORT_COMPONENT(
+			TenantAssistantProvider,
+			"Model provider configured per tenant in the administration",
+			"Assistant AI Provider Tenant Administration");
+
 
 } // namespace ImtAssistPck
 

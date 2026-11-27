@@ -39,6 +39,7 @@ bool IsValidContextKind(const QString& kind)
 } // namespace
 
 
+const QByteArray CAssistantControllerComp::s_getStatusCommandId = QByteArrayLiteral("AssistantGetStatus");
 const QByteArray CAssistantControllerComp::s_startConversationCommandId = QByteArrayLiteral("AssistantStartConversation");
 const QByteArray CAssistantControllerComp::s_sendMessageCommandId = QByteArrayLiteral("AssistantSendMessage");
 const QByteArray CAssistantControllerComp::s_confirmPreviewCommandId = QByteArrayLiteral("AssistantConfirmPreview");
@@ -69,6 +70,14 @@ bool CAssistantControllerComp::CreateRequestContext(const imtgql::CGqlRequest& g
 	context.SetUserId(userId);
 	context.SetTenantId(tenantId);
 	context.SetCorrelationId(QUuid::createUuid().toByteArray(QUuid::WithoutBraces));
+
+	// Actions that call the existing GraphQL API act with this context, i.e. with the rights of the user.
+	if ((gqlContextPtr != nullptr) && !gqlContextPtr->GetUserId().isEmpty()){
+		istd::IChangeableUniquePtr transportContextPtr = gqlContextPtr->CloneMe();
+		if (transportContextPtr.IsValid()){
+			context.SetTransportContext(istd::IChangeableSharedPtr(std::move(transportContextPtr)));
+		}
+	}
 
 	return context.IsValid();
 }
@@ -173,6 +182,13 @@ QJsonObject CAssistantControllerComp::CreateInternalResponse(const imtgql::CGqlR
 
 	QByteArray conversationId = input.GetParamArgumentValue("conversationId").toString().toUtf8();
 	QByteArray previewId = input.GetParamArgumentValue("previewId").toString().toUtf8();
+
+	if (commandId == s_getStatusCommandId){
+		QJsonObject retVal;
+		retVal["available"] = servicePtr->IsAvailable(context);
+
+		return retVal;
+	}
 
 	if (commandId == s_startConversationCommandId){
 		conversationId = servicePtr->StartConversation(context);

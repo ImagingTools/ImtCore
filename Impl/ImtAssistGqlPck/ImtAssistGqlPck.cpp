@@ -20,6 +20,26 @@ I_EXPORT_COMPONENT(
 			"GraphQL controller of the assistant: conversation, confirmation, cancellation",
 			"Assistant AI GraphQL Controller");
 
+I_EXPORT_COMPONENT(
+			AssistantConfigurationController,
+			"GraphQL controller of the assistant configuration of the tenant, for the administration",
+			"Assistant AI GraphQL Configuration Administration Tenant");
+
+I_EXPORT_COMPONENT(
+			AdministrationSearchAction,
+			"Assistant action: search the users, groups or roles of the organization with the rights of the user",
+			"Assistant AI Action Administration Users Groups Roles Search");
+
+I_EXPORT_COMPONENT(
+			AdministrationAddUserToGroupAction,
+			"Assistant action: add a user to a group of the organization after confirmation",
+			"Assistant AI Action Administration Group User Change");
+
+I_EXPORT_COMPONENT(
+			AssistantConfigurationDatabaseDelegate,
+			"SQL delegate of the assistant configurations of the tenants",
+			"Assistant AI Configuration Database SQL Delegate");
+
 
 } // namespace ImtAssistGqlPck
 

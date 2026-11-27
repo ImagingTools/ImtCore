@@ -39,6 +39,13 @@ class IAssistantService: virtual public istd::IPolymorphic
 {
 public:
 	/**
+		Check whether the assistant can be used by the principal of the context:
+		it is enabled for the tenant of the context.
+		Used by clients to show or hide the entry points of the assistant.
+	*/
+	virtual bool IsAvailable(const CAssistantRequestContext& context) const = 0;
+
+	/**
 		Start a new conversation for the principal of the context.
 		\return Conversation ID, or empty if the assistant is disabled or the context is invalid.
 	*/

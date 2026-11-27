@@ -7,6 +7,9 @@
 #include <QtCore/QList>
 #include <QtCore/QString>
 
+// ACF includes
+#include <istd/IChangeable.h>
+
 
 namespace imtassist
 {
@@ -67,6 +70,15 @@ public:
 	void SetContextItems(const ContextItems& items);
 
 	/**
+		Authenticated context of the transport layer, e.g. the GraphQL context of the request.
+		Opaque for the assistant core and never passed to a provider. Actions of the transport
+		layer use it to call the existing APIs of the application with the rights of the user,
+		so that the assistant can do nothing the user could not do in the application.
+	*/
+	const istd::IChangeable* GetTransportContext() const;
+	void SetTransportContext(const istd::IChangeableSharedPtr& transportContextPtr);
+
+	/**
 		A context is valid if it carries an authenticated user.
 	*/
 	bool IsValid() const;
@@ -81,6 +93,7 @@ private:
 	QByteArray m_tenantId;
 	QByteArray m_correlationId;
 	ContextItems m_contextItems;
+	istd::IChangeableSharedPtr m_transportContextPtr;
 };
 
 

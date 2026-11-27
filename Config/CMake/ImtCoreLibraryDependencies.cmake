@@ -79,8 +79,9 @@ declare_target_dependencies(imt3dgui				Acf::iqtgui imt3dview Qt${QT_VERSION_MAJ
 declare_target_dependencies(imt3dview				imt3d imt3dgui)
 declare_target_dependencies(imtaccount				imtbase Acf::iimg)
 declare_target_dependencies(imtapp					Acf::ifile)
-declare_target_dependencies(imtassist				imtrest Acf::istd Acf::icomp Acf::ilog Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Network)
-declare_target_dependencies(imtassistgql			imtassist imtservergql)
+declare_target_dependencies(imtassist				imtrest imtbase Acf::istd Acf::iser Acf::icomp Acf::ilog Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Network)
+declare_target_dependencies(imtassistdb			imtassist imtauthdb imtdb Qt${QT_VERSION_MAJOR}::Sql)
+declare_target_dependencies(imtassistgql			imtassist imtauth imtservergql)
 declare_target_dependencies(imtauth					imtdoc imtlic imtmail Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Svg)
 declare_target_dependencies(imtauthdb				imtdb imtgql Qt${QT_VERSION_MAJOR}::Sql)
 # imtnotifygql: the server registries of imtauthgql (AuthorizableServerFramework.acc, TenantController.acc) contain the notification center

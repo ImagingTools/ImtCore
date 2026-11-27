@@ -73,6 +73,18 @@ bool CAssistantRequestContext::IsSamePrincipal(const CAssistantRequestContext& o
 }
 
 
+const istd::IChangeable* CAssistantRequestContext::GetTransportContext() const
+{
+	return m_transportContextPtr.GetPtr();
+}
+
+
+void CAssistantRequestContext::SetTransportContext(const istd::IChangeableSharedPtr& transportContextPtr)
+{
+	m_transportContextPtr = transportContextPtr;
+}
+
+
 } // namespace imtassist
 
 

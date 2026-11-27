@@ -69,6 +69,14 @@ void CAssistantService::SetProvider(IAssistantProvider* providerPtr)
 }
 
 
+void CAssistantService::SetTenantPolicy(const IAssistantTenantPolicy* policyPtr)
+{
+	QMutexLocker lock(&m_mutex);
+
+	m_tenantPolicyPtr = policyPtr;
+}
+
+
 void CAssistantService::SetActionRegistry(const IAssistantActionRegistry* registryPtr)
 {
 	QMutexLocker lock(&m_mutex);
@@ -125,6 +133,18 @@ CActionPreviewStore& CAssistantService::GetPreviewStore()
 
 // reimplemented (imtassist::IAssistantService)
 
+bool CAssistantService::IsAvailable(const CAssistantRequestContext& context) const
+{
+	if (!context.IsValid()){
+		return false;
+	}
+
+	QMutexLocker lock(&m_mutex);
+
+	return IsAssistantEnabledForTenant(context.GetTenantId());
+}
+
+
 QByteArray CAssistantService::StartConversation(const CAssistantRequestContext& context)
 {
 	if (!context.IsValid()){
@@ -135,7 +155,7 @@ QByteArray CAssistantService::StartConversation(const CAssistantRequestContext& 
 
 	QMutexLocker lock(&m_mutex);
 
-	if (!IsAssistantEnabled()){
+	if (!IsAssistantEnabledForTenant(context.GetTenantId())){
 		lock.unlock();
 		Log(IAssistantAuditLog::ET_REQUEST_REJECTED, context, "AssistantDisabled");
 
@@ -202,7 +222,7 @@ AssistantMessages CAssistantService::SendUserMessage(
 
 		QByteArray rejectionCode;
 		QString rejectionText;
-		if (!IsAssistantEnabled()){
+		if (!IsAssistantEnabledForTenant(context.GetTenantId())){
 			rejectionCode = "AssistantDisabled";
 			rejectionText = "The assistant is not enabled.";
 		}
@@ -274,6 +294,7 @@ AssistantMessages CAssistantService::SendUserMessage(
 
 		IAssistantProvider::Request request;
 		request.correlationId = context.GetCorrelationId();
+		request.tenantId = context.GetTenantId();
 		request.messages = contextMessages + providerMessages;
 		request.tools = tools;
 		request.timeoutMs = timeoutMs;
@@ -298,6 +319,10 @@ AssistantMessages CAssistantService::SendUserMessage(
 		case IAssistantProvider::RS_CANCELED:
 			errorCode = "Canceled";
 			errorText = "The request was cancelled.";
+			break;
+		case IAssistantProvider::RS_NOT_CONFIGURED:
+			errorCode = "ProviderNotConfigured";
+			errorText = "No assistant provider is configured.";
 			break;
 		case IAssistantProvider::RS_INVALID_RESPONSE:
 			errorCode = "InvalidResponse";
@@ -447,7 +472,7 @@ AssistantMessages CAssistantService::ConfirmPreview(const CAssistantRequestConte
 	{
 		QMutexLocker lock(&m_mutex);
 
-		if (!IsAssistantEnabled()){
+		if (!IsAssistantEnabledForTenant(context.GetTenantId())){
 			lock.unlock();
 			Log(IAssistantAuditLog::ET_PREVIEW_CONFIRMED, context, "AssistantDisabled", QByteArray(), previewId);
 			retVal.append(CreateError(context, QByteArray(), "AssistantDisabled", "The assistant is not enabled."));
@@ -660,6 +685,16 @@ bool CAssistantService::CloseConversation(const CAssistantRequestContext& contex
 bool CAssistantService::IsAssistantEnabled() const
 {
 	return m_isEnabled;
+}
+
+
+bool CAssistantService::IsAssistantEnabledForTenant(const QByteArray& tenantId) const
+{
+	if (!IsAssistantEnabled()){
+		return false;
+	}
+
+	return (m_tenantPolicyPtr == nullptr) || m_tenantPolicyPtr->IsAssistantEnabledForTenant(tenantId);
 }
 
 

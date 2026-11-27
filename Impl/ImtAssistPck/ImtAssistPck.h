@@ -10,6 +10,9 @@
 #include <imtassist/CAssistantAuditLogComp.h>
 #include <imtassist/CHttpAssistantProviderComp.h>
 #include <imtassist/CAssistantProviderPresetListComp.h>
+#include <imtassist/CAssistantConfigurationComp.h>
+#include <imtassist/CAssistantConfigurationStoreComp.h>
+#include <imtassist/CTenantAssistantProviderComp.h>
 
 
 /**
@@ -26,6 +29,9 @@ typedef imtassist::CFakeAssistantProviderComp FakeAssistantProvider;
 typedef imtassist::CAssistantAuditLogComp AssistantAuditLog;
 typedef imtassist::CHttpAssistantProviderComp HttpAssistantProvider;
 typedef imtassist::CAssistantProviderPresetListComp AssistantProviderList;
+typedef imtassist::CAssistantConfigurationComp AssistantConfiguration;
+typedef imtassist::CAssistantConfigurationStoreComp AssistantConfigurationStore;
+typedef imtassist::CTenantAssistantProviderComp TenantAssistantProvider;
 
 
 } // namespace ImtAssistPck

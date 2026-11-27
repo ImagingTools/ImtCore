@@ -4,6 +4,10 @@
 
 // ImtCore includes
 #include <imtassistgql/CAssistantControllerComp.h>
+#include <imtassistgql/CAssistantConfigurationControllerComp.h>
+#include <imtassistgql/CAdministrationSearchActionComp.h>
+#include <imtassistgql/CAdministrationAddUserToGroupActionComp.h>
+#include <imtassistdb/CAssistantConfigurationDbDelegateComp.h>
 
 
 /**
@@ -14,6 +18,10 @@ namespace ImtAssistGqlPck
 
 
 typedef imtassistgql::CAssistantControllerComp AssistantController;
+typedef imtassistgql::CAssistantConfigurationControllerComp AssistantConfigurationController;
+typedef imtassistgql::CAdministrationSearchActionComp AdministrationSearchAction;
+typedef imtassistgql::CAdministrationAddUserToGroupActionComp AdministrationAddUserToGroupAction;
+typedef imtassistdb::CAssistantConfigurationDbDelegateComp AssistantConfigurationDatabaseDelegate;
 
 
 } // namespace ImtAssistGqlPck

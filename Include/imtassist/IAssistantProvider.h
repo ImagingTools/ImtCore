@@ -86,6 +86,13 @@ public:
 	struct Request
 	{
 		QByteArray correlationId;
+
+		/**
+			Tenant of the request, taken from the authenticated session.
+			A provider configured per tenant selects its configuration by this ID.
+		*/
+		QByteArray tenantId;
+
 		Messages messages;
 		ToolDescriptions tools;
 		int timeoutMs = 30000;
@@ -97,6 +104,11 @@ public:
 		RS_TIMEOUT,
 		RS_CANCELED,
 		RS_PROVIDER_ERROR,
+
+		/**
+			No provider is configured for the tenant of the request.
+		*/
+		RS_NOT_CONFIGURED,
 		RS_INVALID_RESPONSE
 	};
 

@@ -27,6 +27,7 @@ void CAssistantServiceComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	SetProvider(m_providerCompPtr.GetPtr());
+	SetTenantPolicy(m_tenantPolicyCompPtr.GetPtr());
 	SetActionRegistry(m_actionRegistryCompPtr.GetPtr());
 	SetRepresentationRegistry(m_representationRegistryCompPtr.GetPtr());
 	SetAuditLog(m_auditLogCompPtr.GetPtr());
@@ -56,6 +57,7 @@ void CAssistantServiceComp::OnComponentDestroyed()
 {
 	SetEnabled(false);
 	SetProvider(nullptr);
+	SetTenantPolicy(nullptr);
 	SetActionRegistry(nullptr);
 	SetRepresentationRegistry(nullptr);
 	SetAuditLog(nullptr);

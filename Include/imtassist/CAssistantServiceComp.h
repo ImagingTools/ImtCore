@@ -30,6 +30,7 @@ public:
 		I_REGISTER_INTERFACE(IAssistantService);
 		I_ASSIGN(m_isEnabledAttrPtr, "Enabled", "Enable the assistant. While disabled, no request is sent to a provider; overridden by EnabledParam", true, false);
 		I_ASSIGN(m_enabledParamCompPtr, "EnabledParam", "Setting of the server that enables the assistant; Enabled when unset", false, "EnabledParam");
+		I_ASSIGN(m_tenantPolicyCompPtr, "TenantPolicy", "Decision per tenant, e.g. the assistant configuration of the tenant; all tenants when unset", false, "TenantPolicy");
 		I_ASSIGN(m_providerCompPtr, "Provider", "Adapter to the model provider", false, "Provider");
 		I_ASSIGN(m_actionRegistryCompPtr, "ActionRegistry", "Registry of the actions available to the assistant", true, "ActionRegistry");
 		I_ASSIGN(m_representationRegistryCompPtr, "RepresentationRegistry", "Registry of the known UI representation types", false, "RepresentationRegistry");
@@ -50,6 +51,7 @@ protected:
 private:
 	I_ATTR(bool, m_isEnabledAttrPtr);
 	I_REF(iprm::IEnableableParam, m_enabledParamCompPtr);
+	I_REF(IAssistantTenantPolicy, m_tenantPolicyCompPtr);
 	I_REF(IAssistantProvider, m_providerCompPtr);
 	I_REF(IAssistantActionRegistry, m_actionRegistryCompPtr);
 	I_REF(IUiRepresentationRegistry, m_representationRegistryCompPtr);
