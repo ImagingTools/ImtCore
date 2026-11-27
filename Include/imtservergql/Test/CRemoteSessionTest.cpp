@@ -3,8 +3,11 @@
 
 
 #include <atomic>
+#include <functional>
 #include <memory>
+#include <utility>
 #include <vector>
+#include <QtCore/QEventLoop>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
@@ -61,6 +64,8 @@ public:
 	// When set, the first sign-in waits for it
 	QSemaphore* firstSignInGatePtr = nullptr;
 	mutable QSemaphore firstSignInStarted;
+	// When set, the first sign-in calls it from a nested event loop, as a synchronous request runs the queued calls of its thread
+	std::function<void()> duringFirstSignIn;
 
 	QList<SentSignIn> GetSentSignIns() const
 	{
@@ -98,6 +103,15 @@ public:
 		if (signInIndex == 0 && firstSignInGatePtr != nullptr){
 			firstSignInStarted.release();
 			firstSignInGatePtr->acquire();
+		}
+
+		if (signInIndex == 0 && duringFirstSignIn){
+			QEventLoop nestedLoop;
+			QMetaObject::invokeMethod(&nestedLoop, [this, &nestedLoop](){
+				duringFirstSignIn();
+				nestedLoop.quit();
+			}, Qt::QueuedConnection);
+			nestedLoop.exec();
 		}
 
 		QJsonObject root;
@@ -343,6 +357,68 @@ void CRemoteSessionTest::ParallelRequestsShareOneSignInTest()
 
 	QCOMPARE(fixture.client->GetSentSignIns().size(), 1);
 	QCOMPARE(tokens, QByteArrayList(requestCount, QByteArrayLiteral("token-1")));
+}
+
+
+// The requests of other threads take the outcome of the sign-in they waited for, a failure as well: they send no sign-in of their own
+void CRemoteSessionTest::ParallelRequestsShareAFailedSignInTest()
+{
+	CSessionFixture fixture({Answer::NoConnection});
+	QSemaphore firstSignInGate;
+	fixture.client->firstSignInGatePtr = &firstSignInGate;
+
+	const int requestCount = 4;
+	QMutex errorsMutex;
+	QStringList errors;
+	std::vector<std::unique_ptr<QThread>> threads;
+	threads.reserve(requestCount);
+	for (int index = 0; index < requestCount; ++index){
+		threads.emplace_back(QThread::create([&fixture, &errorsMutex, &errors](){
+			QString error;
+			const QByteArray token = fixture.RequestToken(&error);
+			QMutexLocker locker(&errorsMutex);
+			errors.append(token.isEmpty() ? error : QString());
+		}));
+	}
+
+	threads[0]->start();
+	QVERIFY(fixture.client->firstSignInStarted.tryAcquire(1, 5000));
+	for (int index = 1; index < requestCount; ++index){
+		threads[index]->start();
+	}
+
+	QTest::qWait(200);
+	firstSignInGate.release();
+
+	for (const std::unique_ptr<QThread>& threadPtr : threads){
+		QVERIFY(threadPtr->wait(5000));
+	}
+
+	QCOMPARE(fixture.client->GetSentSignIns().size(), 1);
+	QCOMPARE(errors.size(), requestCount);
+	for (const QString& error : std::as_const(errors)){
+		QVERIFY2(error.contains(QStringLiteral("Connection refused")), qPrintable(error));
+	}
+}
+
+
+// A synchronous sign-in waits in a nested event loop of its thread; a request that comes from that loop fails at once instead of blocking the thread for ever
+void CRemoteSessionTest::RequestFromInsideTheSignInFailsTest()
+{
+	CSessionFixture fixture;
+	QString nestedError;
+	QByteArray nestedToken;
+	fixture.client->duringFirstSignIn = [&fixture, &nestedError, &nestedToken](){
+		nestedToken = fixture.RequestToken(&nestedError);
+	};
+
+	QCOMPARE(fixture.RequestToken(), QByteArrayLiteral("token-1"));
+	QVERIFY(nestedToken.isEmpty());
+	QVERIFY2(nestedError.contains(QStringLiteral("in progress")), qPrintable(nestedError));
+	QCOMPARE(fixture.client->GetSentSignIns().size(), 1);
+
+	// The next request takes the token of the finished sign-in
+	QCOMPARE(fixture.RequestToken(), QByteArrayLiteral("token-1"));
 }
 
 

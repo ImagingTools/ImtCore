@@ -18,5 +18,7 @@ private slots:
 	void AnswerWithoutTokenIsARefusalTest();
 	void ConnectionFailureIsNoRefusalTest();
 	void ParallelRequestsShareOneSignInTest();
+	void ParallelRequestsShareAFailedSignInTest();
+	void RequestFromInsideTheSignInFailsTest();
 	void NewTokenIsAnnouncedInTheThreadOfTheSessionTest();
 };

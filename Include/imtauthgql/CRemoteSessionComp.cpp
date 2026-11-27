@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QCryptographicHash>
+#include <QtCore/QThread>
 
 // ImtCore includes
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
@@ -39,17 +40,9 @@ QByteArray HashCredentials(const QString& login, const QString& password)
 
 imtgql::IGqlContextSharedPtr CRemoteSessionComp::CreateRequestContext(QString& error)
 {
-	QByteArray token = GetToken(QByteArray());
+	const QByteArray token = ObtainToken(error);
 	if (token.isEmpty()){
-		// One sign-in for all the requests waiting for it: the others take its token
-		QMutexLocker signInLocker(&m_signInMutex);
-		token = GetToken(QByteArray());
-		if (token.isEmpty()){
-			token = SignIn(error);
-			if (token.isEmpty()){
-				return imtgql::IGqlContextSharedPtr();
-			}
-		}
+		return imtgql::IGqlContextSharedPtr();
 	}
 
 	imtgql::IGqlContextUniquePtr contextPtr(new imtgql::CGqlContext);
@@ -83,19 +76,85 @@ QByteArray CRemoteSessionComp::GetToken(const QByteArray& /*userId*/) const
 
 // private methods
 
-QByteArray CRemoteSessionComp::SignIn(QString& error)
+QByteArray CRemoteSessionComp::ObtainToken(QString& error)
 {
-	const QString login = m_loginParamCompPtr->GetText();
-	const QString password = m_passwordParamCompPtr->GetText();
-	const QByteArray credentialsHash = HashCredentials(login, password);
-	{
-		QMutexLocker stateLocker(&m_stateMutex);
-		if (credentialsHash == m_refusedCredentialsHash){
-			error = m_refusalMessage;
+	QMutexLocker stateLocker(&m_stateMutex);
+
+	while (m_token.isEmpty()){
+		if (m_signInThreadPtr == nullptr){
+			return SignIn(stateLocker, error);
+		}
+
+		// A synchronous request waits for its answer in a nested event loop that runs the queued calls of its thread,
+		// so this call may come from inside that sign-in: waiting here would block the sign-in for ever
+		if (m_signInThreadPtr == QThread::currentThread()){
+			error = QStringLiteral("The sign-in to the remote server is in progress");
+
+			return QByteArray();
+		}
+
+		// Another thread signs in: this request takes the outcome of that sign-in
+		const quint64 awaitedSignIn = m_finishedSignInCount;
+		while (m_finishedSignInCount == awaitedSignIn){
+			m_signInFinished.wait(&m_stateMutex);
+		}
+
+		if (m_token.isEmpty() && !m_lastSignInError.isEmpty()){
+			error = m_lastSignInError;
 
 			return QByteArray();
 		}
 	}
+
+	return m_token;
+}
+
+
+QByteArray CRemoteSessionComp::SignIn(QMutexLocker<QMutex>& stateLocker, QString& error)
+{
+	const QString login = m_loginParamCompPtr->GetText();
+	const QString password = m_passwordParamCompPtr->GetText();
+	const QByteArray credentialsHash = HashCredentials(login, password);
+	if (credentialsHash == m_refusedCredentialsHash){
+		error = m_refusalMessage;
+
+		return QByteArray();
+	}
+
+	m_signInThreadPtr = QThread::currentThread();
+
+	// No lock is held across the request (see ObtainToken)
+	stateLocker.unlock();
+	bool isRefused = false;
+	QByteArray token = RequestToken(login, password, isRefused, error);
+	stateLocker.relock();
+
+	m_signInThreadPtr = nullptr;
+	++m_finishedSignInCount;
+	m_lastSignInError = token.isEmpty() ? error : QString();
+	m_signInFinished.wakeAll();
+
+	if (token.isEmpty()){
+		if (isRefused){
+			m_refusedCredentialsHash = credentialsHash;
+			m_refusalMessage = error;
+		}
+
+		return QByteArray();
+	}
+
+	m_token = token;
+	m_refusedCredentialsHash.clear();
+	m_refusalMessage.clear();
+	AnnounceTokenChange();
+
+	return token;
+}
+
+
+QByteArray CRemoteSessionComp::RequestToken(const QString& login, const QString& password, bool& isRefused, QString& error) const
+{
+	isRefused = false;
 
 	namespace authsdl = sdl::V1_0::imtauth;
 
@@ -146,17 +205,7 @@ QByteArray CRemoteSessionComp::SignIn(QString& error)
 	if (result){
 		const authsdl::CAuthorizationPayload& payload = result.model;
 		if (payload.token && !payload.token->isEmpty()){
-			const QByteArray token = *payload.token;
-			{
-				QMutexLocker stateLocker(&m_stateMutex);
-				m_token = token;
-				m_refusedCredentialsHash.clear();
-				m_refusalMessage.clear();
-			}
-
-			AnnounceTokenChange();
-
-			return token;
+			return *payload.token;
 		}
 
 		// An answer without a token: the account cannot be used as it is
@@ -185,10 +234,7 @@ QByteArray CRemoteSessionComp::SignIn(QString& error)
 	error = QStringLiteral("The remote server refused the sign-in of '%1': %2. "
 				"It is not tried again until the login or the password changes").arg(login, refusalReason);
 	SendErrorMessage(0, error, "CRemoteSessionComp");
-
-	QMutexLocker stateLocker(&m_stateMutex);
-	m_refusedCredentialsHash = credentialsHash;
-	m_refusalMessage = error;
+	isRefused = true;
 
 	return QByteArray();
 }
