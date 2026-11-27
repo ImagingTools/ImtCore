@@ -1,18 +1,22 @@
 import QtQuick
+import Acf 1.0
 
 Rectangle {
 	id: splash
 
-	implicitWidth: 480
+	implicitWidth: Math.max(480, titleText.implicitWidth + 48)
 	implicitHeight: 270
-	color: "#2b2b2b"
+	color: Style.backgroundColor
 
 	Text {
+		id: titleText
+
 		width: splash.width
 		y: 85 - height / 2
 		horizontalAlignment: Text.AlignHCenter
-		color: "white"
-		font.pixelSize: 24
+		color: Style.textColor
+		font.family: Style.fontFamily
+		font.pixelSize: Style.fontSizeXXL
 		text: Qt.application.name
 	}
 
@@ -20,8 +24,9 @@ Rectangle {
 		width: splash.width
 		y: 175 - height / 2
 		horizontalAlignment: Text.AlignHCenter
-		color: "#bbbbbb"
-		font.pixelSize: 13
+		color: Style.inactiveTextColor
+		font.family: Style.fontFamily
+		font.pixelSize: Style.fontSizeM
 		text: "Initializing..."
 	}
 
@@ -48,7 +53,7 @@ Rectangle {
 				width: 3
 				height: 3
 				radius: 1.5
-				color: "white"
+				color: Style.textColor
 				opacity: (index + 1) / 12
 				x: spinner.width / 2 - 1.5 + 10.5 * Math.sin(index * Math.PI / 6)
 				y: spinner.height / 2 - 1.5 - 10.5 * Math.cos(index * Math.PI / 6)

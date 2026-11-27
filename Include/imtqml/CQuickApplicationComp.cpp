@@ -104,7 +104,10 @@ int CQuickApplicationComp::Execute(int argc, char** argv)
 				if (splashItemPtr == nullptr){
 					QQmlComponent defaultSplashComponent(engine.GetPtr(), QUrl("qrc:/imtqml/DefaultSplashScreen.qml"));
 					splashItemPtr = qobject_cast<QQuickItem*>(defaultSplashComponent.create());
-					if (splashItemPtr != nullptr){
+					if (splashItemPtr == nullptr){
+						qWarning() << "Unable to create the default splash item:" << defaultSplashComponent.errors();
+					}
+					else{
 						splashItemPtr->setParent(hostWindowPtr);
 						splashItemPtr->setParentItem(hostWindowPtr->contentItem());
 					}
