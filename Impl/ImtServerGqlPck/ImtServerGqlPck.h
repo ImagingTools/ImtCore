@@ -49,6 +49,7 @@
 #include <imtservergql/CSimpleGqlContextCreatorComp.h>
 #include <imtservergql/CFilterableSelectControllerComp.h>
 #include <imtservergql/CFileSystemControllerComp.h>
+#include <imtservergql/CFileSystemPublisherComp.h>
 #include <imtservergql/CUserGroupParamsSetJoinerComp.h>
 
 
@@ -101,6 +102,7 @@ typedef imtservergql::CSimpleGqlContextCreatorComp SimpleGqlContextCreator;
 typedef imtservergql::CFilterableSelectControllerComp FilterableSelectController;
 typedef imtservergql::CUserGroupParamsSetJoinerComp UserGroupParamsSetJoiner;
 typedef imtservergql::CFileSystemControllerComp FileSystemController;
+typedef imtservergql::CFileSystemPublisherComp FileSystemPublisher;
 
 
 } // namespace ImtServerGqlPck

@@ -2,6 +2,7 @@ schema {
 	namespace: imtbase
 	version: 1.0
 	query: Query
+	subscription: Subscription
 }
 
 enum FileSystemEntryType {
@@ -94,7 +95,25 @@ type GetDownloadLinkPayload
 	link: DownloadLink
 }
 
+input FileSystemSubscriptionInput
+{
+	# Path of a folder as GetFileSystemEntries returns it; empty for the root.
+	path: String
+}
+
+# The content of the watched folder or the folder itself changed: the subscriber reads the folder again.
+# The event carries no content, and events are not kept: after a reconnection the subscriber reads the folder again too.
+type FileSystemChangedEvent
+{
+	# The path of the subscription.
+	path: String!
+}
+
 type Query {
 	GetFileSystemEntries(input: GetFileSystemEntriesInput): GetFileSystemEntriesPayload!
 	GetDownloadLink(input: GetDownloadLinkInput): GetDownloadLinkPayload!
+}
+
+type Subscription {
+	OnFileSystemChanged(input: FileSystemSubscriptionInput): FileSystemChangedEvent!
 }
