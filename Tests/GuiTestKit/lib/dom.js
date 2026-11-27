@@ -10,7 +10,7 @@
 // On JQML v4 there is no DOM: locate() hands out a locator that runs the same selectors through window.qmlTest
 // (see qml.js), so the functions below work on both.
 
-const { locate, isQml, callQmlTest } = require('./qml');
+const { locate, isQml, callQmlTest, qmlSelector } = require('./qml');
 
 const OBJ = (name) => `[objectName="${cssEscape(name)}"]`;
 
@@ -283,7 +283,7 @@ function columnLayoutQml(ids) {
       const table = t.closest(group.rows[0].id, '"Table"');
       const cells = {};
       for (const id of ids) {
-        cells[id] = group.rows.map((row) => t.find(row.id, `${JSON.stringify(id)}:visible`)[0]).filter(Boolean).map(edges);
+        cells[id] = group.rows.map((row) => t.find(row.id, '*:visible').find((handle) => handle.objectName === id)).filter(Boolean).map(edges);
       }
       return {
         scope,
@@ -369,4 +369,5 @@ module.exports = {
   locate,
   isQml,
   callQmlTest,
+  qmlSelector,
 };

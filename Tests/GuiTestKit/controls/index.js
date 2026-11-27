@@ -300,7 +300,7 @@ class Table {
   async columnValues(headerId) {
     const prefix = this.scope.length ? `${gui.dom.selectorForPath(this.scope)} ` : '';
     if (await gui.dom.isQml(this.page)) {
-      return gui.dom.locate(this.page, `${prefix}[objectName^="TableRow_"][visible]`).run('cellTexts', { cell: JSON.stringify(headerId) });
+      return gui.dom.locate(this.page, `${prefix}[objectName^="TableRow_"][visible]`).run('cellTexts', { cell: headerId });
     }
     return this.page.evaluate(
       ({ prefix, headerId }) =>
