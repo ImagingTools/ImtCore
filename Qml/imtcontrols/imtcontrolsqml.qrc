@@ -18,6 +18,7 @@
                 <file alias="imtcontrols/Base/LinearAlgebra.qml">Base/LinearAlgebra.qml</file>
                 <file alias="imtcontrols/Base/RelativePosition.qml">Base/RelativePosition.qml</file>
                 <file alias="imtcontrols/Base/ButtonType.js">Base/ButtonType.js</file>
+                <file alias="imtcontrols/Base/FileNameTools.js">Base/FileNameTools.js</file>
                 <file alias="imtcontrols/Base/IconTest.qml">Base/IconTest.qml</file>
                 <file alias="imtcontrols/Base/IconProperties.qml">Base/IconProperties.qml</file>
                 <file alias="imtcontrols/Base/FontProperties.qml">Base/FontProperties.qml</file>
