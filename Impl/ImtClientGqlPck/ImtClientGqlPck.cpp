@@ -116,6 +116,11 @@ I_EXPORT_COMPONENT(
 			"Remote File System Structure Provider Folder Browser");
 
 I_EXPORT_COMPONENT(
+			RemoteFileSystemChangeNotifier,
+			"Changes of the folders of a remote file system through its subscription OnFileSystemChanged",
+			"Remote File System Change Notifier Subscription Folder");
+
+I_EXPORT_COMPONENT(
 			RemoteFilterableSelectController,
 			"Remote filterable select controller",
 			"Remote Filterable Select Controller");

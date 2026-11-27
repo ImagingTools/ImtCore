@@ -80,6 +80,9 @@ public:
 	virtual QByteArray RegisterSubscription(
 			const imtgql::IGqlRequest& subscriptionRequest,
 			imtclientgql::IGqlSubscriptionClient& subscriptionClient) override;
+	/**
+		With a 'SubscriptionSender', the last client of a subscription ends it at the server as well (a "stop" message).
+	*/
 	virtual bool UnregisterSubscription(
 			const QByteArray& subscriptionId,
 			const imtclientgql::IGqlSubscriptionClient& subscriptionClient) override;
