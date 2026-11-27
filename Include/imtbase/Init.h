@@ -100,6 +100,12 @@ public:
 		Q_INIT_RESOURCE(imtgeoguiqml);
 	}
 
+	// Must be called from the application main() when the application uses imtqml::CQuickApplicationComp
+	static void InitQuickApplication()
+	{
+		Q_INIT_RESOURCE(imtqml);
+	}
+
 	static void InitTheme()
 	{
 		Q_INIT_RESOURCE(imtguiTheme);

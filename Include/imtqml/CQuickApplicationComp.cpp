@@ -18,13 +18,6 @@ void qt_mac_set_menubar_icons(bool enable);
 #endif
 
 
-// Resources of a static library must be registered explicitly; the call has to be made in the global namespace
-static void InitQmlResources()
-{
-	Q_INIT_RESOURCE(imtqml);
-}
-
-
 namespace imtqml
 {
 
@@ -81,8 +74,6 @@ bool CQuickApplicationComp::InitializeApplication(int argc, char** argv)
 int CQuickApplicationComp::Execute(int argc, char** argv)
 {
 	int retVal = -1;
-
-	InitQmlResources();
 
 	if (BaseClass::InitializeApplication(argc, argv)){
 		m_runtimeStatus.SetRuntimeStatus(ibase::IRuntimeStatusProvider::RS_STARTING);
