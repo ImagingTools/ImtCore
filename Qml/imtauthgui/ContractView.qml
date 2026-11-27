@@ -61,6 +61,7 @@ ViewBase {
 	property bool __replacesEdits: false
 	// The user whose change was read last
 	property string lastChangedBy: ""
+	property bool __changeNoticePending: false
 
 	// A command runs: the steps wait for its answer
 	readonly property bool isBusy: contractView.__busy
@@ -81,6 +82,7 @@ ViewBase {
 	readonly property bool canSign: contractView.__can("canSignContracts")
 	readonly property bool canGive: contractView.__can("canGiveContractPermissions")
 	readonly property bool canDistribute: contractView.__can("canDistributeContractPermissions")
+	readonly property string responsibleUserId: contractView.privateInfo ? (contractView.privateInfo.responsibleUserId || "") : ""
 
 	readonly property bool isEditable: contractView.canEdit && contractView.isInitiator && !contractView.isClosed
 	// Another user changed the terms while this one edits them: the edits cannot be saved
@@ -93,6 +95,13 @@ ViewBase {
 
 	function __can(flag) {
 		return contractView.stateManager ? contractView.stateManager[flag] === true : false
+	}
+
+	function setResponsibleUser(userId) {
+		if (!contractView.privateInfo || !contractView.canEdit || contractView.__busy || userId === contractView.responsibleUserId)
+			return
+		contractView.__busy = true
+		contractView.contractsApiClient.setPrivateInfo(contractView.tenantId, contractView.__currentId, {"responsibleUserId": userId})
 	}
 
 	// The party of the stored contract
@@ -368,8 +377,24 @@ ViewBase {
 	function __load() {
 		if (!contractView.contractsApiClient || contractView.isNew)
 			return
-		contractView.contractsApiClient.fetchContract(contractView.tenantId, contractView.__currentId)
-		contractView.contractsApiClient.fetchEvents(contractView.tenantId, contractView.__currentId)
+		reloadTimer.restart()
+	}
+
+	Timer {
+		id: reloadTimer
+		interval: 50
+		repeat: false
+
+		onTriggered: {
+			if (!contractView.contractsApiClient || contractView.isNew || contractView.isBusy)
+				return
+			if (contractView.__changeNoticePending) {
+				contractView.__changeNoticePending = false
+				PopupManager.addInfoMessage(qsTr("%1 changed the contract").arg(contractView.lastChangedBy), true)
+			}
+			contractView.contractsApiClient.fetchContract(contractView.tenantId, contractView.__currentId)
+			contractView.contractsApiClient.fetchEvents(contractView.tenantId, contractView.__currentId)
+		}
 	}
 
 	// --- The working copy ---
@@ -885,6 +910,8 @@ ViewBase {
 			return qsTr("The party was added")
 		if (command === "SetContractAllocationGroups")
 			return qsTr("The groups were saved")
+		if (command === "SetContractPrivateInfo")
+			return qsTr("The responsible person was saved")
 		if (command === "GiveContractPermissions")
 			return qsTr("The permissions were given")
 		if (command === "WithdrawContractPermissions")
@@ -945,12 +972,13 @@ ViewBase {
 		}
 
 		function onContractNotified(contractId, tenantId, sourceUserId, sourceUserName) {
-			if (contractView.__busy || contractView.isNew || (contractId !== "" && contractId !== contractView.__currentId))
+			if (contractView.__busy || contractView.isNew || (contractId !== "" && contractId !== contractView.__currentId)
+					|| (tenantId !== "" && tenantId !== contractView.tenantId))
 				return
 			// Another user changed it: the user is told who
 			if (sourceUserId !== "" && sourceUserId !== AuthorizationController.getUserId()) {
 				contractView.lastChangedBy = sourceUserName !== "" ? sourceUserName : qsTr("Another user")
-				PopupManager.addInfoMessage(qsTr("%1 changed the contract").arg(contractView.lastChangedBy), true)
+				contractView.__changeNoticePending = true
 			}
 			contractView.__load()
 		}
@@ -1082,6 +1110,7 @@ ViewBase {
 				return
 			multiPageView.addPageOnce("Permissions", qsTr("Permissions"), permissionsPageComp, "Icons/Key")
 			multiPageView.addPageOnce("Documents", qsTr("Documents"), documentsPageComp, "Icons/Attachment")
+			multiPageView.addPageOnce("Responsible", qsTr("Responsible"), responsiblePageComp, "Icons/Assignment")
 			multiPageView.addPageOnce("Journal", qsTr("Journal"), journalPageComp, "Icons/History")
 		}
 
@@ -1196,6 +1225,69 @@ ViewBase {
 
 		ContractDocumentsPage {
 			editor: contractView
+		}
+	}
+
+	Component {
+		id: responsiblePageComp
+
+		Column {
+			id: responsiblePage
+
+			anchors.left: parent.left
+			anchors.right: parent.right
+			anchors.margins: Style.marginXL
+			anchors.top: parent.top
+			spacing: Style.marginL
+
+			readonly property string ownerChoice: "owner"
+			readonly property var members: contractView.stateManager ? contractView.stateManager.pendingMembers : []
+			readonly property string selectedUserId: membersModel.idAt(responsibleInput.currentIndex)
+			readonly property bool canAssign: contractView.canEdit && contractView.privateInfo !== null && !contractView.isBusy
+
+			Component.onCompleted: responsiblePage.fill()
+			onMembersChanged: responsiblePage.fill()
+
+			Connections {
+				target: contractView
+
+				function onResponsibleUserIdChanged() {
+					responsiblePage.fill()
+				}
+			}
+
+			function fill() {
+				var choices = [{"id": responsiblePage.ownerChoice, "name": qsTr("Organization owner (default)")}].concat(responsiblePage.members)
+				var assignedId = contractView.responsibleUserId
+				var selectedId = assignedId || responsiblePage.ownerChoice
+				responsibleInput.currentIndex = membersModel.fill(choices, "id", "name", selectedId)
+			}
+
+			ChoiceModel {
+				id: membersModel
+			}
+
+			BaseText {
+				width: parent.width
+				wrapMode: Text.WordWrap
+				text: qsTr("Contract notifications for this organization go to the responsible person. If nobody is assigned, the organization owner receives them.")
+			}
+
+			ComboBoxElementView {
+				id: responsibleInput
+				width: Math.min(responsiblePage.width, Style.sizeHintL)
+				name: qsTr("Responsible person")
+				enabled: responsiblePage.canAssign
+				model: membersModel
+			}
+
+			Button {
+				text: qsTr("Save responsible person")
+				visible: contractView.canEdit
+				enabled: responsiblePage.canAssign && responsiblePage.selectedUserId !== ""
+					&& responsiblePage.selectedUserId !== (contractView.responsibleUserId || responsiblePage.ownerChoice)
+				onClicked: contractView.setResponsibleUser(responsiblePage.selectedUserId === responsiblePage.ownerChoice ? "" : responsiblePage.selectedUserId)
+			}
 		}
 	}
 

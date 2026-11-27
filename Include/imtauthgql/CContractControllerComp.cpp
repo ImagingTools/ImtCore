@@ -690,21 +690,8 @@ sdlauth::CContractCommandPayload CContractControllerComp::OnSetContractPrivateIn
 	const QByteArray contractId = input.contractId.value_or(QByteArray());
 
 	return RunCommand(gqlRequest, input.tenantId.value_or(QByteArray()), contractId, s_editContractsPermission, [&](const imtauth::ContractActor& actor, QString& error){
-		imtauth::IContractPartyPrivateInfoUniquePtr privateInfoPtr = m_privateInfoFactoryCompPtr.CreateInstance();
-		if (!privateInfoPtr.IsValid()){
-			error = QStringLiteral("The records could not be created");
-
-			return false;
-		}
-
-		privateInfoPtr->SetContractId(contractId);
-		privateInfoPtr->SetTenantId(actor.tenantId);
-		privateInfoPtr->SetInternalNumber(input.internalNumber.value_or(QString()));
-		privateInfoPtr->SetResponsibleUserId(input.responsibleUserId.value_or(QByteArray()));
-		privateInfoPtr->SetNotes(input.notes.value_or(QString()));
-		privateInfoPtr->SetReminderDays(input.reminderDays.value_or(0));
-
-		return m_contractManagerCompPtr->SetPrivateInfo(actor, *privateInfoPtr, error);
+		const imtauth::ContractPrivateInfoUpdate update{input.internalNumber, input.responsibleUserId, input.notes, input.reminderDays};
+		return m_contractManagerCompPtr->SetPrivateInfo(actor, contractId, update, error);
 	});
 }
 

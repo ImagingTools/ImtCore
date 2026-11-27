@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import QtTest 1.12
 import imtauthgui 1.0
+import imtqmltest 1.0
 
 TestCase {
 	id: testCase
@@ -26,6 +27,8 @@ TestCase {
 			property string lastCommand: ""
 			property int lastRevision: -1
 			property int contractReads: 0
+			property int eventReads: 0
+			property var privateWrites: []
 
 			signal contractsReceived()
 			signal contractReceived(string contractId)
@@ -42,7 +45,8 @@ TestCase {
 			function fetchContractTypes(tenantId, includeArchived){}
 			function fetchPartyCandidates(tenantId){}
 			function fetchContract(tenantId, contractId){ contractReads++ }
-			function fetchEvents(tenantId, contractId){}
+			function fetchEvents(tenantId, contractId){ eventReads++ }
+			function setPrivateInfo(tenantId, contractId, info){ privateWrites.push(info) }
 			function createContract(tenantId, draft){ lastCommand = "CreateContract"; lastDraft = draft }
 			function updateContract(tenantId, contractId, revision, draft){ lastCommand = "UpdateContract"; lastDraft = draft; lastRevision = revision }
 			function runCommand(command, tenantId, contractId, revision, comment){ lastCommand = command }
@@ -58,6 +62,7 @@ TestCase {
 			property bool canSignContracts: true
 			property bool canGiveContractPermissions: true
 			property bool canDistributeContractPermissions: true
+			property var pendingMembers: []
 		}
 	}
 
@@ -151,7 +156,7 @@ TestCase {
 	function test_anInvitedPartyDoesNotEditTheTerms(){
 		let client = createTemporaryObject(contractsClientComp, testCase)
 		let view = createView(client, "c1")
-		compare(client.contractReads, 1)
+		tryCompare(client, "contractReads", 1)
 
 		client.contract = {"id": "c1", "name": "Supply", "initiatorTenantId": "other", "state": "Negotiation", "revision": 3,
 			"submittedAt": "2027-01-01T00:00:00Z",
@@ -185,6 +190,7 @@ TestCase {
 		client.contract = testCase.editableContract(revision)
 		client.contractReceived("c1")
 		wait(50)
+		tryCompare(client, "contractReads", 1)
 		verify(view.isEditable)
 		verify(!view.isDirty, "A loaded contract has no changes")
 		return view
@@ -213,7 +219,10 @@ TestCase {
 		tryCompare(view, "isDirty", true)
 
 		client.contractNotified("c1", "me", "u2", "Ann")
-		compare(client.contractReads, 2, "A change of the contract is read again")
+		client.contractNotified("c1", "me", "u2", "Ann")
+		client.contractNotified("c1", "me", "u2", "Ann")
+		tryCompare(client, "contractReads", 2)
+		compare(client.eventReads, 2)
 		let approved = testCase.editableContract(3)
 		approved.parties[1].state = "Approved"
 		client.contract = approved
@@ -223,6 +232,29 @@ TestCase {
 		compare(view.parties.length, 3, "The edits stay")
 		verify(!view.hasConflict)
 		verify(view.canSave)
+	}
+
+	function test_otherOrganizationsDoNotReloadTheCard(){
+		let client = createTemporaryObject(contractsClientComp, testCase)
+		testCase.loadEditable(client, 3)
+
+		client.contractNotified("c1", "other", "u2", "Ann")
+		wait(100)
+		compare(client.contractReads, 1)
+		compare(client.eventReads, 1)
+	}
+
+	function test_assigningResponsibilitySendsOnlyTheUser(){
+		let client = createTemporaryObject(contractsClientComp, testCase)
+		client.privateInfo = {"responsibleUserId": "", "internalNumber": "42", "notes": "Internal", "reminderDays": 5}
+		let view = testCase.loadEditable(client, 3)
+
+		view.setResponsibleUser("")
+		compare(client.privateWrites.length, 0)
+		view.setResponsibleUser("member")
+		view.setResponsibleUser("member")
+		compare(client.privateWrites.length, 1)
+		compare(client.privateWrites[0], {"responsibleUserId": "member"})
 	}
 
 	// The terms changed under the edits: they cannot be saved until the contract is reloaded
@@ -292,5 +324,27 @@ TestCase {
 	function test_theGqlClientCompiles(){
 		let component = Qt.createComponent("qrc:/qml/imtguigql/GqlBasedContractsApiClient.qml")
 		compare(component.status, Component.Ready, component.errorString())
+	}
+
+	function test_privateInfoMutationSendsOnlySuppliedFields(){
+		let component = Qt.createComponent("qrc:/qml/imtguigql/GqlBasedContractsApiClient.qml")
+		compare(component.status, Component.Ready, component.errorString())
+		let client = createTemporaryObject(component, testCase)
+		verify(client !== null)
+		GqlTestTransport.reset()
+		GqlTestTransport.responseBody = '{"data":{"SetContractPrivateInfo":{"success":true,"contractId":"c1"}}}'
+
+		client.setPrivateInfo("me", "c1", {"responsibleUserId": "member"})
+		tryCompare(GqlTestTransport, "requestCount", 1)
+		let query = JSON.parse(GqlTestTransport.lastRequestBody).query
+		verify(/responsibleUserId:\s*"member"/.test(query), query)
+		verify(!/internalNumber|notes|reminderDays/.test(query), query)
+
+		client.setPrivateInfo("me", "c1", {"notes": "", "reminderDays": 0})
+		tryCompare(GqlTestTransport, "requestCount", 2)
+		query = JSON.parse(GqlTestTransport.lastRequestBody).query
+		verify(/notes:\s*""/.test(query), query)
+		verify(/reminderDays:\s*0/.test(query), query)
+		verify(!/responsibleUserId|internalNumber/.test(query), query)
 	}
 }

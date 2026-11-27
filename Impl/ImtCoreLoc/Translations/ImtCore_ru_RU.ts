@@ -6336,18 +6336,6 @@
         <translation>Приглашение в контракт</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+30"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbTest/CDatabaseEnginesTest.cpp" line="+40"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtSdlGenQmlTest/CImtSdlGenQmlTest.cpp" line="-46"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtSdlGenTest/CImtSdlGenTest.cpp" line="-50"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-100"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-68"/>
-        <source>Your organization received permissions by the contract &quot;{subject}&quot;</source>
-        <translation>Ваша организация получила права по контракту «{subject}»</translation>
-    </message>
-    <message>
         <location line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
@@ -6384,30 +6372,6 @@
         <translation>Контракт на подпись</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+50"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-30"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbTest/CDatabaseEnginesTest.cpp" line="-14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtSdlGenQmlTest/CImtSdlGenQmlTest.cpp" line="-48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtSdlGenTest/CImtSdlGenTest.cpp" line="+18"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-38"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-36"/>
-        <source>A date of the contract &quot;{subject}&quot; is coming</source>
-        <translation>Приближается срок по контракту «{subject}»</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbTest/CDatabaseEnginesTest.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtSdlGenQmlTest/CImtSdlGenQmlTest.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtSdlGenTest/CImtSdlGenTest.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
-        <source>Contract reminder</source>
-        <translation>Напоминание по контракту</translation>
-    </message>
-    <message>
         <location line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-36"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
@@ -6430,18 +6394,6 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Contract cancelled</source>
         <translation>Контракт отозван</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+106"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-36"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbTest/CDatabaseEnginesTest.cpp" line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtSdlGenQmlTest/CImtSdlGenQmlTest.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtSdlGenTest/CImtSdlGenTest.cpp" line="+40"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+20"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-62"/>
-        <source>&quot;{partner}&quot; signed the contract &quot;{subject}&quot;</source>
-        <translation>«{partner}» подписал(а) контракт «{subject}»</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -7579,6 +7531,30 @@
     <message>
         <source>Contract renewal stopped</source>
         <translation>Продление контракта остановлено</translation>
+    </message>
+    <message>
+        <source>{count, plural, =1 {&quot;{partner}&quot; signed the contract &quot;{subject}&quot;} other {# parties signed the contract &quot;{subject}&quot;, the latest &quot;{partner}&quot;}}</source>
+        <translation>{count, plural, =1 {«{partner}» подписал(а) контракт «{subject}»} one {# сторона подписала контракт «{subject}», последней — «{partner}»} few {# стороны подписали контракт «{subject}», последней — «{partner}»} many {# сторон подписали контракт «{subject}», последней — «{partner}»} other {# стороны подписали контракт «{subject}», последней — «{partner}»}}</translation>
+    </message>
+    <message>
+        <source>&quot;{partner}&quot; gave your organization permissions by the contract &quot;{subject}&quot;</source>
+        <translation>«{partner}» выдал(а) вашей организации права по контракту «{subject}»</translation>
+    </message>
+    <message>
+        <source>The contract &quot;{subject}&quot; ends on {date}</source>
+        <translation>Контракт «{subject}» заканчивается {date}</translation>
+    </message>
+    <message>
+        <source>Contract ends soon</source>
+        <translation>Контракт скоро заканчивается</translation>
+    </message>
+    <message>
+        <source>Until {date} you can refuse the renewal of the contract &quot;{subject}&quot;</source>
+        <translation>До {date} можно отказаться от продления контракта «{subject}»</translation>
+    </message>
+    <message>
+        <source>Contract renewal deadline</source>
+        <translation>Срок отказа от продления контракта</translation>
     </message>
 </context>
 <context>
@@ -12386,6 +12362,30 @@
 </context>
 <context>
     <name>ContractView</name>
+    <message>
+        <source>Responsible</source>
+        <translation>Ответственный</translation>
+    </message>
+    <message>
+        <source>Organization owner (default)</source>
+        <translation>Владелец организации (по умолчанию)</translation>
+    </message>
+    <message>
+        <source>Contract notifications for this organization go to the responsible person. If nobody is assigned, the organization owner receives them.</source>
+        <translation>Уведомления по контракту для этой организации получает ответственный. Если он не назначен, уведомления получает владелец организации.</translation>
+    </message>
+    <message>
+        <source>Responsible person</source>
+        <translation>Ответственный за контракт</translation>
+    </message>
+    <message>
+        <source>Save responsible person</source>
+        <translation>Сохранить ответственного</translation>
+    </message>
+    <message>
+        <source>The responsible person was saved</source>
+        <translation>Ответственный сохранён</translation>
+    </message>
     <message>
         <source>Relationship and counterparty tenant are required.</source>
         <translation type="vanished">Необходимо указать связь и организацию-контрагента.</translation>

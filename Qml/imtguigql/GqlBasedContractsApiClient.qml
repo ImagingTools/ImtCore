@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 import QtQuick 2.12
+import com.imtcore.imtqml 1.0
 import imtauthContractsSdl 1.0
 import imtauthContractCatalogsSdl 1.0
 import imtauthTenantDirectorySdl 1.0
@@ -99,9 +100,19 @@ ContractsApiClient {
 	}
 
 	function setPrivateInfo(tenantId, contractId, info) {
-		root.__enqueue(ImtauthContractsSdlCommandIds.s_setContractPrivateInfo, "contract", root.__privateInfoInputComp,
-					   {"tenantId": tenantId, "contractId": contractId, "internalNumber": info.internalNumber || "",
-						"responsibleUserId": info.responsibleUserId || "", "notes": info.notes || "", "reminderDays": info.reminderDays || 0})
+		// Use explicit parameters so the generated SDL defaults do not overwrite omitted fields.
+		var params = Gql.GqlObject("input")
+		params.InsertField("tenantId", tenantId)
+		params.InsertField("contractId", contractId)
+		if (info.internalNumber !== undefined)
+			params.InsertField("internalNumber", info.internalNumber)
+		if (info.responsibleUserId !== undefined)
+			params.InsertField("responsibleUserId", info.responsibleUserId)
+		if (info.notes !== undefined)
+			params.InsertField("notes", info.notes)
+		if (info.reminderDays !== undefined)
+			params.InsertField("reminderDays", info.reminderDays)
+		root.__queueCommand({"command": ImtauthContractsSdlCommandIds.s_setContractPrivateInfo, "kind": "contract", "params": params})
 	}
 
 	function setAllocationGroups(tenantId, contractId, allocationId, groupIds) {
@@ -186,7 +197,11 @@ ContractsApiClient {
 	property string __pendingEventsContractId: ""
 
 	function __enqueue(command, kind, inputComp, values) {
-		root.__queue.push({"command": command, "kind": kind, "input": root.__createInput(inputComp, values)})
+		root.__queueCommand({"command": command, "kind": kind, "input": root.__createInput(inputComp, values)})
+	}
+
+	function __queueCommand(request) {
+		root.__queue.push(request)
 		if (root.__runningCommand === "")
 			root.__sendNextCommand()
 	}
@@ -203,8 +218,14 @@ ContractsApiClient {
 		root.__lastCommandError = ""
 		root.__commandRequest.gqlCommandId = next.command
 		// A request that cannot be sent fails through onError
-		root.__commandRequest.send(next.input)
-		next.input.destroy()
+		if (next.input) {
+			root.__commandRequest.send(next.input)
+			next.input.destroy()
+		}
+		else {
+			root.__commandRequest.inputParams = next.params
+			root.__commandRequest.send()
+		}
 	}
 
 	function __finishCommand(success, itemId, revision, errorMessage) {
@@ -436,7 +457,6 @@ ContractsApiClient {
 	property Component __withdrawInputComp: Component { WithdrawContractPermissionsInput {} }
 	property Component __attachmentInputComp: Component { AddContractAttachmentInput {} }
 	property Component __getAttachmentInputComp: Component { GetContractAttachmentInput {} }
-	property Component __privateInfoInputComp: Component { SetContractPrivateInfoInput {} }
 	property Component __allocationGroupsInputComp: Component { SetContractAllocationGroupsInput {} }
 	property Component __catalogInputComp: Component { ContractCatalogInput {} }
 	property Component __saveRoleInputComp: Component { SavePartyRoleInput {} }

@@ -40,6 +40,8 @@ namespace imtauthgql
 
 	Notifications are delivered only to subscribers whose authenticated user
 	matches the target userId (tenant owner).
+	Every change is also announced by OnOrganizationConnectionsChanged to the
+	sessions working in each organization it touched, so their address books follow.
 */
 class CConnectionCodesNotificationPublisherComp:
 			public imtservergql::CGqlPublisherCompBase,
@@ -83,6 +85,7 @@ private:
 				const QByteArray& tenantId,
 				const QByteArray& relatedId,
 				const QByteArray& partnerTenantId) const;
+	void PublishConnectionsChanged(const QByteArray& tenantId) const;
 
 	void SendToNotificationCenter(
 				const QByteArray& targetUserId,

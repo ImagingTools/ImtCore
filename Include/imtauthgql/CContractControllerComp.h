@@ -35,7 +35,6 @@ public:
 	I_BEGIN_COMPONENT(CContractControllerComp);
 		I_ASSIGN(m_contractManagerCompPtr, "ContractManager", "Contracts of the organizations", true, "ContractManager");
 		I_ASSIGN(m_contractFactoryCompPtr, "ContractFactory", "Factory of the draft of a contract", true, "ContractInfo");
-		I_ASSIGN(m_privateInfoFactoryCompPtr, "PrivateInfoFactory", "Factory of the records of a party", true, "ContractPartyPrivateInfo");
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Organizations", true, "TenantManager");
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Members and their permissions in the organizations", true, "TenantMembershipManager");
 		I_ASSIGN(m_relationshipProviderCompPtr, "RelationshipProvider", "Organizations linked by the contracts", true, "RelationshipProvider");
@@ -181,7 +180,6 @@ private:
 private:
 	I_REF(imtauth::IContractManager, m_contractManagerCompPtr);
 	I_FACT(imtauth::IContractInfo, m_contractFactoryCompPtr);
-	I_FACT(imtauth::IContractPartyPrivateInfo, m_privateInfoFactoryCompPtr);
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 	I_REF(imtauth::ITenantRelationshipProvider, m_relationshipProviderCompPtr);

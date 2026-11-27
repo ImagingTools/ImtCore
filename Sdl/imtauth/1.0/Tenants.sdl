@@ -531,6 +531,11 @@ input ConnectionNotificationSubscriptionInput {
 	userId: ID!
 }
 
+# The connections of the organization changed: the sessions working in it read them again
+type OrganizationConnectionsNotification {
+	tenantId: ID!
+}
+
 type Query {
 	GetTenantList (input: GetTenantListInput): GetTenantListPayload!
 	GetTenant (input: GetTenantInput): GetTenantPayload!
@@ -568,6 +573,7 @@ type Mutation {
 type Subscription {
 	OnCrossTenantMessageNotification (input: CrossTenantMessageSubscriptionInput): CrossTenantMessageNotification!
 	OnConnectionNotification (input: ConnectionNotificationSubscriptionInput): ConnectionNotification!
+	OnOrganizationConnectionsChanged: OrganizationConnectionsNotification!
 }
 
 collectionSchema {

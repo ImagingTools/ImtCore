@@ -76,6 +76,23 @@ RemoteCollectionView {
 	// --- Notifications that change the organizations of the user (handled by tenantManagementApiClient) ---
 	property GqlBasedTenantManagementApiClient tenantManagementApiClient: GqlBasedTenantManagementApiClient {}
 	property GqlBasedContractsApiClient contractsApiClient: GqlBasedContractsApiClient {}
+	property string __notificationContractId: ""
+	property string __notificationTenantId: ""
+
+	NavigableItem {
+		parentSegment: container.collectionId
+		paths: ["Contract"]
+		forwardRest: false
+
+		onActivated: {
+			var tenantId = AuthorizationController.getTenantId()
+			if (restPath.length !== 1 || tenantId === "" || !container.commandsDelegate || !container.commandsDelegate.documentManager)
+				return
+			container.__notificationTenantId = tenantId
+			container.__notificationContractId = restPath[0]
+			container.commandsDelegate.documentManager.openDocument("Tenant", tenantId)
+		}
+	}
 
 	Connections {
 		target: container.tenantManagementApiClient
@@ -649,7 +666,13 @@ RemoteCollectionView {
 				TenantEditor {
 					id: tenantEditor
 					apiClient: container.tenantManagementApiClient
-			contractsApiClient: container.contractsApiClient
+					contractsApiClient: container.contractsApiClient
+					contractToOpenId: tenantEditor.tenantData && tenantEditor.tenantData.m_id === container.__notificationTenantId
+						&& AuthorizationController.getTenantId() === container.__notificationTenantId ? container.__notificationContractId : ""
+
+					onContractOpenHandled: {
+						container.__notificationContractId = ""
+					}
 					commandsControllerComp: Component {
 						GqlBasedCommandsController {
 							typeId: "Tenant"

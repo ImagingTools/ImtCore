@@ -88,7 +88,7 @@ QtObject {
 	function addAttachment(tenantId, contractId, fileName, mimeType, data, replacesAttachmentId, isInternal) {}
 	function fetchAttachment(tenantId, contractId, attachmentId) {}
 
-	// The info has the fields internalNumber, responsibleUserId, notes, reminderDays
+	// Supply only the fields to change: internalNumber, responsibleUserId, notes, reminderDays.
 	function setPrivateInfo(tenantId, contractId, info) {}
 	function setAllocationGroups(tenantId, contractId, allocationId, groupIds) {}
 

@@ -30,19 +30,25 @@ bool CConnectionCodesNotificationPublisherComp::IsRequestSupported(const imtgql:
 		}
 	}
 
+	if (gqlRequest.GetCommandId() == sdl::V1_0::imtauth::COnOrganizationConnectionsChangedGqlRequest::GetCommandId()){
+		return true;
+	}
+
 	return BaseClass::IsRequestSupported(gqlRequest);
 }
 
 
 bool CConnectionCodesNotificationPublisherComp::IsOpenFor(SubscriberKind subscriberKind, const imtgql::CGqlRequest& gqlRequest) const
 {
-	// Its notifications go to their recipient by its identity: its permissions do not decide them
+	// Its notifications go to their recipient by its identity, a user or the organization of the session: its permissions do not decide them
 	if (subscriberKind == SK_RECIPIENT){
 		const QByteArray commandId = (m_commandIdsAttrPtr.IsValid() && m_commandIdsAttrPtr.GetCount() > 0)
 					? m_commandIdsAttrPtr[0]
 					: QByteArrayLiteral("OnConnectionCodesNotification");
 
-		return m_readPermissionsAttrPtr.GetCount() == 0 && gqlRequest.GetCommandId() == commandId;
+		return m_readPermissionsAttrPtr.GetCount() == 0
+					&& (gqlRequest.GetCommandId() == commandId
+								|| gqlRequest.GetCommandId() == sdl::V1_0::imtauth::COnOrganizationConnectionsChangedGqlRequest::GetCommandId());
 	}
 
 	return BaseClass::IsOpenFor(subscriberKind, gqlRequest);
@@ -88,6 +94,9 @@ void CConnectionCodesNotificationPublisherComp::OnModelChanged(int /*modelId*/, 
 				PublishNotification(FindTenantOwnerUserId(targetTenantId), NotificationType::ConnectionRequestReceived, targetTenantId,
 							event.value(imtauth::TenantEvent::s_requestId).toByteArray(), sourceTenantId);
 			}
+
+			PublishConnectionsChanged(sourceTenantId);
+			PublishConnectionsChanged(targetTenantId);
 		}
 		else if (type == imtauth::TenantEvent::s_connectionRequestStatusChanged){
 			// The answer goes to the organization that asked
@@ -99,6 +108,9 @@ void CConnectionCodesNotificationPublisherComp::OnModelChanged(int /*modelId*/, 
 			else if (status == RequestStatus::CRS_REJECTED){
 				PublishNotification(FindTenantOwnerUserId(sourceTenantId), NotificationType::ConnectionRequestRejected, sourceTenantId, requestId, targetTenantId);
 			}
+
+			PublishConnectionsChanged(sourceTenantId);
+			PublishConnectionsChanged(targetTenantId);
 		}
 		else if (type == imtauth::TenantEvent::s_connectionRemoved){
 			const NotificationType notificationType = NotificationType::ConnectionRemoved;
@@ -111,6 +123,9 @@ void CConnectionCodesNotificationPublisherComp::OnModelChanged(int /*modelId*/, 
 			if (targetOwnerUserId != sourceOwnerUserId){
 				PublishNotification(targetOwnerUserId, notificationType, targetTenantId, relatedId, sourceTenantId);
 			}
+
+			PublishConnectionsChanged(sourceTenantId);
+			PublishConnectionsChanged(targetTenantId);
 		}
 	}
 }
@@ -125,9 +140,11 @@ void CConnectionCodesNotificationPublisherComp::PublishNotification(
 	const QByteArray& relatedId,
 	const QByteArray& partnerTenantId) const
 {
-	if (!targetUserId.isEmpty()){
-		SendToNotificationCenter(targetUserId, notificationType, tenantId, relatedId, partnerTenantId);
+	if (targetUserId.isEmpty()){
+		return;
 	}
+
+	SendToNotificationCenter(targetUserId, notificationType, tenantId, relatedId, partnerTenantId);
 
 	sdl::V1_0::imtauth::CConnectionNotification notification;
 	notification.notificationType = notificationType;
@@ -159,14 +176,37 @@ void CConnectionCodesNotificationPublisherComp::PublishNotification(
 		? m_commandIdsAttrPtr[0]
 		: QByteArrayLiteral("OnConnectionCodesNotification");
 
-	// The addressee, and whoever works in the organization now: an open address book follows its changes
-	PublishDataFiltered(commandId, data, [targetUserId, tenantId](const imtgql::CGqlRequest& gqlRequest) -> bool {
+	// Only the sessions of the addressee
+	PublishDataFiltered(commandId, data, [targetUserId](const imtgql::CGqlRequest& gqlRequest) -> bool {
 		const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
-		if (contextPtr == nullptr || contextPtr->GetUserId().isEmpty()){
-			return false;
-		}
 
-		return contextPtr->GetUserId() == targetUserId || contextPtr->GetTenantId() == tenantId;
+		return contextPtr != nullptr && contextPtr->GetUserId() == targetUserId;
+	});
+}
+
+
+void CConnectionCodesNotificationPublisherComp::PublishConnectionsChanged(const QByteArray& tenantId) const
+{
+	if (tenantId.isEmpty()){
+		return;
+	}
+
+	sdl::V1_0::imtauth::COrganizationConnectionsNotification notification;
+	notification.tenantId = tenantId;
+
+	QJsonObject jsonObject;
+	if (!notification.WriteToJsonObject(jsonObject)){
+		Q_ASSERT(false);
+		return;
+	}
+
+	const QByteArray data = QJsonDocument(jsonObject).toJson(QJsonDocument::Compact);
+
+	// The sessions working in the organization: its open address book follows the change
+	PublishDataFiltered(sdl::V1_0::imtauth::COnOrganizationConnectionsChangedGqlRequest::GetCommandId(), data, [tenantId](const imtgql::CGqlRequest& gqlRequest) -> bool {
+		const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+
+		return contextPtr != nullptr && !contextPtr->GetUserId().isEmpty() && contextPtr->GetTenantId() == tenantId;
 	});
 }
 

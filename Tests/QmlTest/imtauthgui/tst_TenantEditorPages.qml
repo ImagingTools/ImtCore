@@ -25,6 +25,12 @@ TestCase {
 		}
 	}
 
+	Component {
+		id: contractsClientComp
+
+		ContractsApiClient {}
+	}
+
 	// What GetTenantRepresentation brings for the organization the user created
 	Component {
 		id: representationComp
@@ -120,6 +126,18 @@ TestCase {
 
 		compare(context.spy.count, 1, "The shown page is created once for the arrived representation")
 		verify(context.pageView.getIndexById("Members") >= 0, "The pages of an existing organization are listed")
+	}
+
+	function test_contractLinkWaitsForTheOrganization(){
+		let context = openEditor()
+		context.editor.contractsApiClient = createTemporaryObject(contractsClientComp, testCase)
+		context.editor.contractToOpenId = "contract-id"
+		compare(context.pageView.getIndexById("Contracts"), -1)
+
+		context.model.copyFrom(createTemporaryObject(representationComp, testCase))
+		tryVerify(function(){ return context.pageView.getPageById("Contracts") !== null })
+		compare(context.pageView.currentIndex, context.pageView.getIndexById("Contracts"))
+		compare(context.pageView.getPageById("Contracts").contractToOpenId, "contract-id")
 	}
 
 	// A re-read after a notification brings the same organization: the page the user works in stays

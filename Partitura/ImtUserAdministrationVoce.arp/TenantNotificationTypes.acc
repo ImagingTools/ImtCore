@@ -394,7 +394,8 @@
                                 <Value>ContractPermissionsWithdrawn</Value>
                                 <Value>ContractPermissionsReceived</Value>
                                 <Value>ContractSuperseded</Value>
-                                <Value>ContractReminder</Value>
+                                <Value>ContractEndsSoon</Value>
+                                <Value>ContractRenewalDeadline</Value>
                                 <Value>ContractTermsChanged</Value>
                                 <Value>ContractPartyRemoved</Value>
                                 <Value>ContractNoticeRevoked</Value>
@@ -462,7 +463,7 @@
                         <Data IsEnabled="true" Value="Icons/Assignment"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Message" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="&quot;{partner}&quot; signed the contract &quot;{subject}&quot;"/>
+                        <Data IsEnabled="true" Value="{count, plural, =1 {&quot;{partner}&quot; signed the contract &quot;{subject}&quot;} other {# parties signed the contract &quot;{subject}&quot;, the latest &quot;{partner}&quot;}}"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Name" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Contract signed"/>
@@ -630,10 +631,17 @@
                         <Data IsEnabled="true" Value="Icons/Key"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Message" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Your organization received permissions by the contract &quot;{subject}&quot;"/>
+                        <Data IsEnabled="true" Value="&quot;{partner}&quot; gave your organization permissions by the contract &quot;{subject}&quot;"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Name" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Contract permissions received"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParameterIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>partner</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="TypeId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="imtauth.ContractPermissionsReceived"/>
@@ -659,20 +667,52 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ContractReminder" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+        <Element Id="ContractEndsSoon" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="IconPath" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Icons/Calendar"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Message" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="A date of the contract &quot;{subject}&quot; is coming"/>
+                        <Data IsEnabled="true" Value="The contract &quot;{subject}&quot; ends on {date}"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Name" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Contract reminder"/>
+                        <Data IsEnabled="true" Value="Contract ends soon"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParameterIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>date</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="TypeId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="imtauth.ContractReminder"/>
+                        <Data IsEnabled="true" Value="imtauth.ContractEndsSoon"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ContractRenewalDeadline" PackageId="ImtNotifyGqlPck" ComponentId="NotificationType">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Calendar"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Message" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Until {date} you can refuse the renewal of the contract &quot;{subject}&quot;"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Contract renewal deadline"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParameterIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>date</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="imtauth.ContractRenewalDeadline"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

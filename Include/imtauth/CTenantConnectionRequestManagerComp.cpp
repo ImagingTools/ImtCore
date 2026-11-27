@@ -447,6 +447,10 @@ QByteArray CTenantConnectionRequestManagerComp::CreateConnectionRequest(
 		return RefuseRequest(QStringLiteral("No organization has this connection code"), errorMessagePtr);
 	}
 
+	if (targetTenantId == sourceTenantId){
+		return RefuseRequest(QStringLiteral("This is the connection code of your own organization"), errorMessagePtr);
+	}
+
 	if (!GetAllowConnectionsByCode(targetTenantId)){
 		return RefuseRequest(QStringLiteral("The target organization does not accept connections by code"), errorMessagePtr);
 	}

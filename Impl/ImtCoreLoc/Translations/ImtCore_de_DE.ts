@@ -5725,18 +5725,6 @@
     </message>
     <message>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-46"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-52"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbTest/CDatabaseEnginesTest.cpp" line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtSdlGenQmlTest/CImtSdlGenQmlTest.cpp" line="-90"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtSdlGenTest/CImtSdlGenTest.cpp" line="+42"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-82"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-56"/>
-        <source>Your organization received permissions by the contract &quot;{subject}&quot;</source>
-        <translation>Ihre Organisation hat durch den Vertrag „{subject}“ Berechtigungen erhalten</translation>
-    </message>
-    <message>
-        <location line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbTest/CDatabaseEnginesTest.cpp" line="-2"/>
@@ -5821,30 +5809,6 @@
     </message>
     <message>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-18"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbTest/CDatabaseEnginesTest.cpp" line="-56"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtSdlGenQmlTest/CImtSdlGenQmlTest.cpp" line="-74"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtSdlGenTest/CImtSdlGenTest.cpp" line="-94"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-54"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+18"/>
-        <source>A date of the contract &quot;{subject}&quot; is coming</source>
-        <translation>Ein Termin des Vertrags „{subject}“ naht</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbTest/CDatabaseEnginesTest.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtSdlGenQmlTest/CImtSdlGenQmlTest.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtSdlGenTest/CImtSdlGenTest.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
-        <source>Contract reminder</source>
-        <translation>Vertragserinnerung</translation>
-    </message>
-    <message>
-        <location line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-36"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbTest/CDatabaseEnginesTest.cpp" line="-30"/>
@@ -5890,18 +5854,6 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Invitation received</source>
         <translation>Einladung erhalten</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+54"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+22"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbTest/CDatabaseEnginesTest.cpp" line="-82"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtSdlGenQmlTest/CImtSdlGenQmlTest.cpp" line="-36"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtSdlGenTest/CImtSdlGenTest.cpp" line="+36"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+18"/>
-        <source>&quot;{partner}&quot; signed the contract &quot;{subject}&quot;</source>
-        <translation>„{partner}“ hat den Vertrag „{subject}“ unterzeichnet</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -7431,6 +7383,30 @@
     <message>
         <source>Contract renewal stopped</source>
         <translation>Vertragsverlängerung beendet</translation>
+    </message>
+    <message>
+        <source>{count, plural, =1 {&quot;{partner}&quot; signed the contract &quot;{subject}&quot;} other {# parties signed the contract &quot;{subject}&quot;, the latest &quot;{partner}&quot;}}</source>
+        <translation>{count, plural, =1 {„{partner}“ hat den Vertrag „{subject}“ unterzeichnet} other {# Parteien haben den Vertrag „{subject}“ unterzeichnet, zuletzt „{partner}“}}</translation>
+    </message>
+    <message>
+        <source>&quot;{partner}&quot; gave your organization permissions by the contract &quot;{subject}&quot;</source>
+        <translation>„{partner}“ hat Ihrer Organisation Berechtigungen nach dem Vertrag „{subject}“ erteilt</translation>
+    </message>
+    <message>
+        <source>The contract &quot;{subject}&quot; ends on {date}</source>
+        <translation>Der Vertrag „{subject}“ endet am {date}</translation>
+    </message>
+    <message>
+        <source>Contract ends soon</source>
+        <translation>Vertrag endet bald</translation>
+    </message>
+    <message>
+        <source>Until {date} you can refuse the renewal of the contract &quot;{subject}&quot;</source>
+        <translation>Bis {date} können Sie die Verlängerung des Vertrags „{subject}“ ablehnen</translation>
+    </message>
+    <message>
+        <source>Contract renewal deadline</source>
+        <translation>Frist für die Ablehnung der Verlängerung</translation>
     </message>
 </context>
 <context>
@@ -12206,6 +12182,30 @@
 </context>
 <context>
     <name>ContractView</name>
+    <message>
+        <source>Responsible</source>
+        <translation>Verantwortlich</translation>
+    </message>
+    <message>
+        <source>Organization owner (default)</source>
+        <translation>Organisationsinhaber (Standard)</translation>
+    </message>
+    <message>
+        <source>Contract notifications for this organization go to the responsible person. If nobody is assigned, the organization owner receives them.</source>
+        <translation>Vertragsbenachrichtigungen für diese Organisation erhält die verantwortliche Person. Ist niemand zugewiesen, gehen sie an den Organisationsinhaber.</translation>
+    </message>
+    <message>
+        <source>Responsible person</source>
+        <translation>Verantwortliche Person</translation>
+    </message>
+    <message>
+        <source>Save responsible person</source>
+        <translation>Verantwortliche Person speichern</translation>
+    </message>
+    <message>
+        <source>The responsible person was saved</source>
+        <translation>Die verantwortliche Person wurde gespeichert</translation>
+    </message>
     <message>
         <source>Relationship and counterparty tenant are required.</source>
         <translation type="vanished">Beziehung und Partnermandant sind erforderlich.</translation>

@@ -837,9 +837,6 @@
                     <AttributeInfo Id="PartyRoleCatalog" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PartyRoleCatalog"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PrivateInfoFactory" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="ContractPartyPrivateInfo"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="RelationshipProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ContractRelationshipProvider"/>
                     </AttributeInfo>

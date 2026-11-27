@@ -53,6 +53,7 @@
                                 <Value>OnMembershipNotification</Value>
                                 <Value>OnOrganizationMembersChanged</Value>
                                 <Value>OnConnectionCodesNotification</Value>
+                                <Value>OnOrganizationConnectionsChanged</Value>
                                                                 <Value>OnCrossTenantMessageNotification</Value>
                                 <Value>OnContractNotification</Value>
                                 <Value>OnNotificationEvent</Value>

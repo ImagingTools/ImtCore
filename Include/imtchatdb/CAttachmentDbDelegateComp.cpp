@@ -88,31 +88,18 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAttachmentDbDelegateComp::Create
 		attachId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 	}
 
-	const QString nowUtc = utcNow();
-
-	// Encode binary data as hex for PostgreSQL BYTEA / SQLite BLOB
-	const QByteArray hexData = attachPtr->GetData().toHex();
-
-	// Escape single quotes in user-supplied strings to prevent SQL injection
-	QString escapedFileName = attachPtr->GetFileName();
-	escapedFileName.replace('\'', "''");
-	QString escapedMimeType = attachPtr->GetMimeType();
-	escapedMimeType.replace('\'', "''");
-
 	NewObjectQuery retVal;
-	retVal.query = QString(
+	retVal.query = QStringLiteral(
 		"INSERT INTO \"%1\" "
 		"(\"Id\", \"FileName\", \"MimeType\", \"Data\", \"FileSize\", \"CreatedAt\") "
-		"VALUES('%2', '%3', '%4', E'\\\\x%5', %6, '%7');")
-		.arg(
-			QString::fromUtf8(GetTableName()),
-			QString::fromUtf8(attachId),
-			escapedFileName,
-			escapedMimeType,
-			QString::fromLatin1(hexData),
-			QString::number(attachPtr->GetFileSize()),
-			nowUtc)
-		.toUtf8();
+		"VALUES(:Id, :FileName, :MimeType, :Data, :FileSize, :CreatedAt);").arg(QString::fromUtf8(GetTableName())).toUtf8();
+	retVal.bindValues = {
+		{QStringLiteral(":Id"), QString::fromUtf8(attachId)},
+		{QStringLiteral(":FileName"), attachPtr->GetFileName()},
+		{QStringLiteral(":MimeType"), attachPtr->GetMimeType()},
+		{QStringLiteral(":Data"), attachPtr->GetData()},
+		{QStringLiteral(":FileSize"), attachPtr->GetFileSize()},
+		{QStringLiteral(":CreatedAt"), utcNow()}};
 
 	return retVal;
 }

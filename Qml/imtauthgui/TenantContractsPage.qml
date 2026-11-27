@@ -24,6 +24,8 @@ SimpleCollectionPage {
 
 	// The transport of the contracts (ContractsApiClient)
 	property var contractsApiClient: null
+	property string contractToOpenId: ""
+	signal contractOpenHandled()
 
 	readonly property string __tenantId: contractsPage.model && contractsPage.model.m_id ? String(contractsPage.model.m_id) : ""
 
@@ -44,7 +46,23 @@ SimpleCollectionPage {
 
 	function refresh() {
 		if (contractsPage.contractsApiClient && contractsPage.__tenantId !== "")
-			contractsPage.contractsApiClient.fetchContracts(contractsPage.__tenantId)
+			refreshTimer.restart()
+	}
+
+	onContractToOpenIdChanged: {
+		if (contractsPage.visible && contractsPage.contractToOpenId !== "")
+			contractsPage.refresh()
+	}
+
+	Timer {
+		id: refreshTimer
+		interval: 50
+		repeat: false
+
+		onTriggered: {
+			if (contractsPage.contractsApiClient && contractsPage.__tenantId !== "")
+				contractsPage.contractsApiClient.fetchContracts(contractsPage.__tenantId)
+		}
 	}
 
 	Component.onCompleted: {
@@ -106,6 +124,11 @@ SimpleCollectionPage {
 					others.push(row)
 			}
 			contractsPage.__rows = waiting.concat(others)
+			if (contractsPage.visible && contractsPage.contractToOpenId !== "") {
+				var contractId = contractsPage.contractToOpenId
+				contractsPage.contractOpenHandled()
+				contractsPage.openItem(contractId)
+			}
 		}
 
 		function onCommandSucceeded(command, contractId, revision) {
@@ -123,7 +146,7 @@ SimpleCollectionPage {
 		}
 
 		function onContractNotified(contractId, tenantId) {
-			if (contractsPage.visible)
+			if (contractsPage.visible && (tenantId === "" || tenantId === contractsPage.__tenantId))
 				contractsPage.refresh()
 		}
 	}

@@ -69,7 +69,7 @@ QByteArrayList GetGranteeTenantIds(const IContractInfo& contract, const QByteArr
 {
 	QByteArrayList retVal;
 	for (const IContractInfo::Allocation& allocation : contract.GetAllocations()){
-		if ((grantorTenantId.isEmpty() || allocation.grantorTenantId == grantorTenantId) && !retVal.contains(allocation.granteeTenantId)){
+		if (allocation.grantorTenantId == grantorTenantId && !retVal.contains(allocation.granteeTenantId)){
 			retVal.append(allocation.granteeTenantId);
 		}
 	}
@@ -1037,13 +1037,13 @@ bool CContractManagerComp::AddAttachment(
 }
 
 
-bool CContractManagerComp::SetPrivateInfo(const ContractActor& actor, const IContractPartyPrivateInfo& privateInfo, QString& errorMessage)
+bool CContractManagerComp::SetPrivateInfo(const ContractActor& actor, const QByteArray& contractId, const ContractPrivateInfoUpdate& update, QString& errorMessage)
 {
 	QMutexLocker locker(&m_changeMutex);
 
-	const QByteArray contractId = privateInfo.GetContractId();
 	IContractInfoUniquePtr contractPtr = ReadContract(contractId);
-	if (!contractPtr.IsValid() || FindContractParty(contractPtr->GetParties(), actor.tenantId) < 0){
+	if (!contractPtr.IsValid() || FindContractParty(contractPtr->GetParties(), actor.tenantId) < 0
+				|| (!contractPtr->GetSubmittedAt().isValid() && contractPtr->GetInitiatorTenantId() != actor.tenantId)){
 		errorMessage = QStringLiteral("The organization is not a party of the contract");
 
 		return false;
@@ -1057,17 +1057,27 @@ bool CContractManagerComp::SetPrivateInfo(const ContractActor& actor, const ICon
 	}
 
 	// The notifications of the contract go to the responsible user: one of the organization only
-	const QByteArray responsibleUserId = privateInfo.GetResponsibleUserId();
-	if (!responsibleUserId.isEmpty() && !IsTenantUser(actor.tenantId, responsibleUserId)){
+	if (update.responsibleUserId && !update.responsibleUserId->isEmpty() && !IsTenantUser(actor.tenantId, *update.responsibleUserId)){
 		errorMessage = QStringLiteral("The responsible user is not a member of the organization");
 
 		return false;
 	}
 
-	storedInfoPtr->SetInternalNumber(privateInfo.GetInternalNumber());
-	storedInfoPtr->SetResponsibleUserId(privateInfo.GetResponsibleUserId());
-	storedInfoPtr->SetNotes(privateInfo.GetNotes());
-	storedInfoPtr->SetReminderDays(qMax(0, privateInfo.GetReminderDays()));
+	const QString internalNumber = update.internalNumber.value_or(storedInfoPtr->GetInternalNumber());
+	const QByteArray responsibleUserId = update.responsibleUserId.value_or(storedInfoPtr->GetResponsibleUserId());
+	const QString notes = update.notes.value_or(storedInfoPtr->GetNotes());
+	const int reminderDays = update.reminderDays ? qMax(0, *update.reminderDays) : storedInfoPtr->GetReminderDays();
+	if (storedInfoPtr->GetInternalNumber() == internalNumber
+				&& storedInfoPtr->GetResponsibleUserId() == responsibleUserId
+				&& storedInfoPtr->GetNotes() == notes
+				&& storedInfoPtr->GetReminderDays() == reminderDays){
+		return true;
+	}
+
+	storedInfoPtr->SetInternalNumber(internalNumber);
+	storedInfoPtr->SetResponsibleUserId(responsibleUserId);
+	storedInfoPtr->SetNotes(notes);
+	storedInfoPtr->SetReminderDays(reminderDays);
 	storedInfoPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc());
 	if (!StorePrivateInfo(*storedInfoPtr)){
 		errorMessage = QStringLiteral("The records of the party could not be stored");
@@ -1088,7 +1098,7 @@ bool CContractManagerComp::SetPrivateInfo(const ContractActor& actor, const ICon
 bool CContractManagerComp::IsTenantUser(const QByteArray& tenantId, const QByteArray& userId) const
 {
 	ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
-	if (tenantPtr.IsValid() && (tenantPtr->GetOwnerId() == userId || tenantPtr->GetCreatorId() == userId)){
+	if (tenantPtr.IsValid() && tenantPtr->GetOwnerId() == userId){
 		return true;
 	}
 
@@ -1470,11 +1480,22 @@ void CContractManagerComp::Announce(const IContractInfo& contract, const ChangeR
 		isPrivate = isPrivate && entry.isPrivate;
 	}
 
+	QByteArrayList recipients;
+	if (!contract.GetSubmittedAt().isValid()){
+		recipients = {contract.GetInitiatorTenantId()};
+	}
+	else if (isPrivate){
+		recipients = {actor.tenantId};
+	}
+	else{
+		recipients = GetContractPartyTenantIds(contract);
+	}
+
 	QVariantMap changed = CreateTenantEvent(
 				TenantEvent::s_contractChanged,
 				contract,
 				QByteArray(),
-				isPrivate ? QByteArrayList({actor.tenantId}) : GetContractPartyTenantIds(contract));
+				recipients);
 	changed.insert(TenantEvent::s_userId, actor.userId);
 	changed.insert(TenantEvent::s_userName, actor.userName);
 	TenantEvent::Publish(this, changed);
@@ -2059,9 +2080,16 @@ bool CContractManagerComp::Conclude(IContractInfo& contract, ChangeRecord& recor
 	record.journal.append(concluded);
 	record.events.append(CreateTenantEvent(TenantEvent::s_contractConcluded, contract, QByteArray(), GetContractPartyTenantIds(contract)));
 
-	const QByteArrayList granteeTenantIds = GetGranteeTenantIds(contract, QByteArray());
-	if (!granteeTenantIds.isEmpty()){
-		record.events.append(CreateTenantEvent(TenantEvent::s_contractPermissionsReceived, contract, QByteArray(), granteeTenantIds));
+	// Every party that gave permissions before the conclusion tells its receivers once
+	QByteArrayList grantorTenantIds;
+	for (const IContractInfo::Allocation& allocation : contract.GetAllocations()){
+		if (!grantorTenantIds.contains(allocation.grantorTenantId)){
+			grantorTenantIds.append(allocation.grantorTenantId);
+		}
+	}
+
+	for (const QByteArray& grantorTenantId : std::as_const(grantorTenantIds)){
+		record.events.append(CreateTenantEvent(TenantEvent::s_contractPermissionsReceived, contract, grantorTenantId, GetGranteeTenantIds(contract, grantorTenantId)));
 	}
 
 	record.isConcluded = true;

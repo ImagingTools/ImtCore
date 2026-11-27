@@ -100,7 +100,7 @@ public:
 				const IContractInfo::Attachment& attachment,
 				bool isInternal,
 				QString& errorMessage) override;
-	virtual bool SetPrivateInfo(const ContractActor& actor, const IContractPartyPrivateInfo& privateInfo, QString& errorMessage) override;
+	virtual bool SetPrivateInfo(const ContractActor& actor, const QByteArray& contractId, const ContractPrivateInfoUpdate& update, QString& errorMessage) override;
 	virtual bool SetAllocationGroups(
 				const ContractActor& actor,
 				const QByteArray& contractId,

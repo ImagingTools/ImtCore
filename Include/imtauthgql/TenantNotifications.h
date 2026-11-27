@@ -54,7 +54,8 @@ static const inline QByteArray s_contractWithdrawn = QByteArrayLiteral("imtauth.
 static const inline QByteArray s_contractPermissionsWithdrawn = QByteArrayLiteral("imtauth.ContractPermissionsWithdrawn");
 static const inline QByteArray s_contractPermissionsReceived = QByteArrayLiteral("imtauth.ContractPermissionsReceived");
 static const inline QByteArray s_contractSuperseded = QByteArrayLiteral("imtauth.ContractSuperseded");
-static const inline QByteArray s_contractReminder = QByteArrayLiteral("imtauth.ContractReminder");
+static const inline QByteArray s_contractEndsSoon = QByteArrayLiteral("imtauth.ContractEndsSoon");
+static const inline QByteArray s_contractRenewalDeadline = QByteArrayLiteral("imtauth.ContractRenewalDeadline");
 
 
 /**

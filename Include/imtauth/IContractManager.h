@@ -2,6 +2,9 @@
 #pragma once
 
 
+// ACF includes
+#include <istd/TNullableValue.h>
+
 // ImtCore includes
 #include <imtauth/IContractProvider.h>
 
@@ -24,6 +27,15 @@ struct ContractActor
 struct ContractSignatureRequest
 {
 	QString position;
+};
+
+
+struct ContractPrivateInfoUpdate
+{
+	istd::TNullableValue<QString> internalNumber;
+	istd::TNullableValue<QByteArray> responsibleUserId;
+	istd::TNullableValue<QString> notes;
+	istd::TNullableValue<int> reminderDays;
 };
 
 
@@ -108,9 +120,9 @@ public:
 				QString& errorMessage) = 0;
 
 	/**
-		Change the records the party keeps for itself; its attachments and groups stay.
+		Change the supplied fields of the records the party keeps for itself.
 	*/
-	virtual bool SetPrivateInfo(const ContractActor& actor, const IContractPartyPrivateInfo& privateInfo, QString& errorMessage) = 0;
+	virtual bool SetPrivateInfo(const ContractActor& actor, const QByteArray& contractId, const ContractPrivateInfoUpdate& update, QString& errorMessage) = 0;
 
 	/**
 		Give the permissions an allocation gives the party of the actor to its groups; no group is nobody.

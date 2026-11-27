@@ -206,20 +206,17 @@ QtObject {
 	}
 
 	property SubscriptionClient __connectionCodesSubscription: SubscriptionClient {
-		gqlCommandId: "OnConnectionCodesNotification"
+		gqlCommandId: "OnOrganizationConnectionsChanged"
 
 		function getHeaders() { return {} }
 
 		onMessageReceived: {
 			if (!data) return
 			var notification = {
-				"notificationType": data.containsKey("notificationType") ? data.getData("notificationType") : "",
-				"tenantId": data.containsKey("tenantId") ? data.getData("tenantId") : "",
-				"requestId": data.containsKey("requestId") ? data.getData("requestId") : "",
-				"connectionId": data.containsKey("connectionId") ? data.getData("connectionId") : ""
+				"tenantId": data.containsKey("tenantId") ? data.getData("tenantId") : ""
 			}
 
-			// The notification center tells the owners; here only the state of the views follows
+			// The notification center tells the owners; here every session of the organization follows the change
 			root.subscriptionConnectionCodesChanged(notification)
 		}
 

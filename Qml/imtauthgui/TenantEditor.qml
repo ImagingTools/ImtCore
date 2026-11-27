@@ -40,6 +40,15 @@ DocumentViewBase {
 
 	// Injected transport implementing the ContractsApiClient contract: the contracts, their catalogs and the directory
 	property var contractsApiClient: null
+	property string contractToOpenId: ""
+	signal contractOpenHandled()
+
+	onContractToOpenIdChanged: container.showRequestedContract()
+
+	function showRequestedContract() {
+		if (container.contractToOpenId !== "" && multiPageView && multiPageView.getIndexById("Contracts") >= 0)
+			container.__openPage("Contracts")
+	}
 
 	/**
 	 * Exposed so that TenantCollectionView can bind commandsPanelVisible: isNewTenant.
@@ -268,6 +277,7 @@ DocumentViewBase {
 			}
 
 			multiPageView.currentIndex = 0
+			container.showRequestedContract()
 		}
 
 		Component.onCompleted: {
@@ -577,6 +587,8 @@ DocumentViewBase {
 			apiClient: container.apiClient
 			contractsApiClient: container.contractsApiClient
 			headerHost: container.__headerHost ? container : null
+			contractToOpenId: container.contractToOpenId
+			onContractOpenHandled: container.contractOpenHandled()
 		}
 	}
 
