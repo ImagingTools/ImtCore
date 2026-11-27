@@ -1,0 +1,20 @@
+{
+  "name": "imtcore-node-testkit",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Test server and API suite runner for the Node.js tests of Imt-based products: drops the test database, starts the simulated services and the server, runs a newman collection and scripts, stops them.",
+  "type": "module",
+  "main": "index.mjs",
+  "engines": {
+    "node": ">=18"
+  },
+  "peerDependencies": {
+    "newman": ">=6",
+    "pg": ">=8"
+  },
+  "peerDependenciesMeta": {
+    "newman": {
+      "optional": true
+    }
+  }
+}
