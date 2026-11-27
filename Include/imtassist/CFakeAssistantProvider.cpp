@@ -32,15 +32,25 @@ void CFakeAssistantProvider::AddScriptedReply(const Reply& reply)
 }
 
 
-void CFakeAssistantProvider::AddRule(const QString& keyword, const Reply& reply)
+void CFakeAssistantProvider::AddRule(const QString& keyword, const Reply& reply, const QString& missingContextQuestion)
 {
 	QMutexLocker lock(&m_mutex);
 
 	Rule rule;
 	rule.keyword = keyword;
 	rule.reply = reply;
+	rule.missingContextQuestion = missingContextQuestion;
 
 	m_rules.append(rule);
+}
+
+
+void CFakeAssistantProvider::SetToolResultReply(const Reply& reply)
+{
+	QMutexLocker lock(&m_mutex);
+
+	m_toolResultReply = reply;
+	m_hasToolResultReply = !reply.text.isEmpty();
 }
 
 
@@ -165,16 +175,63 @@ IAssistantProvider::Reply CFakeAssistantProvider::SelectReply(const Request& req
 		return m_scriptedReplies.dequeue();
 	}
 
+	if (!request.messages.isEmpty() && (request.messages.last().role == Message::R_TOOL_RESULT) && m_hasToolResultReply){
+		return m_toolResultReply;
+	}
+
 	if (!request.messages.isEmpty() && (request.messages.last().role == Message::R_USER)){
 		QString userText = request.messages.last().text;
 		for (const Rule& rule: m_rules){
 			if (userText.contains(rule.keyword, Qt::CaseInsensitive)){
-				return rule.reply;
+				return ResolveContextPlaceholders(request, rule.reply, rule.missingContextQuestion);
 			}
 		}
 	}
 
 	return m_defaultReply;
+}
+
+
+IAssistantProvider::Reply CFakeAssistantProvider::ResolveContextPlaceholders(
+			const Request& request,
+			const Reply& reply,
+			const QString& missingContextQuestion)
+{
+	if (reply.kind != RK_ACTION_CALL){
+		return reply;
+	}
+
+	static const QString prefix = QStringLiteral("$context.");
+
+	Reply retVal = reply;
+	for (QJsonObject::iterator iter = retVal.parameters.begin(); iter != retVal.parameters.end(); ++iter){
+		QString value = iter.value().toString();
+		if (!iter.value().isString() || !value.startsWith(prefix)){
+			continue;
+		}
+
+		QStringList parts = value.mid(prefix.size()).split('.');
+		if (parts.size() != 2){
+			continue;
+		}
+
+		QJsonValue resolvedValue;
+		bool isResolved = false;
+		for (const Message& message: request.messages){
+			if ((message.role == Message::R_CONTEXT) && (message.actionId == parts.at(0).toUtf8()) && message.data.contains(parts.at(1))){
+				resolvedValue = message.data.value(parts.at(1));
+				isResolved = true;
+			}
+		}
+
+		if (!isResolved){
+			return CreateClarificationReply(missingContextQuestion.isEmpty() ? QStringLiteral("Which object do you mean?") : missingContextQuestion);
+		}
+
+		iter.value() = resolvedValue;
+	}
+
+	return retVal;
 }
 
 

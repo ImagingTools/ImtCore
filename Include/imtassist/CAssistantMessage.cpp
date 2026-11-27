@@ -182,6 +182,17 @@ QJsonObject CAssistantMessage::ToJson() const
 }
 
 
+QJsonArray CAssistantMessage::ToJsonArray(const QList<CAssistantMessage>& messages)
+{
+	QJsonArray retVal;
+	for (const CAssistantMessage& message: messages){
+		retVal.append(message.ToJson());
+	}
+
+	return retVal;
+}
+
+
 QString CAssistantMessage::GetKindName(MessageKind kind)
 {
 	switch (kind){

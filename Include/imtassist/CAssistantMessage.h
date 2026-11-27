@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QDateTime>
+#include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
 #include <QtCore/QList>
 #include <QtCore/QStringList>
@@ -98,6 +99,11 @@ public:
 	QJsonObject ToJson() const;
 
 	static QString GetKindName(MessageKind kind);
+
+	/**
+		Convert a list of messages to a JSON array.
+	*/
+	static QJsonArray ToJsonArray(const QList<CAssistantMessage>& messages);
 
 private:
 	QByteArray m_messageId;

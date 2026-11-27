@@ -67,6 +67,12 @@ private slots:
 
 	// Message format
 	void testMessage_ToJson();
+
+	// Standard representations and fake provider
+	void testStandardRepresentations_SelectableList();
+	void testFakeProvider_ResolvesContextPlaceholders();
+	void testFakeProvider_ToolResultReply();
+	void testEndToEnd_FakeProviderRules();
 };
 
 

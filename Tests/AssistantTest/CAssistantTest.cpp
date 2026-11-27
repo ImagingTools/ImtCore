@@ -16,6 +16,7 @@
 #include <imtassist/CAssistantActionRegistry.h>
 #include <imtassist/CAssistantService.h>
 #include <imtassist/CFakeAssistantProvider.h>
+#include <imtassist/CStandardRepresentations.h>
 #include <imtassist/CUiRepresentationRegistry.h>
 
 
@@ -1359,6 +1360,143 @@ void CAssistantTest::testMessage_ToJson()
 	QCOMPARE(json.value("conversationId").toString(), QString("conversation-1"));
 	QVERIFY(!json.value("id").toString().isEmpty());
 	QVERIFY(!json.contains("representation"));
+}
+
+
+// Standard representations and fake provider
+
+void CAssistantTest::testStandardRepresentations_SelectableList()
+{
+	CParameterSchema schema = CStandardRepresentations::CreateSelectableListSchema();
+	QCOMPARE(schema.GetSchemaId(), CStandardRepresentations::s_selectableListType);
+	QCOMPARE(schema.GetVersion(), int(CStandardRepresentations::SELECTABLE_LIST_VERSION));
+
+	QJsonArray items;
+	items.append(CStandardRepresentations::CreateSelectableListItem("task-1", "Task 1", "Open"));
+	items.append(CStandardRepresentations::CreateSelectableListItem("task-2", "Task 2"));
+
+	QJsonObject data = CStandardRepresentations::CreateSelectableListData(items, "Open tasks", true);
+	QString error;
+	QVERIFY2(schema.Validate(data, &error), qPrintable(error));
+	QCOMPARE(data.value("selectionMode").toString(), QString("multiple"));
+
+	QJsonObject invalidMode = data;
+	invalidMode["selectionMode"] = QStringLiteral("all");
+	QVERIFY(!schema.Validate(invalidMode));
+
+	QJsonObject withoutItems = data;
+	withoutItems.remove("items");
+	QVERIFY(!schema.Validate(withoutItems));
+
+	// The test registry of this file uses the same type name and version.
+	CUiRepresentationRegistry registry;
+	QVERIFY(registry.RegisterRepresentation(schema));
+	QVERIFY(registry.ValidateRepresentation(CStandardRepresentations::s_selectableListType, 1, data));
+}
+
+
+void CAssistantTest::testFakeProvider_ResolvesContextPlaceholders()
+{
+	CFakeAssistantProvider provider;
+
+	QJsonObject parameters;
+	parameters["taskId"] = QStringLiteral("$context.selection.id");
+	parameters["status"] = QStringLiteral("done");
+	provider.AddRule("done", CFakeAssistantProvider::CreateActionCallReply("tasks.setStatus", parameters), "Which task?");
+
+	IAssistantProvider::Message userMessage;
+	userMessage.role = IAssistantProvider::Message::R_USER;
+	userMessage.text = "Mark it done";
+
+	// Without a released selection the provider asks back.
+	IAssistantProvider::Request request;
+	request.messages << userMessage;
+	IAssistantProvider::Reply reply = provider.Complete(request, CCancellationToken());
+	QCOMPARE(reply.kind, IAssistantProvider::RK_CLARIFICATION);
+	QCOMPARE(reply.text, QString("Which task?"));
+
+	// With a released selection the placeholder is replaced.
+	IAssistantProvider::Message contextMessage;
+	contextMessage.role = IAssistantProvider::Message::R_CONTEXT;
+	contextMessage.actionId = "selection";
+	contextMessage.data["id"] = QStringLiteral("task-2");
+
+	IAssistantProvider::Request contextRequest;
+	contextRequest.messages << contextMessage << userMessage;
+	reply = provider.Complete(contextRequest, CCancellationToken());
+	QCOMPARE(reply.kind, IAssistantProvider::RK_ACTION_CALL);
+	QCOMPARE(reply.parameters.value("taskId").toString(), QString("task-2"));
+	QCOMPARE(reply.parameters.value("status").toString(), QString("done"));
+
+	// Context of another kind does not resolve the placeholder.
+	contextMessage.actionId = "document";
+	IAssistantProvider::Request otherKindRequest;
+	otherKindRequest.messages << contextMessage << userMessage;
+	QCOMPARE(provider.Complete(otherKindRequest, CCancellationToken()).kind, IAssistantProvider::RK_CLARIFICATION);
+}
+
+
+void CAssistantTest::testFakeProvider_ToolResultReply()
+{
+	CFakeAssistantProvider provider;
+
+	IAssistantProvider::Message toolMessage;
+	toolMessage.role = IAssistantProvider::Message::R_TOOL_RESULT;
+
+	IAssistantProvider::Request request;
+	request.messages << toolMessage;
+
+	// Not set: the default reply.
+	QCOMPARE(provider.Complete(request, CCancellationToken()).text, QString("OK"));
+
+	provider.SetToolResultReply(CFakeAssistantProvider::CreateTextReply("Here are the results."));
+	QCOMPARE(provider.Complete(request, CCancellationToken()).text, QString("Here are the results."));
+}
+
+
+void CAssistantTest::testEndToEnd_FakeProviderRules()
+{
+	// The configuration of the example application: rules instead of a script.
+	CFixture fixture;
+	CAssistantRequestContext context = CFixture::Context(s_alice, s_tenantA);
+	QByteArray conversationId = fixture.service.StartConversation(context);
+
+	QJsonObject searchParameters;
+	searchParameters["status"] = QStringLiteral("open");
+	fixture.provider.AddRule("show", CFakeAssistantProvider::CreateActionCallReply("tasks.search", searchParameters));
+
+	QJsonObject changeParameters;
+	changeParameters["taskId"] = QStringLiteral("$context.selection.id");
+	changeParameters["status"] = QStringLiteral("done");
+	fixture.provider.AddRule("done", CFakeAssistantProvider::CreateActionCallReply("tasks.setStatus", changeParameters), "Which task do you mean? Select it in the list.");
+	fixture.provider.SetToolResultReply(CFakeAssistantProvider::CreateTextReply("Select a task and hand it over."));
+
+	AssistantMessages searchMessages = fixture.service.SendUserMessage(context, conversationId, "Show open tasks");
+	QVERIFY(FindMessage(searchMessages, CAssistantMessage::MK_ACTION_RESULT) != nullptr);
+	QVERIFY(FindMessage(searchMessages, CAssistantMessage::MK_ASSISTANT_TEXT) != nullptr);
+
+	// Without a selection: a clarification, no preview.
+	AssistantMessages unclearMessages = fixture.service.SendUserMessage(context, conversationId, "Mark it done");
+	QVERIFY(FindMessage(unclearMessages, CAssistantMessage::MK_CLARIFICATION) != nullptr);
+	QVERIFY(GetPreviewId(unclearMessages).isEmpty());
+
+	// With the selection handed over: a preview of exactly this task.
+	CAssistantRequestContext::ContextItem selection;
+	selection.kind = "selection";
+	selection.label = "Review pull request";
+	selection.data["id"] = QStringLiteral("task-2");
+
+	CAssistantRequestContext selectionContext = context;
+	selectionContext.SetContextItems(CAssistantRequestContext::ContextItems() << selection);
+
+	AssistantMessages previewMessages = fixture.service.SendUserMessage(selectionContext, conversationId, "Mark it done");
+	QByteArray previewId = GetPreviewId(previewMessages);
+	QVERIFY(!previewId.isEmpty());
+	QCOMPARE(FindMessage(previewMessages, CAssistantMessage::MK_ACTION_PREVIEW)->GetData().value("targetId").toString(), QString("task-2"));
+
+	QCOMPARE(GetExecutedCode(fixture.service.ConfirmPreview(context, previewId)), QByteArray("succeeded"));
+	QCOMPARE(fixture.domain.tasks["task-2"].status, QString("done"));
+	QCOMPARE(fixture.domain.tasks["task-1"].status, QString("open"));
 }
 
 

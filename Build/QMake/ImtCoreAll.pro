@@ -268,6 +268,10 @@ imtchat.file = ../../Include/imtchat/QMake/imtchat.pro
 SUBDIRS += imtdesk
 imtdesk.file = ../../Include/imtdesk/QMake/imtdesk.pro
 
+SUBDIRS += imtassistgql
+imtassistgql.file = ../../Include/imtassistgql/QMake/imtassistgql.pro
+imtassistgql.depends = imtassist
+
 SUBDIRS += imtchatgql
 imtchatgql.file = ../../Include/imtchatgql/QMake/imtchatgql.pro
 imtchatgql.depends = imtchatsdl
@@ -528,6 +532,14 @@ ImtHypeDbPck.depends = imthypedb imtbase imtdb imthype
 SUBDIRS += ImtHypeGuiPck
 ImtHypeGuiPck.file = ../../Impl/ImtHypeGuiPck/QMake/ImtHypeGuiPck.pro
 ImtHypeGuiPck.depends = imthypegui imthype imtwidgets imtgui
+
+SUBDIRS += ImtAssistPck
+ImtAssistPck.file = ../../Impl/ImtAssistPck/QMake/ImtAssistPck.pro
+ImtAssistPck.depends = imtassist
+
+SUBDIRS += ImtAssistGqlPck
+ImtAssistGqlPck.file = ../../Impl/ImtAssistGqlPck/QMake/ImtAssistGqlPck.pro
+ImtAssistGqlPck.depends = imtassist imtassistgql imtservergql imtserverapp
 
 SUBDIRS += ImtChatPck
 ImtChatPck.file = ../../Impl/ImtChatPck/QMake/ImtChatPck.pro

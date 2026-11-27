@@ -319,6 +319,9 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_subdirectory("${INCLUDE_DIR}/imtchatgql/CMake" "${AUX_INCLUDE_DIR}/imtchatgql")
 		add_dependencies(imtchatgql imtchatsdl)
 
+		add_subdirectory("${INCLUDE_DIR}/imtassistgql/CMake" "${AUX_INCLUDE_DIR}/imtassistgql")
+		add_dependencies(imtassistgql imtassist imtbasesdl)
+
 		if(USE_QTDB)
 			add_subdirectory("${INCLUDE_DIR}/imtdeskgql/CMake" "${AUX_INCLUDE_DIR}/imtdeskgql")
 			add_dependencies(imtdeskgql imtdesksdl)
@@ -442,6 +445,9 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 			add_subdirectory("${IMPL_DIR}/ImtChatPck/CMake" "${AUX_INCLUDE_DIR}/ImtChatPck")
 			add_dependencies(ImtChatPck imtbase imtchat)
 
+			add_subdirectory("${IMPL_DIR}/ImtAssistPck/CMake" "${AUX_INCLUDE_DIR}/ImtAssistPck")
+			add_dependencies(ImtAssistPck imtassist)
+
 			add_subdirectory("${IMPL_DIR}/ImtDatabasePck/CMake" "${AUX_INCLUDE_DIR}/ImtDatabasePck")
 			add_dependencies(ImtDatabasePck imtbase imtauth imtaccount imtcol imtdb)
 			imt_chain_windeploy_target(ImtDatabasePck)
@@ -556,6 +562,9 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 			add_subdirectory("${IMPL_DIR}/ImtChatGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtChatGqlPck")
 			add_dependencies(ImtChatGqlPck imtchat imtchatsdl imtchatgql)
+
+			add_subdirectory("${IMPL_DIR}/ImtAssistGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtAssistGqlPck")
+			add_dependencies(ImtAssistGqlPck imtassist imtassistgql)
 
 			add_subdirectory("${IMPL_DIR}/ImtDeskGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtDeskGqlPck")
 			add_dependencies(ImtDeskGqlPck imtdb imtdesk imtdesksdl imtservergql imtdoc imtdeskgql)

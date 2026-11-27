@@ -1,0 +1,46 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include "ImtAssistPck.h"
+
+
+// ACF includes
+#include <icomp/export.h>
+
+
+namespace ImtAssistPck
+{
+
+
+I_EXPORT_PACKAGE(
+			"ImtAssistPck",
+			"AI assistant core component package",
+			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
+
+I_EXPORT_COMPONENT(
+			AssistantService,
+			"Provider-independent assistant service, disabled by default",
+			"Assistant AI Service");
+
+I_EXPORT_COMPONENT(
+			AssistantActionRegistry,
+			"Registry of the actions available to the assistant",
+			"Assistant AI Action Registry");
+
+I_EXPORT_COMPONENT(
+			UiRepresentationRegistry,
+			"Registry of the UI representation types known to the application",
+			"Assistant AI UI Representation Registry");
+
+I_EXPORT_COMPONENT(
+			FakeAssistantProvider,
+			"Deterministic assistant provider for development, demos and tests",
+			"Assistant AI Provider Fake Test");
+
+I_EXPORT_COMPONENT(
+			AssistantAuditLog,
+			"Writes assistant audit events without content to the log",
+			"Assistant AI Audit Log");
+
+
+} // namespace ImtAssistPck
+
+
