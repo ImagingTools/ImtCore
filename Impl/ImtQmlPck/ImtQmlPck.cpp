@@ -31,6 +31,11 @@ I_EXPORT_COMPONENT(
 			"Quick QML");
 
 I_EXPORT_COMPONENT(
+			StandartSplashScreenQuick,
+			"Splash screen based on the QML object, shows the product and version information over the background image from the resources",
+			"Splash Screen Quick QML");
+
+I_EXPORT_COMPONENT(
 			ClientUserContext,
 			"Client-specific context for control global properties of QML engine",
 			"Client Localization QML-Engine");

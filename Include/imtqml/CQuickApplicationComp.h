@@ -33,7 +33,8 @@ public:
 		I_ASSIGN(m_minimumWindowWidthAttrPtr, "MinimumWindowWidth", "Minimum window width", false, 800);
 		I_ASSIGN(m_minimumWindowHeightAttrPtr, "MinimumWindowHeight", "Minimum window height", false, 600);
 		I_ASSIGN(m_visibilityAttrPtr, "Visibility", "The screen-occupation state of the window:\n0 - Hidden;\n1 - AutomaticVisibility;\n2 - Windowed;\n3 - Minimized;\n4 - Maximized;\n5 - FullScreen", false, 1);
-		I_ASSIGN(m_splashCompPtr, "SplashScreen", "Splash QML object (root must be an Item) shown in a fixed-size window while the main UI is loading. If not set or not loadable, the built-in splash is used", false, "SplashScreen");
+		I_ASSIGN(m_splashCompPtr, "SplashScreen", "Splash QML object (root must be an Item) shown in a fixed-size window while the main UI is loading. If not set, no splash is shown", false, "SplashScreen");
+		I_ASSIGN(m_minSplashTimeAttrPtr, "MinSplashTime", "Minimum time in milliseconds the splash is shown before the main window appears", false, 3000);
 	I_END_COMPONENT;
 
 	CQuickApplicationComp();
@@ -96,6 +97,7 @@ protected:
 	I_ATTR(int, m_minimumWindowHeightAttrPtr);
 	I_ATTR(int, m_visibilityAttrPtr);
 	I_REF(imtqml::IQuickObject, m_splashCompPtr);
+	I_ATTR(int, m_minSplashTimeAttrPtr);
 };
 
 

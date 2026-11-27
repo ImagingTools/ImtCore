@@ -200,6 +200,9 @@
                     <AttributeInfo Id="MainQuickWindow" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="MainWindow"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="MinSplashTime" Type="Integer" ExportId="MinSplashTime">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="MinimumWindowHeight" Type="Integer" ExportId="MinimumWindowHeight">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

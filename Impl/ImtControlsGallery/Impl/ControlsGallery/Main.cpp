@@ -62,8 +62,6 @@ int main(int argc, char *argv[])
 	Q_INIT_RESOURCE(controlsgalleryContactInfoCollectionDocumentServiceSdl);
 	Q_INIT_RESOURCE(imtguivars);
 
-	DefaultImtCoreQmlInitializer::InitQuickApplication();
-
 #ifdef Q_OS_WIN
 #if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
 	QQuickWindow::setGraphicsApi(QSGRendererInterface::Direct3D12);

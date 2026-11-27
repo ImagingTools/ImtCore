@@ -3,6 +3,7 @@
 
 
 // Qt includes
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QTimer>
 #include <QtCore/QtMath>
 #include <QtCore/QSettings>
@@ -84,41 +85,35 @@ int CQuickApplicationComp::Execute(int argc, char** argv)
 
 			QObject::connect(engine.GetPtr(), &QQmlApplicationEngine::quit, &QGuiApplication::quit);
 
-			// Fixed-size splash window, shown while the main QML tree is being created:
+			// Fixed-size splash window, shown while the main QML tree is being created. It is used only if the splash component is connected:
 			imtqml::IQuickObject* splashQuickPtr = m_splashCompPtr.GetPtr();
 			bool isCustomSplash = false;
-			QQmlComponent hostComponent(engine.GetPtr(), QUrl("qrc:/imtqml/SplashHostWindow.qml"));
-			QQuickWindow* hostWindowPtr = qobject_cast<QQuickWindow*>(hostComponent.create());
+			bool isSplashShown = false;
+			QElapsedTimer splashTimer;
+			QQuickWindow* hostWindowPtr = nullptr;
+			if (splashQuickPtr != nullptr){
+				QQmlComponent hostComponent(engine.GetPtr(), QUrl("qrc:/imtqml/SplashHostWindow.qml"));
+				hostWindowPtr = qobject_cast<QQuickWindow*>(hostComponent.create());
+			}
+
 			if (hostWindowPtr != nullptr){
-				QQuickItem* splashItemPtr = nullptr;
-				if (splashQuickPtr != nullptr){
-					if (splashQuickPtr->CreateQuickItem(hostWindowPtr->contentItem()) && splashQuickPtr->GetQuickItem() != nullptr){
-						splashItemPtr = splashQuickPtr->GetQuickItem();
-						isCustomSplash = true;
-					}
-					else{
-						qWarning() << "Unable to create the splash item";
-					}
-				}
+				if (splashQuickPtr->CreateQuickItem(hostWindowPtr->contentItem()) && splashQuickPtr->GetQuickItem() != nullptr){
+					QQuickItem* splashItemPtr = splashQuickPtr->GetQuickItem();
+					isCustomSplash = true;
 
-				if (splashItemPtr == nullptr){
-					QQmlComponent defaultSplashComponent(engine.GetPtr(), QUrl("qrc:/imtqml/DefaultSplashScreen.qml"));
-					splashItemPtr = qobject_cast<QQuickItem*>(defaultSplashComponent.create());
-					if (splashItemPtr == nullptr){
-						qWarning() << "Unable to create the default splash item:" << defaultSplashComponent.errors();
-					}
-					else{
-						splashItemPtr->setParent(hostWindowPtr);
-						splashItemPtr->setParentItem(hostWindowPtr->contentItem());
-					}
-				}
-
-				if (splashItemPtr != nullptr){
 					if (splashItemPtr->implicitWidth() > 0 && splashItemPtr->implicitHeight() > 0){
-						hostWindowPtr->resize(qCeil(splashItemPtr->implicitWidth()), qCeil(splashItemPtr->implicitHeight()));
+						const QSize splashSize(qCeil(splashItemPtr->implicitWidth()), qCeil(splashItemPtr->implicitHeight()));
+						hostWindowPtr->setMinimumSize(splashSize);
+						hostWindowPtr->setMaximumSize(splashSize);
+						hostWindowPtr->resize(splashSize);
 					}
 					splashItemPtr->setSize(QSizeF(hostWindowPtr->width(), hostWindowPtr->height()));
 					hostWindowPtr->show();
+					splashTimer.start();
+					isSplashShown = true;
+				}
+				else{
+					qWarning() << "Unable to create the splash item";
 				}
 			}
 
@@ -205,6 +200,16 @@ int CQuickApplicationComp::Execute(int argc, char** argv)
 						}
 						settings.endGroup();
 					});
+
+					// Keep the splash visible for the minimum time (events are processed, so the splash stays animated):
+					if (isSplashShown && m_minSplashTimeAttrPtr.IsValid()){
+						const qint64 remainingMs = qint64(*m_minSplashTimeAttrPtr) - splashTimer.elapsed();
+						if (remainingMs > 0){
+							QEventLoop waitLoop;
+							QTimer::singleShot(int(remainingMs), &waitLoop, &QEventLoop::quit);
+							waitLoop.exec();
+						}
+					}
 
 					window->show();
 					QGuiApplication::processEvents();

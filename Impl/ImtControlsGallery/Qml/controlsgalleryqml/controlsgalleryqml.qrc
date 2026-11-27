@@ -8,7 +8,6 @@
     <qresource prefix="/qml">
         <file alias="ImtControlsGalleryMain.qml">ImtControlsGalleryMain.qml</file>
         <file alias="ImtControlsGalleryWeb.qml">ImtControlsGalleryWeb.qml</file>
-        <file alias="SplashScreen.qml">SplashScreen.qml</file>
         <file alias="ButtonsRepresentaitonPage.qml">ButtonsRepresentaitonPage.qml</file>
         <file alias="InputsRepresentaitonPage.qml">InputsRepresentaitonPage.qml</file>
         <file alias="ViewsRepresentaitonPage.qml">ViewsRepresentaitonPage.qml</file>
