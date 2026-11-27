@@ -8,7 +8,7 @@
 import { CanvasContext, commandsExceed, replayCommands } from './canvas.js';
 import { fonts } from './fonts.js';
 import { layoutRichText, linkAtPoint, mightBeRichText, paintRichText, parseRichText } from './richtext.js';
-import { KEY, MODIFIERS, parseKeySequence, qtKeyToDom, STANDARD_KEYS } from './keys.js';
+import { KEY, MODIFIERS, parseKeySequence, pointerState, qtKeyToDom, STANDARD_KEYS } from './keys.js';
 import { QmlError } from './lexer.js';
 import { colorToString, parseColor, toColor, toFloat } from './util.js';
 
@@ -2889,6 +2889,10 @@ export class Canvas extends Item {
 		this.$paintedHeight = -1;
 		this.$context = null;
 		this.$measureContext = null;
+		this.$images = new Map(); // address -> 'loading', 'ready' or 'error'
+		this.$pictures = new Map();
+		this.$drawWaits = new Set(); // addresses drawImage waits for
+		this.$announced = new Set(); // addresses loadImage() was called with: imageLoaded is sent for them
 		this.$renderTarget = 0; // Canvas.Image
 		this.$renderStrategy = 0; // Canvas.Immediate
 		this.$declareSignal('paint', []);
@@ -2900,15 +2904,26 @@ export class Canvas extends Item {
 	// The picture is kept for `createPattern(url, ...)`; the engine finds it from the address like the one of an Image.
 	loadImage(src) {
 		const url = toStr(src);
-		if (this.$images === undefined) {
-			this.$images = new Map();
-			this.$pictures = new Map();
-		}
 		const state = this.$images.get(url);
+		if (state !== 'ready') this.$announced.add(url);
 		if (state === 'ready' || state === 'loading') return;
 		this.$images.set(url, 'loading');
 		this.$painted = false;
 		this.$ensurePainted();
+		this.$requestPicture(url);
+	}
+
+	// drawImage() of an address that is not loaded: as in Qt the picture shows without a loadImage() call, here one paint later.
+	$drawRequest(url) {
+		const state = this.$images.get(url);
+		if (state === 'ready' || state === 'error') return;
+		this.$drawWaits.add(url);
+		if (state === 'loading') return;
+		this.$images.set(url, 'loading');
+		this.$requestPicture(url);
+	}
+
+	$requestPicture(url) {
 		const canvas = this;
 		hooks.loadImage(
 			{
@@ -2921,11 +2936,13 @@ export class Canvas extends Item {
 					if (canvas.$images.get(url) !== 'loading') return;
 					if (status === 3) {
 						canvas.$images.set(url, 'error');
+						canvas.$drawWaits.delete(url);
 						return;
 					}
 					if (picture !== null) canvas.$pictures.set(url, picture);
 					canvas.$images.set(url, 'ready');
-					canvas.$emit('imageLoaded');
+					if (canvas.$drawWaits.delete(url)) canvas.requestPaint();
+					if (canvas.$announced.delete(url)) canvas.$emit('imageLoaded');
 				},
 			},
 			url,
@@ -2933,18 +2950,16 @@ export class Canvas extends Item {
 	}
 
 	unloadImage(src) {
-		if (this.$images !== undefined) {
-			this.$images.delete(toStr(src));
-			this.$pictures.delete(toStr(src));
-		}
+		this.$images.delete(toStr(src));
+		this.$pictures.delete(toStr(src));
 	}
 
 	isImageLoaded(src) {
-		return this.$images !== undefined && this.$images.get(toStr(src)) === 'ready';
+		return this.$images.get(toStr(src)) === 'ready';
 	}
 
 	isImageLoading(src) {
-		return this.$images !== undefined && this.$images.get(toStr(src)) === 'loading';
+		return this.$images.get(toStr(src)) === 'loading';
 	}
 
 	// Inside onPaint this is the recording context. Outside of it (e.g. a hidden canvas used only
@@ -2970,7 +2985,7 @@ export class Canvas extends Item {
 		this.$cmds = [];
 		const signal = this.$sigs.get('paint');
 		if (signal.handlers.length > 0) {
-			this.$context = new CanvasContext(this.$aw, this.$ah, this.$cmds, this.$pictures === undefined ? null : this.$pictures);
+			this.$context = new CanvasContext(this.$aw, this.$ah, this.$cmds, this.$pictures, (url) => this.$drawRequest(url));
 			try {
 				this.$emit('paint');
 			} finally {
@@ -3046,6 +3061,7 @@ export class MouseArea extends Item {
 		this.$holdInterval = 800;
 		this.$holdDeadline = 0; // seconds of the engine time at which pressAndHold is sent; 0 when it is not awaited
 		this.$held = false;
+		this.$wheelPassed = false; // true while a wheel event it did not accept looks for the item below it
 		this.$declareSignal('clicked', ['mouse']);
 		this.$declareSignal('pressed', ['mouse']);
 		this.$declareSignal('released', ['mouse']);
@@ -3060,7 +3076,7 @@ export class MouseArea extends Item {
 
 	$mouseEvent() {
 		const button = this.$pressButton === 2 ? 'RightButton' : 'LeftButton';
-		return { x: this.$mouseX, y: this.$mouseY, button, buttons: button, modifiers: 0, accepted: true, wasHeld: this.$held, isClick: true };
+		return { x: this.$mouseX, y: this.$mouseY, button, buttons: button, modifiers: pointerState.modifiers, accepted: true, wasHeld: this.$held, isClick: true };
 	}
 
 	get $acceptsMouse() {
@@ -3069,6 +3085,21 @@ export class MouseArea extends Item {
 
 	$acceptsButton(button) {
 		return button < 0 || (this.$buttons & (button === 2 ? 2 : button === 1 ? 4 : 1)) !== 0;
+	}
+
+	// As in Qt the area takes the wheel only when something listens to `wheel`.
+	get $acceptsWheel() {
+		if (this.$wheelPassed || this.$sigs === null || !itemEnabled(this)) return false;
+		const signal = this.$sigs.get('wheel');
+		return signal !== undefined && signal.handlers.length > 0;
+	}
+
+	// True when a handler left the event accepted.
+	$mouseWheel(notches, x, y, horizontalNotches = 0) {
+		if (!this.$acceptsWheel) return false;
+		const event = { x: x - this.$sx, y: y - this.$sy, angleDelta: { x: horizontalNotches * 120, y: notches * 120 }, pixelDelta: { x: 0, y: 0 }, buttons: 0, modifiers: pointerState.modifiers, inverted: false, accepted: true };
+		this.$emit('wheel', [event]);
+		return event.accepted;
 	}
 
 	$mousePressAt(sceneX, sceneY) {
@@ -11622,7 +11653,7 @@ export class WheelHandler extends PointerHandler {
 		}
 		const px = x - item.$sx;
 		const py = y - item.$sy;
-		this.$emit('wheel', [{ x: px, y: py, angleDelta: { x: vertical ? 0 : angle, y: vertical ? angle : 0 }, pixelDelta: { x: 0, y: 0 }, modifiers: 0, inverted: false, accepted: true, position: { x: px, y: py }, scenePosition: { x, y } }]);
+		this.$emit('wheel', [{ x: px, y: py, angleDelta: { x: vertical ? 0 : angle, y: vertical ? angle : 0 }, pixelDelta: { x: 0, y: 0 }, modifiers: pointerState.modifiers, inverted: false, accepted: true, position: { x: px, y: py }, scenePosition: { x, y } }]);
 		return true;
 	}
 }

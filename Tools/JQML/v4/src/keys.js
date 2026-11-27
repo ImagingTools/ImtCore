@@ -23,6 +23,17 @@ export const MODIFIERS = {
 	KeypadModifier: 0x20000000,
 };
 
+// The modifiers held at the last pointer or wheel event of the page (the host sets them): mouse and wheel events carry them.
+export const pointerState = { modifiers: 0 };
+
+export function domModifiers(e) {
+	let modifiers = 0;
+	if (e.shiftKey) modifiers |= MODIFIERS.ShiftModifier;
+	if (e.ctrlKey || e.metaKey) modifiers |= MODIFIERS.ControlModifier;
+	if (e.altKey) modifiers |= MODIFIERS.AltModifier;
+	return modifiers;
+}
+
 const NAMED = {
 	Escape: KEY.Key_Escape, Tab: KEY.Key_Tab, Backspace: KEY.Key_Backspace, Enter: KEY.Key_Return, Insert: KEY.Key_Insert,
 	Delete: KEY.Key_Delete, Home: KEY.Key_Home, End: KEY.Key_End, ArrowLeft: KEY.Key_Left, ArrowUp: KEY.Key_Up,

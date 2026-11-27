@@ -1038,6 +1038,8 @@ Rectangle {
 			
 			property int fontSize: canvasPage.objectFontSize
 			property int fontSizeS: canvasPage.objectSecondaryFontSize
+			// Quoted: Qt rejects a font family name with spaces in ctx.font without quotes
+			property string quotedFontFamily: "\"" + Style.fontFamily + "\""
 			property int radius_: Style.radiusXS
 			property int borderShift: 4
 			property int shadowSize: 6
@@ -1339,13 +1341,13 @@ Rectangle {
 				let thirdText = item.m_thirdText
 				
 				ctx.lineWidth = 1;
-				let fontStr_main = String(canvas.fontSize) + "px " + Style.fontFamily
+				let fontStr_main = String(canvas.fontSize) + "px " + canvas.quotedFontFamily
 				ctx.font = fontStr_main;
 
 				let textWidth_main = ctx.measureText(mainText).width
 				
 				ctx.lineWidth = 0.5;
-				let fontStr_second = String(canvas.fontSizeS) + "px " + Style.fontFamily
+				let fontStr_second = String(canvas.fontSizeS) + "px " + canvas.quotedFontFamily
 				ctx.font = fontStr_second;
 				let textWidth_second = ctx.measureText(secondText).width
 				let textWidth_third = ctx.measureText(thirdText).width
@@ -1502,7 +1504,7 @@ Rectangle {
 				ctx.strokeStyle = canvas.mainTextColor;
 				ctx.fillStyle = canvas.mainTextColor;
 				ctx.lineWidth = 1;
-				ctx.font = String(canvas.fontSize) + "px " + Style.fontFamily
+				ctx.font = String(canvas.fontSize) + "px " + canvas.quotedFontFamily
 				let text_x = x_ + canvas.borderShift + canvas.textMargin;
 				let text_y = y_ + canvas.borderShift + canvas.textVerticalOffset;
 				let iconsWidth = 0
@@ -1527,7 +1529,7 @@ Rectangle {
 				ctx.strokeStyle = canvas.secondTextColor;
 				ctx.fillStyle = canvas.secondTextColor;
 				ctx.lineWidth = 0.5;
-				let fontStr2 = String(canvas.fontSizeS) + "px " + Style.fontFamily
+				let fontStr2 = String(canvas.fontSizeS) + "px " + canvas.quotedFontFamily
 				ctx.font = fontStr2;
 				let availableBottomWidth = mainRecWidth - 2 * (canvas.borderShift + canvas.textMargin)
 				let thirdTextWidth = Math.min(ctx.measureText(thirdText).width, availableBottomWidth / 2)

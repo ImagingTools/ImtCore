@@ -1,4 +1,5 @@
 import { attachTextProxy } from './textproxy.js';
+import { domModifiers, pointerState } from './keys.js';
 
 // Connects a scene to a canvas of the page: size, pointer and keyboard input, the system clipboard and
 // the animation loop. Shared by the viewer page (app.js) and by compiled applications (runtime.js).
@@ -16,6 +17,7 @@ export function attachCanvas(canvas, scene, engine, options = {}) {
 	updateSize();
 
 	function position(event) {
+		pointerState.modifiers = domModifiers(event);
 		const rect = canvas.getBoundingClientRect();
 		return [event.clientX - rect.left, event.clientY - rect.top];
 	}
