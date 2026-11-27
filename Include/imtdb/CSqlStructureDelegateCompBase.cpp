@@ -432,7 +432,7 @@ bool CSqlStructureDelegateCompBase::ExecuteTransaction(const QByteArray& sqlQuer
 		return false;
 	}
 
-	QStringList queryList = QString::fromUtf8(sqlQuery).split(";");
+	QStringList queryList = imtdb::SplitSqlStatements(QString::fromUtf8(sqlQuery));
 
 	m_dbEngineCompPtr->BeginTransaction();
 

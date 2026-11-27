@@ -137,14 +137,16 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CMessageDbDelegateComp::CreateNew
 	QString combinedQuery;
 
 	// INSERT into Messages table (without AttachmentIds column)
+	// The content is appended: a following arg() would replace a "%N" typed in it
 	combinedQuery += QString(
 		"INSERT INTO \"Messages\" "
 		"(\"Id\", \"ConversationId\", \"SenderId\", \"Content\", \"Status\", \"ReplyToId\", \"CreatedAt\", \"UpdatedAt\") "
-		"VALUES('%1', '%2', '%3', '%4', %5, %6, '%7', '%8');")
+		"VALUES('%1', '%2', '%3', '")
 		.arg(msgId)
 		.arg(msgPtr->GetConversationId())
 		.arg(msgPtr->GetSenderId())
-		.arg(imtdb::SqlEncode(msgPtr->GetContent()))
+		+ imtdb::SqlEncode(msgPtr->GetContent())
+		+ QString("', %1, %2, '%3', '%4');")
 		.arg(msgPtr->GetStatus())
 		.arg(replyToIdSql)
 		.arg(nowUtc)
@@ -193,13 +195,12 @@ QByteArray CMessageDbDelegateComp::CreateUpdateObjectQuery(
 	QString combinedQuery;
 
 	// UPDATE the message row
-	combinedQuery += QString(
-		"UPDATE \"Messages\" SET "
-		"\"Content\"='%1', "
-		"\"Status\"=%2, "
-		"\"UpdatedAt\"='%3' "
-		"WHERE \"Id\"='%4';")
-		.arg(imtdb::SqlEncode(msgPtr->GetContent()))
+	combinedQuery += QStringLiteral("UPDATE \"Messages\" SET \"Content\"='")
+		+ imtdb::SqlEncode(msgPtr->GetContent())
+		+ QString(
+		"', \"Status\"=%1, "
+		"\"UpdatedAt\"='%2' "
+		"WHERE \"Id\"='%3';")
 		.arg(msgPtr->GetStatus())
 		.arg(nowUtc)
 		.arg(escapedId);

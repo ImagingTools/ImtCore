@@ -23,6 +23,13 @@ namespace imtdeskdb
 {
 
 
+// User text is appended, not passed to QString::arg(): a following arg() would replace a "%N" typed in it
+static QString QuoteText(const QString& text)
+{
+	return QLatin1Char('\'') + imtdb::EscapeSql(text) + QLatin1Char('\'');
+}
+
+
 QString CSupportTicketDbDelegateComp::EscapeSqlLikePattern(const QString& value) const
 {
 	QString escaped = value;
@@ -282,9 +289,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 			reporterId = QString::fromUtf8(gqlContextPtr->GetUserId());
 		}
 	}
-	const QString reporterSql = reporterId.isEmpty()
-			? "NULL"
-			: QStringLiteral("'%1'").arg(imtdb::EscapeSql(reporterId));
+	const QString reporterSql = reporterId.isEmpty() ? QStringLiteral("NULL") : QuoteText(reporterId);
 	const QString conversationId = QString::fromUtf8(ticketPtr->GetConversationId());
 	const QString messageId = QString::fromUtf8(ticketPtr->GetMessageId());
 	const QString resolvedAt = ticketPtr->GetResolvedAt();
@@ -296,9 +301,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 	const QString resolvedSql = resolvedAt.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(resolvedAt);
 	const QString closedSql = closedAt.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(closedAt);
 
-	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty()
-			? "NULL"
-			: QStringLiteral("'%1'").arg(imtdb::EscapeSql(ticketPtr->GetLockReason()));
+	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty() ? QStringLiteral("NULL") : QuoteText(ticketPtr->GetLockReason());
 
 	const QString nowUtc = imtdb::UtcNow();
 
@@ -311,24 +314,26 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 		"\"AssigneeIds\", \"ReporterId\", \"ConversationId\", \"MessageId\", "
 		"\"Locked\", \"LockReason\", "
 		"\"ResolvedAt\", \"ClosedAt\", \"CreatedAt\", \"UpdatedAt\") "
-		"VALUES('%1', '%2', '%3', %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15, '%16', '%17');")
-		.arg(ticketId)
-		.arg(imtdb::EscapeSql(title))
-		.arg(imtdb::EscapeSql(ticketPtr->GetDescription()))
-		.arg(ticketPtr->GetTicketType())
-		.arg(ticketPtr->GetStatus())
-		.arg(ticketPtr->GetStateReason())
-		.arg(ticketPtr->GetPriority())
-		.arg(assigneesSql)
-		.arg(reporterSql)
-		.arg(convSql)
-		.arg(msgSql)
-		.arg(ticketPtr->IsLocked() ? "TRUE" : "FALSE")
-		.arg(lockReasonSql)
-		.arg(resolvedSql)
-		.arg(closedSql)
-		.arg(nowUtc)
-		.arg(nowUtc);
+		"VALUES('%1', ").arg(ticketId)
+		+ QuoteText(title) + QStringLiteral(", ")
+		+ QuoteText(ticketPtr->GetDescription()) + QStringLiteral(", ")
+		+ QString("%1, %2, %3, %4, %5, ")
+			.arg(ticketPtr->GetTicketType())
+			.arg(ticketPtr->GetStatus())
+			.arg(ticketPtr->GetStateReason())
+			.arg(ticketPtr->GetPriority())
+			.arg(assigneesSql)
+		+ reporterSql
+		+ QString(", %1, %2, %3, ")
+			.arg(convSql)
+			.arg(msgSql)
+			.arg(ticketPtr->IsLocked() ? "TRUE" : "FALSE")
+		+ lockReasonSql
+		+ QString(", %1, %2, '%3', '%4');")
+			.arg(resolvedSql)
+			.arg(closedSql)
+			.arg(nowUtc)
+			.arg(nowUtc);
 
 	// INSERT into TicketEntityReferences junction table using entity reference IDs
 	const QByteArrayList entityRefIds = ticketPtr->GetEntityReferences();
@@ -380,46 +385,42 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 	const QString resolvedSql = resolvedAt.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(resolvedAt);
 	const QString closedSql = closedAt.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(closedAt);
 
-	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty()
-			? "NULL"
-			: QStringLiteral("'%1'").arg(imtdb::EscapeSql(ticketPtr->GetLockReason()));
+	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty() ? QStringLiteral("NULL") : QuoteText(ticketPtr->GetLockReason());
 
 	const QString nowUtc = imtdb::UtcNow();
 
 	QString combinedQuery;
 
-	combinedQuery += QString(
-		"UPDATE \"Tickets\" SET "
-		"\"Title\"='%1', "
-		"\"Description\"='%2', "
-		"\"TicketType\"=%3, "
-		"\"Status\"=%4, "
-		"\"StateReason\"=%5, "
-		"\"Priority\"=%6, "
-		"\"AssigneeIds\"=%7, "
-		"\"ConversationId\"=%8, "
-		"\"MessageId\"=%9, "
-		"\"Locked\"=%10, "
-		"\"LockReason\"=%11, "
-		"\"ResolvedAt\"=%12, "
-		"\"ClosedAt\"=%13, "
-		"\"UpdatedAt\"='%14' "
-		"WHERE \"Id\"='%15';")
-		.arg(imtdb::EscapeSql(ticketPtr->GetTitle()))
-		.arg(imtdb::EscapeSql(ticketPtr->GetDescription()))
-		.arg(ticketPtr->GetTicketType())
-		.arg(ticketPtr->GetStatus())
-		.arg(ticketPtr->GetStateReason())
-		.arg(ticketPtr->GetPriority())
-		.arg(assigneesSql)
-		.arg(convSql)
-		.arg(msgSql)
-		.arg(ticketPtr->IsLocked() ? "TRUE" : "FALSE")
-		.arg(lockReasonSql)
-		.arg(resolvedSql)
-		.arg(closedSql)
-		.arg(nowUtc)
-		.arg(objectId);
+	combinedQuery += QStringLiteral("UPDATE \"Tickets\" SET \"Title\"=") + QuoteText(ticketPtr->GetTitle())
+		+ QStringLiteral(", \"Description\"=") + QuoteText(ticketPtr->GetDescription())
+		+ QString(
+			", \"TicketType\"=%1, "
+			"\"Status\"=%2, "
+			"\"StateReason\"=%3, "
+			"\"Priority\"=%4, "
+			"\"AssigneeIds\"=%5, "
+			"\"ConversationId\"=%6, "
+			"\"MessageId\"=%7, "
+			"\"Locked\"=%8, "
+			"\"LockReason\"=")
+			.arg(ticketPtr->GetTicketType())
+			.arg(ticketPtr->GetStatus())
+			.arg(ticketPtr->GetStateReason())
+			.arg(ticketPtr->GetPriority())
+			.arg(assigneesSql)
+			.arg(convSql)
+			.arg(msgSql)
+			.arg(ticketPtr->IsLocked() ? "TRUE" : "FALSE")
+		+ lockReasonSql
+		+ QString(
+			", \"ResolvedAt\"=%1, "
+			"\"ClosedAt\"=%2, "
+			"\"UpdatedAt\"='%3' "
+			"WHERE \"Id\"='%4';")
+			.arg(resolvedSql)
+			.arg(closedSql)
+			.arg(nowUtc)
+			.arg(QString::fromUtf8(objectId));
 
 	// Delete old junction rows and re-insert entity references using IDs
 	combinedQuery += QString(
@@ -485,10 +486,8 @@ QByteArray CSupportTicketDbDelegateComp::CreateRenameObjectQuery(
 		return QByteArray();
 	}
 
-	return QStringLiteral(R"(UPDATE "Tickets" SET "Title"='%1', "UpdatedAt"='%2' WHERE "Id"='%3';)")
-		.arg(imtdb::EscapeSql(newObjectName))
-		.arg(imtdb::UtcNow())
-		.arg(objectId)
+	return (QStringLiteral(R"(UPDATE "Tickets" SET "Title"=)") + QuoteText(newObjectName)
+		+ QStringLiteral(R"(, "UpdatedAt"='%1' WHERE "Id"='%2';)").arg(imtdb::UtcNow(), QString::fromUtf8(objectId)))
 		.toUtf8();
 }
 
@@ -503,10 +502,8 @@ QByteArray CSupportTicketDbDelegateComp::CreateDescriptionObjectQuery(
 		return QByteArray();
 	}
 
-	return QStringLiteral(R"(UPDATE "Tickets" SET "Description"='%1', "UpdatedAt"='%2' WHERE "Id"='%3';)")
-		.arg(imtdb::EscapeSql(description))
-		.arg(imtdb::UtcNow())
-		.arg(objectId)
+	return (QStringLiteral(R"(UPDATE "Tickets" SET "Description"=)") + QuoteText(description)
+		+ QStringLiteral(R"(, "UpdatedAt"='%1' WHERE "Id"='%2';)").arg(imtdb::UtcNow(), QString::fromUtf8(objectId)))
 		.toUtf8();
 }
 
