@@ -17,9 +17,12 @@
 #include <itest/CStandardTestExecutor.h>
 
 // ImtCore includes
-#include <imtauth/CCrossOrgGrantComp.h>
-#include <imtauth/CCrossOrgGrantManagerComp.h>
 #include <imtauth/CDocumentShareInfo.h>
+#include <imtauth/CContractManagerComp.h>
+#include <imtauth/CContractInfoComp.h>
+#include <imtauth/CContractEventInfoComp.h>
+#include <imtauth/CContractPartyPrivateInfoComp.h>
+#include <imtauth/CProductPermissionSnapshot.h>
 #include <imtauth/CDocumentShareInfoComp.h>
 #include <imtauth/CDocumentShareManagerComp.h>
 #include <imtauth/CPersonalAccessToken.h>
@@ -36,15 +39,9 @@
 #include <imtauth/CTenantMembership.h>
 #include <imtauth/CTenantMembershipComp.h>
 #include <imtauth/CTenantMembershipManagerComp.h>
-#include <imtauth/CTenantRelationshipInfo.h>
-#include <imtauth/CTenantRelationshipInfoComp.h>
-#include <imtauth/CTenantRelationshipProposal.h>
-#include <imtauth/CTenantRelationshipProposalComp.h>
 #include <imtauth/TenantEvents.h>
 #include <imtauth/CUserVerification.h>
 #include <imtauth/CUserVerificationControllerComp.h>
-#include <imtauth/CTenantRelationshipProviderComp.h>
-#include <imtauth/CRelationshipDocumentValidatorComp.h>
 #include <imtdoc/imtdoc.h>
 
 // Test includes
@@ -235,6 +232,7 @@ public:
 		manager->SetRef("RelationshipProvider", relationships);
 		manager->SetBoolAttr("AutoAccept", true);
 		manager->SetIntAttr("RelationshipCacheTimeout", 10);
+		manager->SetIdAttr("ProductId", CTestRelationshipProviderComp::s_productId);
 		manager->InitComponent();
 	}
 
@@ -330,23 +328,17 @@ class CConnectionFixture
 public:
 	CConnectionFixture()
 	{
-		for (CTestCollectionComp* collectionPtr : {&requests.GetImpl(), &codes.GetImpl(), &connections.GetImpl(), &proposals.GetImpl(), &relationships.GetImpl()}){
+		for (CTestCollectionComp* collectionPtr : {&requests.GetImpl(), &codes.GetImpl(), &connections.GetImpl()}){
 			collectionPtr->SetUuidFieldIds({"TenantAId", "TenantBId", "SourceTenantId", "TargetTenantId", "ConnectionId", "Id"});
 		}
 		requests->InitComponent();
 		codes->InitComponent();
 		connections->InitComponent();
-		proposals->InitComponent();
-		relationships->InitComponent();
 
 		manager->SetRef("RequestCollection", requests);
 		manager->SetRef("ConnectionCodeCollection", codes);
 		manager->SetRef("ConnectionCollection", connections);
-		manager->SetRef("ProposalCollection", proposals);
-		manager->SetRef("RelationshipCollection", relationships);
 		manager->SetFactory("ConnectionFactory", &connectionFactory);
-		manager->SetFactory("RelationshipFactory", &relationshipFactory);
-		manager->SetFactory("ProposalFactory", &proposalFactory);
 		manager->InitComponent();
 	}
 
@@ -366,41 +358,9 @@ public:
 		return connections->AddObject("TenantConnection", connection, connectionId);
 	}
 
-	QByteArray AddRelationship(
-				const QByteArray& connectionId,
-				const QByteArray& sourceTenantId,
-				const QByteArray& targetTenantId,
-				imtauth::ITenantRelationshipInfo::TenantRelationshipStatus status = imtauth::ITenantRelationshipInfo::TRS_ACTIVE,
-				const QDateTime& createdAt = QDateTime(),
-				const QDateTime& updatedAt = QDateTime())
-	{
-		const QByteArray relationshipId = NewId();
-
-		imtauth::CIdentifiableTenantRelationshipInfo relationship;
-		relationship.SetRelationshipId(relationshipId);
-		relationship.SetConnectionId(connectionId);
-		relationship.SetSourceTenantId(sourceTenantId);
-		relationship.SetTargetTenantId(targetTenantId);
-		relationship.SetStatus(status);
-		relationship.SetCreatedAt(createdAt.toString(Qt::ISODateWithMs));
-		relationship.SetUpdatedAt(updatedAt.toString(Qt::ISODateWithMs));
-
-		return relationships->AddObject("TenantRelationship", relationship, relationshipId);
-	}
-
 	CTestCollectionComp& Connections()
 	{
 		return connections.GetImpl();
-	}
-
-	CTestCollectionComp& Relationships()
-	{
-		return relationships.GetImpl();
-	}
-
-	CTestCollectionComp& Proposals()
-	{
-		return proposals.GetImpl();
 	}
 
 	imtauth::ITenantConnectionRequestManager& Manager()
@@ -416,41 +376,8 @@ public:
 	icomp::TSimSharedComponentPtr<CTestCollectionComp> requests;
 	icomp::TSimSharedComponentPtr<CTestCollectionComp> codes;
 	icomp::TSimSharedComponentPtr<CTestCollectionComp> connections;
-	icomp::TSimSharedComponentPtr<CTestCollectionComp> proposals;
-	icomp::TSimSharedComponentPtr<CTestCollectionComp> relationships;
 	icomp::TSimComponentsFactory<imtauth::CTenantConnectionComp> connectionFactory;
-	icomp::TSimComponentsFactory<imtauth::CTenantRelationshipInfoComp> relationshipFactory;
-	icomp::TSimComponentsFactory<imtauth::CTenantRelationshipProposalComp> proposalFactory;
 	icomp::TSimSharedComponentPtr<CTestConnectionManagerComp> manager;
-};
-
-
-class CGrantFixture
-{
-public:
-	CGrantFixture()
-	{
-		collection->SetUuidFieldIds({"SourceTenantId", "TargetTenantId"});
-		collection->InitComponent();
-
-		manager->SetRef("GrantCollection", collection);
-		manager->SetFactory("GrantFactory", &grantFactory);
-		manager->InitComponent();
-	}
-
-	CTestCollectionComp& Collection()
-	{
-		return collection.GetImpl();
-	}
-
-	imtauth::ICrossOrgGrant& Manager()
-	{
-		return manager.GetImpl();
-	}
-
-	icomp::TSimSharedComponentPtr<CTestCollectionComp> collection;
-	icomp::TSimComponentsFactory<imtauth::CCrossOrgGrantComp> grantFactory;
-	icomp::TSimSharedComponentPtr<imtauth::CCrossOrgGrantManagerComp> manager;
 };
 
 
@@ -964,93 +891,15 @@ void COrganizationLookupTest::testGetConnectionIds_LoadsOnlyTheTenants()
 }
 
 
-void COrganizationLookupTest::testGetTenantRelationshipIds_LoadsOnlyTheTenants()
-{
-	CConnectionFixture fixture;
-
-	const QByteArray tenantId = NewId();
-	for (int i = 0; i < 20; ++i){
-		fixture.AddRelationship(NewId(), NewId(), NewId());
-	}
-	const QByteArray asSourceId = fixture.AddRelationship(NewId(), tenantId, NewId());
-	const QByteArray asTargetId = fixture.AddRelationship(NewId(), NewId(), tenantId);
-	fixture.AddRelationship(NewId(), tenantId, NewId(), imtauth::ITenantRelationshipInfo::TRS_ARCHIVED);
-
-	fixture.Relationships().ResetLoadCount();
-	QCOMPARE(Sorted(fixture.Manager().GetTenantRelationshipIds(tenantId)), Sorted({asSourceId, asTargetId}));
-	QCOMPARE(fixture.Relationships().GetLoadCount(), 3);
-	QCOMPARE(fixture.Relationships().GetUnfilteredSelectionCount(), 0);
-	QVERIFY(fixture.Relationships().GetUnknownFieldIds().isEmpty());
-}
-
-
-void COrganizationLookupTest::testRemoveConnection_ArchivesOnlyItsRelationships()
-{
-	CConnectionFixture fixture;
-
-	const QByteArray tenantId = NewId();
-	const QByteArray partnerId = NewId();
-	const QByteArray otherPartnerId = NewId();
-	const QByteArray connectionId = fixture.AddConnection(tenantId, partnerId);
-	const QByteArray otherConnectionId = fixture.AddConnection(tenantId, otherPartnerId);
-	const QByteArray firstId = fixture.AddRelationship(connectionId, tenantId, partnerId);
-	const QByteArray secondId = fixture.AddRelationship(connectionId, partnerId, tenantId);
-	const QByteArray otherId = fixture.AddRelationship(otherConnectionId, tenantId, otherPartnerId);
-
-	QVERIFY(!fixture.Manager().RemoveConnection(connectionId, NewId()));
-
-	fixture.Relationships().ResetLoadCount();
-	QVERIFY(fixture.Manager().RemoveConnection(connectionId, tenantId));
-	QCOMPARE(fixture.Relationships().GetUnfilteredSelectionCount(), 0);
-
-	QCOMPARE(fixture.Manager().GetConnectionIds(tenantId), QByteArrayList({otherConnectionId}));
-	QCOMPARE(fixture.Manager().GetTenantRelationshipIds(tenantId), QByteArrayList({otherId}));
-	QCOMPARE(fixture.Manager().GetTenantRelationship(firstId)->GetStatus(), imtauth::ITenantRelationshipInfo::TRS_ARCHIVED);
-	QCOMPARE(fixture.Manager().GetTenantRelationship(secondId)->GetStatus(), imtauth::ITenantRelationshipInfo::TRS_ARCHIVED);
-	QVERIFY(!fixture.Manager().RemoveConnection(connectionId, tenantId));
-}
-
-
 void COrganizationLookupTest::testConnectionLookups_NonUuidIds_MatchNothing()
 {
 	CConnectionFixture fixture;
 	fixture.AddConnection("not-a-tenant", NewId());
-	fixture.AddRelationship(NewId(), "not-a-tenant", NewId());
 
 	fixture.Connections().ResetLoadCount();
-	fixture.Relationships().ResetLoadCount();
 	QVERIFY(fixture.Manager().GetConnectionIds("not-a-tenant").isEmpty());
-	QVERIFY(fixture.Manager().GetTenantRelationshipIds("not-a-tenant").isEmpty());
 	QVERIFY(fixture.Manager().GetConnectionIds(QByteArray()).isEmpty());
 	QCOMPARE(fixture.Connections().GetLoadCount(), 0);
-	QCOMPARE(fixture.Relationships().GetLoadCount(), 0);
-}
-
-
-// Cross-organization grants
-
-void COrganizationLookupTest::testGetGrantsBySourceTenant_LoadsOnlyTheTenants()
-{
-	CGrantFixture fixture;
-
-	const QByteArray tenantId = NewId();
-	for (int i = 0; i < 20; ++i){
-		QVERIFY(!fixture.Manager().CreateGrant(NewId(), NewId(), {"Viewer"}).isEmpty());
-	}
-	const QByteArray grantId = fixture.Manager().CreateGrant(tenantId, NewId(), {"Viewer"});
-	QVERIFY(!fixture.Manager().CreateGrant(NewId(), tenantId, {"Viewer"}).isEmpty());
-
-	fixture.Collection().ResetLoadCount();
-	const imtauth::CrossOrgGrants grants = fixture.Manager().GetGrantsBySourceTenant(tenantId);
-	QCOMPARE(grants.size(), 1);
-	QCOMPARE(grants[0].grantId, grantId);
-	QCOMPARE(fixture.Collection().GetLoadCount(), 1);
-	QCOMPARE(fixture.Collection().GetUnfilteredSelectionCount(), 0);
-	QVERIFY(fixture.Collection().GetUnknownFieldIds().isEmpty());
-
-	fixture.Collection().ResetLoadCount();
-	QVERIFY(fixture.Manager().GetGrantsBySourceTenant("not-a-tenant").isEmpty());
-	QCOMPARE(fixture.Collection().GetLoadCount(), 0);
 }
 
 
@@ -1196,7 +1045,7 @@ void COrganizationLookupTest::testRemoveUnrelatedShares_KeepsTheSharesOfARelatio
 }
 
 
-void COrganizationLookupTest::testShareDocument_RefusesARelationshipOutsideItsValidity()
+void COrganizationLookupTest::testShareDocument_RefusesAPartnerWithoutAContractInForce()
 {
 	CShareFixture fixture;
 
@@ -1213,7 +1062,7 @@ void COrganizationLookupTest::testShareDocument_RefusesARelationshipOutsideItsVa
 
 	QString errorMessage;
 	QVERIFY(fixture.Manager().ShareDocument(share, &errorMessage).isEmpty());
-	QCOMPARE(errorMessage, QStringLiteral("The relationship of the organizations is not valid at this time"));
+	QCOMPARE(errorMessage, QStringLiteral("No contract in force allows the organizations to share documents"));
 	QVERIFY(fixture.StoredShareIds().isEmpty());
 }
 
@@ -1234,160 +1083,20 @@ void COrganizationLookupTest::testRemoveUnrelatedShares_ReadsTheRelationshipsOnc
 }
 
 
-void COrganizationLookupTest::testGetTenantRelationship_UnknownIdIsNoRelationship()
-{
-	CConnectionFixture fixture;
-	fixture.AddRelationship(NewId(), NewId(), NewId());
-
-	QVERIFY(!fixture.Manager().GetTenantRelationship(NewId()).IsValid());
-	QVERIFY(!fixture.Manager().RemoveTenantRelationship(NewId(), NewId()));
-	QVERIFY(fixture.EventManager().m_events.isEmpty());
-}
-
-
-// The period of relationships of two organizations
-
-void COrganizationLookupTest::testGetUninterruptedStart_FollowsTheRelationshipsThatOverlap()
-{
-	const QDateTime t0 = QDateTime::currentDateTimeUtc().addDays(-100);
-
-	// R1 from day 0 to day 20, R2 from day 10 to day 30, R3 from day 30 on
-	const QList<imtauth::RelationshipPeriod> periods = {
-		{t0, t0.addDays(20)},
-		{t0.addDays(10), t0.addDays(30)},
-		{t0.addDays(30), QDateTime()}};
-	QCOMPARE(imtauth::GetUninterruptedStart(periods), t0);
-
-	// The order of the periods does not matter
-	QCOMPARE(imtauth::GetUninterruptedStart({periods[2], periods[1], periods[0]}), t0);
-
-	// Of two active relationships the earlier one starts the period
-	QCOMPARE(imtauth::GetUninterruptedStart({{t0.addDays(5), QDateTime()}, {t0.addDays(1), QDateTime()}}), t0.addDays(1));
-}
-
-
-void COrganizationLookupTest::testGetUninterruptedStart_StopsAtAGap()
-{
-	const QDateTime t0 = QDateTime::currentDateTimeUtc().addDays(-100);
-
-	// R1 ended on day 20, R2 started on day 21
-	QCOMPARE(imtauth::GetUninterruptedStart({{t0, t0.addDays(20)}, {t0.addDays(21), QDateTime()}}), t0.addDays(21));
-
-	// An earlier relationship without a known end does not bridge the gap
-	QCOMPARE(imtauth::GetUninterruptedStart({{t0, t0.addDays(20)}, {QDateTime(), t0.addDays(40)}, {t0.addDays(30), QDateTime()}}), t0.addDays(30));
-}
-
-
-void COrganizationLookupTest::testGetUninterruptedStart_UnknownOrNoActiveRelationship()
-{
-	const QDateTime t0 = QDateTime::currentDateTimeUtc().addDays(-100);
-
-	QVERIFY(!imtauth::GetUninterruptedStart({}).isValid());
-	QVERIFY(!imtauth::GetUninterruptedStart({{t0, t0.addDays(20)}}).isValid());
-	QVERIFY(!imtauth::GetUninterruptedStart({{QDateTime(), QDateTime()}, {t0, QDateTime()}}).isValid());
-}
-
-
-void COrganizationLookupTest::testGetRelatedSince_KeepsTheStartWhenARelationshipIsReplaced()
-{
-	CConnectionFixture fixture;
-
-	const QDateTime t0 = QDateTime::currentDateTimeUtc().addDays(-100).toUTC();
-	const QByteArray tenantId = NewId();
-	const QByteArray partnerId = NewId();
-	const QByteArray connectionId = fixture.AddConnection(tenantId, partnerId);
-
-	// R1 is archived only after R2 started: the organizations were related the whole time
-	fixture.AddRelationship(connectionId, tenantId, partnerId, imtauth::ITenantRelationshipInfo::TRS_ARCHIVED, t0, t0.addDays(20));
-	fixture.AddRelationship(connectionId, partnerId, tenantId, imtauth::ITenantRelationshipInfo::TRS_ACTIVE, t0.addDays(10));
-	fixture.AddRelationship(connectionId, tenantId, NewId(), imtauth::ITenantRelationshipInfo::TRS_ARCHIVED, t0.addDays(-50), t0.addDays(30));
-
-	fixture.Relationships().ResetLoadCount();
-	QCOMPARE(fixture.Manager().GetRelatedSince(tenantId, partnerId), t0);
-	QCOMPARE(fixture.Manager().GetRelatedSince(partnerId, tenantId), t0);
-	QCOMPARE(fixture.Relationships().GetLoadCount(), 4);
-	QCOMPARE(fixture.Relationships().GetUnfilteredSelectionCount(), 0);
-}
-
-
-void COrganizationLookupTest::testGetRelatedSince_StartsAnewAfterAGap()
-{
-	CConnectionFixture fixture;
-
-	const QDateTime t0 = QDateTime::currentDateTimeUtc().addDays(-100).toUTC();
-	const QByteArray tenantId = NewId();
-	const QByteArray partnerId = NewId();
-	const QByteArray connectionId = fixture.AddConnection(tenantId, partnerId);
-
-	fixture.AddRelationship(connectionId, tenantId, partnerId, imtauth::ITenantRelationshipInfo::TRS_ARCHIVED, t0, t0.addDays(20));
-	QVERIFY(!fixture.Manager().GetRelatedSince(tenantId, partnerId).isValid());
-
-	fixture.AddRelationship(connectionId, tenantId, partnerId, imtauth::ITenantRelationshipInfo::TRS_ACTIVE, t0.addDays(21));
-	QCOMPARE(fixture.Manager().GetRelatedSince(tenantId, partnerId), t0.addDays(21));
-	QVERIFY(!fixture.Manager().GetRelatedSince(tenantId, "not-a-tenant").isValid());
-}
-
-
 // Removal events
 
-void COrganizationLookupTest::testRemoveTenantRelationship_PublishesTheRemoval()
-{
-	CConnectionFixture fixture;
-
-	const QByteArray tenantId = NewId();
-	const QByteArray partnerId = NewId();
-	const QByteArray relationshipId = fixture.AddRelationship(fixture.AddConnection(tenantId, partnerId), tenantId, partnerId);
-
-	QVERIFY(!fixture.Manager().RemoveTenantRelationship(NewId(), relationshipId));
-	QVERIFY(fixture.EventManager().m_events.isEmpty());
-
-	QVERIFY(fixture.Manager().RemoveTenantRelationship(partnerId, relationshipId));
-	QCOMPARE(fixture.EventManager().GetEventTypes(), QStringList({imtauth::TenantEvent::s_relationshipRemoved}));
-	QCOMPARE(fixture.EventManager().m_events.first().value(imtauth::TenantEvent::s_relationshipId).toByteArray(), relationshipId);
-	QCOMPARE(fixture.Manager().GetTenantRelationship(relationshipId)->GetStatus(), imtauth::ITenantRelationshipInfo::TRS_ARCHIVED);
-}
-
-
-void COrganizationLookupTest::testDeleteProposal_PublishesTheRemoval()
+void COrganizationLookupTest::testRemoveConnection_PublishesTheConnectionRemoval()
 {
 	CConnectionFixture fixture;
 
 	const QByteArray tenantId = NewId();
 	const QByteArray partnerId = NewId();
 	const QByteArray connectionId = fixture.AddConnection(tenantId, partnerId);
-	const QByteArray relationshipId = fixture.AddRelationship(connectionId, tenantId, partnerId);
 
-	imtauth::CTenantRelationshipProposal proposal;
-	proposal.SetConnectionId(connectionId);
-	proposal.SetInitiatorTenantId(tenantId);
-	proposal.SetCounterpartyTenantId(partnerId);
-	proposal.SetProposalType(imtauth::ITenantRelationshipProposalInfo::RPT_DELETE);
-	proposal.SetExistingRelationshipId(relationshipId);
-
-	const QByteArray proposalId = fixture.Manager().CreateRelationshipProposal(proposal);
-	QVERIFY(!proposalId.isEmpty());
-	fixture.EventManager().m_events.clear();
-
-	QCOMPARE(fixture.Manager().ApproveRelationshipProposal(proposalId, partnerId), relationshipId);
-	QVERIFY(fixture.EventManager().GetEventTypes().contains(imtauth::TenantEvent::s_relationshipRemoved));
-	QCOMPARE(fixture.Manager().GetTenantRelationship(relationshipId)->GetStatus(), imtauth::ITenantRelationshipInfo::TRS_ARCHIVED);
-}
-
-
-void COrganizationLookupTest::testRemoveConnection_PublishesOnlyTheConnectionRemoval()
-{
-	CConnectionFixture fixture;
-
-	const QByteArray tenantId = NewId();
-	const QByteArray partnerId = NewId();
-	const QByteArray connectionId = fixture.AddConnection(tenantId, partnerId);
-	fixture.AddRelationship(connectionId, tenantId, partnerId);
-	fixture.AddRelationship(connectionId, partnerId, tenantId);
-
-	// The owners are told once about the connection, not again about each of its relationships
+	// The owners are told once about the removed entry of the address book
 	QVERIFY(fixture.Manager().RemoveConnection(connectionId, tenantId));
 	QCOMPARE(fixture.EventManager().GetEventTypes(), QStringList({imtauth::TenantEvent::s_connectionRemoved}));
-	QVERIFY(fixture.Manager().GetTenantRelationshipIds(tenantId).isEmpty());
+	QVERIFY(!fixture.Manager().AreConnected(tenantId, partnerId));
 }
 
 
@@ -1437,52 +1146,6 @@ void COrganizationLookupTest::testGetShareOwnerTenantIds_FailedRemovalTrustsNoPa
 }
 
 
-void COrganizationLookupTest::testGetTenantRelationshipIds_ReportsAFailedRead()
-{
-	CConnectionFixture fixture;
-
-	const QByteArray tenantId = NewId();
-	const QByteArray partnerId = NewId();
-	const QByteArray relationshipId = fixture.AddRelationship(fixture.AddConnection(tenantId, partnerId), tenantId, partnerId);
-
-	bool isRead = false;
-	QCOMPARE(fixture.Manager().GetTenantRelationshipIds(tenantId, &isRead), QByteArrayList({relationshipId}));
-	QVERIFY(isRead);
-
-	fixture.Relationships().SetSelectionFailing(true);
-	QVERIFY(fixture.Manager().GetTenantRelationshipIds(tenantId, &isRead).isEmpty());
-	QVERIFY(!isRead);
-
-	fixture.Relationships().SetSelectionFailing(false);
-	fixture.Relationships().SetLoadFailingIds({relationshipId});
-	QVERIFY(fixture.Manager().GetTenantRelationshipIds(tenantId, &isRead).isEmpty());
-	QVERIFY(!isRead);
-}
-
-
-void COrganizationLookupTest::testGetRelatedTenants_PartialReadIsNotRead()
-{
-	CConnectionFixture fixture;
-
-	icomp::TSimSharedComponentPtr<imtauth::CTenantRelationshipProviderComp> provider;
-	provider->SetRef("ConnectionRequestManager", fixture.manager);
-	provider->InitComponent();
-
-	const QByteArray tenantId = NewId();
-	const QByteArray partnerId = NewId();
-	fixture.AddRelationship(fixture.AddConnection(tenantId, partnerId), tenantId, partnerId);
-
-	bool isRead = false;
-	QCOMPARE(provider->GetRelatedTenants(tenantId, nullptr, &isRead).size(), 1);
-	QVERIFY(isRead);
-
-	// An empty answer of a failed read would make the shares of the partner look ended
-	fixture.Relationships().SetSelectionFailing(true);
-	QVERIFY(provider->GetRelatedTenants(tenantId, nullptr, &isRead).isEmpty());
-	QVERIFY(!isRead);
-}
-
-
 void COrganizationLookupTest::testRemoveMembership_RefusedWhenItCannotBeRead()
 {
 	CTenantFixture tenants;
@@ -1515,121 +1178,6 @@ void COrganizationLookupTest::testRemoveMembership_RefusedWhenItCannotBeRead()
 	QVERIFY(!manager->RemoveMembership(ownerMembershipId));
 	QVERIFY(manager->RemoveMembership(membershipId));
 	QCOMPARE(memberships.Collection().GetElementIds(), QByteArrayList({ownerMembershipId}));
-}
-
-
-void COrganizationLookupTest::testGetRelatedTenants_RelationshipReplacedDuringTheRead()
-{
-	CConnectionFixture fixture;
-
-	icomp::TSimSharedComponentPtr<imtauth::CTenantRelationshipProviderComp> provider;
-	provider->SetRef("ConnectionRequestManager", fixture.manager);
-	provider->InitComponent();
-
-	const QByteArray tenantId = NewId();
-	const QByteArray partnerId = NewId();
-	const QByteArray connectionId = fixture.AddConnection(tenantId, partnerId);
-	const QByteArray firstId = fixture.AddRelationship(connectionId, tenantId, partnerId);
-
-	// Once the ids are read, another request replaces the relationship: the new one is created, the old one archived.
-	// The pair was related all along, so its shares must not look ended.
-	fixture.Relationships().SetAfterLoadHook([&fixture, connectionId, tenantId, partnerId, firstId](){
-		fixture.AddRelationship(connectionId, tenantId, partnerId);
-		fixture.Manager().RemoveTenantRelationship(tenantId, firstId);
-	});
-
-	bool isRead = false;
-	const imtauth::RelatedTenantInfos relatedTenants = provider->GetRelatedTenants(tenantId, nullptr, &isRead);
-	QVERIFY(isRead);
-	QCOMPARE(relatedTenants.size(), 1);
-	QCOMPARE(relatedTenants[0].tenantId, partnerId);
-}
-
-
-void COrganizationLookupTest::testRemoveTenantRelationship_RepeatedRemovalKeepsTheEnd()
-{
-	CConnectionFixture fixture;
-
-	const QByteArray tenantId = NewId();
-	const QByteArray partnerId = NewId();
-	const QByteArray relationshipId = fixture.AddRelationship(fixture.AddConnection(tenantId, partnerId), tenantId, partnerId);
-
-	QVERIFY(fixture.Manager().RemoveTenantRelationship(tenantId, relationshipId));
-	const QString endedAt = fixture.Manager().GetTenantRelationship(relationshipId)->GetUpdatedAt();
-	QTest::qWait(5);
-
-	// The end is final: a later write would join the period of this relationship with one that starts later
-	QVERIFY(fixture.Manager().RemoveTenantRelationship(partnerId, relationshipId));
-	QCOMPARE(fixture.Manager().GetTenantRelationship(relationshipId)->GetUpdatedAt(), endedAt);
-	QCOMPARE(fixture.EventManager().GetEventTypes(), QStringList({imtauth::TenantEvent::s_relationshipRemoved}));
-}
-
-
-void COrganizationLookupTest::testUpdateProposal_RefusesAnEndedRelationship()
-{
-	CConnectionFixture fixture;
-
-	const QByteArray tenantId = NewId();
-	const QByteArray partnerId = NewId();
-	const QByteArray connectionId = fixture.AddConnection(tenantId, partnerId);
-	const QByteArray relationshipId = fixture.AddRelationship(connectionId, tenantId, partnerId);
-
-	imtauth::CTenantRelationshipProposal proposal;
-	proposal.SetConnectionId(connectionId);
-	proposal.SetInitiatorTenantId(tenantId);
-	proposal.SetCounterpartyTenantId(partnerId);
-	proposal.SetProposalType(imtauth::ITenantRelationshipProposalInfo::RPT_UPDATE);
-	proposal.SetExistingRelationshipId(relationshipId);
-	proposal.SetProposedDescription("New terms");
-
-	const QByteArray proposalId = fixture.Manager().CreateRelationshipProposal(proposal);
-	QVERIFY(!proposalId.isEmpty());
-
-	// The relationship ends while the proposal waits
-	QVERIFY(fixture.Manager().RemoveTenantRelationship(tenantId, relationshipId));
-	const QString endedAt = fixture.Manager().GetTenantRelationship(relationshipId)->GetUpdatedAt();
-
-	QVERIFY(fixture.Manager().ApproveRelationshipProposal(proposalId, partnerId).isEmpty());
-	QVERIFY(fixture.Manager().GetRelationshipProposal(proposalId)->GetStatus() != imtauth::ITenantRelationshipProposalInfo::RPS_APPLIED);
-	imtauth::ITenantRelationshipInfoUniquePtr relationshipPtr = fixture.Manager().GetTenantRelationship(relationshipId);
-	QCOMPARE(relationshipPtr->GetUpdatedAt(), endedAt);
-	QVERIFY(relationshipPtr->GetDescription() != "New terms");
-}
-
-
-void COrganizationLookupTest::testValidateRelationship_RefusesAnEndedRelationship()
-{
-	CConnectionFixture fixture;
-
-	icomp::TSimSharedComponentPtr<imtauth::CRelationshipDocumentValidatorComp> validator;
-	validator->SetRef("RelationshipCollection", fixture.relationships);
-	validator->InitComponent();
-
-	const QByteArray tenantId = NewId();
-	const QByteArray partnerId = NewId();
-	const QByteArray connectionId = fixture.AddConnection(tenantId, partnerId);
-	const QByteArray activeId = fixture.AddRelationship(connectionId, tenantId, partnerId);
-	const QByteArray endedId = fixture.AddRelationship(connectionId, NewId(), partnerId, imtauth::ITenantRelationshipInfo::TRS_ARCHIVED);
-
-	QString errorMessage;
-	QVERIFY2(validator->ValidateDocumentData(*fixture.Manager().GetTenantRelationship(activeId), errorMessage, imtdoc::CreateObjectSourceParams(activeId).GetPtr()), qPrintable(errorMessage));
-
-	// The document service over the relationships could otherwise write an archived row
-	QVERIFY(!validator->ValidateDocumentData(*fixture.Manager().GetTenantRelationship(endedId), errorMessage, imtdoc::CreateObjectSourceParams(endedId).GetPtr()));
-	QVERIFY(!errorMessage.isEmpty());
-
-	// A stored row that cannot be read may be archived; a new document has no object id
-	imtauth::ITenantRelationshipInfoUniquePtr activePtr = fixture.Manager().GetTenantRelationship(activeId);
-	fixture.Relationships().SetLoadFailingIds({activeId});
-	errorMessage.clear();
-	QVERIFY(!validator->ValidateDocumentData(*activePtr, errorMessage, imtdoc::CreateObjectSourceParams(activeId).GetPtr()));
-	QVERIFY(!errorMessage.isEmpty());
-	fixture.Relationships().SetLoadFailingIds({});
-
-	imtauth::ITenantRelationshipInfoUniquePtr newPtr = fixture.Manager().GetTenantRelationship(endedId);
-	newPtr->SetSourceTenantId(NewId());
-	newPtr->SetStatus(imtauth::ITenantRelationshipInfo::TRS_ACTIVE);
-	QVERIFY2(validator->ValidateDocumentData(*newPtr, errorMessage), qPrintable(errorMessage));
 }
 
 
@@ -1722,51 +1270,6 @@ void COrganizationLookupTest::testOwnedOrCreated_ReportsAFailedRead()
 	fixture.Collection().SetLoadFailingIds({});
 	fixture.Collection().SetSelectionFailing(true);
 	QVERIFY(fixture.Manager().GetOwnedOrCreatedTenantIds(userId, &isRead).isEmpty());
-	QVERIFY(!isRead);
-}
-
-
-void COrganizationLookupTest::testGetGrantsBySourceTenant_ReportsAFailedRead()
-{
-	CGrantFixture fixture;
-
-	const QByteArray tenantId = NewId();
-	const QByteArray grantId = fixture.Manager().CreateGrant(tenantId, NewId(), {"Viewer"});
-
-	bool isRead = false;
-	QCOMPARE(fixture.Manager().GetGrantsBySourceTenant(tenantId, &isRead).size(), 1);
-	QVERIFY(isRead);
-
-	// A grant that cannot be read would stay active when its connection is removed
-	fixture.Collection().SetLoadFailingIds({grantId});
-	QVERIFY(fixture.Manager().GetGrantsBySourceTenant(tenantId, &isRead).isEmpty());
-	QVERIFY(!isRead);
-
-	fixture.Collection().SetLoadFailingIds({});
-	fixture.Collection().SetSelectionFailing(true);
-	QVERIFY(fixture.Manager().GetGrantsBySourceTenant(tenantId, &isRead).isEmpty());
-	QVERIFY(!isRead);
-}
-
-
-void COrganizationLookupTest::testGetRelatedSince_ReportsAFailedHistoryRead()
-{
-	CConnectionFixture fixture;
-
-	const QDateTime t0 = QDateTime::currentDateTimeUtc().addDays(-100).toUTC();
-	const QByteArray tenantId = NewId();
-	const QByteArray partnerId = NewId();
-	const QByteArray connectionId = fixture.AddConnection(tenantId, partnerId);
-	const QByteArray archivedId = fixture.AddRelationship(connectionId, tenantId, partnerId, imtauth::ITenantRelationshipInfo::TRS_ARCHIVED, t0, t0.addDays(20));
-	fixture.AddRelationship(connectionId, partnerId, tenantId, imtauth::ITenantRelationshipInfo::TRS_ACTIVE, t0.addDays(10));
-
-	bool isRead = false;
-	QCOMPARE(fixture.Manager().GetRelatedSince(tenantId, partnerId, &isRead), t0);
-	QVERIFY(isRead);
-
-	// Without the archived relationship the start moves forward and the shares of the overlap look earlier
-	fixture.Relationships().SetLoadFailingIds({archivedId});
-	fixture.Manager().GetRelatedSince(tenantId, partnerId, &isRead);
 	QVERIFY(!isRead);
 }
 
@@ -1944,218 +1447,168 @@ void COrganizationLookupTest::testGetShareOwnerTenantIds_UnreadShareTrustsNoPart
 }
 
 
-void COrganizationLookupTest::testRemoveConnection_KeepsTheConnectionWhenARelationshipStays()
-{
-	CConnectionFixture fixture;
-
-	const QByteArray tenantId = NewId();
-	const QByteArray partnerId = NewId();
-	const QByteArray connectionId = fixture.AddConnection(tenantId, partnerId);
-	const QByteArray relationshipId = fixture.AddRelationship(connectionId, tenantId, partnerId);
-
-	// A removed connection with an active relationship would keep the shares of the relationship giving access
-	fixture.Relationships().SetLoadFailingIds({relationshipId});
-	QVERIFY(!fixture.Manager().RemoveConnection(connectionId, tenantId));
-	fixture.Relationships().SetLoadFailingIds({});
-	QCOMPARE(fixture.Manager().GetConnection(connectionId)->GetStatus(), imtauth::ITenantConnectionInfo::CS_ACTIVE);
-	QCOMPARE(fixture.Manager().GetTenantRelationship(relationshipId)->GetStatus(), imtauth::ITenantRelationshipInfo::TRS_ACTIVE);
-
-	fixture.Relationships().SetStoreFailing(true);
-	QVERIFY(!fixture.Manager().RemoveConnection(connectionId, tenantId));
-	fixture.Relationships().SetStoreFailing(false);
-	QCOMPARE(fixture.Manager().GetConnection(connectionId)->GetStatus(), imtauth::ITenantConnectionInfo::CS_ACTIVE);
-
-	// The connection cannot be stored after its relationships were archived: it stays active, and a retry completes the removal
-	fixture.Connections().SetStoreFailing(true);
-	QVERIFY(!fixture.Manager().RemoveConnection(connectionId, tenantId));
-	fixture.Connections().SetStoreFailing(false);
-	QCOMPARE(fixture.Manager().GetConnection(connectionId)->GetStatus(), imtauth::ITenantConnectionInfo::CS_ACTIVE);
-
-	QVERIFY(fixture.Manager().RemoveConnection(connectionId, tenantId));
-	QCOMPARE(fixture.Manager().GetConnection(connectionId)->GetStatus(), imtauth::ITenantConnectionInfo::CS_REMOVED);
-	QCOMPARE(fixture.Manager().GetTenantRelationship(relationshipId)->GetStatus(), imtauth::ITenantRelationshipInfo::TRS_ARCHIVED);
-}
-
-
-void COrganizationLookupTest::testApproveProposal_IsNotAppliedTwice()
-{
-	CConnectionFixture fixture;
-
-	const QByteArray tenantId = NewId();
-	const QByteArray partnerId = NewId();
-	const QByteArray connectionId = fixture.AddConnection(tenantId, partnerId);
-
-	imtauth::CTenantRelationshipProposal proposal;
-	proposal.SetConnectionId(connectionId);
-	proposal.SetInitiatorTenantId(tenantId);
-	proposal.SetCounterpartyTenantId(partnerId);
-	proposal.SetProposalType(imtauth::ITenantRelationshipProposalInfo::RPT_CREATE);
-	const QByteArray proposalId = fixture.Manager().CreateRelationshipProposal(proposal);
-	QVERIFY(!proposalId.isEmpty());
-
-	// A status that cannot be stored must not leave an applied proposal approvable again
-	fixture.Proposals().SetStoreFailing(true);
-	QVERIFY(fixture.Manager().ApproveRelationshipProposal(proposalId, partnerId).isEmpty());
-	QVERIFY(fixture.Manager().GetTenantRelationshipIds(tenantId).isEmpty());
-
-	fixture.Proposals().SetStoreFailing(false);
-	QVERIFY(!fixture.Manager().ApproveRelationshipProposal(proposalId, partnerId).isEmpty());
-	QVERIFY(fixture.Manager().ApproveRelationshipProposal(proposalId, partnerId).isEmpty());
-	QCOMPARE(fixture.Manager().GetTenantRelationshipIds(tenantId).size(), 1);
-}
-
-
-// Fourth review round
-
 namespace
 {
-
-
-QByteArray ProposeRelationship(CConnectionFixture& fixture, const QByteArray& connectionId, const QByteArray& initiatorId, const QByteArray& counterpartyId)
+class CContractFixture
 {
-	imtauth::CTenantRelationshipProposal proposal;
-	proposal.SetConnectionId(connectionId);
-	proposal.SetInitiatorTenantId(initiatorId);
-	proposal.SetCounterpartyTenantId(counterpartyId);
-	proposal.SetProposalType(imtauth::ITenantRelationshipProposalInfo::RPT_CREATE);
+public:
+	CContractFixture()
+	{
+		contracts->InitComponent();
+		privateRecords->InitComponent();
+		events->InitComponent();
+		snapshots->InitComponent();
+		tenantCollection->InitComponent();
+		tenantManager->SetRef("TenantCollection", tenantCollection);
+		tenantManager->SetFactory("TenantFactory", &tenantFactory);
+		tenantManager->InitComponent();
+		imtauth::CIdentifiableTenantInfo tenant;
+		tenant.SetTenantId("11111111-1111-4111-8111-111111111111");
+		tenant.SetTenantPermissions({"/Product/View", "/OtherProduct/Edit"});
+		tenantCollection->AddObject("Tenant", tenant, "11111111-1111-4111-8111-111111111111");
+		manager->SetRef("TenantManager", tenantManager);
+		manager->SetRef("ContractCollection", contracts);
+		manager->SetRef("PrivateInfoCollection", privateRecords);
+		manager->SetRef("EventCollection", events);
+		manager->SetRef("SnapshotCollection", snapshots);
+		manager->SetFactory("ContractFactory", &contractFactory);
+		manager->SetFactory("EventFactory", &eventFactory);
+		manager->SetFactory("PrivateInfoFactory", &privateFactory);
+		manager->InitComponent();
+	}
 
-	return fixture.Manager().CreateRelationshipProposal(proposal);
+	QByteArray Add(const QByteArray& productId)
+	{
+		imtauth::CIdentifiableContractInfo contract;
+		contract.SetContractId(NewId());
+		contract.SetProductId(productId);
+		contract.SetInitiatorTenantId("11111111-1111-4111-8111-111111111111");
+		contract.SetRevision(1);
+		imtauth::IContractInfo::Party owner;
+		owner.tenantId = "11111111-1111-4111-8111-111111111111";
+		imtauth::IContractInfo::Party partner;
+		partner.tenantId = "partner";
+		contract.SetParties({owner, partner});
+		imtauth::IContractInfo::Link link;
+		link.linkId = "link";
+		link.tenantAId = "11111111-1111-4111-8111-111111111111";
+		link.tenantBId = "partner";
+		contract.SetLinks({link});
+		return contracts->AddObject("Contract", contract, contract.GetContractId());
+	}
+
+	icomp::TSimSharedComponentPtr<CTestCollectionComp> contracts, privateRecords, events, snapshots, tenantCollection;
+	icomp::TSimSharedComponentPtr<imtauth::CTenantManagerComp> tenantManager;
+	icomp::TSimComponentsFactory<imtauth::CTenantInfoComp> tenantFactory;
+	icomp::TSimComponentsFactory<imtauth::CContractInfoComp> contractFactory;
+	icomp::TSimComponentsFactory<imtauth::CContractEventInfoComp> eventFactory;
+	icomp::TSimComponentsFactory<imtauth::CContractPartyPrivateInfoComp> privateFactory;
+	icomp::TSimSharedComponentPtr<imtauth::CContractManagerComp> manager;
+};
 }
 
-
-} // anonymous namespace
-
-
-void COrganizationLookupTest::testApproveProposal_AfterTheConnectionWasRemovedCreatesNoRelationship()
+void COrganizationLookupTest::testContracts_ForeignProductCommandsAreUnavailable()
 {
-	CConnectionFixture fixture;
-
-	const QByteArray tenantId = NewId();
-	const QByteArray partnerId = NewId();
-	const QByteArray connectionId = fixture.AddConnection(tenantId, partnerId);
-	const QByteArray proposalId = ProposeRelationship(fixture, connectionId, tenantId, partnerId);
-	QVERIFY(!proposalId.isEmpty());
-
-	// A relationship on a removed connection would make its partner trusted for shares again
-	QVERIFY(fixture.Manager().RemoveConnection(connectionId, tenantId));
-	QVERIFY(fixture.Manager().ApproveRelationshipProposal(proposalId, partnerId).isEmpty());
-	QVERIFY(fixture.Manager().GetTenantRelationshipIds(tenantId).isEmpty());
-	QCOMPARE(fixture.Manager().GetRelationshipProposal(proposalId)->GetStatus(), imtauth::ITenantRelationshipProposalInfo::RPS_CANCELED);
-
-	// A reconnection reactivates the same connection, as CreateConnection does: the old proposal stays canceled
-	imtauth::CIdentifiableTenantConnection reconnected;
-	reconnected.SetConnectionId(connectionId);
-	reconnected.SetTenantAId(tenantId);
-	reconnected.SetTenantBId(partnerId);
-	reconnected.SetStatus(imtauth::ITenantConnectionInfo::CS_ACTIVE);
-	QVERIFY(fixture.Connections().SetObjectData(connectionId, reconnected));
-	QVERIFY(fixture.Manager().ApproveRelationshipProposal(proposalId, partnerId).isEmpty());
-	QVERIFY(fixture.Manager().GetTenantRelationshipIds(tenantId).isEmpty());
+	CContractFixture fixture;
+	const QByteArray contractId = fixture.Add("ProLife");
+	const imtauth::ContractActor actor = {"11111111-1111-4111-8111-111111111111", "user", QStringLiteral("User"), "Puma"};
+	imtauth::IContractInfo::Allocation allocation;
+	allocation.granteeTenantId = "partner";
+	allocation.permissionIds = {"/Product/View"};
+	imtauth::IContractInfo::Attachment attachment;
+	attachment.attachmentId = "file";
+	attachment.fileName = QStringLiteral("file.txt");
+	using Command = std::function<bool(const QByteArray&, QString&)>;
+	const QList<Command> commands = {
+		[&](const QByteArray& id, QString& e){ imtauth::CContractInfo draft; draft.SetContractId(id); return fixture.manager->UpdateContract(actor, draft, 1, e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->RemoveContract(actor, id, e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->AddPartyByCode(actor, id, 1, "code", QByteArray(), e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->SubmitContract(actor, id, 1, e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->CancelContract(actor, id, QStringLiteral("Reason"), e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->RequestChanges(actor, id, 1, QStringLiteral("Reason"), e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->ApproveContract(actor, id, 1, e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->SignContract(actor, id, 1, {}, e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->DeclineContract(actor, id, QStringLiteral("Reason"), e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->GiveNotice(actor, id, QStringLiteral("Reason"), true, e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->RevokeNotice(actor, id, e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->GiveNonRenewalNotice(actor, id, e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->GiveAllocation(actor, id, allocation, e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->WithdrawAllocation(actor, id, "allocation", e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->SetPrivateInfo(actor, id, {}, e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->SetAllocationGroups(actor, id, "allocation", {}, e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->AddAttachment(actor, id, attachment, true, e); },
+		[&](const QByteArray& id, QString& e){ return fixture.manager->AddAttachment(actor, id, attachment, false, e); }
+	};
+	for (const Command& command : commands){
+		QString foreignError, missingError;
+		QVERIFY(!command(contractId, foreignError));
+		QVERIFY(!command(NewId(), missingError));
+		QCOMPARE(foreignError, missingError);
+	}
+	QCOMPARE(fixture.manager->GetContract(contractId)->GetRevision(), 1);
+	QVERIFY(fixture.privateRecords->GetElementIds().isEmpty());
+	QVERIFY(fixture.events->GetElementIds().isEmpty());
 }
 
-
-void COrganizationLookupTest::testRemoveConnection_RefusedWhenAProposalCannotBeCanceled()
+void COrganizationLookupTest::testContracts_SelectionAndCacheAreProductScoped()
 {
-	CConnectionFixture fixture;
-
-	const QByteArray tenantId = NewId();
-	const QByteArray partnerId = NewId();
-	const QByteArray connectionId = fixture.AddConnection(tenantId, partnerId);
-	const QByteArray proposalId = ProposeRelationship(fixture, connectionId, tenantId, partnerId);
-	QVERIFY(!proposalId.isEmpty());
-
-	// A proposal left open on a removed connection could be approved after a reconnection
-	fixture.Proposals().SetStoreFailing(true);
-	QVERIFY(!fixture.Manager().RemoveConnection(connectionId, tenantId));
-	fixture.Proposals().SetStoreFailing(false);
-	QCOMPARE(fixture.Manager().GetConnection(connectionId)->GetStatus(), imtauth::ITenantConnectionInfo::CS_ACTIVE);
-
-	fixture.Proposals().SetSelectionFailing(true);
-	QVERIFY(!fixture.Manager().RemoveConnection(connectionId, tenantId));
-	fixture.Proposals().SetSelectionFailing(false);
-	QCOMPARE(fixture.Manager().GetConnection(connectionId)->GetStatus(), imtauth::ITenantConnectionInfo::CS_ACTIVE);
-
-	QVERIFY(fixture.Manager().RemoveConnection(connectionId, tenantId));
-	QCOMPARE(fixture.Manager().GetRelationshipProposal(proposalId)->GetStatus(), imtauth::ITenantRelationshipProposalInfo::RPS_CANCELED);
-}
-
-
-void COrganizationLookupTest::testApproveProposal_ConcurrentApprovalsCreateOneRelationship()
-{
-	CConnectionFixture fixture;
-
-	const QByteArray tenantId = NewId();
-	const QByteArray partnerId = NewId();
-	const QByteArray connectionId = fixture.AddConnection(tenantId, partnerId);
-
-	for (int round = 0; round < 20; ++round){
-		const QByteArray proposalId = ProposeRelationship(fixture, connectionId, tenantId, partnerId);
-		QVERIFY(!proposalId.isEmpty());
-
-		std::atomic<int> appliedCount{0};
-		std::atomic<int> waitingCount{0};
-		auto approve = [&fixture, &proposalId, &partnerId, &appliedCount, &waitingCount](){
-			// Both threads approve at once
-			++waitingCount;
-			while (waitingCount.load() < 2){
-				std::this_thread::yield();
-			}
-			if (!fixture.Manager().ApproveRelationshipProposal(proposalId, partnerId).isEmpty()){
-				++appliedCount;
-			}
-		};
-		std::thread first(approve);
-		std::thread second(approve);
-		first.join();
-		second.join();
-
-		QCOMPARE(appliedCount.load(), 1);
-		QCOMPARE(fixture.Manager().GetTenantRelationshipIds(tenantId).size(), round + 1);
+	for (bool filtered : {true, false}){
+		CContractFixture fixture;
+		const QByteArray p = fixture.Add("ProLife");
+		const QByteArray q = fixture.Add("Puma");
+		fixture.contracts->SetFilterSupported(filtered);
+		bool isRead = false;
+		const auto prolife = fixture.manager->GetContractsOfParty("11111111-1111-4111-8111-111111111111", "ProLife", &isRead);
+		QVERIFY(isRead);
+		QCOMPARE(prolife.size(), 1);
+		QCOMPARE(prolife.first()->GetContractId(), p);
+		const auto puma = fixture.manager->GetContractsOfParty("11111111-1111-4111-8111-111111111111", "Puma", &isRead);
+		QVERIFY(isRead);
+		QCOMPARE(puma.size(), 1);
+		QCOMPARE(puma.first()->GetContractId(), q);
+		QString error;
+		QVERIFY(fixture.manager->RemoveContract({"11111111-1111-4111-8111-111111111111", "user", {}, "ProLife"}, p, error));
+		QVERIFY(fixture.manager->GetContractsOfParty("11111111-1111-4111-8111-111111111111", "ProLife").isEmpty());
+		QCOMPARE(fixture.manager->GetContractsOfParty("11111111-1111-4111-8111-111111111111", "Puma").size(), 1);
 	}
 }
 
 
-void COrganizationLookupTest::testCancelProposal_DuringAnApprovalLeavesOneOutcome()
+void COrganizationLookupTest::testContracts_ProductIsFixedByActor()
 {
-	CConnectionFixture fixture;
+	CContractFixture fixture;
+	const imtauth::ContractActor actor = {"11111111-1111-4111-8111-111111111111", "user", {}, "ProLife"};
+	imtauth::CContractInfo draft;
+	draft.SetName(QStringLiteral("Fixed product"));
+	draft.SetProductId("Puma");
+	QString error;
+	const QByteArray id = fixture.manager->CreateContract(actor, draft, error);
+	QVERIFY2(!id.isEmpty(), qPrintable(error));
+	QCOMPARE(fixture.manager->GetContract(id)->GetProductId(), QByteArray("ProLife"));
+	draft.SetContractId(id);
+	draft.SetName(QStringLiteral("Updated"));
+	QVERIFY2(fixture.manager->UpdateContract(actor, draft, 1, error), qPrintable(error));
+	QCOMPARE(fixture.manager->GetContract(id)->GetProductId(), QByteArray("ProLife"));
+}
 
-	const QByteArray tenantId = NewId();
-	const QByteArray partnerId = NewId();
-	const QByteArray connectionId = fixture.AddConnection(tenantId, partnerId);
-
-	int relationshipCount = 0;
-	for (int round = 0; round < 20; ++round){
-		const QByteArray proposalId = ProposeRelationship(fixture, connectionId, tenantId, partnerId);
-		QVERIFY(!proposalId.isEmpty());
-
-		std::atomic<int> waitingCount{0};
-		std::atomic<bool> isApplied{false};
-		std::atomic<bool> isCanceled{false};
-		auto waitForBoth = [&waitingCount](){
-			++waitingCount;
-			while (waitingCount.load() < 2){
-				std::this_thread::yield();
-			}
-		};
-		std::thread approval([&](){
-			waitForBoth();
-			isApplied = !fixture.Manager().ApproveRelationshipProposal(proposalId, partnerId).isEmpty();
-		});
-		std::thread cancellation([&](){
-			waitForBoth();
-			isCanceled = fixture.Manager().CancelRelationshipProposal(proposalId, tenantId);
-		});
-		approval.join();
-		cancellation.join();
-
-		// An applied proposal marked canceled would hide an active relationship
-		QVERIFY(isApplied.load() != isCanceled.load());
-		relationshipCount += isApplied.load() ? 1 : 0;
-		QCOMPARE(fixture.Manager().GetRelationshipProposal(proposalId)->GetStatus(), isApplied.load()
-					? imtauth::ITenantRelationshipProposalInfo::RPS_APPLIED
-					: imtauth::ITenantRelationshipProposalInfo::RPS_CANCELED);
-		QCOMPARE(fixture.Manager().GetTenantRelationshipIds(tenantId).size(), relationshipCount);
-	}
+void COrganizationLookupTest::testContracts_PermissionsMustBelongToProduct()
+{
+	CContractFixture fixture;
+	const QByteArray id = fixture.Add("ProLife");
+	imtauth::CIdentifiableProductPermissionSnapshot snapshot;
+	snapshot.SetProductId("ProLife");
+	snapshot.SetTree(R"({"groups":[{"entries":[{"permissionId":"/Product/View"}]}]})");
+	QVERIFY(!fixture.snapshots->AddObject("ProductPermissionSnapshot", snapshot, NewId()).isEmpty());
+	imtauth::IContractInfo::Allocation allocation;
+	allocation.granteeTenantId = "partner";
+	allocation.permissionIds = {"/OtherProduct/Edit"};
+	QString error;
+	QVERIFY(!fixture.manager->GiveAllocation({"11111111-1111-4111-8111-111111111111", "user", {}, "ProLife"}, id, allocation, error));
+	QCOMPARE(error, QStringLiteral("The permission is not part of the contract product"));
+	QVERIFY(fixture.manager->GetContract(id)->GetAllocations().isEmpty());
+	allocation.permissionIds = {"/Product/View"};
+	QVERIFY2(fixture.manager->GiveAllocation({"11111111-1111-4111-8111-111111111111", "user", {}, "ProLife"}, id, allocation, error), qPrintable(error));
+	QCOMPARE(fixture.manager->GetContract(id)->GetAllocations().size(), 1);
 }
 
 

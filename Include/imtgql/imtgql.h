@@ -53,6 +53,11 @@ imtauth::IUserInfo::FeatureIds CollectTenantScopedPermissions(const IGqlContext&
 */
 imtauth::IUserInfo::FeatureIds CollectOrganizationAccessPermissions(const IGqlContext& gqlContext, const QByteArray& userId);
 
+/**
+	The product the request is served for, empty for a request without a context.
+*/
+QByteArray GetRequestProductId(const CGqlRequest& gqlRequest);
+
 QByteArray GetLanguageIdFromRequest(const QList<CGqlParamObject>& inputParams);
 QByteArray GetDesignSchemeIdFromRequest(const QList<CGqlParamObject>& inputParams);
 QByteArray GetTranslation(const iqt::ITranslationManager* translationManagerPtr, const CGqlRequest& gqlRequest, const QByteArray& phrase, const QByteArray& context);

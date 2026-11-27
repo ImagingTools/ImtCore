@@ -718,26 +718,12 @@ bool CUserGroupCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequ
 		return true;
 	}
 
-	// Allow access for delegated users via cross-org grants
-	if (gqlContextPtr != nullptr && m_delegatedAccessCompPtr.IsValid() && m_membershipManagerCompPtr.IsValid()){
-		QByteArray userId = gqlContextPtr->GetUserId();
-		QByteArray currentTenantId = gqlContextPtr->GetTenantId();
-		if (!userId.isEmpty() && !currentTenantId.isEmpty()){
-			const imtauth::ITenantMembershipManager::MembershipIds membershipIds =
-				m_membershipManagerCompPtr->GetMembershipsByUser(userId);
-			for (const QByteArray& membershipId : membershipIds){
-				imtauth::ITenantMembershipUniquePtr homeMembershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
-				if (!homeMembershipPtr.IsValid() || !homeMembershipPtr->IsActive()){
-					continue;
-				}
-				QByteArray homeTenantId = homeMembershipPtr->GetTenantId();
-				if (homeTenantId.isEmpty() || homeTenantId == currentTenantId){
-					continue;
-				}
-				if (m_delegatedAccessCompPtr->IsDelegatedAccess(userId, homeTenantId, currentTenantId)){
-					return true;
-				}
-			}
+	// Users given permissions by the contracts of the organization
+	if (gqlContextPtr != nullptr && m_delegatedAccessCompPtr.IsValid()){
+		const QByteArray userId = gqlContextPtr->GetUserId();
+		const QByteArray currentTenantId = gqlContextPtr->GetTenantId();
+		if (!userId.isEmpty() && !currentTenantId.isEmpty() && m_delegatedAccessCompPtr->HasDelegatedAccess(userId, currentTenantId, gqlContextPtr->GetProductId())){
+			return true;
 		}
 	}
 

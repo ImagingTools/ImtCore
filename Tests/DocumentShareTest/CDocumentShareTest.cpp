@@ -13,7 +13,6 @@
 // ImtCore includes
 #include <imtauth/CDocumentShareInfo.h>
 #include <imtauth/CTenantFilterParam.h>
-#include <imtauth/ITenantRelationshipProvider.h>
 
 
 namespace
@@ -35,6 +34,7 @@ void FillSampleShare(imtauth::IDocumentShareInfo& share)
 	share.SetStatus(imtauth::IDocumentShareInfo::DSS_ACTIVE);
 	share.SetValidUntil(QDateTime::fromString("2030-01-01T00:00:00.000Z", Qt::ISODateWithMs));
 	share.SetMessage("Please review");
+	share.SetContractId("contract-1");
 	share.SetCreatedByUserId("user-1");
 	share.SetCreatedAt(QDateTime::fromString("2026-10-21T10:00:00.000Z", Qt::ISODateWithMs));
 	share.SetUpdatedAt(QDateTime::fromString("2026-10-21T11:00:00.000Z", Qt::ISODateWithMs));
@@ -76,6 +76,7 @@ void CDocumentShareTest::testShare_SerializeRoundTrip()
 	QVERIFY(target.IsEqual(source));
 	QCOMPARE(target.GetTargetGroupIds(), QByteArrayList({"group-1", "group-2"}));
 	QCOMPARE(target.GetEntityName(), QString("Account; with separator"));
+	QCOMPARE(target.GetContractId(), QByteArray("contract-1"));
 }
 
 
@@ -195,24 +196,6 @@ void CDocumentShareTest::testTenantFilter_CopyFrom()
 	QCOMPARE(target.GetTenantType(), imtbase::TT_ORGANIZATION);
 	QCOMPARE(target.GetSharingScope(), imtauth::SS_OWN);
 	QVERIFY(!target.IsGroupRestrictionEnabled());
-}
-
-
-void CDocumentShareTest::testRelationshipValidity_OpenBounds()
-{
-	QVERIFY(imtauth::IsTenantRelationshipValidNow(QString(), QString()));
-}
-
-
-void CDocumentShareTest::testRelationshipValidity_Bounds()
-{
-	const QDateTime now = QDateTime::currentDateTimeUtc();
-	const QString past = now.addDays(-1).toString(Qt::ISODateWithMs);
-	const QString future = now.addDays(1).toString(Qt::ISODateWithMs);
-
-	QVERIFY(imtauth::IsTenantRelationshipValidNow(past, future));
-	QVERIFY(!imtauth::IsTenantRelationshipValidNow(future, QString()));
-	QVERIFY(!imtauth::IsTenantRelationshipValidNow(QString(), past));
 }
 
 

@@ -34,7 +34,7 @@ public:
 		I_ASSIGN(m_jwtSessionControllerCompPtr, "JwtSessionController", "Json Web Token session controller", false, "JwtSessionController");
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager", false, "TenantManager");
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager", false, "TenantMembershipManager");
-		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Delegated access resolver for cross-org grants", false, "DelegatedAccessResolver");
+		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Permissions given to the users by the contracts of the organizations", false, "ContractDelegatedAccess");
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", false, "VersionInfo");
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection, read for the password lifetime check on a token refresh", false, "UserCollection");
 		I_ASSIGN(m_passwordPolicyCompPtr, "PasswordPolicy", "Password policy: a token refresh is refused once the password has expired", false, "PasswordPolicy");
@@ -98,7 +98,7 @@ protected:
 private:
 	AuthorizationState CheckAuthorizationServer(const ::imtgql::CGqlRequest& gqlRequest, QByteArray& productId, QString& message) const;
 	QByteArray GetAuthenticatedUserId(const ::imtgql::CGqlRequest& gqlRequest) const;
-	bool CanUseTenant(const QByteArray& userId, const QByteArray& tenantId, QString& errorMessage) const;
+	bool CanUseTenant(const QByteArray& userId, const QByteArray& tenantId, const QByteArray& productId, QString& errorMessage) const;
 	bool IsPasswordChangeRequired(const QByteArray& userId) const;
 	sdl::V1_0::imtauth::CUserSession CreateUserSessionData(
 			const imtauth::IJwtSessionController::UserSession& userSession) const;

@@ -97,6 +97,15 @@ QtObject {
 	readonly property bool canRemoveOrganizationConnection: stateManager.hasPermission("/OrganizationManagement/Connections/Edit/Remove")
 	readonly property bool canManageOrganizationConnections: stateManager.hasAnyPermission(["/OrganizationManagement/Connections/Edit/Connect", "/OrganizationManagement/Connections/Edit/Remove"])
 
+	readonly property bool canViewContracts: stateManager.hasPermission("/OrganizationManagement/Contracts/View")
+	readonly property bool canEditContracts: stateManager.hasPermission("/OrganizationManagement/Contracts/Edit")
+	readonly property bool canApproveContracts: stateManager.hasPermission("/OrganizationManagement/Contracts/Approve")
+	readonly property bool canSignContracts: stateManager.hasPermission("/OrganizationManagement/Contracts/Sign")
+	readonly property bool canGiveContractPermissions: stateManager.hasPermission("/OrganizationManagement/Contracts/Give")
+	readonly property bool canDistributeContractPermissions: stateManager.hasPermission("/OrganizationManagement/Contracts/Distribute")
+	readonly property bool canEditPartyRoles: stateManager.hasPermission("/OrganizationManagement/PartyRoles/Edit")
+	readonly property bool canEditContractTypes: stateManager.hasPermission("/OrganizationManagement/ContractTypes/Edit")
+	readonly property bool canEditDirectoryProfile: stateManager.hasPermission("/OrganizationManagement/Directory/Edit")
 	// Computed key for page-list change detection.
 	// Changes whenever any page-controlling permission flips (add or remove).
 	// TenantEditor watches onPagesConfigKeyChanged to know when to rebuild the page list.
@@ -110,7 +119,10 @@ QtObject {
 		(isOwner ? "O" : "") +
 		(canViewOrganizationConnections ? "VC" : "") +
 		(canViewOrganizationConnectionCode ? "VCC" : "") +
-		(canConnectOrganization ? "CO" : "")
+		(canConnectOrganization ? "CO" : "") +
+		(canViewContracts ? "VK" : "") +
+		(canEditPartyRoles || canEditContractTypes ? "EK" : "") +
+		(canEditDirectoryProfile ? "ED" : "")
 
 	readonly property bool canManageMembers: stateManager.canManageOrganizationMembers
 		|| stateManager.canManageOrganizationRoles

@@ -466,9 +466,7 @@ bool CRoleCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& 
 						gqlContextPtr->GetTenantId(),
 						gqlContextPtr->GetProductId(),
 						m_bindingManagerCompPtr.GetPtr(),
-						m_delegatedAccessCompPtr.GetPtr(),
-						m_membershipManagerCompPtr.GetPtr(),
-						nullptr);
+						m_delegatedAccessCompPtr.GetPtr());
 		}
 	}
 

@@ -74,8 +74,6 @@ sdl::V1_0::imtauth::CUserData CUserCollectionDocumentServiceComp::OnGetUserRepre
 
 	imtauth::ITenantEntityBindingManager* bindingPtr = m_bindingManagerCompPtr.IsValid() ? m_bindingManagerCompPtr.GetPtr() : nullptr;
 	imtauth::IDelegatedAccess* delegatedPtr = m_delegatedAccessCompPtr.IsValid() ? m_delegatedAccessCompPtr.GetPtr() : nullptr;
-	imtauth::ITenantMembershipManager* membershipPtr = m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr;
-	imtauth::IRoleInfoProvider* roleProviderPtr = m_roleInfoProviderCompPtr.IsValid() ? m_roleInfoProviderCompPtr.GetPtr() : nullptr;
 
 	istd::IChangeableUniquePtr tenantAdapted = AdaptUserForTenant(
 				userPtr->GetObjectUuid(),
@@ -83,9 +81,7 @@ sdl::V1_0::imtauth::CUserData CUserCollectionDocumentServiceComp::OnGetUserRepre
 				currentTenantId,
 				currentProductId,
 				bindingPtr,
-				delegatedPtr,
-				membershipPtr,
-				roleProviderPtr);
+				delegatedPtr);
 
 	const imtauth::IUserInfo* effectiveUserPtr = userPtr;
 	if (tenantAdapted.IsValid()){

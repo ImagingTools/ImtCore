@@ -4,6 +4,10 @@ import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 
+/**
+	A date typed as dd.MM.yyyy or picked in the calendar.
+	An optional date (canShowCurrentDate false) starts empty and reads as empty when its text is cleared.
+*/
 ElementView {
 	id: expirationEditor;
 	
@@ -11,7 +15,13 @@ ElementView {
 	
 	property bool readOnly: false;
 	property bool timeEdit: false;
+	// False for an optional date: no date is shown until one is set
+	property bool canShowCurrentDate: true;
+	property string placeHolderText: qsTr("dd.mm.yyyy");
 	property DateInput datePicker: null;
+
+	// A date set before the input exists
+	property string __pendingDate: "";
 	
 	signal editingFinished();
 	
@@ -21,18 +31,33 @@ ElementView {
 		}
 	}
 	
+	// "dd.MM.yyyy"; an empty text clears the date
 	function setDateAsString(dateStr){
-		if (datePicker){
-			datePicker.setDateAsString(dateStr);
+		if (!datePicker){
+			__pendingDate = dateStr;
+			return;
 		}
+
+		if (dateStr === ""){
+			datePicker.inputItem.text = "";
+			datePicker.dateStr = "";
+			return;
+		}
+
+		datePicker.setDateAsString(dateStr);
 	}
 	
+	// "dd.MM.yyyy", empty when no date is typed
 	function getDateAsString(){
-		if (datePicker){
-			return datePicker.getDateAsString();
+		if (!datePicker){
+			return __pendingDate;
 		}
-		
-		return "";
+
+		if (datePicker.inputItem.text.trim() === ""){
+			return "";
+		}
+
+		return datePicker.getDateAsString();
 	}
 	
 	function setDate(date){
@@ -47,9 +72,15 @@ ElementView {
 		DateInput {
 			width: expirationEditor.contentWidth > 0 ? Math.min(200, expirationEditor.contentWidth) : 200;
 			hasTitle: false
+			readOnly: expirationEditor.readOnly
+			canShowCurrentDate: expirationEditor.canShowCurrentDate
+			placeHolderText: expirationEditor.placeHolderText
 
 			Component.onCompleted: {
 				expirationEditor.datePicker = this;
+				if (expirationEditor.__pendingDate !== ""){
+					expirationEditor.setDateAsString(expirationEditor.__pendingDate);
+				}
 			}
 			
 			onDateChanged: {
@@ -58,5 +89,3 @@ ElementView {
 		}
 	}
 }
-
-

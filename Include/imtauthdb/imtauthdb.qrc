@@ -7,14 +7,19 @@
         <file alias="CreateTenantMembershipsTable.sql">Resources/SQL/Postgres/CreateTenantMembershipsTable.sql</file>
 	<file alias="CreateTenantInvitationsTable.sql">Resources/SQL/Postgres/CreateTenantInvitationsTable.sql</file>
 	<file alias="CreateTenantPermissionsTable.sql">Resources/SQL/Postgres/CreateTenantPermissionsTable.sql</file>
-	<file alias="CreateCrossOrgGrantsTable.sql">Resources/SQL/Postgres/CreateCrossOrgGrantsTable.sql</file>
-	<file alias="CreateContractsTable.sql">Resources/SQL/Postgres/CreateContractsTable.sql</file>
-	<file alias="CreateCrossTenantMessagesTable.sql">Resources/SQL/Postgres/CreateCrossTenantMessagesTable.sql</file>
-	<file alias="CreateOrderRequestsTable.sql">Resources/SQL/Postgres/CreateOrderRequestsTable.sql</file>
-	<file alias="CreateTenantRelationshipsTable.sql">Resources/SQL/Postgres/CreateTenantRelationshipsTable.sql</file>
+	<file alias="CreateContractMessagesTable.sql">Resources/SQL/Postgres/CreateContractMessagesTable.sql</file>
+	<file alias="CreateContractOrderRequestsTable.sql">Resources/SQL/Postgres/CreateContractOrderRequestsTable.sql</file>
+	<file alias="CreateTenantConnectionsTable.sql">Resources/SQL/Postgres/CreateTenantConnectionsTable.sql</file>
 	<file alias="CreateTenantEntityBindingsTable.sql">Resources/SQL/Postgres/CreateTenantEntityBindingsTable.sql</file>
 	<file alias="CreateDocumentSharesTable.sql">Resources/SQL/Postgres/CreateDocumentSharesTable.sql</file>
 	<file alias="CreateExternalIdentitiesTable.sql">Resources/SQL/Postgres/CreateExternalIdentitiesTable.sql</file>
+	<file alias="CreateTenantContractsTable.sql">Resources/SQL/Postgres/CreateTenantContractsTable.sql</file>
+	<file alias="CreateContractPartyRecordsTable.sql">Resources/SQL/Postgres/CreateContractPartyRecordsTable.sql</file>
+	<file alias="CreateContractEventsTable.sql">Resources/SQL/Postgres/CreateContractEventsTable.sql</file>
+	<file alias="CreateContractPartyRolesTable.sql">Resources/SQL/Postgres/CreateContractPartyRolesTable.sql</file>
+	<file alias="CreateContractTypesTable.sql">Resources/SQL/Postgres/CreateContractTypesTable.sql</file>
+	<file alias="CreateTenantDirectoryProfilesTable.sql">Resources/SQL/Postgres/CreateTenantDirectoryProfilesTable.sql</file>
+	<file alias="CreateContractAttachmentsTable.sql">Resources/SQL/Postgres/CreateContractAttachmentsTable.sql</file>
     </qresource>
     <qresource prefix="/SQL/Duck">
         <file alias="CreatePersonalAccessTokenTable.sql">Resources/SQL/Postgres/CreatePersonalAccessTokenTable.sql</file>
@@ -24,14 +29,19 @@
         <file alias="CreateTenantMembershipsTable.sql">Resources/SQL/Postgres/CreateTenantMembershipsTable.sql</file>
 	<file alias="CreateTenantInvitationsTable.sql">Resources/SQL/Postgres/CreateTenantInvitationsTable.sql</file>
 	<file alias="CreateTenantPermissionsTable.sql">Resources/SQL/Postgres/CreateTenantPermissionsTable.sql</file>
-	<file alias="CreateCrossOrgGrantsTable.sql">Resources/SQL/Postgres/CreateCrossOrgGrantsTable.sql</file>
-	<file alias="CreateContractsTable.sql">Resources/SQL/Postgres/CreateContractsTable.sql</file>
-	<file alias="CreateCrossTenantMessagesTable.sql">Resources/SQL/Postgres/CreateCrossTenantMessagesTable.sql</file>
-	<file alias="CreateOrderRequestsTable.sql">Resources/SQL/Postgres/CreateOrderRequestsTable.sql</file>
-	<file alias="CreateTenantRelationshipsTable.sql">Resources/SQL/Postgres/CreateTenantRelationshipsTable.sql</file>
+	<file alias="CreateContractMessagesTable.sql">Resources/SQL/Postgres/CreateContractMessagesTable.sql</file>
+	<file alias="CreateContractOrderRequestsTable.sql">Resources/SQL/Postgres/CreateContractOrderRequestsTable.sql</file>
+	<file alias="CreateTenantConnectionsTable.sql">Resources/SQL/Postgres/CreateTenantConnectionsTable.sql</file>
 	<file alias="CreateTenantEntityBindingsTable.sql">Resources/SQL/Postgres/CreateTenantEntityBindingsTable.sql</file>
 	<file alias="CreateDocumentSharesTable.sql">Resources/SQL/Postgres/CreateDocumentSharesTable.sql</file>
 	<file alias="CreateExternalIdentitiesTable.sql">Resources/SQL/Postgres/CreateExternalIdentitiesTable.sql</file>
+	<file alias="CreateTenantContractsTable.sql">Resources/SQL/Postgres/CreateTenantContractsTable.sql</file>
+	<file alias="CreateContractPartyRecordsTable.sql">Resources/SQL/Postgres/CreateContractPartyRecordsTable.sql</file>
+	<file alias="CreateContractEventsTable.sql">Resources/SQL/Postgres/CreateContractEventsTable.sql</file>
+	<file alias="CreateContractPartyRolesTable.sql">Resources/SQL/Postgres/CreateContractPartyRolesTable.sql</file>
+	<file alias="CreateContractTypesTable.sql">Resources/SQL/Postgres/CreateContractTypesTable.sql</file>
+	<file alias="CreateTenantDirectoryProfilesTable.sql">Resources/SQL/Postgres/CreateTenantDirectoryProfilesTable.sql</file>
+	<file alias="CreateContractAttachmentsTable.sql">Resources/SQL/Postgres/CreateContractAttachmentsTable.sql</file>
     </qresource>
     <qresource prefix="/SQL/SQLite">
         <file alias="CreatePersonalAccessTokenTable.sql">Resources/SQL/SQLite/CreatePersonalAccessTokenTable.sql</file>
@@ -41,13 +51,18 @@
         <file alias="CreateTenantMembershipsTable.sql">Resources/SQL/SQLite/CreateTenantMembershipsTable.sql</file>
 	<file alias="CreateTenantInvitationsTable.sql">Resources/SQL/SQLite/CreateTenantInvitationsTable.sql</file>
 	<file alias="CreateTenantPermissionsTable.sql">Resources/SQL/SQLite/CreateTenantPermissionsTable.sql</file>
-	<file alias="CreateCrossOrgGrantsTable.sql">Resources/SQL/SQLite/CreateCrossOrgGrantsTable.sql</file>
-	<file alias="CreateContractsTable.sql">Resources/SQL/SQLite/CreateContractsTable.sql</file>
-	<file alias="CreateCrossTenantMessagesTable.sql">Resources/SQL/SQLite/CreateCrossTenantMessagesTable.sql</file>
-	<file alias="CreateOrderRequestsTable.sql">Resources/SQL/SQLite/CreateOrderRequestsTable.sql</file>
-	<file alias="CreateTenantRelationshipsTable.sql">Resources/SQL/SQLite/CreateTenantRelationshipsTable.sql</file>
+	<file alias="CreateContractMessagesTable.sql">Resources/SQL/SQLite/CreateContractMessagesTable.sql</file>
+	<file alias="CreateContractOrderRequestsTable.sql">Resources/SQL/SQLite/CreateContractOrderRequestsTable.sql</file>
+	<file alias="CreateTenantConnectionsTable.sql">Resources/SQL/SQLite/CreateTenantConnectionsTable.sql</file>
 	<file alias="CreateTenantEntityBindingsTable.sql">Resources/SQL/SQLite/CreateTenantEntityBindingsTable.sql</file>
 	<file alias="CreateDocumentSharesTable.sql">Resources/SQL/SQLite/CreateDocumentSharesTable.sql</file>
 	<file alias="CreateExternalIdentitiesTable.sql">Resources/SQL/SQLite/CreateExternalIdentitiesTable.sql</file>
+	<file alias="CreateTenantContractsTable.sql">Resources/SQL/SQLite/CreateTenantContractsTable.sql</file>
+	<file alias="CreateContractPartyRecordsTable.sql">Resources/SQL/SQLite/CreateContractPartyRecordsTable.sql</file>
+	<file alias="CreateContractEventsTable.sql">Resources/SQL/SQLite/CreateContractEventsTable.sql</file>
+	<file alias="CreateContractPartyRolesTable.sql">Resources/SQL/SQLite/CreateContractPartyRolesTable.sql</file>
+	<file alias="CreateContractTypesTable.sql">Resources/SQL/SQLite/CreateContractTypesTable.sql</file>
+	<file alias="CreateTenantDirectoryProfilesTable.sql">Resources/SQL/SQLite/CreateTenantDirectoryProfilesTable.sql</file>
+	<file alias="CreateContractAttachmentsTable.sql">Resources/SQL/SQLite/CreateContractAttachmentsTable.sql</file>
     </qresource>
 </RCC>

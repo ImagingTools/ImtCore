@@ -25,6 +25,12 @@ TestCase {
 		}
 	}
 
+	Component {
+		id: contractsClientComp
+
+		ContractsApiClient {}
+	}
+
 	// What GetTenantRepresentation brings for the organization the user created
 	Component {
 		id: representationComp
@@ -122,6 +128,18 @@ TestCase {
 		verify(context.pageView.getIndexById("Members") >= 0, "The pages of an existing organization are listed")
 	}
 
+	function test_contractLinkWaitsForTheOrganization(){
+		let context = openEditor()
+		context.editor.contractsApiClient = createTemporaryObject(contractsClientComp, testCase)
+		context.editor.contractToOpenId = "contract-id"
+		compare(context.pageView.getIndexById("Contracts"), -1)
+
+		context.model.copyFrom(createTemporaryObject(representationComp, testCase))
+		tryVerify(function(){ return context.pageView.getPageById("Contracts") !== null })
+		compare(context.pageView.currentIndex, context.pageView.getIndexById("Contracts"))
+		compare(context.pageView.getPageById("Contracts").contractToOpenId, "contract-id")
+	}
+
 	// A re-read after a notification brings the same organization: the page the user works in stays
 	function test_sameRepresentationKeepsTheShownPage(){
 		let context = openEditor()
@@ -216,11 +234,11 @@ TestCase {
 	function test_leaveClosesTheEditorsOfAllSections(){
 		let context = openHostedEditor()
 		let members = openPageEditor(context, "Members")
-		let grants = openPageEditor(context, "CrossOrgGrants")
+		let roles = openPageEditor(context, "Roles")
 		context.pageView.activatePage(0)
 		let shown = []
 		members.editorOpenChanged.connect(function(){ shown.push("Members:" + context.pageView.currentIndex) })
-		grants.editorOpenChanged.connect(function(){ shown.push("CrossOrgGrants:" + context.pageView.currentIndex) })
+		roles.editorOpenChanged.connect(function(){ shown.push("Roles:" + context.pageView.currentIndex) })
 		let answers = []
 
 		context.editor.requestLeave(function(left){
@@ -229,8 +247,8 @@ TestCase {
 
 		compare(answers, [true])
 		verify(!members.editorOpen)
-		verify(!grants.editorOpen)
-		compare(shown, ["Members:" + context.pageView.getIndexById("Members"), "CrossOrgGrants:" + context.pageView.getIndexById("CrossOrgGrants")])
+		verify(!roles.editorOpen)
+		compare(shown, ["Members:" + context.pageView.getIndexById("Members"), "Roles:" + context.pageView.getIndexById("Roles")])
 	}
 
 	// The pages are not rebuilt under an open editor: that would drop its changes

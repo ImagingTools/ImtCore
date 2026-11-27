@@ -438,5 +438,6 @@
         <Component ExportedId="WebSocketServerFramework" ComponentId="WebSocketServerFramework"/>
         <Component ExportedId="NotificationSender" ComponentId="PumaClientEngine/NotificationSender"/>
         <Component ExportedId="TicketNotificationProducer" ComponentId="DeskController/TicketNotificationProducer"/>
+        <Component ExportedId="RemoteContractController" ComponentId="PumaClientEngine/RemoteContractController"/>
     </ExportedComponents>
 </Acf>

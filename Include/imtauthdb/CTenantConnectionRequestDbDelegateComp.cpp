@@ -81,19 +81,6 @@ istd::IChangeableUniquePtr CTenantConnectionRequestDbDelegateComp::CreateObjectF
 	requestPtr->SetCreatedAt(RecordDateTimeToString(record, "CreatedAt"));
 	requestPtr->SetRespondedAt(RecordDateTimeToString(record, "RespondedAt"));
 
-	if (record.contains("RelationshipProposed")){
-		requestPtr->SetRelationshipProposed(record.value("RelationshipProposed").toInt() != 0);
-	}
-	if (record.contains("ProposedSourceRole") && !record.value("ProposedSourceRole").isNull()){
-		requestPtr->SetProposedSourceRole(static_cast<imtauth::ITenantRelationshipInfo::TenantRelationshipRole>(record.value("ProposedSourceRole").toInt()));
-	}
-	if (record.contains("ProposedTargetRole") && !record.value("ProposedTargetRole").isNull()){
-		requestPtr->SetProposedTargetRole(static_cast<imtauth::ITenantRelationshipInfo::TenantRelationshipRole>(record.value("ProposedTargetRole").toInt()));
-	}
-	if (record.contains("ProposedScope")){
-		requestPtr->SetProposedScope(record.value("ProposedScope").toString());
-	}
-
 	return requestPtr;
 }
 
@@ -122,15 +109,9 @@ CTenantConnectionRequestDbDelegateComp::NewObjectQuery CTenantConnectionRequestD
 	QString createdAt = !requestPtr->GetCreatedAt().isEmpty() ? imtdb::EscapeSql(requestPtr->GetCreatedAt()) : imtdb::UtcNow();
 	QString respondedAt = NullableSqlDateTime(requestPtr->GetRespondedAt());
 
-	const bool isProposed = requestPtr->IsRelationshipProposed();
-	const QString proposedSourceRole = isProposed ? QString::number(static_cast<int>(requestPtr->GetProposedSourceRole())) : imtdb::NULL_DATA_LITERAL;
-	const QString proposedTargetRole = isProposed ? QString::number(static_cast<int>(requestPtr->GetProposedTargetRole())) : imtdb::NULL_DATA_LITERAL;
-	const QString proposedScope = isProposed ? NullableSqlText(requestPtr->GetProposedScope()) : imtdb::NULL_DATA_LITERAL;
-
 	result.query = QString(
-		"INSERT INTO \"%1\" (\"Id\", \"SourceTenantId\", \"TargetTenantId\", \"ConnectionCode\", \"Message\", \"Status\", \"CreatedAt\", \"RespondedAt\", "
-		"\"RelationshipProposed\", \"ProposedSourceRole\", \"ProposedTargetRole\", \"ProposedScope\") "
-		"VALUES ('%2', '%3', %4, %5, %6, %7, '%8', %9, %10, %11, %12, %13);")
+		"INSERT INTO \"%1\" (\"Id\", \"SourceTenantId\", \"TargetTenantId\", \"ConnectionCode\", \"Message\", \"Status\", \"CreatedAt\", \"RespondedAt\") "
+		"VALUES ('%2', '%3', %4, %5, %6, %7, '%8', %9);")
 		.arg(
 					QString::fromUtf8(*m_tableNameAttrPtr),
 					id,
@@ -140,11 +121,7 @@ CTenantConnectionRequestDbDelegateComp::NewObjectQuery CTenantConnectionRequestD
 					message,
 					QString::number(status),
 					createdAt,
-					respondedAt,
-					isProposed ? QStringLiteral("1") : QStringLiteral("0"),
-					proposedSourceRole,
-					proposedTargetRole,
-					proposedScope).toUtf8();
+					respondedAt).toUtf8();
 
 	return result;
 }
@@ -223,30 +200,6 @@ QByteArray CTenantConnectionRequestDbDelegateComp::CreateDescriptionObjectQuery(
 		const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	return QByteArray();
-}
-
-
-// reimplemented (icomp::CComponentBase)
-
-void CTenantConnectionRequestDbDelegateComp::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-
-	// The table may come from before the proposed terms
-	const QString tableName = QString::fromUtf8(GetTableName());
-	if (!m_databaseEngineCompPtr.IsValid() || !TableExists(tableName)){
-		return;
-	}
-
-	const QString quotedTableName = QStringLiteral(R"("%1")").arg(tableName);
-	const bool isComplete =
-				imtdb::AddColumnIfMissing(*m_databaseEngineCompPtr, quotedTableName, QStringLiteral("RelationshipProposed"), QStringLiteral("INTEGER"), QStringLiteral("0")) &&
-				imtdb::AddColumnIfMissing(*m_databaseEngineCompPtr, quotedTableName, QStringLiteral("ProposedSourceRole"), QStringLiteral("INTEGER")) &&
-				imtdb::AddColumnIfMissing(*m_databaseEngineCompPtr, quotedTableName, QStringLiteral("ProposedTargetRole"), QStringLiteral("INTEGER")) &&
-				imtdb::AddColumnIfMissing(*m_databaseEngineCompPtr, quotedTableName, QStringLiteral("ProposedScope"), QStringLiteral("TEXT"));
-	if (!isComplete){
-		SendErrorMessage(0, QStringLiteral("The columns of the proposed relationship could not be added to the table '%1'").arg(tableName));
-	}
 }
 
 

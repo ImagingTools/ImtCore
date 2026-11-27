@@ -89,6 +89,9 @@ Rectangle{
 
 		onClicked:{
 			clickFunction();
+			if (dayDelegate.calendarItem.acceptOnClick && !dayDelegate.calendarItem.multiSelection){
+				dayDelegate.calendarItem.acceptDay();
+			}
 		}
 
 		onDoubleClicked: {

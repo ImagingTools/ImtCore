@@ -87,7 +87,7 @@
                         <Data IsEnabled="true" Value="TenantConnectionCodeInfo"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CreateTableScriptPath" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value=":/SQL/Postgres/CreateTenantRelationshipsTable.sql"/>
+                        <Data IsEnabled="true" Value=":/SQL/Postgres/CreateTenantConnectionsTable.sql"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>

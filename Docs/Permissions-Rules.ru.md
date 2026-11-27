@@ -83,7 +83,11 @@ Lisa FeatureEditor ──generate──► <Product>Features.h ──FillProduct
 ├─ Roles/{View, Edit → Roles/View /{Add, Change, Remove}}
 ├─ Groups/{View, Edit → Groups/View /{Add, Change, Remove}}
 ├─ Permissions/{View, Change → Permissions/View}
-└─ Connections/{View, ViewCode, Edit → Connections/View /{Connect, Remove}}
+├─ Connections/{View, ViewCode, Edit → Connections/View /{Connect, Remove}}
+├─ Contracts/{View, Edit, Approve, Sign, Suspend, Distribute} → Contracts/View
+├─ PartyRoles/Edit
+├─ ContractTypes/Edit
+└─ Directory/Edit
 ```
 
 Права этого дерева, как и продуктовые, хранятся и проверяются только полными путями (раздел 4).
@@ -113,10 +117,20 @@ Lisa FeatureEditor ──generate──► <Product>Features.h ──FillProduct
 | `GetTenantPermissions` | `Permissions/View` или `Roles/View` |
 | права участника другого пользователя (`GetOrganizationPermissions`) | `Permissions/View` |
 | изменение прав участника (`UpdateMembershipPermissions`) | любой лист `Members/Edit/*` (13.23) |
-| связи, запросы, предложения, договоры, гранты, сообщения, заявки — чтение | `Connections/View` |
+| адресная книга, запросы, сообщения, заявки — чтение | `Connections/View` |
 | код подключения | `Connections/ViewCode` |
-| создание, принятие, отклонение, отмена; договоры, гранты, сообщения, заявки — изменение; код подключения — изменение | `Connections/Edit/Connect` |
-| удаление связи | `Connections/Edit/Remove` |
+| запрос в адресную книгу (по коду или из справочника), принятие, отклонение, отмена; сообщения, заявки — изменение; код подключения — изменение | `Connections/Edit/Connect` |
+| контракты, их вложения, журнал, связанные организации — чтение | `Contracts/View` |
+| черновик, изменение условий, отправка, отзыв оферты, запрос изменений, вложения, внутренние данные | `Contracts/Edit` |
+| согласование | `Contracts/Approve` |
+| подпись, отказ, уведомление о выходе, отказ от продления, расторжение по соглашению | `Contracts/Sign` |
+| приостановка выданных по контракту прав | `Contracts/Suspend` |
+| раздача полученных по контракту прав группам | `Contracts/Distribute` |
+| справочники ролей и типов — чтение | `Contracts/View`, `Contracts/Edit`, `PartyRoles/Edit` или `ContractTypes/Edit` |
+| свои роли / свои типы контрактов | `PartyRoles/Edit` / `ContractTypes/Edit` |
+| поиск в справочнике организаций | `Connections/Edit/Connect` или `Contracts/Edit` |
+| профиль организации в справочнике | `Directory/Edit` |
+| удаление из адресной книги | `Connections/Edit/Remove` |
 | расшарки: ограничение группами, статус, удаление (`SetDocumentShareGroups`, `SetDocumentSharesStatus`, `RemoveOrganizationDocumentShares`) | продуктовый `/OrganizationManagement/Shares/Edit` (ProLife, атрибут `EditCommandPermissions` композиции `DocumentShareController`); чтение (`GetOrganizationDocumentShares`) — `View` |
 
 ## 4. Формат идентификатора и правило сравнения

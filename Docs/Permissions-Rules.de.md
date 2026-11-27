@@ -83,7 +83,11 @@ Besondere Aktionen eines Bereichs sind Blätter neben `View` (`/SensorManagement
 ├─ Roles/{View, Edit → Roles/View /{Add, Change, Remove}}
 ├─ Groups/{View, Edit → Groups/View /{Add, Change, Remove}}
 ├─ Permissions/{View, Change → Permissions/View}
-└─ Connections/{View, ViewCode, Edit → Connections/View /{Connect, Remove}}
+├─ Connections/{View, ViewCode, Edit → Connections/View /{Connect, Remove}}
+├─ Contracts/{View, Edit, Approve, Sign, Suspend, Distribute} → Contracts/View
+├─ PartyRoles/Edit
+├─ ContractTypes/Edit
+└─ Directory/Edit
 ```
 
 Berechtigungen dieses Baums werden wie Produktberechtigungen nur als vollständige Pfade gespeichert und geprüft (Abschnitt 4).
@@ -113,10 +117,20 @@ Interne Organisationsbefehle werden mit der Produktberechtigung `/OrganizationMa
 | `GetTenantPermissions` | `Permissions/View` oder `Roles/View` |
 | Berechtigungen eines anderen Mitglieds lesen (`GetOrganizationPermissions`) | `Permissions/View` |
 | Berechtigungen eines Mitglieds ändern (`UpdateMembershipPermissions`) | Jedes Blatt `Members/Edit/*` (13.23) |
-| Verbindungen, Anfragen, Angebote, Verträge, Grants, Nachrichten und Anträge lesen | `Connections/View` |
+| Adressbuch, Anfragen, Nachrichten und Anträge lesen | `Connections/View` |
 | Verbindungscode | `Connections/ViewCode` |
-| Erstellen, Annehmen, Ablehnen oder Abbrechen; Verträge, Grants, Nachrichten oder Anträge ändern; Verbindungscode ändern | `Connections/Edit/Connect` |
-| Verbindung entfernen | `Connections/Edit/Remove` |
+| Adressbucheintrag anfragen (per Code oder aus dem Verzeichnis), annehmen, ablehnen oder abbrechen; Nachrichten oder Anträge ändern; Verbindungscode ändern | `Connections/Edit/Connect` |
+| Verträge, ihre Anhänge, Journal und verbundene Organisationen lesen | `Contracts/View` |
+| Entwurf, Bedingungen ändern, senden, Angebot zurückziehen, Änderungen anfordern, Anhänge, interne Daten | `Contracts/Edit` |
+| Genehmigen | `Contracts/Approve` |
+| Unterschreiben, ablehnen, kündigen, Verlängerung beenden, einvernehmlich aufheben | `Contracts/Sign` |
+| Durch einen Vertrag gewährte Berechtigungen aussetzen | `Contracts/Suspend` |
+| Durch einen Vertrag erhaltene Berechtigungen an Gruppen geben | `Contracts/Distribute` |
+| Kataloge der Rollen und Typen lesen | `Contracts/View`, `Contracts/Edit`, `PartyRoles/Edit` oder `ContractTypes/Edit` |
+| Eigene Rollen / eigene Vertragstypen | `PartyRoles/Edit` / `ContractTypes/Edit` |
+| Im Organisationsverzeichnis suchen | `Connections/Edit/Connect` oder `Contracts/Edit` |
+| Profil der Organisation im Verzeichnis | `Directory/Edit` |
+| Adressbucheintrag entfernen | `Connections/Edit/Remove` |
 | Freigaben: auf Gruppen beschränken, Status, Entfernen (`SetDocumentShareGroups`, `SetDocumentSharesStatus`, `RemoveOrganizationDocumentShares`) | Produktberechtigung `/OrganizationManagement/Shares/Edit` (ProLife, Attribut `EditCommandPermissions` der Komposition `DocumentShareController`); Lesen (`GetOrganizationDocumentShares`) ist `View` |
 
 ## 4. Kennungsformat und Vergleichsregel

@@ -1,0 +1,153 @@
+schema {
+	query: Query
+	mutation: Mutation
+	namespace: imtauth
+	version: 1.0
+}
+
+# --- Roles of the parties and types of contracts ---
+
+type PartyRole {
+	roleId: ID!
+	name: String
+	description: String
+	# Empty for a system role
+	ownerTenantId: ID
+	isPartyRole: Boolean
+	isLinkRole: Boolean
+	pairedRoleId: ID
+	templateProductId: ID
+	templatePermissionIds: [ID]
+	isArchived: Boolean
+	isSystem: Boolean
+}
+
+input PartyRoleInput {
+	# Empty for a new role
+	roleId: ID
+	name: String!
+	description: String
+	isPartyRole: Boolean
+	isLinkRole: Boolean
+	pairedRoleId: ID
+	templateProductId: ID
+	templatePermissionIds: [ID]
+}
+
+type ContractTypeRoleSlot {
+	roleId: ID!
+	minCount: Int
+	maxCount: Int
+}
+
+input ContractTypeRoleSlotInput {
+	roleId: ID!
+	minCount: Int
+	maxCount: Int
+}
+
+type ContractAllocationTemplate {
+	grantorRoleId: ID!
+	granteeRoleId: ID!
+	productId: ID!
+	permissionIds: [ID]
+}
+
+input ContractAllocationTemplateInput {
+	grantorRoleId: ID!
+	granteeRoleId: ID!
+	productId: ID!
+	permissionIds: [ID]
+}
+
+enum ContractLinkScheme {
+	Manual
+	Mesh
+	Star
+}
+
+type ContractType {
+	typeId: ID!
+	name: String
+	description: String
+	ownerTenantId: ID
+	numberPrefix: String
+	roleSlots: [ContractTypeRoleSlot]
+	linkScheme: ContractLinkScheme
+	starRoleId: ID
+	termDays: Int
+	autoRenew: Boolean
+	renewalPeriodDays: Int
+	renewalNoticeDays: Int
+	terminationNoticeDays: Int
+	allocationTemplates: [ContractAllocationTemplate]
+	isArchived: Boolean
+	isSystem: Boolean
+}
+
+input ContractTypeInput {
+	# Empty for a new type
+	typeId: ID
+	name: String!
+	description: String
+	numberPrefix: String
+	roleSlots: [ContractTypeRoleSlotInput]
+	linkScheme: ContractLinkScheme
+	starRoleId: ID
+	termDays: Int
+	autoRenew: Boolean
+	renewalPeriodDays: Int
+	renewalNoticeDays: Int
+	terminationNoticeDays: Int
+	allocationTemplates: [ContractAllocationTemplateInput]
+}
+
+input ContractCatalogInput {
+	tenantId: ID!
+	includeArchived: Boolean
+}
+
+type GetPartyRolesPayload {
+	roles: [PartyRole]
+	errorMessage: String
+}
+
+type GetContractTypesPayload {
+	types: [ContractType]
+	errorMessage: String
+}
+
+input SavePartyRoleInput {
+	tenantId: ID!
+	role: PartyRoleInput!
+}
+
+input SaveContractTypeInput {
+	tenantId: ID!
+	contractType: ContractTypeInput!
+}
+
+input SetCatalogItemArchivedInput {
+	tenantId: ID!
+	itemId: ID!
+	isArchived: Boolean!
+}
+
+type CatalogCommandPayload {
+	success: Boolean
+	itemId: ID
+	errorMessage: String
+}
+
+type Query {
+	GetPartyRoles (input: ContractCatalogInput): GetPartyRolesPayload!
+	GetContractTypes (input: ContractCatalogInput): GetContractTypesPayload!
+}
+
+type Mutation {
+	SavePartyRole (input: SavePartyRoleInput): CatalogCommandPayload!
+	SetPartyRoleArchived (input: SetCatalogItemArchivedInput): CatalogCommandPayload!
+	SaveContractType (input: SaveContractTypeInput): CatalogCommandPayload!
+	SetContractTypeArchived (input: SetCatalogItemArchivedInput): CatalogCommandPayload!
+}
+

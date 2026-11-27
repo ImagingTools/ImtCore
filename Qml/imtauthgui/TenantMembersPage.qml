@@ -26,6 +26,8 @@ SimpleCollectionPage {
 
 	// Members use stateManager-driven model, not a data provider
 	listModel: __combinedModel
+	// The members and the invitations are filtered while they are combined
+	filtersListModel: false
 	managePermissionIds: ["/OrganizationManagement/Members/Edit/Add", "/OrganizationManagement/Members/Edit/Change", "/OrganizationManagement/Members/Edit/Invite", "/OrganizationManagement/Members/Edit/Exclude", "/OrganizationManagement/Members/Edit/ChangeRole"]
 	createPermissionIds: ["/OrganizationManagement/Members/Edit/Add"]
 	editPermissionIds: ["/OrganizationManagement/Members/Edit/Change", "/OrganizationManagement/Members/Edit/ChangeRole"]

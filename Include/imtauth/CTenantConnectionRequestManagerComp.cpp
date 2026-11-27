@@ -12,7 +12,6 @@
 
 // ImtCore includes
 #include <imtauth/CollectionSelection.h>
-#include <imtauth/ITenantRelationshipProvider.h>
 #include <imtauth/TenantEvents.h>
 
 
@@ -115,45 +114,6 @@ bool CTenantConnectionRequestManagerComp::StoreConnection(const ITenantConnectio
 }
 
 
-bool CTenantConnectionRequestManagerComp::StoreProposal(const QByteArray& proposalId, const ITenantRelationshipProposalInfo& proposalInfo)
-{
-	if (!m_proposalCollectionCompPtr.IsValid() || !m_proposalFactoryCompPtr.IsValid()){
-		return false;
-	}
-
-	ITenantRelationshipProposalInfoUniquePtr dataPtr = m_proposalFactoryCompPtr.CreateInstance();
-	if (!dataPtr.IsValid()){
-		return false;
-	}
-	dataPtr->SetProposalId(proposalInfo.GetProposalId());
-	dataPtr->SetConnectionId(proposalInfo.GetConnectionId());
-	dataPtr->SetExistingRelationshipId(proposalInfo.GetExistingRelationshipId());
-	dataPtr->SetProposalType(proposalInfo.GetProposalType());
-	dataPtr->SetInitiatorTenantId(proposalInfo.GetInitiatorTenantId());
-	dataPtr->SetCounterpartyTenantId(proposalInfo.GetCounterpartyTenantId());
-	dataPtr->SetProposedSourceRole(proposalInfo.GetProposedSourceRole());
-	dataPtr->SetProposedTargetRole(proposalInfo.GetProposedTargetRole());
-	dataPtr->SetProposedScope(proposalInfo.GetProposedScope());
-	dataPtr->SetProposedDescription(proposalInfo.GetProposedDescription());
-	dataPtr->SetProposedValidFrom(proposalInfo.GetProposedValidFrom());
-	dataPtr->SetProposedValidUntil(proposalInfo.GetProposedValidUntil());
-	dataPtr->SetStatus(proposalInfo.GetStatus());
-	dataPtr->SetMessage(proposalInfo.GetMessage());
-	dataPtr->SetCreatedAt(proposalInfo.GetCreatedAt());
-	dataPtr->SetUpdatedAt(proposalInfo.GetUpdatedAt());
-
-	// Try update first
-	imtbase::IObjectCollection::DataPtr existingPtr;
-	if (m_proposalCollectionCompPtr->GetObjectData(proposalId, existingPtr)){
-		return m_proposalCollectionCompPtr->SetObjectData(proposalId, *dataPtr);
-	}
-
-	// Insert new
-	QByteArray storedId = m_proposalCollectionCompPtr->InsertNewObject("TenantRelationshipProposal", QString(), QString(), dataPtr.GetPtr(), proposalId);
-	return !storedId.isEmpty();
-}
-
-
 // --- Helpers ---
 
 QString CTenantConnectionRequestManagerComp::GenerateConnectionCode() const
@@ -181,22 +141,6 @@ QByteArray CTenantConnectionRequestManagerComp::FindTenantByConnectionCode(const
 		}
 	}
 	return QByteArray();
-}
-
-
-void CTenantConnectionRequestManagerComp::PublishProposalEvent(
-			const QString& eventType,
-			const ITenantRelationshipProposalInfo& proposal,
-			ITenantRelationshipProposalInfo::RelationshipProposalStatus previousStatus)
-{
-	TenantEvent::Publish(this, {
-				{TenantEvent::s_type, eventType},
-				{TenantEvent::s_proposalId, proposal.GetProposalId()},
-				{TenantEvent::s_connectionId, proposal.GetConnectionId()},
-				{TenantEvent::s_sourceTenantId, proposal.GetInitiatorTenantId()},
-				{TenantEvent::s_targetTenantId, proposal.GetCounterpartyTenantId()},
-				{TenantEvent::s_status, int(proposal.GetStatus())},
-				{TenantEvent::s_previousStatus, int(previousStatus)}});
 }
 
 
@@ -317,162 +261,6 @@ QByteArray CTenantConnectionRequestManagerComp::CreateConnection(const QByteArra
 
 	if (StoreConnection(*connPtr)){
 		return connectionId;
-	}
-	return QByteArray();
-}
-
-
-bool CTenantConnectionRequestManagerComp::ArchiveRelationshipsForConnection(const QByteArray& connectionId)
-{
-	if (!m_relationshipCollectionCompPtr.IsValid() || !m_relationshipFactoryCompPtr.IsValid()){
-		return false;
-	}
-
-	bool isArchived = true;
-	for (const QByteArray& id : SelectIds(*m_relationshipCollectionCompPtr, ColumnEquals("ConnectionId", connectionId), QByteArrayList(), &isArchived)){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (!m_relationshipCollectionCompPtr->GetObjectData(id, dataPtr)){
-			isArchived = false;
-			continue;
-		}
-
-		const ITenantRelationshipInfo* relPtr = dynamic_cast<const ITenantRelationshipInfo*>(dataPtr.GetPtr());
-		// The removal of the connection is published instead of each relationship
-		if (relPtr != nullptr && relPtr->GetConnectionId() == connectionId
-		&& relPtr->GetStatus() == ITenantRelationshipInfo::TRS_ACTIVE && !ArchiveRelationship(id, *relPtr, false)){
-			isArchived = false;
-		}
-	}
-
-	return isArchived;
-}
-
-
-bool CTenantConnectionRequestManagerComp::CancelProposalsForConnection(const QByteArray& connectionId)
-{
-	if (!m_proposalCollectionCompPtr.IsValid() || !m_proposalFactoryCompPtr.IsValid()){
-		return false;
-	}
-
-	bool isCanceled = true;
-	for (const QByteArray& id : SelectIds(*m_proposalCollectionCompPtr, ColumnEquals("ConnectionId", connectionId), QByteArrayList(), &isCanceled)){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (!m_proposalCollectionCompPtr->GetObjectData(id, dataPtr)){
-			isCanceled = false;
-			continue;
-		}
-
-		const ITenantRelationshipProposalInfo* proposalPtr = dynamic_cast<const ITenantRelationshipProposalInfo*>(dataPtr.GetPtr());
-		if (proposalPtr == nullptr || proposalPtr->GetConnectionId() != connectionId){
-			continue;
-		}
-
-		const ITenantRelationshipProposalInfo::RelationshipProposalStatus status = proposalPtr->GetStatus();
-		if (status != ITenantRelationshipProposalInfo::RPS_PENDING
-		&& status != ITenantRelationshipProposalInfo::RPS_APPROVED_BY_INITIATOR
-		&& status != ITenantRelationshipProposalInfo::RPS_APPROVED_BY_COUNTERPARTY){
-			continue;
-		}
-
-		ITenantRelationshipProposalInfoUniquePtr updatedProposal = m_proposalFactoryCompPtr.CreateInstance();
-		if (!updatedProposal.IsValid()){
-			isCanceled = false;
-			continue;
-		}
-		updatedProposal->CopyFrom(*proposalPtr);
-		updatedProposal->SetStatus(ITenantRelationshipProposalInfo::RPS_CANCELED);
-		updatedProposal->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs));
-		if (!StoreProposal(id, *updatedProposal)){
-			isCanceled = false;
-			continue;
-		}
-
-		PublishProposalEvent(TenantEvent::s_proposalStatusChanged, *updatedProposal, status);
-	}
-
-	return isCanceled;
-}
-
-
-QByteArray CTenantConnectionRequestManagerComp::ApplyRelationshipProposal(const ITenantRelationshipProposalInfo* proposalPtr)
-{
-	if (!m_relationshipCollectionCompPtr.IsValid() || !m_relationshipFactoryCompPtr.IsValid() || proposalPtr == nullptr){
-		return QByteArray();
-	}
-
-	// A relationship lives only on an active connection: a proposal made before its connection was removed applies no more
-	if (proposalPtr->GetProposalType() != ITenantRelationshipProposalInfo::RPT_DELETE){
-		ITenantConnectionInfoUniquePtr connectionPtr = GetConnection(proposalPtr->GetConnectionId());
-		if (!connectionPtr.IsValid() || connectionPtr->GetStatus() != ITenantConnectionInfo::CS_ACTIVE){
-			return QByteArray();
-		}
-	}
-
-	if (proposalPtr->GetProposalType() == ITenantRelationshipProposalInfo::RPT_CREATE){
-		istd::TUniqueInterfacePtr<ITenantRelationshipInfo> relPtr = m_relationshipFactoryCompPtr.CreateInstance();
-		if (!relPtr.IsValid()){
-			return QByteArray();
-		}
-		QByteArray relId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-		relPtr->SetRelationshipId(relId);
-		relPtr->SetConnectionId(proposalPtr->GetConnectionId());
-		relPtr->SetSourceTenantId(proposalPtr->GetInitiatorTenantId());
-		relPtr->SetTargetTenantId(proposalPtr->GetCounterpartyTenantId());
-		relPtr->SetSourceRole(proposalPtr->GetProposedSourceRole());
-		relPtr->SetTargetRole(proposalPtr->GetProposedTargetRole());
-		relPtr->SetScope(proposalPtr->GetProposedScope());
-		relPtr->SetDescription(proposalPtr->GetProposedDescription());
-		relPtr->SetValidFrom(proposalPtr->GetProposedValidFrom());
-		relPtr->SetValidUntil(proposalPtr->GetProposedValidUntil());
-		relPtr->SetStatus(ITenantRelationshipInfo::TRS_ACTIVE);
-		relPtr->SetCreatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs));
-
-		QByteArray storedId = m_relationshipCollectionCompPtr->InsertNewObject("TenantRelationship", QString(), QString(), relPtr.GetPtr(), relId);
-		if (!storedId.isEmpty()){
-			return relId;
-		}
-		return QByteArray();
-	}
-	else if (proposalPtr->GetProposalType() == ITenantRelationshipProposalInfo::RPT_UPDATE){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (!m_relationshipCollectionCompPtr->GetObjectData(proposalPtr->GetExistingRelationshipId(), dataPtr)){
-			return QByteArray();
-		}
-		const ITenantRelationshipInfo* existingPtr = dynamic_cast<const ITenantRelationshipInfo*>(dataPtr.GetPtr());
-		// The terms of an ended relationship stay as they were
-		if (existingPtr == nullptr || existingPtr->GetStatus() != ITenantRelationshipInfo::TRS_ACTIVE){
-			return QByteArray();
-		}
-		istd::TUniqueInterfacePtr<ITenantRelationshipInfo> updatedPtr = m_relationshipFactoryCompPtr.CreateInstance();
-		if (!updatedPtr.IsValid()){
-			return QByteArray();
-		}
-		updatedPtr->CopyFrom(*existingPtr);
-		updatedPtr->SetSourceRole(proposalPtr->GetProposedSourceRole());
-		updatedPtr->SetTargetRole(proposalPtr->GetProposedTargetRole());
-		updatedPtr->SetScope(proposalPtr->GetProposedScope());
-		updatedPtr->SetDescription(proposalPtr->GetProposedDescription());
-		updatedPtr->SetValidFrom(proposalPtr->GetProposedValidFrom());
-		updatedPtr->SetValidUntil(proposalPtr->GetProposedValidUntil());
-		updatedPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs));
-		if (m_relationshipCollectionCompPtr->SetObjectData(proposalPtr->GetExistingRelationshipId(), *updatedPtr)){
-			return proposalPtr->GetExistingRelationshipId();
-		}
-		return QByteArray();
-	}
-	else if (proposalPtr->GetProposalType() == ITenantRelationshipProposalInfo::RPT_DELETE){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (!m_relationshipCollectionCompPtr->GetObjectData(proposalPtr->GetExistingRelationshipId(), dataPtr)){
-			return QByteArray();
-		}
-		const ITenantRelationshipInfo* existingPtr = dynamic_cast<const ITenantRelationshipInfo*>(dataPtr.GetPtr());
-		if (existingPtr == nullptr){
-			return QByteArray();
-		}
-		if (ArchiveRelationship(proposalPtr->GetExistingRelationshipId(), *existingPtr, true)){
-			return proposalPtr->GetExistingRelationshipId();
-		}
-		return QByteArray();
 	}
 	return QByteArray();
 }
@@ -648,27 +436,69 @@ QByteArray CTenantConnectionRequestManagerComp::CreateConnectionRequest(
 		const QByteArray& sourceTenantId,
 		const QString& connectionCode,
 		const QString& message,
-		QString* errorMessagePtr,
-		const ITenantRelationshipProposalInfo* proposedRelationshipPtr)
+		QString* errorMessagePtr)
+{
+	if (sourceTenantId.isEmpty() || connectionCode.isEmpty()){
+		return RefuseRequest(QStringLiteral("Source organization and connection code are required"), errorMessagePtr);
+	}
+
+	const QByteArray targetTenantId = FindTenantByConnectionCode(connectionCode);
+	if (targetTenantId.isEmpty()){
+		return RefuseRequest(QStringLiteral("No organization has this connection code"), errorMessagePtr);
+	}
+
+	if (targetTenantId == sourceTenantId){
+		return RefuseRequest(QStringLiteral("This is the connection code of your own organization"), errorMessagePtr);
+	}
+
+	if (!GetAllowConnectionsByCode(targetTenantId)){
+		return RefuseRequest(QStringLiteral("The target organization does not accept connections by code"), errorMessagePtr);
+	}
+
+	return CreateRequest(sourceTenantId, targetTenantId, connectionCode, message, errorMessagePtr);
+}
+
+
+QByteArray CTenantConnectionRequestManagerComp::CreateConnectionRequestToTenant(
+			const QByteArray& sourceTenantId,
+			const QByteArray& targetTenantId,
+			const QString& message,
+			QString* errorMessagePtr)
+{
+	if (sourceTenantId.isEmpty() || targetTenantId.isEmpty()){
+		return RefuseRequest(QStringLiteral("Source and target organizations are required"), errorMessagePtr);
+	}
+
+	ITenantDirectoryProfileUniquePtr profilePtr = m_directoryCompPtr.IsValid() ? m_directoryCompPtr->GetProfile(targetTenantId) : nullptr;
+	if (!profilePtr.IsValid() || !profilePtr->IsListed()){
+		return RefuseRequest(QStringLiteral("The organization is not listed in the directory"), errorMessagePtr);
+	}
+
+	return CreateRequest(sourceTenantId, targetTenantId, QString(), message, errorMessagePtr);
+}
+
+
+QByteArray CTenantConnectionRequestManagerComp::RefuseRequest(const QString& reason, QString* errorMessagePtr) const
+{
+	SendErrorMessage(0, reason, "CTenantConnectionRequestManagerComp");
+	if (errorMessagePtr != nullptr){
+		*errorMessagePtr = reason;
+	}
+
+	return QByteArray();
+}
+
+
+QByteArray CTenantConnectionRequestManagerComp::CreateRequest(
+			const QByteArray& sourceTenantId,
+			const QByteArray& targetTenantId,
+			const QString& connectionCode,
+			const QString& message,
+			QString* errorMessagePtr)
 {
 	auto refuse = [this, errorMessagePtr](const QString& reason){
-		SendErrorMessage(0, reason, "CTenantConnectionRequestManagerComp");
-		if (errorMessagePtr != nullptr){
-			*errorMessagePtr = reason;
-		}
-
-		return QByteArray();
+		return RefuseRequest(reason, errorMessagePtr);
 	};
-
-	if (sourceTenantId.isEmpty() || connectionCode.isEmpty()){
-		return refuse(QStringLiteral("Source organization and connection code are required"));
-	}
-
-	// Find target tenant by connection code
-	QByteArray targetTenantId = FindTenantByConnectionCode(connectionCode);
-	if (targetTenantId.isEmpty()){
-		return refuse(QStringLiteral("No organization has this connection code"));
-	}
 
 	if (m_tenantManagerCompPtr.IsValid()){
 		ITenantInfoUniquePtr sourceTenantPtr = m_tenantManagerCompPtr->GetTenant(sourceTenantId);
@@ -683,11 +513,7 @@ QByteArray CTenantConnectionRequestManagerComp::CreateConnectionRequest(
 	}
 
 	if (targetTenantId == sourceTenantId){
-		return refuse(QStringLiteral("This is the connection code of your own organization"));
-	}
-
-	if (!GetAllowConnectionsByCode(targetTenantId)){
-		return refuse(QStringLiteral("The target organization does not accept connections by code"));
+		return refuse(QStringLiteral("An organization does not connect to itself"));
 	}
 
 	if (ConnectionExists(sourceTenantId, targetTenantId)){
@@ -714,12 +540,6 @@ QByteArray CTenantConnectionRequestManagerComp::CreateConnectionRequest(
 	reqPtr->SetMessage(message);
 	reqPtr->SetStatus(ITenantConnectionRequestInfo::CRS_PENDING);
 	reqPtr->SetCreatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs));
-	if (proposedRelationshipPtr != nullptr){
-		reqPtr->SetRelationshipProposed(true);
-		reqPtr->SetProposedSourceRole(proposedRelationshipPtr->GetProposedSourceRole());
-		reqPtr->SetProposedTargetRole(proposedRelationshipPtr->GetProposedTargetRole());
-		reqPtr->SetProposedScope(proposedRelationshipPtr->GetProposedScope());
-	}
 
 	// Resolve tenant names so they display correctly in the UI
 	if (m_tenantManagerCompPtr.IsValid()){
@@ -747,7 +567,7 @@ QByteArray CTenantConnectionRequestManagerComp::CreateConnectionRequest(
 }
 
 
-QByteArray CTenantConnectionRequestManagerComp::ApproveConnectionRequest(const QByteArray& requestId, const QByteArray& approvingTenantId, QByteArray* relationshipIdPtr)
+QByteArray CTenantConnectionRequestManagerComp::ApproveConnectionRequest(const QByteArray& requestId, const QByteArray& approvingTenantId)
 {
 	if (requestId.isEmpty() || approvingTenantId.isEmpty() || !m_requestCollectionCompPtr.IsValid()){
 		return QByteArray();
@@ -800,31 +620,13 @@ QByteArray CTenantConnectionRequestManagerComp::ApproveConnectionRequest(const Q
 		}
 	}
 
-	const bool isNewConnection = connectionId.isEmpty();
-	if (isNewConnection){
+	if (connectionId.isEmpty()){
 		connectionId = CreateConnection(reqPtr->GetSourceTenantId(), reqPtr->GetTargetTenantId());
 	}
 
 	if (connectionId.isEmpty()){
 		SendErrorMessage(0, "Failed to create or resolve connection for approved request", "CTenantConnectionRequestManagerComp");
 		return QByteArray();
-	}
-
-	// The relationship comes into force before the request is approved: a request it fails for stays pending
-	if (reqPtr->IsRelationshipProposed()){
-		const QByteArray relationshipId = ApplyRequestedRelationship(*reqPtr, connectionId);
-		if (relationshipId.isEmpty()){
-			if (isNewConnection && !RemoveConnection(connectionId, approvingTenantId)){
-				SendErrorMessage(0, QStringLiteral("The connection '%1' made for the request '%2' could not be removed").arg(QString::fromUtf8(connectionId), QString::fromUtf8(requestId)), "CTenantConnectionRequestManagerComp");
-			}
-			SendErrorMessage(0, QStringLiteral("The relationship proposed by the request '%1' could not come into force").arg(QString::fromUtf8(requestId)), "CTenantConnectionRequestManagerComp");
-
-			return QByteArray();
-		}
-
-		if (relationshipIdPtr != nullptr){
-			*relationshipIdPtr = relationshipId;
-		}
 	}
 
 	// Update the request status
@@ -848,37 +650,6 @@ QByteArray CTenantConnectionRequestManagerComp::ApproveConnectionRequest(const Q
 				{TenantEvent::s_status, int(updatedReqPtr->GetStatus())}});
 
 	return connectionId;
-}
-
-
-QByteArray CTenantConnectionRequestManagerComp::ApplyRequestedRelationship(const ITenantConnectionRequestInfo& request, const QByteArray& connectionId)
-{
-	ITenantRelationshipProposalInfoUniquePtr proposalPtr = m_proposalFactoryCompPtr.CreateInstance();
-	if (!proposalPtr.IsValid()){
-		return QByteArray();
-	}
-
-	// The requesting organization proposed the terms, the approving one accepts them: the usual proposal path
-	proposalPtr->SetConnectionId(connectionId);
-	proposalPtr->SetInitiatorTenantId(request.GetSourceTenantId());
-	proposalPtr->SetCounterpartyTenantId(request.GetTargetTenantId());
-	proposalPtr->SetProposalType(ITenantRelationshipProposalInfo::RPT_CREATE);
-	proposalPtr->SetProposedSourceRole(request.GetProposedSourceRole());
-	proposalPtr->SetProposedTargetRole(request.GetProposedTargetRole());
-	proposalPtr->SetProposedScope(request.GetProposedScope());
-	proposalPtr->SetMessage(request.GetMessage());
-
-	const QByteArray proposalId = CreateRelationshipProposal(*proposalPtr);
-	if (proposalId.isEmpty()){
-		return QByteArray();
-	}
-
-	const QByteArray relationshipId = ApproveRelationshipProposal(proposalId, request.GetTargetTenantId());
-	if (relationshipId.isEmpty() && !CancelRelationshipProposal(proposalId, request.GetSourceTenantId())){
-		SendErrorMessage(0, QStringLiteral("The relationship proposal '%1' of a connection request could not be withdrawn").arg(QString::fromUtf8(proposalId)), "CTenantConnectionRequestManagerComp");
-	}
-
-	return relationshipId;
 }
 
 
@@ -1076,7 +847,7 @@ ITenantConnectionInfoUniquePtr CTenantConnectionRequestManagerComp::GetConnectio
 
 bool CTenantConnectionRequestManagerComp::RemoveConnection(const QByteArray& connectionId, const QByteArray& tenantId)
 {
-	QMutexLocker locker(&m_relationshipChangeMutex);
+	QMutexLocker locker(&m_connectionChangeMutex);
 
 	if (!m_connectionCollectionCompPtr.IsValid()){
 		return false;
@@ -1109,9 +880,8 @@ bool CTenantConnectionRequestManagerComp::RemoveConnection(const QByteArray& con
 	updatedConnPtr->SetStatus(ITenantConnectionInfo::CS_REMOVED);
 	updatedConnPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs));
 
-	// The open proposals and the relationships end first: a reconnection reactivates this connection, and an old proposal
-	// approved then, or an active relationship, would keep the partner's shares giving access
-	if (!CancelProposalsForConnection(connectionId) || !ArchiveRelationshipsForConnection(connectionId) || !StoreConnection(*updatedConnPtr)){
+	// The contracts of the organizations stay: a connection is their address book only
+	if (!StoreConnection(*updatedConnPtr)){
 		return false;
 	}
 
@@ -1125,486 +895,25 @@ bool CTenantConnectionRequestManagerComp::RemoveConnection(const QByteArray& con
 }
 
 
-// --- Relationship Proposals ---
-
-QByteArray CTenantConnectionRequestManagerComp::CreateRelationshipProposal(
-		const ITenantRelationshipProposalInfo& proposalInfo)
+bool CTenantConnectionRequestManagerComp::AreConnected(const QByteArray& tenantId, const QByteArray& otherTenantId) const
 {
-	QMutexLocker locker(&m_relationshipChangeMutex);
+	return !tenantId.isEmpty() && !otherTenantId.isEmpty() && ConnectionExists(tenantId, otherTenantId);
+}
 
-	QByteArray connectionId = proposalInfo.GetConnectionId();
-	QByteArray initiatorTenantId = proposalInfo.GetInitiatorTenantId();
-	QByteArray counterpartyTenantId = proposalInfo.GetCounterpartyTenantId();
 
-	if (connectionId.isEmpty() || initiatorTenantId.isEmpty() || counterpartyTenantId.isEmpty()){
-		SendErrorMessage(0, "Connection ID and both tenant IDs are required", "CTenantConnectionRequestManagerComp");
+QByteArray CTenantConnectionRequestManagerComp::EnsureConnection(const QByteArray& tenantId, const QByteArray& otherTenantId)
+{
+	if (tenantId.isEmpty() || otherTenantId.isEmpty() || tenantId == otherTenantId){
 		return QByteArray();
 	}
 
-	// Verify connection exists and is active
-	bool connectionValid = false;
-	if (m_connectionCollectionCompPtr.IsValid()){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_connectionCollectionCompPtr->GetObjectData(connectionId, dataPtr)){
-			const ITenantConnectionInfo* connPtr = dynamic_cast<const ITenantConnectionInfo*>(dataPtr.GetPtr());
-			if (connPtr != nullptr && connPtr->GetStatus() == ITenantConnectionInfo::CS_ACTIVE){
-				connectionValid = true;
-			}
-		}
-	}
-	if (!connectionValid){
-		SendErrorMessage(0, "No active connection found", "CTenantConnectionRequestManagerComp");
-		return QByteArray();
-	}
+	QMutexLocker locker(&m_connectionChangeMutex);
 
 	istd::CChangeNotifier changeNotifier(this);
 
-	ITenantRelationshipProposalInfoUniquePtr newProposal = m_proposalFactoryCompPtr.CreateInstance();
-	if (!newProposal.IsValid()){
-		return QByteArray();
-	}
-	QByteArray newProposalId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-	newProposal->SetProposalId(newProposalId);
-	newProposal->SetConnectionId(connectionId);
-	newProposal->SetInitiatorTenantId(initiatorTenantId);
-	newProposal->SetCounterpartyTenantId(counterpartyTenantId);
-	newProposal->SetProposalType(proposalInfo.GetProposalType());
-	newProposal->SetProposedSourceRole(proposalInfo.GetProposedSourceRole());
-	newProposal->SetProposedTargetRole(proposalInfo.GetProposedTargetRole());
-	newProposal->SetProposedScope(proposalInfo.GetProposedScope());
-	newProposal->SetProposedDescription(proposalInfo.GetProposedDescription());
-	newProposal->SetProposedValidFrom(proposalInfo.GetProposedValidFrom());
-	newProposal->SetProposedValidUntil(proposalInfo.GetProposedValidUntil());
-	newProposal->SetMessage(proposalInfo.GetMessage());
-	if (!proposalInfo.GetExistingRelationshipId().isEmpty()){
-		newProposal->SetExistingRelationshipId(proposalInfo.GetExistingRelationshipId());
-	}
-	newProposal->SetStatus(ITenantRelationshipProposalInfo::RPS_APPROVED_BY_INITIATOR); // Initiator auto-approves
-	QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
-	newProposal->SetCreatedAt(now);
-	newProposal->SetUpdatedAt(now);
-
-	if (StoreProposal(newProposalId, *newProposal)){
-		PublishProposalEvent(TenantEvent::s_proposalCreated, *newProposal, newProposal->GetStatus());
-
-		return newProposalId;
-	}
-	return QByteArray();
-}
-
-
-QByteArray CTenantConnectionRequestManagerComp::ApproveRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId)
-{
-	QMutexLocker locker(&m_relationshipChangeMutex);
-
-	if (!m_proposalCollectionCompPtr.IsValid() || !m_proposalFactoryCompPtr.IsValid()){
-		return QByteArray();
-	}
-
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (!m_proposalCollectionCompPtr->GetObjectData(proposalId, dataPtr)){
-		return QByteArray();
-	}
-
-	const ITenantRelationshipProposalInfo* proposalPtr = dynamic_cast<const ITenantRelationshipProposalInfo*>(dataPtr.GetPtr());
-	if (proposalPtr == nullptr){
-		return QByteArray();
-	}
-
-	QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
-
-	// The counterparty approves
-	if (proposalPtr->GetCounterpartyTenantId() == tenantId && proposalPtr->GetStatus() == ITenantRelationshipProposalInfo::RPS_APPROVED_BY_INITIATOR){
-		istd::CChangeNotifier changeNotifier(this);
-		ITenantRelationshipProposalInfoUniquePtr updatedProposal = m_proposalFactoryCompPtr.CreateInstance();
-		if (!updatedProposal.IsValid()){
-			return QByteArray();
-		}
-		updatedProposal->CopyFrom(*proposalPtr);
-		updatedProposal->SetStatus(ITenantRelationshipProposalInfo::RPS_APPLIED);
-		updatedProposal->SetUpdatedAt(now);
-
-		// Marked applied first, so a proposal is never applied twice; one that cannot be applied
-		// (e.g. new terms of an ended relationship) gets its status back
-		if (!StoreProposal(proposalId, *updatedProposal)){
-			return QByteArray();
-		}
-
-		const QByteArray relationshipId = ApplyRelationshipProposal(updatedProposal.GetPtr());
-		if (relationshipId.isEmpty()){
-			if (!StoreProposal(proposalId, *proposalPtr)){
-				SendErrorMessage(0, QStringLiteral("Relationship proposal '%1' was not applied, and its status could not be restored").arg(QString::fromUtf8(proposalId)), "CTenantConnectionRequestManagerComp");
-			}
-
-			return QByteArray();
-		}
-
-		PublishProposalEvent(TenantEvent::s_proposalStatusChanged, *updatedProposal, proposalPtr->GetStatus());
-
-		return relationshipId;
-	}
-
-	// The initiator approves (when counterparty already approved)
-	if (proposalPtr->GetInitiatorTenantId() == tenantId && proposalPtr->GetStatus() == ITenantRelationshipProposalInfo::RPS_APPROVED_BY_COUNTERPARTY){
-		istd::CChangeNotifier changeNotifier(this);
-		ITenantRelationshipProposalInfoUniquePtr updatedProposal = m_proposalFactoryCompPtr.CreateInstance();
-		if (!updatedProposal.IsValid()){
-			return QByteArray();
-		}
-		updatedProposal->CopyFrom(*proposalPtr);
-		updatedProposal->SetStatus(ITenantRelationshipProposalInfo::RPS_APPLIED);
-		updatedProposal->SetUpdatedAt(now);
-
-		// Marked applied first, so a proposal is never applied twice; one that cannot be applied
-		// (e.g. new terms of an ended relationship) gets its status back
-		if (!StoreProposal(proposalId, *updatedProposal)){
-			return QByteArray();
-		}
-
-		const QByteArray relationshipId = ApplyRelationshipProposal(updatedProposal.GetPtr());
-		if (relationshipId.isEmpty()){
-			if (!StoreProposal(proposalId, *proposalPtr)){
-				SendErrorMessage(0, QStringLiteral("Relationship proposal '%1' was not applied, and its status could not be restored").arg(QString::fromUtf8(proposalId)), "CTenantConnectionRequestManagerComp");
-			}
-
-			return QByteArray();
-		}
-
-		PublishProposalEvent(TenantEvent::s_proposalStatusChanged, *updatedProposal, proposalPtr->GetStatus());
-
-		return relationshipId;
-	}
-
-	// If initiator hasn't approved yet but counterparty is approving
-	if (proposalPtr->GetCounterpartyTenantId() == tenantId && proposalPtr->GetStatus() == ITenantRelationshipProposalInfo::RPS_PENDING){
-		istd::CChangeNotifier changeNotifier(this);
-		ITenantRelationshipProposalInfoUniquePtr updatedProposal = m_proposalFactoryCompPtr.CreateInstance();
-		if (!updatedProposal.IsValid()){
-			return QByteArray();
-		}
-		updatedProposal->CopyFrom(*proposalPtr);
-		updatedProposal->SetStatus(ITenantRelationshipProposalInfo::RPS_APPROVED_BY_COUNTERPARTY);
-		updatedProposal->SetUpdatedAt(now);
-		if (StoreProposal(proposalId, *updatedProposal)){
-			PublishProposalEvent(TenantEvent::s_proposalStatusChanged, *updatedProposal, proposalPtr->GetStatus());
-		}
-		return QByteArray();
-	}
-
-	return QByteArray();
-}
-
-
-bool CTenantConnectionRequestManagerComp::RejectRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId)
-{
-	QMutexLocker locker(&m_relationshipChangeMutex);
-
-	if (!m_proposalCollectionCompPtr.IsValid() || !m_proposalFactoryCompPtr.IsValid()){
-		return false;
-	}
-
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (!m_proposalCollectionCompPtr->GetObjectData(proposalId, dataPtr)){
-		return false;
-	}
-
-	const ITenantRelationshipProposalInfo* proposalPtr = dynamic_cast<const ITenantRelationshipProposalInfo*>(dataPtr.GetPtr());
-	if (proposalPtr == nullptr){
-		return false;
-	}
-
-	if (proposalPtr->GetInitiatorTenantId() != tenantId && proposalPtr->GetCounterpartyTenantId() != tenantId){
-		return false;
-	}
-	if (proposalPtr->GetStatus() == ITenantRelationshipProposalInfo::RPS_APPLIED
-	|| proposalPtr->GetStatus() == ITenantRelationshipProposalInfo::RPS_REJECTED
-	|| proposalPtr->GetStatus() == ITenantRelationshipProposalInfo::RPS_CANCELED){
-		return false;
-	}
-
-	istd::CChangeNotifier changeNotifier(this);
-	ITenantRelationshipProposalInfoUniquePtr updatedProposal = m_proposalFactoryCompPtr.CreateInstance();
-	if (!updatedProposal.IsValid()){
-		return false;
-	}
-	updatedProposal->CopyFrom(*proposalPtr);
-	updatedProposal->SetStatus(ITenantRelationshipProposalInfo::RPS_REJECTED);
-	updatedProposal->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs));
-	if (!StoreProposal(proposalId, *updatedProposal)){
-		return false;
-	}
-
-	PublishProposalEvent(TenantEvent::s_proposalStatusChanged, *updatedProposal, proposalPtr->GetStatus());
-
-	return true;
-}
-
-
-bool CTenantConnectionRequestManagerComp::CancelRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId)
-{
-	QMutexLocker locker(&m_relationshipChangeMutex);
-
-	if (!m_proposalCollectionCompPtr.IsValid() || !m_proposalFactoryCompPtr.IsValid()){
-		return false;
-	}
-
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (!m_proposalCollectionCompPtr->GetObjectData(proposalId, dataPtr)){
-		return false;
-	}
-
-	const ITenantRelationshipProposalInfo* proposalPtr = dynamic_cast<const ITenantRelationshipProposalInfo*>(dataPtr.GetPtr());
-	if (proposalPtr == nullptr){
-		return false;
-	}
-
-	if (proposalPtr->GetInitiatorTenantId() != tenantId){
-		return false;
-	}
-	if (proposalPtr->GetStatus() == ITenantRelationshipProposalInfo::RPS_APPLIED
-	|| proposalPtr->GetStatus() == ITenantRelationshipProposalInfo::RPS_CANCELED){
-		return false;
-	}
-
-	istd::CChangeNotifier changeNotifier(this);
-	ITenantRelationshipProposalInfoUniquePtr updatedProposal = m_proposalFactoryCompPtr.CreateInstance();
-	if (!updatedProposal.IsValid()){
-		return false;
-	}
-	updatedProposal->CopyFrom(*proposalPtr);
-	updatedProposal->SetStatus(ITenantRelationshipProposalInfo::RPS_CANCELED);
-	updatedProposal->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs));
-	if (!StoreProposal(proposalId, *updatedProposal)){
-		return false;
-	}
-
-	PublishProposalEvent(TenantEvent::s_proposalStatusChanged, *updatedProposal, proposalPtr->GetStatus());
-
-	return true;
-}
-
-
-QByteArrayList CTenantConnectionRequestManagerComp::GetRelationshipProposalIds(const QByteArray& tenantId) const
-{
-	QByteArrayList result;
-	if (!m_proposalCollectionCompPtr.IsValid()){
-		return result;
-	}
-
-	for (const QByteArray& id : SelectIds(*m_proposalCollectionCompPtr, AnyColumnEquals("InitiatorTenantId", "CounterpartyTenantId", tenantId))){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_proposalCollectionCompPtr->GetObjectData(id, dataPtr)){
-			const ITenantRelationshipProposalInfo* proposalPtr = dynamic_cast<const ITenantRelationshipProposalInfo*>(dataPtr.GetPtr());
-			if (proposalPtr != nullptr){
-				if (proposalPtr->GetInitiatorTenantId() == tenantId || proposalPtr->GetCounterpartyTenantId() == tenantId){
-					result.append(proposalPtr->GetProposalId());
-				}
-			}
-		}
-	}
-	return result;
-}
-
-
-ITenantRelationshipProposalInfoUniquePtr CTenantConnectionRequestManagerComp::GetRelationshipProposal(const QByteArray& proposalId) const
-{
-	if (!m_proposalCollectionCompPtr.IsValid() || !m_proposalFactoryCompPtr.IsValid() || proposalId.isEmpty()){
-		return nullptr;
-	}
-
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (!m_proposalCollectionCompPtr->GetObjectData(proposalId, dataPtr)){
-		return nullptr;
-	}
-
-	const ITenantRelationshipProposalInfo* proposalPtr = dynamic_cast<const ITenantRelationshipProposalInfo*>(dataPtr.GetPtr());
-	if (proposalPtr == nullptr){
-		return nullptr;
-	}
-
-	ITenantRelationshipProposalInfoUniquePtr clonedProposal = m_proposalFactoryCompPtr.CreateInstance();
-	if (!clonedProposal.IsValid() || !clonedProposal->CopyFrom(*proposalPtr)){
-		return nullptr;
-	}
-
-	return clonedProposal;
-}
-
-
-// --- Relationships ---
-
-QByteArrayList CTenantConnectionRequestManagerComp::GetTenantRelationshipIds(const QByteArray& tenantId, bool* isReadPtr) const
-{
-	QByteArrayList result;
-	if (isReadPtr != nullptr){
-		*isReadPtr = false;
-	}
-
-	if (!m_relationshipCollectionCompPtr.IsValid()){
-		return result;
-	}
-
-	bool isRead = true;
-	for (const QByteArray& id : SelectIds(*m_relationshipCollectionCompPtr, AnyColumnEquals("SourceTenantId", "TargetTenantId", tenantId), QByteArrayList(), &isRead)){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		// A selected relationship that cannot be loaded may be an active one
-		if (!m_relationshipCollectionCompPtr->GetObjectData(id, dataPtr)){
-			isRead = false;
-		}
-		else{
-			const ITenantRelationshipInfo* relPtr = dynamic_cast<const ITenantRelationshipInfo*>(dataPtr.GetPtr());
-			if (relPtr != nullptr && relPtr->GetStatus() == ITenantRelationshipInfo::TRS_ACTIVE
-			&& (relPtr->GetSourceTenantId() == tenantId || relPtr->GetTargetTenantId() == tenantId)){
-				result.append(relPtr->GetRelationshipId());
-			}
-		}
-	}
-
-	if (isReadPtr != nullptr){
-		*isReadPtr = isRead;
-	}
-
-	return result;
-}
-
-
-ITenantRelationshipInfoUniquePtr CTenantConnectionRequestManagerComp::GetTenantRelationship(const QByteArray& relationshipId) const
-{
-	if (!m_relationshipCollectionCompPtr.IsValid() || !m_relationshipFactoryCompPtr.IsValid() || relationshipId.isEmpty()){
-		return nullptr;
-	}
-
-	const ITenantRelationshipInfo* relationshipPtr = nullptr;
-	imtbase::IObjectCollection::DataPtr dataPtr;
-
-	// The relationships are stored under their ids
-	if (m_relationshipCollectionCompPtr->GetObjectData(relationshipId, dataPtr)){
-		relationshipPtr = dynamic_cast<const ITenantRelationshipInfo*>(dataPtr.GetPtr());
-	}
-
-	if (relationshipPtr == nullptr){
-		return nullptr;
-	}
-
-	ITenantRelationshipInfoUniquePtr clonedRelationship = m_relationshipFactoryCompPtr.CreateInstance();
-	if (!clonedRelationship.IsValid()){
-		return nullptr;
-	}
-
-	if (!clonedRelationship->CopyFrom(*relationshipPtr)){
-		return nullptr;
-	}
-
-	return clonedRelationship;
-}
-
-
-QDateTime CTenantConnectionRequestManagerComp::GetRelatedSince(const QByteArray& tenantId, const QByteArray& otherTenantId, bool* isReadPtr) const
-{
-	if (isReadPtr != nullptr){
-		*isReadPtr = false;
-	}
-
-	if (!m_relationshipCollectionCompPtr.IsValid()){
-		return QDateTime();
-	}
-
-	// A missing archived relationship would move the start forward and the shares of that time would look earlier
-	bool isRead = true;
-	QList<RelationshipPeriod> periods;
-	for (const QByteArray& id : SelectIds(*m_relationshipCollectionCompPtr, PairInEitherOrder("SourceTenantId", "TargetTenantId", tenantId, otherTenantId), QByteArrayList(), &isRead)){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (!m_relationshipCollectionCompPtr->GetObjectData(id, dataPtr)){
-			isRead = false;
-			continue;
-		}
-
-		const ITenantRelationshipInfo* relPtr = dynamic_cast<const ITenantRelationshipInfo*>(dataPtr.GetPtr());
-		if (relPtr == nullptr){
-			continue;
-		}
-
-		const bool isPair = (relPtr->GetSourceTenantId() == tenantId && relPtr->GetTargetTenantId() == otherTenantId)
-					|| (relPtr->GetSourceTenantId() == otherTenantId && relPtr->GetTargetTenantId() == tenantId);
-		if (!isPair){
-			continue;
-		}
-
-		// An archived relationship ended when it was archived, the last change made to it
-		if (relPtr->GetStatus() == ITenantRelationshipInfo::TRS_ACTIVE){
-			periods.append({ParseRelationshipTime(relPtr->GetCreatedAt()), QDateTime()});
-		}
-		else if (relPtr->GetStatus() == ITenantRelationshipInfo::TRS_ARCHIVED){
-			periods.append({ParseRelationshipTime(relPtr->GetCreatedAt()), ParseRelationshipTime(relPtr->GetUpdatedAt())});
-		}
-	}
-
-	if (isReadPtr != nullptr){
-		*isReadPtr = isRead;
-	}
-
-	return GetUninterruptedStart(periods);
-}
-
-
-bool CTenantConnectionRequestManagerComp::RemoveTenantRelationship(const QByteArray& tenantId, const QByteArray& relationshipId)
-{
-	QMutexLocker locker(&m_relationshipChangeMutex);
-
-	if (!m_relationshipCollectionCompPtr.IsValid() || !m_relationshipFactoryCompPtr.IsValid()){
-		return false;
-	}
-
-	// The relationships are stored under their ids
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (!m_relationshipCollectionCompPtr->GetObjectData(relationshipId, dataPtr)){
-		return false;
-	}
-
-	const ITenantRelationshipInfo* relPtr = dynamic_cast<const ITenantRelationshipInfo*>(dataPtr.GetPtr());
-	if (relPtr == nullptr){
-		return false;
-	}
-	if (relPtr->GetSourceTenantId() != tenantId && relPtr->GetTargetTenantId() != tenantId){
-		return false;
-	}
-
-	istd::CChangeNotifier changeNotifier(this);
-
-	return ArchiveRelationship(relationshipId, *relPtr, true);
-}
-
-
-bool CTenantConnectionRequestManagerComp::ArchiveRelationship(const QByteArray& relationshipId, const ITenantRelationshipInfo& relationship, bool isRemovalPublished)
-{
-	// The end of an archived relationship is final: writing it again would move the end and join its period with a later one
-	if (relationship.GetStatus() != ITenantRelationshipInfo::TRS_ACTIVE){
-		return true;
-	}
-
-	istd::TUniqueInterfacePtr<ITenantRelationshipInfo> updatedPtr = m_relationshipFactoryCompPtr.CreateInstance();
-	if (!updatedPtr.IsValid()){
-		return false;
-	}
-
-	updatedPtr->CopyFrom(relationship);
-	updatedPtr->SetStatus(ITenantRelationshipInfo::TRS_ARCHIVED);
-	updatedPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs));
-	if (!m_relationshipCollectionCompPtr->SetObjectData(relationshipId, *updatedPtr)){
-		return false;
-	}
-
-	if (isRemovalPublished){
-		TenantEvent::Publish(this, {
-					{TenantEvent::s_type, TenantEvent::s_relationshipRemoved},
-					{TenantEvent::s_relationshipId, updatedPtr->GetRelationshipId()},
-					{TenantEvent::s_connectionId, updatedPtr->GetConnectionId()},
-					{TenantEvent::s_sourceTenantId, updatedPtr->GetSourceTenantId()},
-					{TenantEvent::s_targetTenantId, updatedPtr->GetTargetTenantId()}});
-	}
-
-	return true;
+	return CreateConnection(tenantId, otherTenantId);
 }
 
 
 } // namespace imtauth
+

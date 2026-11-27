@@ -29,6 +29,7 @@ static const inline QByteArray s_keyPrefix = QByteArrayLiteral("TenantEvent:");
 static const inline QString s_type = QStringLiteral("type");
 static const inline QString s_tenantId = QStringLiteral("tenantId");
 static const inline QString s_userId = QStringLiteral("userId");
+static const inline QString s_userName = QStringLiteral("userName");
 static const inline QString s_membershipId = QStringLiteral("membershipId");
 static const inline QString s_invitationId = QStringLiteral("invitationId");
 static const inline QString s_invitedByUserId = QStringLiteral("invitedByUserId");
@@ -36,8 +37,6 @@ static const inline QString s_previousOwnerId = QStringLiteral("previousOwnerId"
 static const inline QString s_ownerId = QStringLiteral("ownerId");
 static const inline QString s_requestId = QStringLiteral("requestId");
 static const inline QString s_connectionId = QStringLiteral("connectionId");
-static const inline QString s_proposalId = QStringLiteral("proposalId");
-static const inline QString s_relationshipId = QStringLiteral("relationshipId");
 static const inline QString s_messageId = QStringLiteral("messageId");
 static const inline QString s_sourceTenantId = QStringLiteral("sourceTenantId");
 static const inline QString s_targetTenantId = QStringLiteral("targetTenantId");
@@ -53,11 +52,33 @@ static const inline QString s_ownershipTransferred = QStringLiteral("OwnershipTr
 static const inline QString s_connectionRequestCreated = QStringLiteral("ConnectionRequestCreated");
 static const inline QString s_connectionRequestStatusChanged = QStringLiteral("ConnectionRequestStatusChanged");
 static const inline QString s_connectionRemoved = QStringLiteral("ConnectionRemoved");
-static const inline QString s_proposalCreated = QStringLiteral("ProposalCreated");
-static const inline QString s_proposalStatusChanged = QStringLiteral("ProposalStatusChanged");
-static const inline QString s_relationshipRemoved = QStringLiteral("RelationshipRemoved");
 static const inline QString s_messageCreated = QStringLiteral("MessageCreated");
 static const inline QString s_messageStatusChanged = QStringLiteral("MessageStatusChanged");
+static const inline QString s_contractId = QStringLiteral("contractId");
+// The product a contract is for
+static const inline QString s_productId = QStringLiteral("productId");
+// The organizations a contract event is for, a list of ids
+static const inline QString s_recipientTenantIds = QStringLiteral("recipientTenantIds");
+// Every change of a contract, for all its parties
+static const inline QString s_contractChanged = QStringLiteral("ContractChanged");
+static const inline QString s_contractInvitationReceived = QStringLiteral("ContractInvitationReceived");
+// The terms of a sent contract changed: the parties review it again
+static const inline QString s_contractTermsChanged = QStringLiteral("ContractTermsChanged");
+static const inline QString s_contractPartyRemoved = QStringLiteral("ContractPartyRemoved");
+static const inline QString s_contractChangesRequested = QStringLiteral("ContractChangesRequested");
+static const inline QString s_contractSigned = QStringLiteral("ContractSigned");
+static const inline QString s_contractDeclined = QStringLiteral("ContractDeclined");
+static const inline QString s_contractConcluded = QStringLiteral("ContractConcluded");
+static const inline QString s_contractCancelled = QStringLiteral("ContractCancelled");
+static const inline QString s_contractNoticeGiven = QStringLiteral("ContractNoticeGiven");
+static const inline QString s_contractNoticeRevoked = QStringLiteral("ContractNoticeRevoked");
+static const inline QString s_contractRenewalStopped = QStringLiteral("ContractRenewalStopped");
+static const inline QString s_contractWithdrawn = QStringLiteral("ContractWithdrawn");
+static const inline QString s_contractPermissionsWithdrawn = QStringLiteral("ContractPermissionsWithdrawn");
+static const inline QString s_contractPermissionsReceived = QStringLiteral("ContractPermissionsReceived");
+static const inline QString s_contractSuperseded = QStringLiteral("ContractSuperseded");
+static const inline QString s_contractReminder = QStringLiteral("ContractReminder");
+static const inline QString s_reminderKey = QStringLiteral("reminderKey");
 
 
 /**

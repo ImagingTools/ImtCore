@@ -28,13 +28,10 @@ Item {
 	property bool hasTitle: true;
 	property bool readOnly: false;
 
+	// A typed text that is not a date: the field is framed red
 	property bool  isError: false;
 	property bool  isMonthError: false;
 	property bool  isDayError: false;
-
-	property string errorString: qsTr("Wrong date format!");
-	property string errorStringMonth: qsTr("Invalid month value!");
-	property string errorStringDay: qsTr("Invalid day value!");
 
 	property int calendarWidth: 350;
 	property int calendarHeight: 350;
@@ -60,6 +57,9 @@ Item {
 	}
 
 	function setDate(date){
+		dateInput.isError = false;
+		dateInput.isMonthError = false;
+		dateInput.isDayError = false;
 		dateInput.selectedDate = date;
 		dateInput.dateStr = Functions.dateToStr(date,"dd.MM.yyyy");
 		input.text = dateInput.dateStr;
@@ -87,15 +87,45 @@ Item {
 		month -=1
 
 		dateInput.dateStr = str;
-		dateInput.selectedDate.setFullYear(year);
-		dateInput.selectedDate.setMonth(month);
-		dateInput.selectedDate.setDate(day);
+		dateInput.selectedDate = new Date(Number(year), month, Number(day));
 
 		dateInput.dateChanged(dateInput.dateStr);
 
 		return true;
 	}
 	
+	// The typed text: empty clears the date; a wrong one is no date either, its field is framed
+	function applyText(){
+		if (input.text.trim() === ""){
+			dateInput.clearDate();
+			return true;
+		}
+
+		if (dateInput.setDateAsString(input.text)){
+			return true;
+		}
+
+		if (dateInput.dateStr !== ""){
+			dateInput.dateStr = "";
+			dateInput.dateChanged("");
+		}
+
+		return false;
+	}
+
+	function clearDate(){
+		dateInput.isError = false;
+		dateInput.isMonthError = false;
+		dateInput.isDayError = false;
+		if (input.text !== ""){
+			input.text = "";
+		}
+		if (dateInput.dateStr !== ""){
+			dateInput.dateStr = "";
+			dateInput.dateChanged("");
+		}
+	}
+
 	// "dd.MM.yyyy" format
 	function getDateAsString(){
 		return dateInput.dateStr
@@ -176,17 +206,6 @@ Item {
 		}
 
 		ok = !dateInput.isError && !dateInput.isMonthError && !dateInput.isDayError
-		let toShowErr = dateInput.isError || dateInput.isMonthError || dateInput.isDayError
-
-
-		if(toShowErr && !tooltip.openST){
-			let errorString_ = dateInput.isError ? dateInput.errorString :
-													   dateInput.isMonthError ? dateInput.errorStringMonth :
-																	 dateInput.isDayError ? dateInput.errorStringDay: ""
-
-			tooltip.text = errorString_;
-			openTooltipPause.restart();
-		}
 
 		return ok;
 	}
@@ -300,10 +319,10 @@ Item {
 				}
 
 				onEditingFinished: {
-					dateInput.setDateAsString(input.text);
+					dateInput.applyText();
 				}
 				onAccepted: {
-					if(dateInput.setDateAsString(input.text) && dateInput.tabKeyItem){
+					if(dateInput.applyText() && dateInput.tabKeyItem){
 						dateInput.tabKeyItem.forceActiveFocus();
 					}
 				}
@@ -373,11 +392,7 @@ Item {
 								let monthOk = dateInput.checkMonth(month);
 								let dayOk = dateInput.checkDay(day, month, year);
 								if(monthOk && dayOk){
-									let dayInt = day[0] == "0" ? Number(day[1]) : Number(day);
-									let monthInt = month[0] == "0" ? Number(month[1]) -1 : Number(month)  - 1;
-									date_.setFullYear(Number(year));
-									date_.setMonth(monthInt);
-									date_.setDate(dayInt);
+									date_ = new Date(Number(year), Number(month) - 1, Number(day));
 									dateOk = true;
 								}
 							}
@@ -407,33 +422,6 @@ Item {
 
 	}
 
-	CustomTooltip{
-		id: tooltip;
-
-		fontPixelSize: Style.fontSizeXL
-	}
-
-
-	PauseAnimation {
-		id: closeTooltipPause;
-
-		duration: 2000
-		onFinished: {
-			tooltip.hide();
-		}
-	}
-
-	PauseAnimation {
-		id: openTooltipPause;
-
-		duration: 50;
-		onFinished: {
-			let point = dateInput.mapToItem(null, 0, -8 - tooltip.componentHeight)
-			tooltip.openTooltipWithCoord(point.x,point.y)
-			closeTooltipPause.restart();
-		}
-	}
-
 	Component{
 		id: calendarComp;
 
@@ -442,6 +430,7 @@ Item {
 			height: dateInput.calendarHeight;
 			hiddenBackground: true;
 			centered: false;
+			acceptOnClick: true;
 			onAccepted: {
 				dateInput.setDate(date);
 			}

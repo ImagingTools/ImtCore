@@ -14,10 +14,7 @@ namespace imtauth
 
 
 CTenantConnectionRequest::CTenantConnectionRequest():
-	m_status(CRS_PENDING),
-	m_isRelationshipProposed(false),
-	m_proposedSourceRole(ITenantRelationshipInfo::TRR_PARTNER),
-	m_proposedTargetRole(ITenantRelationshipInfo::TRR_PARTNER)
+	m_status(CRS_PENDING)
 {
 }
 
@@ -182,70 +179,6 @@ void CTenantConnectionRequest::SetTargetTenantName(const QString& targetTenantNa
 }
 
 
-bool CTenantConnectionRequest::IsRelationshipProposed() const
-{
-	return m_isRelationshipProposed;
-}
-
-
-void CTenantConnectionRequest::SetRelationshipProposed(bool isProposed)
-{
-	if (m_isRelationshipProposed != isProposed){
-		istd::CChangeNotifier notifier(this);
-
-		m_isRelationshipProposed = isProposed;
-	}
-}
-
-
-ITenantRelationshipInfo::TenantRelationshipRole CTenantConnectionRequest::GetProposedSourceRole() const
-{
-	return m_proposedSourceRole;
-}
-
-
-void CTenantConnectionRequest::SetProposedSourceRole(ITenantRelationshipInfo::TenantRelationshipRole role)
-{
-	if (m_proposedSourceRole != role){
-		istd::CChangeNotifier notifier(this);
-
-		m_proposedSourceRole = role;
-	}
-}
-
-
-ITenantRelationshipInfo::TenantRelationshipRole CTenantConnectionRequest::GetProposedTargetRole() const
-{
-	return m_proposedTargetRole;
-}
-
-
-void CTenantConnectionRequest::SetProposedTargetRole(ITenantRelationshipInfo::TenantRelationshipRole role)
-{
-	if (m_proposedTargetRole != role){
-		istd::CChangeNotifier notifier(this);
-
-		m_proposedTargetRole = role;
-	}
-}
-
-
-QString CTenantConnectionRequest::GetProposedScope() const
-{
-	return m_proposedScope;
-}
-
-
-void CTenantConnectionRequest::SetProposedScope(const QString& scope)
-{
-	if (m_proposedScope != scope){
-		istd::CChangeNotifier notifier(this);
-
-		m_proposedScope = scope;
-	}
-}
-
-
 bool CTenantConnectionRequest::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
@@ -294,30 +227,6 @@ bool CTenantConnectionRequest::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_respondedAt);
 	retVal = retVal && archive.EndTag(respondedAtTag);
 
-	iser::CArchiveTag proposedTag("RelationshipProposed", "Relationship proposed", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(proposedTag);
-	retVal = retVal && archive.Process(m_isRelationshipProposed);
-	retVal = retVal && archive.EndTag(proposedTag);
-
-	iser::CArchiveTag sourceRoleTag("ProposedSourceRole", "Proposed role of the source", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(sourceRoleTag);
-	int sourceRole = static_cast<int>(m_proposedSourceRole);
-	retVal = retVal && archive.Process(sourceRole);
-	m_proposedSourceRole = static_cast<ITenantRelationshipInfo::TenantRelationshipRole>(sourceRole);
-	retVal = retVal && archive.EndTag(sourceRoleTag);
-
-	iser::CArchiveTag targetRoleTag("ProposedTargetRole", "Proposed role of the target", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(targetRoleTag);
-	int targetRole = static_cast<int>(m_proposedTargetRole);
-	retVal = retVal && archive.Process(targetRole);
-	m_proposedTargetRole = static_cast<ITenantRelationshipInfo::TenantRelationshipRole>(targetRole);
-	retVal = retVal && archive.EndTag(targetRoleTag);
-
-	iser::CArchiveTag scopeTag("ProposedScope", "Proposed scope", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(scopeTag);
-	retVal = retVal && archive.Process(m_proposedScope);
-	retVal = retVal && archive.EndTag(scopeTag);
-
 	return retVal;
 }
 
@@ -341,10 +250,6 @@ bool CTenantConnectionRequest::CopyFrom(const IChangeable& object, Compatibility
 	m_respondedAt = sourcePtr->m_respondedAt;
 	m_sourceTenantName = sourcePtr->m_sourceTenantName;
 	m_targetTenantName = sourcePtr->m_targetTenantName;
-	m_isRelationshipProposed = sourcePtr->m_isRelationshipProposed;
-	m_proposedSourceRole = sourcePtr->m_proposedSourceRole;
-	m_proposedTargetRole = sourcePtr->m_proposedTargetRole;
-	m_proposedScope = sourcePtr->m_proposedScope;
 
 	return true;
 }
@@ -375,10 +280,6 @@ bool CTenantConnectionRequest::ResetData(CompatibilityMode /*mode*/)
 	m_respondedAt.clear();
 	m_sourceTenantName.clear();
 	m_targetTenantName.clear();
-	m_isRelationshipProposed = false;
-	m_proposedSourceRole = ITenantRelationshipInfo::TRR_PARTNER;
-	m_proposedTargetRole = ITenantRelationshipInfo::TRR_PARTNER;
-	m_proposedScope.clear();
 
 	return true;
 }

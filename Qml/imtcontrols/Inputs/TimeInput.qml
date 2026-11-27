@@ -48,11 +48,9 @@ Item {
 	function checkDateFormat(str){
 		//console.log("Check Date Format")
 		str = correctTimeFormat(str);
+		// A wrong time only frames the field
 		timeInput.isError = str.match(timeInput.timeRegExpFull) === null;
 
-		if(timeInput.isError){
-			openTooltipPause.restart();
-		}
 		return !timeInput.isError;
 	}
 
@@ -234,35 +232,6 @@ Item {
 	}
 
 
-
-	CustomTooltip{
-		id: tooltip;
-
-		text: qsTr("Wrong time format!")
-
-		fontPixelSize: Style.fontSizeXL
-	}
-
-
-	PauseAnimation {
-		id: closeTooltipPause;
-
-		duration: 2000
-		onFinished: {
-			tooltip.hide();
-		}
-	}
-
-	PauseAnimation {
-		id: openTooltipPause;
-
-		duration: 50;
-		onFinished: {
-			let point = timeInput.mapToItem(null, 0, -8 - tooltip.componentHeight)
-			tooltip.openTooltipWithCoord(point.x,point.y)
-			closeTooltipPause.restart();
-		}
-	}
 
 	Component{
 		id: timeInputDialogComp;

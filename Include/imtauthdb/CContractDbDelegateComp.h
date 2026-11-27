@@ -3,68 +3,41 @@
 
 
 // ImtCore includes
-#include <imtauth/IContractData.h>
-#include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
+#include <imtauth/IContractInfo.h>
+#include <imtauthdb/CSerializedObjectDbDelegateCompBase.h>
 
 
 namespace imtauthdb
 {
 
 
-class CContractDbDelegateComp: public imtdb::CSqlDatabaseObjectDelegateCompBase
+/**
+	SQL delegate of the contracts: the contract with its state for the lists, and the index of its parties.
+	The parameter "PartyTenantId" selects the contracts of a party.
+*/
+class CContractDbDelegateComp: public CSerializedObjectDbDelegateCompBase
 {
 public:
-	typedef imtdb::CSqlDatabaseObjectDelegateCompBase BaseClass;
+	typedef CSerializedObjectDbDelegateCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CContractDbDelegateComp)
-		I_ASSIGN(m_contractFactCompPtr, "ContractFactory", "Factory used for creation of contract instances", true, "ContractFactory");
+		I_ASSIGN(m_dataFactoryCompPtr, "ContractFactory", "Factory of the stored objects", true, "ContractInfo");
+		I_ASSIGN(m_partiesTableNameAttrPtr, "PartiesTableName", "Table of the parties of the contracts", true, "TenantContractParties");
 	I_END_COMPONENT
 
-	virtual istd::IChangeableUniquePtr CreateObjectFromRecord(
-				const QSqlRecord& record,
-				const iprm::IParamsSet* dataConfigurationPtr = nullptr) const override;
-	virtual NewObjectQuery CreateNewObjectQuery(
-				const QByteArray& typeId,
-				const QByteArray& proposedObjectId,
-				const QString& objectName,
-				const QString& objectDescription,
-				const istd::IChangeable* valuePtr,
-				const imtbase::IOperationContext* operationContextPtr) const override;
-	virtual QByteArray CreateUpdateObjectQuery(
-				const imtbase::IObjectCollection& collection,
-				const QByteArray& objectId,
-				const istd::IChangeable& object,
-				const imtbase::IOperationContext* operationContextPtr,
-				bool useExternDelegate = true) const override;
-	virtual QByteArray CreateDeleteObjectsQuery(
-				const imtbase::IObjectCollection& collection,
-				const QByteArrayList& objectIds,
-				const imtbase::IOperationContext* operationContextPtr) const override;
-	virtual QByteArray CreateDeleteObjectSetQuery(
-				const imtbase::IObjectCollection& collection,
-				const iprm::IParamsSet* paramsPtr = nullptr,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
-	virtual QByteArray CreateRenameObjectQuery(
-				const imtbase::IObjectCollection& collection,
-				const QByteArray& objectId,
-				const QString& newObjectName,
-				const imtbase::IOperationContext* operationContextPtr) const override;
-	virtual QByteArray CreateDescriptionObjectQuery(
-				const imtbase::IObjectCollection& collection,
-				const QByteArray& objectId,
-				const QString& description,
-				const imtbase::IOperationContext* operationContextPtr) const override;
-	virtual bool SetCollectionItemMetaInfoFromRecord(
-				const QSqlRecord& record,
-				idoc::IDocumentMetaInfo& metaInfo) const override;
-
 protected:
-	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const override;
-	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
+	// reimplemented (imtauthdb::CSerializedObjectDbDelegateCompBase)
+	virtual istd::IChangeableUniquePtr CreateDataObject() const override;
+	virtual bool GetColumns(const istd::IChangeable& object, Columns& columns) const override;
+	virtual QString CreateDependentStatements(const QByteArray& objectId, const istd::IChangeable* objectPtr) const override;
+	virtual QString CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const override;
 
 private:
-	I_FACT(imtauth::IContractData, m_contractFactCompPtr);
+	I_FACT(imtauth::IContractInfo, m_dataFactoryCompPtr);
+	I_ATTR(QByteArray, m_partiesTableNameAttrPtr);
 };
 
 
 } // namespace imtauthdb
+
+

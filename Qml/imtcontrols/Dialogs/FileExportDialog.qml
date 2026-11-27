@@ -29,11 +29,9 @@ FileDialog {
 	}
 
 	onAccepted: {
-		let filePath = fileDialogSave.file.toString();
-
 		let mimeType = ""
 		if (Qt.platform.os == "web"){
-
+			// The browser saves the file itself: no chosen file path
 			exportFileIO.source = fileDialogSave.currentFile;
 
 			let index = fileDialogSave.getDialogNameFilterIndex(fileDialogSave.nameFilters, fileDialogSave.fileExt)
@@ -45,6 +43,7 @@ FileDialog {
 			mimeType = mimeTypes[index]
 		}
 		else{
+			let filePath = fileDialogSave.file.toString();
 			let extension = filePath.substring(filePath.lastIndexOf('.') + 1);
 			fileDialogSave.fileExt = extension;
 
@@ -65,7 +64,9 @@ FileDialog {
 
 	function writeData(name){
 		if (Qt.platform.os == "web"){
-			exportFileIO.source = name + "." + fileExt;
+			let suffix = "." + fileExt
+			let hasSuffix = String(name).length >= suffix.length && String(name).substring(String(name).length - suffix.length) === suffix
+			exportFileIO.source = hasSuffix ? String(name) : name + suffix;
 		}
 
 		let encodedStr = Qt.atob(dataStr);

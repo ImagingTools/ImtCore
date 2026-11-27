@@ -71,6 +71,10 @@ QNetworkRequest* CGqlClientEngineComp::CreateNetworkRequest(const imtgql::IGqlRe
 
 	networkRequest->setUrl(url);
 
+	if (m_clientProductIdAttrPtr.IsValid() && !(*m_clientProductIdAttrPtr).isEmpty()){
+		networkRequest->setRawHeader(imtbase::s_productIdHeaderId, *m_clientProductIdAttrPtr);
+	}
+
 	const imtgql::IGqlContext* contextPtr = request.GetRequestContext();
 	if (contextPtr != nullptr){
 		QByteArray productId = contextPtr->GetProductId();

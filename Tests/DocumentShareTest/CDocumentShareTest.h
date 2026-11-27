@@ -22,10 +22,6 @@ private slots:
 	void testTenantFilter_SerializeRoundTrip();
 	void testTenantFilter_SerializationDiffersBySharing();
 	void testTenantFilter_CopyFrom();
-
-	// Relationship validity
-	void testRelationshipValidity_OpenBounds();
-	void testRelationshipValidity_Bounds();
 };
 
 

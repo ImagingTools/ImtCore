@@ -28,25 +28,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SQLiteContractRepository" PackageId="ImtUserAdministrationVoce" ComponentId="SQLiteContractRepository">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="SQLiteCrossOrgGrantRepository" PackageId="ImtUserAdministrationVoce" ComponentId="SQLiteCrossOrgGrantRepository">
+        <Element Id="SQLiteContractRepository" PackageId="ImtUserAdministrationVoce" ComponentId="ContractSqlRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
@@ -238,42 +220,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SQLiteTenantRelationshipProposalRepository" PackageId="ImtUserAdministrationVoce" ComponentId="SQLiteTenantRelationshipProposalRepository">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="LocalDatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="SQLiteTenantRelationshipRepository" PackageId="ImtUserAdministrationVoce" ComponentId="SQLiteTenantRelationshipRepository">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="SQLiteTenantRepository" PackageId="ImtUserAdministrationVoce" ComponentId="SQLiteTenantRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -388,13 +334,120 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="SQLiteContractPartyRecordRepository" PackageId="ImtUserAdministrationVoce" ComponentId="ContractPartyRecordSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SQLiteContractEventRepository" PackageId="ImtUserAdministrationVoce" ComponentId="ContractEventSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SQLiteContractPartyRoleRepository" PackageId="ImtUserAdministrationVoce" ComponentId="ContractPartyRoleSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SQLiteContractTypeRepository" PackageId="ImtUserAdministrationVoce" ComponentId="ContractTypeSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SQLiteTenantDirectoryProfileRepository" PackageId="ImtUserAdministrationVoce" ComponentId="TenantDirectoryProfileSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SQLiteContractAttachmentRepository" PackageId="ImtUserAdministrationVoce" ComponentId="ContractAttachmentSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces/>
     <ExportedComponents>
         <Component ExportedId="RoleRepository" ComponentId="SQLiteRoleRepository"/>
         <Component ExportedId="SQLiteContractRepository" ComponentId="SQLiteContractRepository"/>
-        <Component ExportedId="SQLiteCrossOrgGrantRepository" ComponentId="SQLiteCrossOrgGrantRepository"/>
         <Component ExportedId="SQLiteCrossTenantMessageRepository" ComponentId="SQLiteCrossTenantMessageRepository"/>
         <Component ExportedId="SQLiteOrderRequestRepository" ComponentId="SQLiteOrderRequestRepository"/>
         <Component ExportedId="SQLiteTenantConnectionCodeRepository" ComponentId="SQLiteTenantConnectionCodeRepository"/>
@@ -403,13 +456,17 @@
         <Component ExportedId="SQLiteTenantEntityBindingRepository" ComponentId="SQLiteTenantEntityBindingRepository"/>
         <Component ExportedId="SQLiteTenantInvitationRepository" ComponentId="SQLiteTenantInvitationRepository"/>
         <Component ExportedId="SQLiteTenantMembershipRepository" ComponentId="SQLiteTenantMembershipRepository"/>
-        <Component ExportedId="SQLiteTenantRelationshipProposalRepository" ComponentId="SQLiteTenantRelationshipProposalRepository"/>
-        <Component ExportedId="SQLiteTenantRelationshipRepository" ComponentId="SQLiteTenantRelationshipRepository"/>
         <Component ExportedId="SQLiteTenantRepository" ComponentId="SQLiteTenantRepository"/>
         <Component ExportedId="SessionSqlRepository" ComponentId="SessionSqlRepository"/>
         <Component ExportedId="UserConnectionRepository" ComponentId="UserConnectionRepository"/>
         <Component ExportedId="UserGroupRepository" ComponentId="SQLiteUserGroupRepository"/>
         <Component ExportedId="UserRepository" ComponentId="SQLiteUserRepository"/>
         <Component ExportedId="UserSettingsRepository" ComponentId="DatabaseUserSettings/UserSettingsRepository"/>
+        <Component ExportedId="SQLiteContractPartyRecordRepository" ComponentId="SQLiteContractPartyRecordRepository"/>
+        <Component ExportedId="SQLiteContractEventRepository" ComponentId="SQLiteContractEventRepository"/>
+        <Component ExportedId="SQLiteContractPartyRoleRepository" ComponentId="SQLiteContractPartyRoleRepository"/>
+        <Component ExportedId="SQLiteContractTypeRepository" ComponentId="SQLiteContractTypeRepository"/>
+        <Component ExportedId="SQLiteTenantDirectoryProfileRepository" ComponentId="SQLiteTenantDirectoryProfileRepository"/>
+        <Component ExportedId="SQLiteContractAttachmentRepository" ComponentId="SQLiteContractAttachmentRepository"/>
     </ExportedComponents>
 </Acf>

@@ -8,8 +8,50 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ContractInfo" X="575" Y="400" Note=""/>
-        <Element ComponentName="ContractManager" X="575" Y="175" Note=""/>
+        <Element ComponentName="ContractInfo" X="150" Y="150" Note=""/>
+        <Element ComponentName="ContractPartyPrivateInfo" X="450" Y="150" Note=""/>
+        <Element ComponentName="ContractEventInfo" X="750" Y="150" Note=""/>
+        <Element ComponentName="PartyRoleInfo" X="1050" Y="150" Note=""/>
+        <Element ComponentName="ContractTypeInfo" X="1350" Y="150" Note=""/>
+        <Element ComponentName="TenantDirectoryProfile" X="1650" Y="150" Note=""/>
+        <Element ComponentName="CrossTenantMessageInfo" X="150" Y="350" Note=""/>
+        <Element ComponentName="Attachment" X="450" Y="350" Note=""/>
+        <Element ComponentName="RoleParent" X="750" Y="350" Note=""/>
+        <Element ComponentName="RoleChild" X="1050" Y="350" Note=""/>
+        <Element ComponentName="RolePartner" X="1350" Y="350" Note=""/>
+        <Element ComponentName="RoleSupplier" X="1650" Y="350" Note=""/>
+        <Element ComponentName="RoleCustomer" X="150" Y="550" Note=""/>
+        <Element ComponentName="RoleAffiliate" X="450" Y="550" Note=""/>
+        <Element ComponentName="RoleContractor" X="750" Y="550" Note=""/>
+        <Element ComponentName="RoleSubcontractor" X="1050" Y="550" Note=""/>
+        <Element ComponentName="RoleDistributor" X="1350" Y="550" Note=""/>
+        <Element ComponentName="RoleAgent" X="1650" Y="550" Note=""/>
+        <Element ComponentName="RoleServiceProvider" X="150" Y="750" Note=""/>
+        <Element ComponentName="RoleLicensor" X="450" Y="750" Note=""/>
+        <Element ComponentName="RoleLicensee" X="750" Y="750" Note=""/>
+        <Element ComponentName="RoleGuarantor" X="1050" Y="750" Note=""/>
+        <Element ComponentName="TypeCooperation" X="1350" Y="750" Note=""/>
+        <Element ComponentName="TypeSupply" X="1650" Y="750" Note=""/>
+        <Element ComponentName="TypeServices" X="150" Y="950" Note=""/>
+        <Element ComponentName="TypeNda" X="450" Y="950" Note=""/>
+        <Element ComponentName="TypeFramework" X="750" Y="950" Note=""/>
+        <Element ComponentName="PartyRoleCatalog" X="1050" Y="950" Note=""/>
+        <Element ComponentName="ContractTypeCatalog" X="1350" Y="950" Note=""/>
+        <Element ComponentName="TenantDirectory" X="1650" Y="950" Note=""/>
+        <Element ComponentName="ContractManager" X="150" Y="1150" Note=""/>
+        <Element ComponentName="ContractRelationshipProvider" X="450" Y="1150" Note=""/>
+        <Element ComponentName="ContractDelegatedAccess" X="750" Y="1150" Note=""/>
+        <Element ComponentName="ContractReminder" X="1050" Y="1150" Note=""/>
+        <Element ComponentName="AttachmentStorage" X="1350" Y="1150" Note=""/>
+        <Element ComponentName="CrossTenantMessageProjection" X="1650" Y="1150" Note=""/>
+        <Element ComponentName="CrossTenantMessageBroker" X="150" Y="1350" Note=""/>
+        <Element ComponentName="ContractController" X="450" Y="1350" Note=""/>
+        <Element ComponentName="ContractCatalogController" X="750" Y="1350" Note=""/>
+        <Element ComponentName="TenantDirectoryController" X="1050" Y="1350" Note=""/>
+        <Element ComponentName="ContractNotificationPublisher" X="1350" Y="1350" Note=""/>
+        <Element ComponentName="CrossTenantMessageNotificationPublisher" X="1650" Y="1350" Note=""/>
+        <Element ComponentName="Demultiplexer" X="150" Y="1550" Note=""/>
+        <Element ComponentName="SlaveSubscriberController" X="450" Y="1550" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

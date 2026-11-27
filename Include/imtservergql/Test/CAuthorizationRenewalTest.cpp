@@ -777,7 +777,7 @@ public:
 };
 
 
-// The roles another organization delegates to the user
+// The permissions the contracts of another organization give to the user
 class CDelegatedAccessComp: public icomp::CComponentBase, virtual public imtauth::IDelegatedAccess
 {
 public:
@@ -786,20 +786,40 @@ public:
 		I_REGISTER_INTERFACE(imtauth::IDelegatedAccess);
 	I_END_COMPONENT
 
-	QByteArrayList roleIds;
+	QByteArrayList permissionIds;
 	bool isReadable = true;
+	// The organizations of the user come from its memberships, as in imtauth::CContractDelegatedAccessComp
+	const CMembershipManagerComp* membershipsPtr = nullptr;
 
-	imtauth::DelegatedTenantList GetAccessibleTenants(const QByteArray&, const QByteArray&) const override { return imtauth::DelegatedTenantList(); }
-	bool HasDelegatedRole(const QByteArray&, const QByteArray&, const QByteArray&, const QByteArray&) const override { return false; }
-	QByteArrayList GetDelegatedRoles(const QByteArray&, const QByteArray&, bool* isReadPtr) const override
+	QByteArrayList GetDelegatedPermissions(const QByteArray&, const QByteArray&, const QByteArray&, bool* isReadPtr) const override
+	{
+		const bool isRead = IsRead();
+		if (isReadPtr != nullptr){
+			*isReadPtr = isRead;
+		}
+		return isRead ? permissionIds : QByteArrayList();
+	}
+	QByteArrayList GetDelegatingTenantIds(const QByteArray&, const QByteArray&, bool* isReadPtr) const override
 	{
 		if (isReadPtr != nullptr){
-			*isReadPtr = isReadable;
+			*isReadPtr = IsRead();
 		}
-		return isReadable ? roleIds : QByteArrayList();
+		return QByteArrayList();
 	}
-	bool IsDelegatedAccess(const QByteArray&, const QByteArray&, const QByteArray&) const override { return false; }
-	QByteArrayList GetDelegatedUserRoles(const QByteArray&) const override { return QByteArrayList(); }
+	bool HasDelegatedAccess(const QByteArray&, const QByteArray&, const QByteArray&, bool* isReadPtr) const override
+	{
+		const bool isRead = IsRead();
+		if (isReadPtr != nullptr){
+			*isReadPtr = isRead;
+		}
+		return isRead && !permissionIds.isEmpty();
+	}
+
+private:
+	bool IsRead() const
+	{
+		return isReadable && (membershipsPtr == nullptr || membershipsPtr->isReadable);
+	}
 };
 
 
@@ -1107,6 +1127,7 @@ struct CRenewalFixture
 
 		if (options & O_COMPUTED_BY_SOURCE){
 			bindings->InitComponent();
+			delegations->membershipsPtr = &*memberships;
 			delegations->InitComponent();
 			owner->SetRef("ObjectCollection", users);
 			owner->SetRef("RoleCollection", roles);

@@ -20,6 +20,9 @@
         <Element ComponentName="TenantInfo" X="575" Y="425" Note=""/>
         <Element ComponentName="TenantMembershipManagerController" X="625" Y="600" Note=""/>
         <Element ComponentName="TenantRemoteRepresentationController" X="925" Y="225" Note=""/>
+        <Element ComponentName="RemoteContractController" X="150" Y="800" Note=""/>
+        <Element ComponentName="RemoteContractCatalogController" X="450" Y="800" Note=""/>
+        <Element ComponentName="RemoteTenantDirectoryController" X="750" Y="800" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

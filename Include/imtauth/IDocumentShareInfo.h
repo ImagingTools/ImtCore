@@ -79,6 +79,12 @@ public:
 	virtual QByteArrayList GetTargetGroupIds() const = 0;
 	virtual void SetTargetGroupIds(const QByteArrayList& groupIds) = 0;
 
+	/**
+		The contract the share is made under: the share ends with it. Empty: any contract of the two allowing it.
+	*/
+	virtual QByteArray GetContractId() const = 0;
+	virtual void SetContractId(const QByteArray& contractId) = 0;
+
 	virtual AccessLevel GetAccessLevel() const = 0;
 	virtual void SetAccessLevel(AccessLevel accessLevel) = 0;
 

@@ -88,29 +88,18 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAttachmentDbDelegateComp::Create
 		attachId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 	}
 
-	const QString nowUtc = utcNow();
-
-	// Encode binary data as hex for PostgreSQL BYTEA / SQLite BLOB
-	const QByteArray hexData = attachPtr->GetData().toHex();
-
-	// Escape single quotes in user-supplied strings to prevent SQL injection
-	QString escapedFileName = attachPtr->GetFileName();
-	escapedFileName.replace('\'', "''");
-	QString escapedMimeType = attachPtr->GetMimeType();
-	escapedMimeType.replace('\'', "''");
-
 	NewObjectQuery retVal;
-	retVal.query = QString(
-		"INSERT INTO \"Attachments\" "
+	retVal.query = QStringLiteral(
+		"INSERT INTO \"%1\" "
 		"(\"Id\", \"FileName\", \"MimeType\", \"Data\", \"FileSize\", \"CreatedAt\") "
-		"VALUES('%1', '%2', '%3', E'\\\\x%4', %5, '%6');")
-		.arg(attachId)
-		.arg(escapedFileName)
-		.arg(escapedMimeType)
-		.arg(hexData)
-		.arg(attachPtr->GetFileSize())
-		.arg(nowUtc)
-		.toUtf8();
+		"VALUES(:Id, :FileName, :MimeType, :Data, :FileSize, :CreatedAt);").arg(QString::fromUtf8(GetTableName())).toUtf8();
+	retVal.bindValues = {
+		{QStringLiteral(":Id"), QString::fromUtf8(attachId)},
+		{QStringLiteral(":FileName"), attachPtr->GetFileName()},
+		{QStringLiteral(":MimeType"), attachPtr->GetMimeType()},
+		{QStringLiteral(":Data"), attachPtr->GetData()},
+		{QStringLiteral(":FileSize"), attachPtr->GetFileSize()},
+		{QStringLiteral(":CreatedAt"), utcNow()}};
 
 	return retVal;
 }
@@ -145,8 +134,8 @@ QByteArray CAttachmentDbDelegateComp::CreateDeleteObjectsQuery(
 		idsStr += QStringLiteral("'%1'").arg(escaped);
 	}
 
-	return QStringLiteral(R"(DELETE FROM "Attachments" WHERE "Id" IN (%1);)")
-		.arg(idsStr)
+	return QStringLiteral(R"(DELETE FROM "%1" WHERE "Id" IN (%2);)")
+		.arg(QString::fromUtf8(GetTableName()), idsStr)
 		.toUtf8();
 }
 
@@ -189,7 +178,7 @@ void CAttachmentDbDelegateComp::OnComponentCreated()
 	}
 
 	const QString tableName = GetTableName();
-	if (TableExists(tableName)){
+	if (!(*m_referencingTableNameAttrPtr).isEmpty() && TableExists(tableName)){
 		CleanupOrphanedAttachments();
 	}
 }
@@ -225,10 +214,10 @@ void CAttachmentDbDelegateComp::CleanupOrphanedAttachments()
 	QString cutoffTime = QDateTime::currentDateTimeUtc().addSecs(-24 * 3600).toString(Qt::ISODateWithMs);
 
 	QByteArray query = QString(
-		"DELETE FROM \"Attachments\" "
-		"WHERE \"Id\" NOT IN (SELECT \"AttachmentId\" FROM \"MessageAttachments\") "
-		"AND \"CreatedAt\" < '%1';")
-		.arg(cutoffTime)
+		"DELETE FROM \"%1\" "
+		"WHERE \"Id\" NOT IN (SELECT \"AttachmentId\" FROM \"%2\") "
+		"AND \"CreatedAt\" < '%3';")
+		.arg(QString::fromUtf8(GetTableName()), QString::fromUtf8(*m_referencingTableNameAttrPtr), cutoffTime)
 		.toUtf8();
 
 	QSqlError sqlError;

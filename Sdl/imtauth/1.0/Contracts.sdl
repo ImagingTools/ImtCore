@@ -1,0 +1,509 @@
+schema {
+	query: Query
+	mutation: Mutation
+	subscription: Subscription
+	namespace: imtauth
+	version: 1.0
+}
+
+# --- Contracts of organizations ---
+
+enum ContractState {
+	Draft
+	Negotiation
+	Signing
+	Rejected
+	Cancelled
+	Signed
+	Active
+	Expired
+	Terminated
+	Superseded
+}
+
+enum ContractPartyState {
+	Invited
+	Reviewing
+	ChangesRequested
+	Approved
+	Signed
+	Declined
+	NoticeGiven
+	Withdrawn
+}
+
+enum ContractReferenceType {
+	Supersedes
+	Framework
+	Related
+}
+
+enum ContractPartyChannel {
+	Initiator
+	AddressBook
+	ConnectionCode
+	Directory
+	CoParty
+}
+
+enum ContractEventType {
+	Created
+	Updated
+	PartyAdded
+	Submitted
+	Cancelled
+	ChangesRequested
+	Approved
+	Signed
+	Declined
+	Concluded
+	AttachmentAdded
+	AttachmentReplaced
+	NoticeGiven
+	NoticeRevoked
+	Withdrawn
+	NonRenewalNotice
+	PermissionsGiven
+	PermissionsWithdrawn
+	Superseded
+	PrivateInfoChanged
+	AllocationGroupsChanged
+	ReminderSent
+}
+
+type ContractSignature {
+	userId: ID
+	userName: String
+	position: String
+	signedAt: String
+	revision: Int
+	contentHash: String
+}
+
+type ContractParty {
+	tenantId: ID!
+	tenantName: String
+	roleId: ID
+	roleName: String
+	channel: ContractPartyChannel
+	state: ContractPartyState
+	stateComment: String
+	stateChangedAt: String
+	signatures: [ContractSignature]
+	withdrawAt: String
+	withdrawReason: String
+	nonRenewalNoticeAt: String
+	# Signed and not left now
+	isBound: Boolean
+}
+
+input ContractPartyInput {
+	tenantId: ID!
+	roleId: ID
+}
+
+type ContractLink {
+	linkId: ID!
+	tenantAId: ID!
+	tenantBId: ID!
+	roleAId: ID
+	roleAName: String
+	roleBId: ID
+	roleBName: String
+	validFrom: String
+	validUntil: String
+	isMessagingAllowed: Boolean
+	isSharingAllowed: Boolean
+	isInForce: Boolean
+}
+
+input ContractLinkInput {
+	# Empty for a new link
+	linkId: ID
+	tenantAId: ID!
+	tenantBId: ID!
+	roleAId: ID
+	roleBId: ID
+	validFrom: String
+	validUntil: String
+	isMessagingAllowed: Boolean
+	isSharingAllowed: Boolean
+}
+
+type ContractAllocation {
+	allocationId: ID!
+	linkId: ID!
+	grantorTenantId: ID!
+	granteeTenantId: ID!
+	permissionIds: [ID]
+	validFrom: String
+	validUntil: String
+	comment: String
+	isInForce: Boolean
+}
+
+type ContractReference {
+	contractId: ID!
+	referenceType: ContractReferenceType
+	contractNumber: String
+	contractName: String
+}
+
+input ContractReferenceInput {
+	contractId: ID!
+	referenceType: ContractReferenceType
+}
+
+type ContractAttachment {
+	attachmentId: ID!
+	fileName: String
+	mimeType: String
+	fileSize: Int
+	contentHash: String
+	addedByTenantId: ID
+	addedByUserId: ID
+	addedAt: String
+	replacesAttachmentId: ID
+	isReplaced: Boolean
+	isInternal: Boolean
+}
+
+type ContractRoleSlot {
+	roleId: ID!
+	minCount: Int
+	maxCount: Int
+}
+
+type Contract {
+	isReadOnly: Boolean
+	productId: ID!
+	id: ID!
+	number: String
+	name: String
+	description: String
+	terms: String
+	typeId: ID
+	typeName: String
+	initiatorTenantId: ID
+	createdByUserId: ID
+	effectiveFrom: String
+	termDays: Int
+	validUntil: String
+	autoRenew: Boolean
+	renewalPeriodDays: Int
+	renewalNoticeDays: Int
+	terminationNoticeDays: Int
+	parties: [ContractParty]
+	links: [ContractLink]
+	allocations: [ContractAllocation]
+	references: [ContractReference]
+	attachments: [ContractAttachment]
+	roleSlots: [ContractRoleSlot]
+	revision: Int
+	contentHash: String
+	submittedAt: String
+	cancelledAt: String
+	signedAt: String
+	terminatedAt: String
+	terminationReason: String
+	supersededBy: ID
+	supersededAt: String
+	createdAt: String
+	updatedAt: String
+	# Computed from the facts at the time of the answer
+	state: ContractState
+	isChangesRequested: Boolean
+	isTerminating: Boolean
+	isExpiring: Boolean
+	effectiveStart: String
+	periodEnd: String
+	endsAt: String
+	endedAt: String
+}
+
+type ContractListItem {
+	isReadOnly: Boolean
+	productId: ID!
+	id: ID!
+	number: String
+	name: String
+	typeName: String
+	initiatorTenantId: ID
+	partyNames: [String]
+	state: ContractState
+	# The state of the organization asking
+	partyState: ContractPartyState
+	isMyTurnToSign: Boolean
+	isChangesRequested: Boolean
+	isTerminating: Boolean
+	isExpiring: Boolean
+	effectiveStart: String
+	periodEnd: String
+	endedAt: String
+	updatedAt: String
+}
+
+input ContractDraftInput {
+	name: String!
+	description: String
+	terms: String
+	typeId: ID
+	effectiveFrom: String
+	termDays: Int
+	validUntil: String
+	autoRenew: Boolean
+	renewalPeriodDays: Int
+	renewalNoticeDays: Int
+	terminationNoticeDays: Int
+	parties: [ContractPartyInput]
+	links: [ContractLinkInput]
+	references: [ContractReferenceInput]
+}
+
+type ContractAllocationGroups {
+	allocationId: ID!
+	groupIds: [ID]
+}
+
+type ContractPrivateInfo {
+	internalNumber: String
+	responsibleUserId: ID
+	notes: String
+	attachments: [ContractAttachment]
+	allocationGroups: [ContractAllocationGroups]
+	reminderDays: Int
+	updatedAt: String
+}
+
+type ContractEvent {
+	id: ID!
+	eventType: ContractEventType
+	tenantId: ID
+	tenantName: String
+	userId: ID
+	userName: String
+	time: String
+	revision: Int
+	comment: String
+	subjectId: ID
+	isPrivate: Boolean
+}
+
+type RelatedTenant {
+	tenantId: ID!
+	tenantName: String
+	isEffective: Boolean
+	relatedContractIds: [ID]
+	sharingContractIds: [ID]
+	relatedSince: String
+}
+
+type ContractPartyCandidate {
+	tenantId: ID!
+	tenantName: String
+	channel: ContractPartyChannel
+}
+
+# --- Requests ---
+
+input ContractTenantInput {
+	tenantId: ID!
+}
+
+input ContractIdInput {
+	tenantId: ID!
+	contractId: ID!
+}
+
+# A command on a contract: the revision the caller read, a comment or a reason where the command takes one
+input ContractCommandInput {
+	tenantId: ID!
+	contractId: ID!
+	revision: Int
+	comment: String
+}
+
+type ContractCommandPayload {
+	success: Boolean
+	contractId: ID
+	revision: Int
+	errorMessage: String
+}
+
+input CreateContractInput {
+	tenantId: ID!
+	draft: ContractDraftInput!
+}
+
+input UpdateContractInput {
+	tenantId: ID!
+	contractId: ID!
+	revision: Int!
+	draft: ContractDraftInput!
+}
+
+input AddContractPartyByCodeInput {
+	tenantId: ID!
+	contractId: ID!
+	revision: Int!
+	connectionCode: String!
+	roleId: ID
+}
+
+input SignContractInput {
+	tenantId: ID!
+	contractId: ID!
+	revision: Int!
+	position: String
+}
+
+input GiveContractNoticeInput {
+	tenantId: ID!
+	contractId: ID!
+	reason: String
+	isImmediate: Boolean
+}
+
+# The organization gives its own permissions to a party it is linked with
+input GiveContractPermissionsInput {
+	tenantId: ID!
+	contractId: ID!
+	granteeTenantId: ID!
+	permissionIds: [ID]
+	validUntil: String
+	comment: String
+}
+
+input WithdrawContractPermissionsInput {
+	tenantId: ID!
+	contractId: ID!
+	allocationId: ID!
+}
+
+input AddContractAttachmentInput {
+	tenantId: ID!
+	contractId: ID!
+	fileName: String!
+	mimeType: String
+	# Base64 of the file
+	data: String!
+	replacesAttachmentId: ID
+	isInternal: Boolean
+}
+
+input GetContractAttachmentInput {
+	tenantId: ID!
+	contractId: ID!
+	attachmentId: ID!
+}
+
+type GetContractAttachmentPayload {
+	fileName: String
+	mimeType: String
+	data: String
+	errorMessage: String
+}
+
+input SetContractPrivateInfoInput {
+	tenantId: ID!
+	contractId: ID!
+	internalNumber: String
+	responsibleUserId: ID
+	notes: String
+	reminderDays: Int
+}
+
+input SetContractAllocationGroupsInput {
+	tenantId: ID!
+	contractId: ID!
+	allocationId: ID!
+	groupIds: [ID]
+}
+
+type GetContractsPayload {
+	contracts: [ContractListItem]
+	errorMessage: String
+}
+
+type GetContractPayload {
+	contract: Contract
+	privateInfo: ContractPrivateInfo
+	errorMessage: String
+}
+
+type GetContractEventsPayload {
+	events: [ContractEvent]
+	errorMessage: String
+}
+
+type GetRelatedTenantsPayload {
+	tenantName: String
+	relatedTenants: [RelatedTenant]
+	errorMessage: String
+}
+
+type GetContractPartyCandidatesPayload {
+	candidates: [ContractPartyCandidate]
+	errorMessage: String
+}
+
+# --- Notifications ---
+
+enum EContractNotificationType {
+	ContractChanged
+}
+
+type ContractNotification {
+	notificationType: EContractNotificationType!
+	contractId: ID!
+	tenantId: ID!
+	# The user whose change is told
+	sourceUserId: ID
+	sourceUserName: String
+}
+
+input ContractNotificationSubscriptionInput {
+	userId: ID!
+}
+
+# A contract changed: the servers of the products drop what they computed for the access of their sessions
+type ContractsChangedNotification {
+	productId: ID!
+	contractId: ID!
+}
+
+type Query {
+	GetContracts (input: ContractTenantInput): GetContractsPayload!
+	GetContract (input: ContractIdInput): GetContractPayload!
+	GetContractEvents (input: ContractIdInput): GetContractEventsPayload!
+	GetContractAttachment (input: GetContractAttachmentInput): GetContractAttachmentPayload!
+	GetRelatedTenants (input: ContractTenantInput): GetRelatedTenantsPayload!
+	GetContractPartyCandidates (input: ContractTenantInput): GetContractPartyCandidatesPayload!
+}
+
+type Mutation {
+	CreateContract (input: CreateContractInput): ContractCommandPayload!
+	UpdateContract (input: UpdateContractInput): ContractCommandPayload!
+	AddContractPartyByCode (input: AddContractPartyByCodeInput): ContractCommandPayload!
+	RemoveContract (input: ContractCommandInput): ContractCommandPayload!
+	SubmitContract (input: ContractCommandInput): ContractCommandPayload!
+	CancelContract (input: ContractCommandInput): ContractCommandPayload!
+	RequestContractChanges (input: ContractCommandInput): ContractCommandPayload!
+	ApproveContract (input: ContractCommandInput): ContractCommandPayload!
+	SignContract (input: SignContractInput): ContractCommandPayload!
+	DeclineContract (input: ContractCommandInput): ContractCommandPayload!
+	GiveContractNotice (input: GiveContractNoticeInput): ContractCommandPayload!
+	RevokeContractNotice (input: ContractCommandInput): ContractCommandPayload!
+	GiveContractNonRenewalNotice (input: ContractCommandInput): ContractCommandPayload!
+	GiveContractPermissions (input: GiveContractPermissionsInput): ContractCommandPayload!
+	WithdrawContractPermissions (input: WithdrawContractPermissionsInput): ContractCommandPayload!
+	AddContractAttachment (input: AddContractAttachmentInput): ContractCommandPayload!
+	SetContractPrivateInfo (input: SetContractPrivateInfoInput): ContractCommandPayload!
+	SetContractAllocationGroups (input: SetContractAllocationGroupsInput): ContractCommandPayload!
+}
+
+type Subscription {
+	OnContractNotification (input: ContractNotificationSubscriptionInput): ContractNotification!
+	OnContractsChanged: ContractsChangedNotification!
+}
+

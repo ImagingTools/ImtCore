@@ -21,6 +21,8 @@ import imtcontrols 1.0
  *     fetch/fetchMore/retry and reflects its loading and error state.
  *   - `listModel` - a model the subclass builds and refreshes itself. Note
  *     that `refresh()` does nothing in this mode; the subclass owns reloading.
+ *     An array of rows is filtered by the text of the filter in its columns,
+ *     unless the subclass filters it itself (`filtersListModel: false`).
  *
  * It also implements the `actionHandler` interface expected by
  * SimpleCollectionItemDelegateBase (canManage/canEdit/canDelete, openEdit,
@@ -59,6 +61,8 @@ ViewBase {
 	property var columnDelegateComponents: []
 	property Component headerButtonsComponent: null
 	property Component customEditorComponent: null
+	// A dialog creates and edits the items instead of an editor page; it is opened with {"itemId": id}, "" for a new item
+	property Component editorDialogComponent: null
 	property bool showCreateButton: true
 	property var managePermissionIds: []
 	property var createPermissionIds: []
@@ -226,7 +230,29 @@ ViewBase {
 	property bool __refreshPending: false
 
 	// Exactly one of listModel/dataProvider should be set; listModel wins if both are (see __warnIfMisconfigured).
-	readonly property var effectiveModel: root.listModel ? root.listModel : root.__listItems
+	readonly property var effectiveModel: root.listModel ? root.__filteredList(root.listModel, root.__lastFilterText) : root.__listItems
+
+	// False when the subclass applies the filter to its listModel itself
+	property bool filtersListModel: true
+
+	// The rows of an array whose shown columns contain the text; a ListModel is left as it is
+	function __filteredList(model, text) {
+		var lowerText = text ? text.trim().toLowerCase() : ""
+		if (!root.filtersListModel || lowerText === "" || model.count !== undefined || model.length === undefined)
+			return model
+		var result = []
+		for (var i = 0; i < model.length; i++) {
+			var row = model[i]
+			for (var c = 0; c < root.columnIds.length; c++) {
+				var value = row ? row[root.columnIds[c]] : undefined
+				if (value !== undefined && value !== null && String(value).toLowerCase().indexOf(lowerText) >= 0) {
+					result.push(row)
+					break
+				}
+			}
+		}
+		return result
+	}
 
 	function __findItemById(id) {
 		var items = root.effectiveModel
@@ -303,6 +329,10 @@ ViewBase {
 	}
 
 	function openCreate() {
+		if (root.editorDialogComponent) {
+			ModalDialogManager.openDialog(root.editorDialogComponent, {"itemId": ""})
+			return
+		}
 		__clearExtraPages()
 		root.__isCreating = true
 		root.editorTitle = qsTr("Create New %1").arg(root.entityName)
@@ -313,7 +343,7 @@ ViewBase {
 	// A double-clicked row of the table; pages with rows that are not documents override it
 	function openItem(itemId) {
 		var item = root.__findItemById(itemId)
-		if (item && root.canEdit && (root.documentManager || root.customEditorComponent))
+		if (item && root.canEdit && (root.documentManager || root.customEditorComponent || root.editorDialogComponent))
 			root.__openEdit(itemId, item.title || item.id || "", item.description || "")
 	}
 
@@ -322,6 +352,10 @@ ViewBase {
 	}
 
 	function __openEdit(itemId, itemName, itemDescription) {
+		if (root.editorDialogComponent) {
+			ModalDialogManager.openDialog(root.editorDialogComponent, {"itemId": itemId})
+			return
+		}
 		root.__editItemId = itemId
 		root.__isCreating = false
 		__clearExtraPages()

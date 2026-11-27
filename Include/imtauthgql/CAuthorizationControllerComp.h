@@ -42,7 +42,7 @@ public:
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager", false, "TenantManager");
 		I_ASSIGN(m_tenantMembershipManagerCompPtr, "TenantMembershipManager", "Tenant membership manager", false, "TenantMembershipManager");
 		I_ASSIGN(m_bindingManagerCompPtr, "BindingManager", "Tenant entity binding manager for tenant-scoped adaptation of user roles/groups/permissions", false, "TenantEntityBindingManager");
-		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Delegated access resolver for cross-org grants", false, "DelegatedAccessResolver");
+		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Permissions given to the users by the contracts of the organizations", false, "ContractDelegatedAccess");
 		I_ASSIGN(m_roleInfoProviderCompPtr, "RoleInfoProvider", "Role info provider (used for delegated role product validation)", false, "RoleInfoProvider");
 		I_ASSIGN(m_passwordPolicyCompPtr, "PasswordPolicy", "Password policy for password lifetime checks", false, "PasswordPolicy");
 		I_ASSIGN(m_externalLoginControllerCompPtr, "ExternalLoginController", "Sign-in with external identity providers", false, "ExternalLoginController");

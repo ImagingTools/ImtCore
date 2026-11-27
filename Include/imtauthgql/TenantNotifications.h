@@ -39,10 +39,23 @@ static const inline QByteArray s_connectionRequestReceived = QByteArrayLiteral("
 static const inline QByteArray s_connectionRequestApproved = QByteArrayLiteral("imtauth.ConnectionRequestApproved");
 static const inline QByteArray s_connectionRequestRejected = QByteArrayLiteral("imtauth.ConnectionRequestRejected");
 static const inline QByteArray s_connectionRemoved = QByteArrayLiteral("imtauth.ConnectionRemoved");
-static const inline QByteArray s_relationshipProposalReceived = QByteArrayLiteral("imtauth.RelationshipProposalReceived");
-static const inline QByteArray s_relationshipProposalApproved = QByteArrayLiteral("imtauth.RelationshipProposalApproved");
-static const inline QByteArray s_relationshipProposalRejected = QByteArrayLiteral("imtauth.RelationshipProposalRejected");
-static const inline QByteArray s_relationshipRemoved = QByteArrayLiteral("imtauth.RelationshipRemoved");
+static const inline QByteArray s_contractInvitationReceived = QByteArrayLiteral("imtauth.ContractInvitationReceived");
+static const inline QByteArray s_contractChangesRequested = QByteArrayLiteral("imtauth.ContractChangesRequested");
+static const inline QByteArray s_contractTermsChanged = QByteArrayLiteral("imtauth.ContractTermsChanged");
+static const inline QByteArray s_contractPartyRemoved = QByteArrayLiteral("imtauth.ContractPartyRemoved");
+static const inline QByteArray s_contractSigned = QByteArrayLiteral("imtauth.ContractSigned");
+static const inline QByteArray s_contractDeclined = QByteArrayLiteral("imtauth.ContractDeclined");
+static const inline QByteArray s_contractConcluded = QByteArrayLiteral("imtauth.ContractConcluded");
+static const inline QByteArray s_contractCancelled = QByteArrayLiteral("imtauth.ContractCancelled");
+static const inline QByteArray s_contractNoticeGiven = QByteArrayLiteral("imtauth.ContractNoticeGiven");
+static const inline QByteArray s_contractNoticeRevoked = QByteArrayLiteral("imtauth.ContractNoticeRevoked");
+static const inline QByteArray s_contractRenewalStopped = QByteArrayLiteral("imtauth.ContractRenewalStopped");
+static const inline QByteArray s_contractWithdrawn = QByteArrayLiteral("imtauth.ContractWithdrawn");
+static const inline QByteArray s_contractPermissionsWithdrawn = QByteArrayLiteral("imtauth.ContractPermissionsWithdrawn");
+static const inline QByteArray s_contractPermissionsReceived = QByteArrayLiteral("imtauth.ContractPermissionsReceived");
+static const inline QByteArray s_contractSuperseded = QByteArrayLiteral("imtauth.ContractSuperseded");
+static const inline QByteArray s_contractEndsSoon = QByteArrayLiteral("imtauth.ContractEndsSoon");
+static const inline QByteArray s_contractRenewalDeadline = QByteArrayLiteral("imtauth.ContractRenewalDeadline");
 
 
 /**
@@ -60,7 +73,8 @@ inline bool Send(
 			const QByteArray& groupKey = QByteArray(),
 			istd::IInformationProvider::InformationCategory severity = istd::IInformationProvider::IC_INFO,
 			const imtnotify::ObjectLinkInfo& actor = imtnotify::ObjectLinkInfo(),
-			const imtnotify::NotificationArguments& arguments = imtnotify::NotificationArguments())
+			const imtnotify::NotificationArguments& arguments = imtnotify::NotificationArguments(),
+			const QByteArray& productId = QByteArray())
 {
 	if (senderPtr == nullptr || userId.isEmpty()){
 		return false;
@@ -68,6 +82,7 @@ inline bool Send(
 
 	imtnotify::INotificationSender::Audience audience;
 	audience.tenantId = tenantId;
+	audience.productId = productId;
 	audience.userIds = {userId};
 
 	imtnotify::INotificationSender::Message message;
@@ -134,7 +149,7 @@ inline imtnotify::ObjectLinkInfo RequestUserLink(const imtbase::IObjectCollectio
 /**
 	Withdraw a group from every inbox of the tenant.
 */
-inline bool Withdraw(imtnotify::INotificationSender* senderPtr, const QByteArray& tenantId, const QByteArray& groupKey)
+inline bool Withdraw(imtnotify::INotificationSender* senderPtr, const QByteArray& tenantId, const QByteArray& groupKey, const QByteArray& productId = QByteArray())
 {
 	if (senderPtr == nullptr){
 		return false;
@@ -142,6 +157,7 @@ inline bool Withdraw(imtnotify::INotificationSender* senderPtr, const QByteArray
 
 	imtnotify::INotificationSender::Audience audience;
 	audience.tenantId = tenantId;
+	audience.productId = productId;
 
 	return senderPtr->Withdraw(audience, groupKey);
 }

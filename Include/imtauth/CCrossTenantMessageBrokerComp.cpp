@@ -10,6 +10,7 @@
 #include <istd/CChangeNotifier.h>
 
 // ImtCore includes
+#include <imtauth/ContractState.h>
 #include <imtauth/TenantEvents.h>
 #include <imtauth/CollectionSelection.h>
 
@@ -18,52 +19,26 @@ namespace imtauth
 {
 
 
-static bool IsWithinValidityWindow(const QString& validFrom, const QString& validUntil)
-{
-	const QDateTime now = QDateTime::currentDateTimeUtc();
-
-	if (!validFrom.isEmpty()){
-		QDateTime from = QDateTime::fromString(validFrom, Qt::ISODateWithMs);
-		if (from.isValid() && from > now){
-			return false;
-		}
-	}
-
-	if (!validUntil.isEmpty()){
-		QDateTime until = QDateTime::fromString(validUntil, Qt::ISODateWithMs);
-		if (until.isValid() && until < now){
-			return false;
-		}
-	}
-
-	return true;
-}
-
-
-bool CCrossTenantMessageBrokerComp::ValidateRelationship(
+bool CCrossTenantMessageBrokerComp::ValidateLink(
 		const QByteArray& sourceTenantId,
 		const QByteArray& targetTenantId,
-		const QByteArray& relationshipId) const
+		const QByteArray& contractId,
+		const QByteArray& linkId) const
 {
-	if (!m_tenantManagerCompPtr.IsValid()){
-		// No tenant manager wired: relationship validation is skipped so the
-		// broker can still operate in reduced/standalone compositions.
-		return true;
-	}
-
-	ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(sourceTenantId);
-	if (!tenantPtr.IsValid()){
+	IContractInfoUniquePtr contractPtr = m_contractProviderCompPtr->GetContract(contractId);
+	if (!contractPtr.IsValid()){
 		return false;
 	}
 
-	QByteArrayList relIds = tenantPtr->GetRelationshipIds();
-	if (!relIds.contains(relationshipId)){
+	const IContractInfo::Links links = contractPtr->GetLinks();
+	const int linkIndex = FindContractLink(links, linkId);
+	if (linkIndex < 0){
 		return false;
 	}
 
-	// Relationship ID is associated with this tenant — allow access
-	Q_UNUSED(targetTenantId);
-	return true;
+	const IContractInfo::Link& link = links[linkIndex];
+
+	return link.Connects(sourceTenantId, targetTenantId) && link.isMessagingAllowed && IsLinkInForce(*contractPtr, link, QDateTime::currentDateTimeUtc());
 }
 
 
@@ -121,32 +96,38 @@ void CCrossTenantMessageBrokerComp::DispatchToHandlers(CrossTenantMessageInfo& i
 QByteArray CCrossTenantMessageBrokerComp::SendMessage(
 		const QByteArray& sourceTenantId,
 		const QByteArray& targetTenantId,
-		const QByteArray& relationshipId,
+		const QByteArray& contractId,
+		const QByteArray& linkId,
 		CrossTenantMessageType messageType,
 		const QByteArray& payload,
 		const QByteArray& sourceObjectId,
 		const QString& customType,
 		const QString& expiresAt,
-		const QByteArray& contractId)
+		QString* errorMessagePtr)
 {
-	if (!m_messageCollectionCompPtr.IsValid() || !m_messageFactoryCompPtr.IsValid()){
-		SendErrorMessage(0, "Message collection or factory not configured", "CCrossTenantMessageBrokerComp");
+	auto refuse = [this, errorMessagePtr](const QString& reason){
+		SendErrorMessage(0, reason, "CCrossTenantMessageBrokerComp");
+		if (errorMessagePtr != nullptr){
+			*errorMessagePtr = reason;
+		}
+
 		return QByteArray();
+	};
+
+	if (!m_messageCollectionCompPtr.IsValid() || !m_messageFactoryCompPtr.IsValid()){
+		return refuse(QStringLiteral("Message collection or factory not configured"));
 	}
 
-	if (sourceTenantId.isEmpty() || targetTenantId.isEmpty() || relationshipId.isEmpty()){
-		SendErrorMessage(0, "Source tenant, target tenant and relationship are required", "CCrossTenantMessageBrokerComp");
-		return QByteArray();
+	if (sourceTenantId.isEmpty() || targetTenantId.isEmpty() || contractId.isEmpty() || linkId.isEmpty()){
+		return refuse(QStringLiteral("Source tenant, target tenant, contract and link are required"));
 	}
 
 	if (sourceTenantId == targetTenantId){
-		SendErrorMessage(0, "Cross-tenant message cannot reference the same tenant as source and target", "CCrossTenantMessageBrokerComp");
-		return QByteArray();
+		return refuse(QStringLiteral("Cross-tenant message cannot reference the same tenant as source and target"));
 	}
 
-	if (!ValidateRelationship(sourceTenantId, targetTenantId, relationshipId)){
-		SendErrorMessage(0, "No active relationship authorizes this cross-tenant message", "CCrossTenantMessageBrokerComp");
-		return QByteArray();
+	if (!ValidateLink(sourceTenantId, targetTenantId, contractId, linkId)){
+		return refuse(QStringLiteral("No link of a contract in force allows this message"));
 	}
 
 	QByteArray projectedPayload = payload;
@@ -154,8 +135,7 @@ QByteArray CCrossTenantMessageBrokerComp::SendMessage(
 		bool isValid = true;
 		projectedPayload = m_projectionCompPtr->ProjectPayload(messageType, customType, payload, isValid);
 		if (!isValid){
-			SendErrorMessage(0, "Payload rejected by the projection layer", "CCrossTenantMessageBrokerComp");
-			return QByteArray();
+			return refuse(QStringLiteral("Payload rejected by the projection layer"));
 		}
 	}
 
@@ -173,8 +153,8 @@ QByteArray CCrossTenantMessageBrokerComp::SendMessage(
 	info.messageId = messageId;
 	info.sourceTenantId = sourceTenantId;
 	info.targetTenantId = targetTenantId;
-	info.relationshipId = relationshipId;
 	info.contractId = contractId;
+	info.linkId = linkId;
 	info.sourceObjectId = sourceObjectId;
 	info.messageType = messageType;
 	info.customType = customType;
@@ -263,10 +243,10 @@ CrossTenantMessages CCrossTenantMessageBrokerComp::GetOutgoingMessages(const QBy
 }
 
 
-CrossTenantMessages CCrossTenantMessageBrokerComp::GetMessagesByRelationship(const QByteArray& relationshipId) const
+CrossTenantMessages CCrossTenantMessageBrokerComp::GetMessagesByContract(const QByteArray& contractId) const
 {
-	return CollectMessages("RelationshipId", relationshipId, [&relationshipId](const CrossTenantMessageInfo& info){
-		return info.relationshipId == relationshipId;
+	return CollectMessages("ContractId", contractId, [&contractId](const CrossTenantMessageInfo& info){
+		return info.contractId == contractId;
 	});
 }
 

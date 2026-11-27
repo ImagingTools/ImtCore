@@ -13,8 +13,6 @@
 #include <imtauth/ITenantConnectionRequestManager.h>
 #include <imtauth/ITenantConnectionRequestInfo.h>
 #include <imtauth/ITenantConnectionInfo.h>
-#include <imtauth/ITenantRelationshipProposalInfo.h>
-#include <imtauth/ITenantRelationshipInfo.h>
 #include <imtauth/ITenantManager.h>
 #include <imtservergql/CGqlPublisherCompBase.h>
 #include <imtbase/IObjectCollection.h>
@@ -39,12 +37,11 @@ namespace imtauthgql
 	  (new request = ConnectionRequestReceived, approval = ConnectionRequestApproved,
 	  rejection = ConnectionRequestRejected)
 	- Connection removals (ConnectionRemoved)
-	- Relationship proposal lifecycle: the counterparty owner receives a new
-	  proposal (RelationshipProposalReceived), the initiator owner learns about
-	  the answer (RelationshipProposalApproved, RelationshipProposalRejected)
 
 	Notifications are delivered only to subscribers whose authenticated user
 	matches the target userId (tenant owner).
+	Every change is also announced by OnOrganizationConnectionsChanged to the
+	sessions working in each organization it touched, so their address books follow.
 */
 class CConnectionCodesNotificationPublisherComp:
 			public imtservergql::CGqlPublisherCompBase,
@@ -88,6 +85,7 @@ private:
 				const QByteArray& tenantId,
 				const QByteArray& relatedId,
 				const QByteArray& partnerTenantId) const;
+	void PublishConnectionsChanged(const QByteArray& tenantId) const;
 
 	void SendToNotificationCenter(
 				const QByteArray& targetUserId,

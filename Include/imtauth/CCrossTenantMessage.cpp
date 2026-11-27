@@ -62,10 +62,10 @@ bool CCrossTenantMessage::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_info.targetTenantId);
 	retVal = retVal && archive.EndTag(targetTag);
 
-	iser::CArchiveTag relationshipTag("RelationshipId", "Relationship ID", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(relationshipTag);
-	retVal = retVal && archive.Process(m_info.relationshipId);
-	retVal = retVal && archive.EndTag(relationshipTag);
+	iser::CArchiveTag linkTag("LinkId", "Link of the contract", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(linkTag);
+	retVal = retVal && archive.Process(m_info.linkId);
+	retVal = retVal && archive.EndTag(linkTag);
 
 	iser::CArchiveTag contractTag("ContractId", "Contract ID", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(contractTag);

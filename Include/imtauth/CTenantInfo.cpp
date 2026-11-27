@@ -152,46 +152,6 @@ void CTenantInfo::SetUpdatedAt(const QString& updatedAt)
 }
 
 
-QByteArrayList CTenantInfo::GetRelationshipIds() const
-{
-	return m_relationshipIds;
-}
-
-
-void CTenantInfo::SetRelationshipIds(const QByteArrayList& relationshipIds)
-{
-	if (m_relationshipIds != relationshipIds){
-		istd::CChangeNotifier notifier(this);
-
-		m_relationshipIds = relationshipIds;
-	}
-}
-
-
-void CTenantInfo::AddRelationshipId(const QByteArray& relationshipId)
-{
-	if (!m_relationshipIds.contains(relationshipId)){
-		istd::CChangeNotifier notifier(this);
-
-		m_relationshipIds.append(relationshipId);
-	}
-}
-
-
-bool CTenantInfo::RemoveRelationshipId(const QByteArray& relationshipId)
-{
-	int idx = m_relationshipIds.indexOf(relationshipId);
-	if (idx >= 0){
-		istd::CChangeNotifier notifier(this);
-
-		m_relationshipIds.removeAt(idx);
-
-		return true;
-	}
-
-	return false;
-}
-
 
 QByteArrayList CTenantInfo::GetTenantPermissions() const
 {
@@ -311,7 +271,6 @@ bool CTenantInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_updatedAt);
 	retVal = retVal && archive.EndTag(updatedAtTag);
 
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_relationshipIds, "RelationshipIds", "RelationshipId");
 
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_tenantPermissions, "TenantPermissions", "TenantPermission");
 
@@ -350,7 +309,7 @@ bool CTenantInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/
 		m_isActive = sourcePtr->m_isActive;
 		m_createdAt = sourcePtr->m_createdAt;
 		m_updatedAt = sourcePtr->m_updatedAt;
-		m_relationshipIds = sourcePtr->m_relationshipIds;
+
 		m_tenantPermissions = sourcePtr->m_tenantPermissions;
 		m_parentTenantId = sourcePtr->m_parentTenantId;
 		m_depth = sourcePtr->m_depth;
@@ -386,7 +345,7 @@ bool CTenantInfo::ResetData(CompatibilityMode /*mode*/)
 	m_isActive = true;
 	m_createdAt.clear();
 	m_updatedAt.clear();
-	m_relationshipIds.clear();
+
 	m_tenantPermissions.clear();
 	m_parentTenantId.clear();
 	m_depth = 0;

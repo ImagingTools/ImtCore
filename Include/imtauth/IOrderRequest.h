@@ -50,8 +50,8 @@ struct OrderRequestInfo
 	QByteArray messageId;
 	QByteArray sourceTenantId;
 	QByteArray targetTenantId;
-	QByteArray relationshipId;
 	QByteArray contractId;
+	QByteArray linkId;
 	QByteArray sourceOrderId;
 	QString articleNumber;
 	int quantity = 0;
@@ -67,8 +67,8 @@ struct OrderRequestInfo
 			&& messageId == other.messageId
 			&& sourceTenantId == other.sourceTenantId
 			&& targetTenantId == other.targetTenantId
-			&& relationshipId == other.relationshipId
 			&& contractId == other.contractId
+			&& linkId == other.linkId
 			&& sourceOrderId == other.sourceOrderId
 			&& articleNumber == other.articleNumber
 			&& quantity == other.quantity
@@ -114,9 +114,9 @@ public:
 	virtual OrderRequests GetOrderRequests(const QByteArray& targetTenantId) const = 0;
 
 	/**
-		Get all order requests associated with a specific relationship.
+		Get all order requests made under a contract.
 	*/
-	virtual OrderRequests GetOrderRequestsByRelationship(const QByteArray& relationshipId) const = 0;
+	virtual OrderRequests GetOrderRequestsByContract(const QByteArray& contractId) const = 0;
 
 	/**
 		Confirm an order request and report the confirmation back to the source

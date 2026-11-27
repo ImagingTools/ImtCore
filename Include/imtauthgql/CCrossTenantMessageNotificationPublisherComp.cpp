@@ -200,7 +200,7 @@ void CCrossTenantMessageNotificationPublisherComp::PublishNotification(
 	notification.messageId = message.messageId;
 	notification.sourceTenantId = message.sourceTenantId;
 	notification.targetTenantId = message.targetTenantId;
-	notification.relationshipId = message.relationshipId;
+	notification.contractId = message.contractId;
 	notification.messageType = ToSdlMessageType(message.messageType);
 	notification.status = ToSdlMessageStatus(message.status);
 	notification.tenantName = tenantName;

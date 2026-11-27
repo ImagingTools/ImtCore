@@ -29,7 +29,7 @@ public:
 	QByteArray SendMessage(
 				const QByteArray& sourceTenantId,
 				const QByteArray& targetTenantId,
-				const QByteArray& relationshipId,
+				const QByteArray& linkId,
 				CrossTenantMessageType messageType,
 				const QByteArray& payload,
 				const QByteArray& sourceObjectId = QByteArray())
@@ -38,7 +38,7 @@ public:
 		info.messageId = QByteArray::number(++m_counter);
 		info.sourceTenantId = sourceTenantId;
 		info.targetTenantId = targetTenantId;
-		info.relationshipId = relationshipId;
+		info.linkId = linkId;
 		info.sourceObjectId = sourceObjectId;
 		info.messageType = messageType;
 		info.payload = payload;
@@ -74,7 +74,7 @@ public:
 		info.messageId = messageInfo.messageId;
 		info.sourceTenantId = messageInfo.sourceTenantId;
 		info.targetTenantId = messageInfo.targetTenantId;
-		info.relationshipId = messageInfo.relationshipId;
+		info.linkId = messageInfo.linkId;
 		info.sourceOrderId = messageInfo.sourceObjectId;
 		info.articleNumber = payloadObject.value("articleNumber").toString();
 		info.quantity = payloadObject.value("quantity").toInt();
@@ -110,7 +110,7 @@ public:
 			m_brokerPtr->SendMessage(
 						info.targetTenantId,
 						info.sourceTenantId,
-						info.relationshipId,
+						info.linkId,
 						feedbackType,
 						QJsonDocument(feedbackObject).toJson(QJsonDocument::Compact),
 						info.orderRequestId);

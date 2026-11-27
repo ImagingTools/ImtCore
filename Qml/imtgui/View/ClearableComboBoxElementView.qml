@@ -25,8 +25,8 @@ ComboBoxElementView {
 				id: cb;
 				
 				anchors.left: parent.left;
-				anchors.right: clearButton.left;
-				anchors.rightMargin: Style.marginM
+				anchors.right: clearButton.visible ? clearButton.left : parent.right;
+				anchors.rightMargin: clearButton.visible ? Style.marginM : 0
 				
 				height: Style.controlHeightM;
 				
@@ -74,7 +74,9 @@ ComboBoxElementView {
 				
 				text: qsTr("Clear");
 				
-				enabled: root.changeable && root.currentIndex >= 0;
+				// A field that cannot be changed has nothing to clear
+				visible: root.changeable;
+				enabled: root.currentIndex >= 0;
 				
 				onClicked: {
 					root.currentIndex = -1;

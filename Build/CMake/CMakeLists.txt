@@ -638,6 +638,12 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_subdirectory("${TESTS_DIR}/OrganizationLookupTest/CMake" "${AUX_INCLUDE_DIR}/OrganizationLookupTest")
 		add_dependencies(OrganizationLookupTest imtbase imtauth imtaccount)
 
+		add_subdirectory("${TESTS_DIR}/ContractTest/CMake" "${AUX_INCLUDE_DIR}/ContractTest")
+		add_dependencies(ContractTest imtbase imtauth)
+
+		add_subdirectory("${TESTS_DIR}/ContractNotificationTest/CMake" "${AUX_INCLUDE_DIR}/ContractNotificationTest")
+		add_dependencies(ContractNotificationTest imtbase imtauth imtauthgql)
+
 		add_subdirectory("${TESTS_DIR}/UserControllerTest/CMake" "${AUX_INCLUDE_DIR}/UserControllerTest")
 		add_dependencies(UserControllerTest imtbase imtauth imtaccount imtcrypt imtgql imtservergql imtauthsdl imtauthgql)
 

@@ -13,7 +13,6 @@
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/ITenantEntityBindingManager.h>
 #include <imtauth/IDelegatedAccess.h>
-#include <imtauth/IRoleInfoProvider.h>
 #include <imtauth/IPasswordPolicy.h>
 
 // Generated includes
@@ -47,8 +46,7 @@ public:
 		I_ASSIGN(m_hashCalculatorCompPtr, "HashCalculator", "Hash calculator for password hashing", true, "HashCalculator");
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager for auto-adding membership on user save", false, "MembershipManager");
 		I_ASSIGN(m_bindingManagerCompPtr, "BindingManager", "Tenant entity binding manager for tenant-scoped adaptation of user roles/groups/permissions", false, "TenantEntityBindingManager");
-		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Delegated access resolver used to enrich the user with roles delegated via cross-org grants", false, "DelegatedAccessResolver");
-		I_ASSIGN(m_roleInfoProviderCompPtr, "RoleInfoProvider", "Role info provider for delegated role product validation", false, "RoleInfoProvider");
+		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Permissions given to the users by the contracts of the organizations", false, "ContractDelegatedAccess");
 		I_ASSIGN(m_passwordPolicyCompPtr, "PasswordPolicy", "Password policy checked for a password set in the user editor", false, "PasswordPolicy");
 	I_END_COMPONENT
 
@@ -72,7 +70,6 @@ private:
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 	I_REF(imtauth::ITenantEntityBindingManager, m_bindingManagerCompPtr);
 	I_REF(imtauth::IDelegatedAccess, m_delegatedAccessCompPtr);
-	I_REF(imtauth::IRoleInfoProvider, m_roleInfoProviderCompPtr);
 	I_REF(imtauth::IPasswordPolicy, m_passwordPolicyCompPtr);
 
 	mutable QMutex m_pendingTenantIdsMutex;

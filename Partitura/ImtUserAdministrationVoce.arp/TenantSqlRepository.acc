@@ -80,9 +80,6 @@
         <Element Id="TenantDatabaseDelegate" PackageId="ImtAuthDbPck" ComponentId="TenantDatabaseDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="AutoCreateCrossOrgGrantsTable" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="AutoCreateInvitationsTable" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
@@ -92,14 +89,8 @@
                     <AttributeInfo Id="AutoCreatePermissionsTable" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="AutoCreateRelationshipsTable" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="AutoCreateTable" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CreateCrossOrgGrantsTableScriptPath" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value=":/SQL/Postgres/CreateCrossOrgGrantsTable.sql"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CreateInvitationsTableScriptPath" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value=":/SQL/Postgres/CreateTenantInvitationsTable.sql"/>
@@ -110,14 +101,8 @@
                     <AttributeInfo Id="CreatePermissionsTableScriptPath" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value=":/SQL/Postgres/CreateTenantPermissionsTable.sql"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="CreateRelationshipsTableScriptPath" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value=":/SQL/Postgres/CreateTenantRelationshipsTable.sql"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="CreateTableScriptPath" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value=":/SQL/Postgres/CreateTenantsTable.sql"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CrossOrgGrantsTableName" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="CrossOrgGrants"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>
@@ -131,9 +116,6 @@
                     <AttributeInfo Id="PermissionsTableName" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="TenantPermissions"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="RelationshipsTableName" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="TenantRelationships"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="TableName" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Tenants"/>
                     </AttributeInfo>
@@ -142,6 +124,12 @@
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AutoCreateConnectionsTable" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CreateConnectionsTableScriptPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value=":/SQL/Postgres/CreateTenantConnectionsTable.sql"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

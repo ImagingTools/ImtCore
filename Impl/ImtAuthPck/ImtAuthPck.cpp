@@ -286,15 +286,6 @@ I_EXPORT_COMPONENT(
 			"Manager for tenant invitations and accept/reject/revoke flows",
 			"Tenant Invitation Manager");
 
-I_EXPORT_COMPONENT(
-			CrossOrgGrantInfo,
-			"Entity representing a cross-org grant delegating access between tenants",
-			"Cross Org Grant Info");
-
-I_EXPORT_COMPONENT(
-			CrossOrgGrantManager,
-			"Manager for cross-org grants (create/revoke/query access delegation)",
-			"Cross Org Grant Manager");
 
 I_EXPORT_COMPONENT(
 			DocumentShareInfo,
@@ -307,19 +298,79 @@ I_EXPORT_COMPONENT(
 			"Document Share Manager");
 
 I_EXPORT_COMPONENT(
-			TenantRelationshipProvider,
-			"Provider of the related tenants based on the local tenant relationships",
-			"Tenant Relationship Provider");
-
-I_EXPORT_COMPONENT(
 			ContractInfo,
-			"Entity representing a cooperation contract between two tenants",
+			"Contract of organizations: its terms, parties, links, allocations and the facts of its life",
 			"Contract Info");
 
 I_EXPORT_COMPONENT(
+			ContractPartyPrivateInfo,
+			"Record a party of a contract keeps for itself",
+			"Contract Party Private Info");
+
+I_EXPORT_COMPONENT(
+			ContractEventInfo,
+			"Entry of the journal of a contract",
+			"Contract Event Info");
+
+I_EXPORT_COMPONENT(
 			ContractManager,
-			"Manager for cooperation contracts (create/update-status/terminate/query)",
+			"Life of the contracts of organizations: drafts, review, signatures, leaving and end",
 			"Contract Manager");
+
+I_EXPORT_COMPONENT(
+			ContractReminder,
+			"Reminds the parties of the deadlines, the ends and the renewals of their contracts",
+			"Contract Reminder Deadline");
+
+I_EXPORT_COMPONENT(
+			ContractRelationshipProvider,
+			"Related organizations as the links of their contracts show them",
+			"Contract Relationship Provider");
+
+I_EXPORT_COMPONENT(
+			ContractDelegatedAccess,
+			"Permissions the users get in other organizations from the contracts of their organizations",
+			"Contract Delegated Access");
+
+I_EXPORT_COMPONENT(
+			PartyRoleInfo,
+			"Role of the parties of an organization",
+			"Party Role Info");
+
+I_EXPORT_COMPONENT(
+			SystemPartyRole,
+			"System role of the parties of contracts declared in an .acc file",
+			"System Party Role");
+
+I_EXPORT_COMPONENT(
+			PartyRoleCatalog,
+			"Catalog of the roles of the parties: system roles and roles of the organizations",
+			"Party Role Catalog");
+
+I_EXPORT_COMPONENT(
+			ContractTypeInfo,
+			"Type of contracts of an organization",
+			"Contract Type Info");
+
+I_EXPORT_COMPONENT(
+			SystemContractType,
+			"System type of contracts declared in an .acc file",
+			"System Contract Type");
+
+I_EXPORT_COMPONENT(
+			ContractTypeCatalog,
+			"Catalog of the types of contracts: system types and types of the organizations",
+			"Contract Type Catalog");
+
+I_EXPORT_COMPONENT(
+			TenantDirectoryProfile,
+			"Profile of an organization in the directory",
+			"Tenant Directory Profile");
+
+I_EXPORT_COMPONENT(
+			TenantDirectory,
+			"Directory of the organizations that want to be found",
+			"Tenant Directory");
 
 I_EXPORT_COMPONENT(
 			TenantConnectionRequestInfo,
@@ -341,15 +392,6 @@ I_EXPORT_COMPONENT(
 			"Entity representing an active connection between two tenants",
 			"Tenant Connection Info");
 
-I_EXPORT_COMPONENT(
-			TenantRelationshipProposalInfo,
-			"Entity representing a bilateral relationship proposal between connected tenants",
-			"Tenant Relationship Proposal Info");
-
-I_EXPORT_COMPONENT(
-			TenantRelationshipInfo,
-			"Entity representing a directional relationship between two connected tenants",
-			"Tenant Relationship Info");
 
 I_EXPORT_COMPONENT(
 			CrossTenantMessageInfo,
@@ -381,10 +423,6 @@ I_EXPORT_COMPONENT(
 			"Provides default document name from tenant name",
 			"Tenant Document Name Provider");
 
-I_EXPORT_COMPONENT(
-			TenantRelationshipDocumentNameProvider,
-			"Provides default document name from target tenant name",
-			"Tenant Relationship Document Name Provider");
 
 I_EXPORT_COMPONENT(
 			RoleDocumentNameProvider,
@@ -406,15 +444,6 @@ I_EXPORT_COMPONENT(
 			"Tenant document validator",
 			"Tenant Document Validator");
 
-I_EXPORT_COMPONENT(
-			CrossOrgGrantDocumentValidator,
-			"Cross org grant document validator",
-			"Cross Org Grant Document Validator");
-
-I_EXPORT_COMPONENT(
-			RelationshipDocumentValidator,
-			"Relationship document validator",
-			"Relationship Document Validator");
 
 I_EXPORT_COMPONENT(
 			RoleDocumentValidator,
@@ -430,11 +459,6 @@ I_EXPORT_COMPONENT(
 			UserGroupDocumentValidator,
 			"User group document validator",
 			"User Group Document Validator");
-
-I_EXPORT_COMPONENT(
-			DelegatedAccessResolver,
-			"Resolver composing membership and cross-org grants for delegated access checks",
-			"Delegated Access Resolver");
 
 
 } // namespace ImtAuthPck

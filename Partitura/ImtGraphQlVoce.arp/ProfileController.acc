@@ -32,9 +32,6 @@
                     <AttributeInfo Id="BindingManager" Type="Reference" ExportId="BindingManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="CrossOrgGrantManager" Type="Reference" ExportId="CrossOrgGrantManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="DelegatedAccess" Type="Reference" ExportId="DelegatedAccess">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

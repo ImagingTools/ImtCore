@@ -16,7 +16,7 @@ imtauth::OrderRequestInfo MakeSampleInfo()
 	info.messageId = "msg-1";
 	info.sourceTenantId = "tenantB";
 	info.targetTenantId = "tenantA";
-	info.relationshipId = "rel-1";
+	info.linkId = "link-1";
 	info.sourceOrderId = "order-42";
 	info.articleNumber = "A-1";
 	info.quantity = 5;
@@ -35,7 +35,7 @@ imtauth::CrossTenantMessageInfo MakeOrderRequestMessage()
 	info.messageId = "msg-7";
 	info.sourceTenantId = "tenantB";
 	info.targetTenantId = "tenantA";
-	info.relationshipId = "rel-1";
+	info.linkId = "link-1";
 	info.sourceObjectId = "order-42";
 	info.messageType = imtauth::CTMT_ORDER_REQUEST;
 	info.payload = "{\"articleNumber\":\"A-1\",\"quantity\":5,\"note\":\"urgent\"}";
@@ -116,7 +116,7 @@ void COrderRequestTest::testHandleMessage_MaterializesOrderRequest()
 	imtauth::OrderRequestInfo materialized = m_handlerPtr->GetOrderRequest(targetObjectId);
 	QCOMPARE(materialized.sourceTenantId, QByteArray("tenantB"));
 	QCOMPARE(materialized.targetTenantId, QByteArray("tenantA"));
-	QCOMPARE(materialized.relationshipId, QByteArray("rel-1"));
+	QCOMPARE(materialized.linkId, QByteArray("link-1"));
 	QCOMPARE(materialized.sourceOrderId, QByteArray("order-42"));
 	QCOMPARE(materialized.articleNumber, QString("A-1"));
 	QCOMPARE(materialized.quantity, 5);
@@ -148,7 +148,7 @@ void COrderRequestTest::testConfirmOrderRequest_SendsConfirmationFeedback()
 	// Feedback travels back in the reverse direction.
 	QCOMPARE(feedback.sourceTenantId, QByteArray("tenantA"));
 	QCOMPARE(feedback.targetTenantId, QByteArray("tenantB"));
-	QCOMPARE(feedback.relationshipId, QByteArray("rel-1"));
+	QCOMPARE(feedback.linkId, QByteArray("link-1"));
 
 	QJsonObject payloadObject = QJsonDocument::fromJson(feedback.payload).object();
 	QCOMPARE(payloadObject.value("sourceOrderId").toString(), QString("order-42"));

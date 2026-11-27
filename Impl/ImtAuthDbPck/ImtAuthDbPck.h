@@ -18,14 +18,16 @@
 #include <imtauthdb/CTenantMembershipDbDelegateComp.h>
 #include <imtauthdb/CTenantEntityBindingDbDelegateComp.h>
 #include <imtauthdb/CTenantInvitationDbDelegateComp.h>
-#include <imtauthdb/CCrossOrgGrantDbDelegateComp.h>
 #include <imtauthdb/CDocumentShareDbDelegateComp.h>
 #include <imtauthdb/CContractDbDelegateComp.h>
+#include <imtauthdb/CContractPartyPrivateDbDelegateComp.h>
+#include <imtauthdb/CContractEventDbDelegateComp.h>
+#include <imtauthdb/CPartyRoleDbDelegateComp.h>
+#include <imtauthdb/CContractTypeDbDelegateComp.h>
+#include <imtauthdb/CTenantDirectoryProfileDbDelegateComp.h>
 #include <imtauthdb/CTenantConnectionRequestDbDelegateComp.h>
 #include <imtauthdb/CTenantConnectionCodeDbDelegateComp.h>
 #include <imtauthdb/CTenantConnectionDbDelegateComp.h>
-#include <imtauthdb/CTenantRelationshipProposalDbDelegateComp.h>
-#include <imtauthdb/CTenantRelationshipDbDelegateComp.h>
 #include <imtauthdb/CCrossTenantMessageDbDelegateComp.h>
 #include <imtauthdb/COrderRequestDbDelegateComp.h>
 #include <imtauthdb/CPermissionPathMigrationComp.h>
@@ -56,14 +58,16 @@ typedef imtauthdb::CTenantDbDelegateComp TenantDatabaseDelegate;
 typedef imtauthdb::CTenantMembershipDbDelegateComp TenantMembershipDatabaseDelegate;
 typedef imtauthdb::CTenantEntityBindingDbDelegateComp TenantEntityBindingDatabaseDelegate;
 typedef imtauthdb::CTenantInvitationDbDelegateComp TenantInvitationDatabaseDelegate;
-typedef imtauthdb::CCrossOrgGrantDbDelegateComp CrossOrgGrantDatabaseDelegate;
 typedef imtauthdb::CDocumentShareDbDelegateComp DocumentShareDatabaseDelegate;
 typedef imtauthdb::CContractDbDelegateComp ContractDatabaseDelegate;
+typedef imtauthdb::CContractPartyPrivateDbDelegateComp ContractPartyPrivateDatabaseDelegate;
+typedef imtauthdb::CContractEventDbDelegateComp ContractEventDatabaseDelegate;
+typedef imtauthdb::CPartyRoleDbDelegateComp PartyRoleDatabaseDelegate;
+typedef imtauthdb::CContractTypeDbDelegateComp ContractTypeDatabaseDelegate;
+typedef imtauthdb::CTenantDirectoryProfileDbDelegateComp TenantDirectoryProfileDatabaseDelegate;
 typedef imtauthdb::CTenantConnectionRequestDbDelegateComp TenantConnectionRequestDatabaseDelegate;
 typedef imtauthdb::CTenantConnectionCodeDbDelegateComp TenantConnectionCodeDatabaseDelegate;
 typedef imtauthdb::CTenantConnectionDbDelegateComp TenantConnectionDatabaseDelegate;
-typedef imtauthdb::CTenantRelationshipProposalDbDelegateComp TenantRelationshipProposalDatabaseDelegate;
-typedef imtauthdb::CTenantRelationshipDbDelegateComp TenantRelationshipDatabaseDelegate;
 typedef imtauthdb::CCrossTenantMessageDbDelegateComp CrossTenantMessageDatabaseDelegate;
 typedef imtauthdb::CPermissionPathMigrationComp PermissionPathMigration;
 typedef imtauthdb::COrderRequestDbDelegateComp OrderRequestDatabaseDelegate;

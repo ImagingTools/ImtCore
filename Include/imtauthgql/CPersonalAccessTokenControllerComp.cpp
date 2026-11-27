@@ -137,7 +137,6 @@ bool CPersonalAccessTokenControllerComp::AreRequestedScopesAllowed(
 				productId,
 				m_bindingManagerCompPtr.IsValid() ? m_bindingManagerCompPtr.GetPtr() : nullptr,
 				m_delegatedAccessCompPtr.IsValid() ? m_delegatedAccessCompPtr.GetPtr() : nullptr,
-				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
 				m_roleInfoProviderCompPtr.IsValid() ? m_roleInfoProviderCompPtr.GetPtr() : nullptr);
 	for (const QByteArray& scope : scopes){
 		if (!imtauth::HasPermission(callerPermissions, scope)){

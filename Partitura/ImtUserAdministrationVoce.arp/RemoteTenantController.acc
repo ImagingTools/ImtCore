@@ -21,6 +21,9 @@
                             <Values>
                                 <Value>RemoteCollectionController</Value>
                                 <Value>RemoteTenantController</Value>
+                                <Value>RemoteContractController</Value>
+                                <Value>RemoteContractCatalogController</Value>
+                                <Value>RemoteTenantDirectoryController</Value>
                                 <Value>TenantRemoteRepresentationController</Value>
                                 <Value>RemoteCommandsController</Value>
                                 <Value>RemoteDocumentRevisionController</Value>
@@ -50,11 +53,11 @@
                                 <Value>OnMembershipNotification</Value>
                                 <Value>OnOrganizationMembersChanged</Value>
                                 <Value>OnConnectionCodesNotification</Value>
-                                <Value>OnTenantRelationshipsCollectionChanged</Value>
-                                <Value>OnCrossTenantMessageNotification</Value>
+                                <Value>OnOrganizationConnectionsChanged</Value>
+                                                                <Value>OnCrossTenantMessageNotification</Value>
+                                <Value>OnContractNotification</Value>
                                 <Value>OnNotificationEvent</Value>
-                                <Value>OnCrossOrgGrantsCollectionChanged</Value>
-                                <Value>OnUsersForInvitationCollectionChanged</Value>
+                                                                <Value>OnUsersForInvitationCollectionChanged</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -83,6 +86,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Tenants</Value>
+                                <Value>DirectoryProfiles</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -118,9 +122,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Tenants</Value>
-                                <Value>TenantRelationships</Value>
-                                <Value>CrossOrgGrants</Value>
-                            </Values>
+                                                                                            </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -158,9 +160,7 @@
                             <Values>
                                 <Value>Tenant</Value>
                                 <Value>Tenants</Value>
-                                <Value>TenantRelationship</Value>
-                                <Value>CrossOrgGrants</Value>
-                                <Value>CrossOrgGrant</Value>
+                                <Value>Contract</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -206,9 +206,7 @@
                             <Values>
                                 <Value>UsersForInvitation</Value>
                                 <Value>TenantConnections</Value>
-                                <Value>TenantRelationships</Value>
-                                <Value>CrossOrgGrants</Value>
-                            </Values>
+                                                                                            </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -298,10 +296,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>GetTenantList</Value>
-                                <Value>UpdateRelationshipFromRepresentation</Value>
-                                <Value>GetRelationshipRepresentation</Value>
-                                <Value>UpdateGrantFromRepresentation</Value>
-                                <Value>GetGrantRepresentation</Value>
+                                <Value>DirectoryProfilesList</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -323,6 +318,60 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="RemoteContractController" PackageId="ImtAuthGqlPck" ComponentId="RemoteContractController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RemoteContractCatalogController" PackageId="ImtAuthGqlPck" ComponentId="RemoteContractCatalogController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RemoteTenantDirectoryController" PackageId="ImtAuthGqlPck" ComponentId="RemoteTenantDirectoryController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
@@ -331,5 +380,6 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="RemoteTenantController" ComponentId="RemoteTenantController"/>
+        <Component ExportedId="RemoteContractController" ComponentId="RemoteContractController"/>
     </ExportedComponents>
 </Acf>

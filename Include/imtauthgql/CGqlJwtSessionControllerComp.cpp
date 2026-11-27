@@ -6,6 +6,7 @@
 #include <iser/CJsonMemWriteArchive.h>
 
 // ImtCore includes
+#include <imtgql/imtgql.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Sessions.h>
 #include <imtauth/ITenantInfo.h>
 #include <imtauth/IUserInfo.h>
@@ -110,8 +111,7 @@ imtauth::ISessionAuthorizationProvider::SessionAuthorization CGqlJwtSessionContr
 		m_roleCollectionCompPtr.GetPtr(),
 		m_userGroupCollectionCompPtr.GetPtr(),
 		m_bindingManagerCompPtr.GetPtr(),
-		m_delegatedAccessCompPtr.GetPtr(),
-		m_membershipManagerCompPtr.GetPtr()
+		m_delegatedAccessCompPtr.GetPtr()
 	};
 	istd::IChangeableUniquePtr userPtr;
 	switch (ComputeTenantUser(sources, claims.userId, claims.tenantId, productId, userPtr, message)){
@@ -446,7 +446,7 @@ sdl::V1_0::imtauth::CCreateNewSessionPayload CGqlJwtSessionControllerComp::OnCre
 		}
 
 		QString tenantError;
-		if (!CanUseTenant(userId, tenantId, tenantError)){
+		if (!CanUseTenant(userId, tenantId, imtgql::GetRequestProductId(gqlRequest), tenantError)){
 			response.ok = false;
 			response.errorMessage = tenantError;
 			return response;
@@ -498,7 +498,7 @@ sdl::V1_0::imtauth::CSelectTenantPayload CGqlJwtSessionControllerComp::OnSelectT
 
 	if (!tenantId.isEmpty()){
 		QString tenantError;
-		if (!CanUseTenant(userId, tenantId, tenantError)){
+		if (!CanUseTenant(userId, tenantId, imtgql::GetRequestProductId(gqlRequest), tenantError)){
 			response.ok = false;
 			response.errorMessage = tenantError;
 			return response;
@@ -688,6 +688,7 @@ QByteArray CGqlJwtSessionControllerComp::GetAuthenticatedUserId(const ::imtgql::
 bool CGqlJwtSessionControllerComp::CanUseTenant(
 			const QByteArray& userId,
 			const QByteArray& tenantId,
+			const QByteArray& productId,
 			QString& errorMessage) const
 {
 	if (tenantId.isEmpty()){
@@ -726,23 +727,9 @@ bool CGqlJwtSessionControllerComp::CanUseTenant(
 		return true;
 	}
 
-	// Check delegated access via cross-org grants
-	if (m_delegatedAccessCompPtr.IsValid()){
-		// Resolve user's home tenants from direct memberships
-		const imtauth::ITenantMembershipManager::MembershipIds membershipIds = m_membershipManagerCompPtr->GetMembershipsByUser(userId);
-		for (const QByteArray& membershipId : membershipIds){
-			imtauth::ITenantMembershipUniquePtr homeMembershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
-			if (!homeMembershipPtr.IsValid() || !homeMembershipPtr->IsActive()){
-				continue;
-			}
-			QByteArray homeTenantId = homeMembershipPtr->GetTenantId();
-			if (homeTenantId.isEmpty()){
-				continue;
-			}
-			if (m_delegatedAccessCompPtr->IsDelegatedAccess(userId, homeTenantId, tenantId)){
-				return true;
-			}
-		}
+	// Permissions given to the user by the contracts of the organization
+	if (m_delegatedAccessCompPtr.IsValid() && m_delegatedAccessCompPtr->HasDelegatedAccess(userId, tenantId, productId)){
+		return true;
 	}
 
 	errorMessage = QStringLiteral("You are not an active member of this organization");

@@ -35,6 +35,8 @@ public:
 	virtual void SetTargetTenantName(const QString& tenantName) override;
 	virtual QByteArrayList GetTargetGroupIds() const override;
 	virtual void SetTargetGroupIds(const QByteArrayList& groupIds) override;
+	virtual QByteArray GetContractId() const override;
+	virtual void SetContractId(const QByteArray& contractId) override;
 	virtual AccessLevel GetAccessLevel() const override;
 	virtual void SetAccessLevel(AccessLevel accessLevel) override;
 	virtual ShareStatus GetStatus() const override;
@@ -69,6 +71,7 @@ protected:
 	QByteArray m_targetTenantId;
 	QString m_targetTenantName;
 	QByteArrayList m_targetGroupIds;
+	QByteArray m_contractId;
 	AccessLevel m_accessLevel;
 	ShareStatus m_status;
 	QDateTime m_validUntil;

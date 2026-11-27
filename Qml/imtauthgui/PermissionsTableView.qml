@@ -1044,10 +1044,11 @@ Item {
 
 				property int row: model.row
 				property bool isGroup: root.__isGroup[rowItem.row] === true
-				property int checkState: root.__revision >= 0 ? root.__rowState[rowItem.row] : Qt.Unchecked
+				// A delegate of a removed row reads nothing while the model is rebuilt
+				property int checkState: root.__revision >= 0 && root.__rowState[rowItem.row] !== undefined ? root.__rowState[rowItem.row] : Qt.Unchecked
 				property bool checkActive: root.__revision >= 0 ? !root.__rowLocked[rowItem.row] && !root.readOnly : false
-				property string badge: root.__revision >= 0 ? root.__rowBadge[rowItem.row] : ""
-				property string hint: root.__revision >= 0 ? root.__rowHint[rowItem.row] : ""
+				property string badge: root.__revision >= 0 && root.__rowBadge[rowItem.row] !== undefined ? root.__rowBadge[rowItem.row] : ""
+				property string hint: root.__revision >= 0 && root.__rowHint[rowItem.row] !== undefined ? root.__rowHint[rowItem.row] : ""
 				property bool expanded: root.__revision >= 0 ? root.__expanded[rowItem.row] === true : false
 				property bool selected: root.__currentRow === rowItem.row
 				property bool hovered: false
@@ -1188,7 +1189,7 @@ Item {
 					anchors.leftMargin: Style.spacingS
 					anchors.right: rowItem.isGroup ? counterText.left : badgeItem.visible ? badgeItem.left : parent.right
 					anchors.rightMargin: Style.marginM
-					text: root.__names[rowItem.row]
+					text: root.__names[rowItem.row] !== undefined ? root.__names[rowItem.row] : ""
 					font.family: Style.fontFamily
 					font.pixelSize: Style.fontSizeM
 					font.bold: rowItem.isGroup

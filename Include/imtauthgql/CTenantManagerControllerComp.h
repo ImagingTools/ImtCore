@@ -13,8 +13,6 @@
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/ITenantInvitationManager.h>
 #include <imtauth/IUserManager.h>
-#include <imtauth/ICrossOrgGrant.h>
-#include <imtauth/IContract.h>
 #include <imtauth/ITenantConnectionRequestManager.h>
 #include <imtauth/ITenantConnectionRequestInfo.h>
 #include <imtauth/ITenantConnectionInfo.h>
@@ -38,12 +36,9 @@ public:
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager for member operations", true, "MembershipManager");
 		I_ASSIGN(m_invitationManagerCompPtr, "InvitationManager", "Tenant invitation manager, revokes the invitations of a removed member", false, "InvitationManager");
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Collection of users", true, "UserCollection");
-		I_ASSIGN(m_grantManagerCompPtr, "CrossOrgGrantManager", "Manager for cross-org grants", false, "CrossOrgGrantManager");
-		I_ASSIGN(m_contractManagerCompPtr, "ContractManager", "Manager for cooperation contracts", false, "ContractManager");
 		I_ASSIGN(m_connectionRequestManagerCompPtr, "TenantConnectionRequestManager", "Manager for tenant connection requests", false, "TenantConnectionRequestManager");
 		I_ASSIGN(m_messageBrokerCompPtr, "CrossTenantMessageBroker", "Broker for cross-tenant messages", false, "CrossTenantMessageBroker");
 		I_ASSIGN(m_orderRequestManagerCompPtr, "OrderRequestManager", "Manager for order requests", false, "OrderRequestManager");
-		I_ASSIGN(m_proposalFactoryCompPtr, "ProposalFactory", "Relationship proposal factory", false, "TenantRelationshipProposalInfo");
 	I_END_COMPONENT;
 
 protected:
@@ -74,38 +69,6 @@ protected:
 				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtauth::CSetTenantActivePayload OnSetTenantActive(
 				const sdl::V1_0::imtauth::CSetTenantActiveGqlRequest& setTenantActiveRequest,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtauth::CGetCrossOrgGrantsPayload OnGetCrossOrgGrants(
-				const sdl::V1_0::imtauth::CGetCrossOrgGrantsGqlRequest& getCrossOrgGrantsRequest,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtauth::CCreateCrossOrgGrantPayload OnCreateCrossOrgGrant(
-				const sdl::V1_0::imtauth::CCreateCrossOrgGrantGqlRequest& createCrossOrgGrantRequest,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtauth::CRevokeCrossOrgGrantPayload OnRevokeCrossOrgGrant(
-				const sdl::V1_0::imtauth::CRevokeCrossOrgGrantGqlRequest& revokeCrossOrgGrantRequest,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtauth::CRemoveCrossOrgGrantsPayload OnRemoveCrossOrgGrants(
-				const sdl::V1_0::imtauth::CRemoveCrossOrgGrantsGqlRequest& removeCrossOrgGrantsRequest,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtauth::CGetContractsPayload OnGetContracts(
-				const sdl::V1_0::imtauth::CGetContractsGqlRequest& getContractsRequest,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtauth::CCreateContractPayload OnCreateContract(
-				const sdl::V1_0::imtauth::CCreateContractGqlRequest& createContractRequest,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtauth::CUpdateContractStatusPayload OnUpdateContractStatus(
-				const sdl::V1_0::imtauth::CUpdateContractStatusGqlRequest& updateContractStatusRequest,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtauth::CTerminateContractPayload OnTerminateContract(
-				const sdl::V1_0::imtauth::CTerminateContractGqlRequest& terminateContractRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtauth::CEnsureSystemTenantPayload OnEnsureSystemTenant(
@@ -159,37 +122,7 @@ protected:
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
-	// --- Relationships ---
-	virtual sdl::V1_0::imtauth::CGetTenantRelationshipsPayload OnGetTenantRelationships(
-				const sdl::V1_0::imtauth::CGetTenantRelationshipsGqlRequest& request,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtauth::CRemoveTenantRelationshipPayload OnRemoveTenantRelationship(
-				const sdl::V1_0::imtauth::CRemoveTenantRelationshipGqlRequest& request,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
 
-	// --- Relationship Proposals ---
-	virtual sdl::V1_0::imtauth::CGetRelationshipProposalsPayload OnGetRelationshipProposals(
-				const sdl::V1_0::imtauth::CGetRelationshipProposalsGqlRequest& request,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtauth::CCreateRelationshipProposalPayload OnCreateRelationshipProposal(
-				const sdl::V1_0::imtauth::CCreateRelationshipProposalGqlRequest& request,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtauth::CApproveRelationshipProposalPayload OnApproveRelationshipProposal(
-				const sdl::V1_0::imtauth::CApproveRelationshipProposalGqlRequest& request,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtauth::CRejectRelationshipProposalPayload OnRejectRelationshipProposal(
-				const sdl::V1_0::imtauth::CRejectRelationshipProposalGqlRequest& request,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtauth::CCancelRelationshipProposalPayload OnCancelRelationshipProposal(
-				const sdl::V1_0::imtauth::CCancelRelationshipProposalGqlRequest& request,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtauth::CGetCrossTenantMessagePayload OnGetCrossTenantMessage(
 				const sdl::V1_0::imtauth::CGetCrossTenantMessageGqlRequest& getCrossTenantMessageRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
@@ -234,25 +167,14 @@ private:
 				const QByteArrayList& tenantIds,
 				const QByteArrayList& requiredOrgPermissions,
 				QString& errorMessage) const;
-	// True when the caller may manage the grantor or the grantee organization of an existing grant.
-	bool CanManageGrant(
-				const ::imtgql::CGqlRequest& gqlRequest,
-				const QByteArray& grantId,
-				QString& errorMessage) const;
-	// Revoke the active grants between two organizations, in both directions.
-	/// False when a grant could not be read or revoked, so some may still give access.
-	bool RevokeGrantsBetween(const QByteArray& tenantAId, const QByteArray& tenantBId) const;
 
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 	I_REF(imtauth::ITenantInvitationManager, m_invitationManagerCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
-	I_REF(imtauth::ICrossOrgGrant, m_grantManagerCompPtr);
-	I_REF(imtauth::IContract, m_contractManagerCompPtr);
 	I_REF(imtauth::ITenantConnectionRequestManager, m_connectionRequestManagerCompPtr);
 	I_REF(imtauth::ICrossTenantMessage, m_messageBrokerCompPtr);
 	I_REF(imtauth::IOrderRequest, m_orderRequestManagerCompPtr);
-	I_FACT(imtauth::ITenantRelationshipProposalInfo, m_proposalFactoryCompPtr);
 };
 
 

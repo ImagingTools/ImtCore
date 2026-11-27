@@ -122,6 +122,14 @@ imtauth::IUserInfo::FeatureIds CollectOrganizationAccessPermissions(const IGqlCo
 }
 
 
+QByteArray GetRequestProductId(const CGqlRequest& gqlRequest)
+{
+	const IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+
+	return (contextPtr != nullptr) ? contextPtr->GetProductId() : QByteArray();
+}
+
+
 QByteArray GetLanguageIdFromRequest(const QList<CGqlParamObject>& inputParams)
 {
 	qsizetype count = inputParams.count();

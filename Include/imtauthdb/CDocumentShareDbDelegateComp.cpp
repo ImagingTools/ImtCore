@@ -60,6 +60,20 @@ QDateTime RecordDateTime(const QSqlRecord& record, const char* field)
 } // anonymous namespace
 
 
+// reimplemented (icomp::CComponentBase)
+
+void CDocumentShareDbDelegateComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	// A table of the shares made before the contracts lacks the column of the contract
+	if (m_databaseEngineCompPtr.IsValid() && TableExists(*m_tableNameAttrPtr)
+				&& !imtdb::AddColumnIfMissing(*m_databaseEngineCompPtr, GetQualifiedTableName(), QStringLiteral("ContractId"), QStringLiteral("TEXT"))){
+		SendErrorMessage(0, QStringLiteral("The column of the contract could not be added to the table of the document shares"), "CDocumentShareDbDelegateComp");
+	}
+}
+
+
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
 istd::IChangeableUniquePtr CDocumentShareDbDelegateComp::CreateObjectFromRecord(
@@ -83,6 +97,7 @@ istd::IChangeableUniquePtr CDocumentShareDbDelegateComp::CreateObjectFromRecord(
 	sharePtr->SetTargetTenantId(imtdb::VariantToByteArray(record.value("TargetTenantId")));
 	sharePtr->SetTargetTenantName(record.value("TargetTenantName").toString());
 	sharePtr->SetTargetGroupIds(targetGroupIds);
+	sharePtr->SetContractId(imtdb::VariantToByteArray(record.value("ContractId")));
 	sharePtr->SetAccessLevel(static_cast<imtauth::IDocumentShareInfo::AccessLevel>(record.value("AccessLevel").toInt()));
 	sharePtr->SetStatus(static_cast<imtauth::IDocumentShareInfo::ShareStatus>(record.value("Status").toInt()));
 	sharePtr->SetValidUntil(RecordDateTime(record, "ValidUntil"));
@@ -118,9 +133,9 @@ CDocumentShareDbDelegateComp::NewObjectQuery CDocumentShareDbDelegateComp::Creat
 	result.objectName = sharePtr->GetEntityName();
 	result.query = QStringLiteral(
 				R"(INSERT INTO %1 ("Id", "CollectionId", "EntityId", "EntityName", "OwnerTenantId", "OwnerTenantName", )"
-				R"("TargetTenantId", "TargetTenantName", "TargetGroupIds", "AccessLevel", "Status", "ValidUntil", "Message", )"
+				R"("TargetTenantId", "TargetTenantName", "TargetGroupIds", "ContractId", "AccessLevel", "Status", "ValidUntil", "Message", )"
 				R"("CreatedByUserId", "CreatedAt", "UpdatedAt") VALUES (:Id, :CollectionId, :EntityId, :EntityName, :OwnerTenantId, )"
-				R"(:OwnerTenantName, :TargetTenantId, :TargetTenantName, :TargetGroupIds, :AccessLevel, :Status, :ValidUntil, :Message, )"
+				R"(:OwnerTenantName, :TargetTenantId, :TargetTenantName, :TargetGroupIds, :ContractId, :AccessLevel, :Status, :ValidUntil, :Message, )"
 				R"(:CreatedByUserId, :CreatedAt, :UpdatedAt))").arg(GetQualifiedTableName()).toUtf8();
 	result.bindValues = CreateBindValues(*sharePtr, shareId);
 
@@ -156,13 +171,13 @@ CDocumentShareDbDelegateComp::NewObjectQuery CDocumentShareDbDelegateComp::Creat
 
 	result.query = QStringLiteral(
 				R"(UPDATE %1 SET "CollectionId" = :CollectionId, "EntityName" = :EntityName, "OwnerTenantName" = :OwnerTenantName, )"
-				R"("TargetTenantName" = :TargetTenantName, "TargetGroupIds" = :TargetGroupIds, "AccessLevel" = :AccessLevel, )"
+				R"("TargetTenantName" = :TargetTenantName, "TargetGroupIds" = :TargetGroupIds, "ContractId" = :ContractId, "AccessLevel" = :AccessLevel, )"
 				R"("Status" = :Status, "ValidUntil" = :ValidUntil, "Message" = :Message, "UpdatedAt" = :UpdatedAt WHERE "Id" = :Id)")
 				.arg(GetQualifiedTableName()).toUtf8();
 
 	const QVariantMap allValues = CreateBindValues(*sharePtr, objectId);
 	static const QStringList updatedFields = {
-				":Id", ":CollectionId", ":EntityName", ":OwnerTenantName", ":TargetTenantName", ":TargetGroupIds",
+				":Id", ":CollectionId", ":EntityName", ":OwnerTenantName", ":TargetTenantName", ":TargetGroupIds", ":ContractId",
 				":AccessLevel", ":Status", ":ValidUntil", ":Message", ":UpdatedAt"};
 	for (const QString& field : updatedFields){
 		result.bindValues.insert(field, allValues.value(field));
@@ -285,6 +300,7 @@ QVariantMap CDocumentShareDbDelegateComp::CreateBindValues(const imtauth::IDocum
 
 	// Stored as ",id1,id2," so that a single LIKE '%,id,%' finds a group
 	retVal.insert(":TargetGroupIds", targetGroupIds.isEmpty() ? QStringLiteral("") : QStringLiteral(",%1,").arg(QString::fromUtf8(targetGroupIds.join(','))));
+	retVal.insert(":ContractId", NullableText(QString::fromUtf8(shareInfo.GetContractId())));
 	retVal.insert(":AccessLevel", static_cast<int>(shareInfo.GetAccessLevel()));
 	retVal.insert(":Status", static_cast<int>(shareInfo.GetStatus()));
 	retVal.insert(":ValidUntil", NullableTime(shareInfo.GetValidUntil()));

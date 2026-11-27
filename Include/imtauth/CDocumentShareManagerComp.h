@@ -40,6 +40,7 @@ public:
 		I_ASSIGN(m_relationshipProviderCompPtr, "RelationshipProvider", "Provider of the tenant relationships a share requires", true, "RelationshipProvider");
 		I_ASSIGN(m_autoAcceptAttrPtr, "AutoAccept", "Activate new shares without the confirmation of the target tenant", true, true);
 		I_ASSIGN(m_relationshipCacheTimeoutAttrPtr, "RelationshipCacheTimeout", "Seconds the related organizations of a tenant are reused before they are requested again", true, 10);
+		I_ASSIGN(m_productIdAttrPtr, "ProductId", "Product whose contracts let the organizations share documents", true, "");
 	I_END_COMPONENT;
 
 	// reimplemented (imtauth::IDocumentShareManager)
@@ -78,6 +79,7 @@ private:
 	I_REF(ITenantRelationshipProvider, m_relationshipProviderCompPtr);
 	I_ATTR(bool, m_autoAcceptAttrPtr);
 	I_ATTR(int, m_relationshipCacheTimeoutAttrPtr);
+	I_ATTR(QByteArray, m_productIdAttrPtr);
 
 	struct RelatedTenantsCacheItem
 	{

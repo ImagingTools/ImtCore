@@ -32,6 +32,14 @@ Rectangle {
 	property bool canShowToday: true;
 	property bool readOnly: false;
 	property bool hasDoubleClickReaction: !multiSelection;
+	// A single date is taken with the click on a day, or on Today, without Ok
+	property bool acceptOnClick: false;
+
+	function acceptDay(){
+		calendar.acceptFunction();
+		calendar.accepted();
+		calendar.close();
+	}
 
 	property int startYear: 1900;
 	property int lastYear: 2100;
@@ -991,6 +999,10 @@ Rectangle {
 						calendar.selectedIndexYear = year;
 						calendar.selectedIndexMonth = month;
 						calendar.fillMonthModel(month, year);
+					}
+
+					if (calendar.acceptOnClick && !calendar.multiSelection){
+						calendar.acceptDay();
 					}
 				}
 			}

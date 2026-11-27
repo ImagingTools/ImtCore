@@ -125,25 +125,6 @@ public:
 	*/
 	virtual void SetUpdatedAt(const QString& updatedAt) = 0;
 
-	/**
-		Get relationship IDs associated with this tenant.
-	*/
-	virtual QByteArrayList GetRelationshipIds() const = 0;
-
-	/**
-		Set relationship IDs for this tenant.
-	*/
-	virtual void SetRelationshipIds(const QByteArrayList& relationshipIds) = 0;
-
-	/**
-		Add a relationship ID to this tenant.
-	*/
-	virtual void AddRelationshipId(const QByteArray& relationshipId) = 0;
-
-	/**
-		Remove a relationship ID from this tenant.
-	*/
-	virtual bool RemoveRelationshipId(const QByteArray& relationshipId) = 0;
 
 	/**
 		Get the list of permissions available for this tenant.

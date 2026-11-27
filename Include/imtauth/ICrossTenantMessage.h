@@ -56,7 +56,7 @@ enum CrossTenantMessageStatus
 	A cross-tenant message is the unit of exchange of the inter-tenant messaging
 	pipeline. It never grants direct access to another tenant's data: the source
 	tenant produces a message from its own object, the broker validates the
-	tenant relationship and applies a projection to the payload, and a domain
+	link of a contract in force and applies a projection to the payload, and a domain
 	handler in the target tenant materializes a brand-new local object from the
 	projected payload. Both tenants only ever work with their own local objects,
 	linked through \a sourceObjectId and \a targetObjectId.
@@ -66,8 +66,8 @@ struct CrossTenantMessageInfo
 	QByteArray messageId;
 	QByteArray sourceTenantId;
 	QByteArray targetTenantId;
-	QByteArray relationshipId;
 	QByteArray contractId;
+	QByteArray linkId;
 	QByteArray sourceObjectId;
 	QByteArray targetObjectId;
 	CrossTenantMessageType messageType = CTMT_CUSTOM;
@@ -84,8 +84,8 @@ struct CrossTenantMessageInfo
 		return messageId == other.messageId
 			&& sourceTenantId == other.sourceTenantId
 			&& targetTenantId == other.targetTenantId
-			&& relationshipId == other.relationshipId
 			&& contractId == other.contractId
+			&& linkId == other.linkId
 			&& sourceObjectId == other.sourceObjectId
 			&& targetObjectId == other.targetObjectId
 			&& messageType == other.messageType
@@ -112,7 +112,7 @@ typedef QList<CrossTenantMessageInfo> CrossTenantMessages;
 
 	The broker is the central, domain-agnostic component of the messaging core
 	(RFC phase 2). It accepts cross-tenant requests, validates them against the
-	tenant relationship, applies the configured projection to the payload, stores
+	link of a contract in force, applies the configured projection to the payload, stores
 	the message and dispatches it to the registered domain handlers. It does not
 	understand the business semantics of any concrete message; the meaning is
 	provided by pluggable ICrossTenantMessageHandler implementations.
@@ -124,16 +124,13 @@ class ICrossTenantMessage: virtual public istd::IChangeable
 public:
 	/**
 		Send a new cross-tenant message.
-
-		The broker validates that an active relationship identified by
-		\a relationshipId exists between \a sourceTenantId and \a targetTenantId,
-		applies the projection to \a payload and stores the resulting message. If
-		domain handlers are registered they are dispatched synchronously and the
-		message status is advanced accordingly.
-
+		The broker checks that the link \a linkId of the contract \a contractId connects \a sourceTenantId and
+		\a targetTenantId, is in force and allows messages, applies the projection to \a payload and stores the resulting
+		message. If domain handlers are registered they are dispatched synchronously and the message status is advanced accordingly.
 		\param sourceTenantId Tenant producing the message.
 		\param targetTenantId Tenant the message is addressed to.
-		\param relationshipId Relationship authorizing the exchange.
+		\param contractId Contract authorizing the exchange.
+		\param linkId Link of the two tenants in the contract.
 		\param messageType Domain type of the message.
 		\param payload Source payload (e.g. a serialized domain object). The broker
 			stores the projected payload, not the raw one.
@@ -141,19 +138,20 @@ public:
 			produced from.
 		\param customType Concrete type name when \a messageType is CTMT_CUSTOM.
 		\param expiresAt Optional expiry timestamp (empty for no expiry).
-		\param contractId Optional contract that authorizes this exchange (empty for ad-hoc messages).
+		\param errorMessagePtr [optional] Receives the reason when the message is refused.
 		\return Message ID if successful, empty if validation or storage failed.
 	*/
 	virtual QByteArray SendMessage(
 				const QByteArray& sourceTenantId,
 				const QByteArray& targetTenantId,
-				const QByteArray& relationshipId,
+				const QByteArray& contractId,
+				const QByteArray& linkId,
 				CrossTenantMessageType messageType,
 				const QByteArray& payload,
 				const QByteArray& sourceObjectId = QByteArray(),
 				const QString& customType = QString(),
 				const QString& expiresAt = QString(),
-				const QByteArray& contractId = QByteArray()) = 0;
+				QString* errorMessagePtr = nullptr) = 0;
 
 	/**
 		Get a specific message by its ID.
@@ -171,9 +169,9 @@ public:
 	virtual CrossTenantMessages GetOutgoingMessages(const QByteArray& sourceTenantId) const = 0;
 
 	/**
-		Get all messages associated with a specific relationship.
+		Get all messages exchanged under a contract.
 	*/
-	virtual CrossTenantMessages GetMessagesByRelationship(const QByteArray& relationshipId) const = 0;
+	virtual CrossTenantMessages GetMessagesByContract(const QByteArray& contractId) const = 0;
 
 	/**
 		Update the lifecycle status of a message.

@@ -62,15 +62,6 @@ QtObject {
 	signal userUpdated(string userId)
 	signal userDataReceived(var data)
 
-	// --- Cross-org grants ---
-	signal crossOrgGrantsRemoved()
-
-	// --- Cooperation contracts ---
-	signal contractCreated(string contractId)
-	signal contractStatusUpdated(string contractId)
-	signal contractTerminated(string contractId)
-	signal contractsReceived(var contracts)
-
 	// --- Connection Code ---
 	signal connectionCodeReceived(string code, bool allowByCode)
 	signal connectionCodeRegenerated(string newCode)
@@ -87,17 +78,6 @@ QtObject {
 	// --- Connections ---
 	signal connectionsReceived()
 	signal connectionRemoved(string connectionId)
-
-	// --- Tenant Relationships ---
-	signal tenantRelationshipRemoved()
-	signal tenantRelationshipsReceived()
-
-	// --- Relationship Proposals ---
-	signal relationshipProposalCreated()
-	signal relationshipProposalApproved(string relationshipId)
-	signal relationshipProposalRejected()
-	signal relationshipProposalCanceled()
-	signal relationshipProposalsReceived()
 
 	// --- Cross-tenant messages (phase 2) ---
 	signal crossTenantMessageSent(string messageId)
@@ -175,20 +155,9 @@ QtObject {
 	signal memberPermissionsUpdated()
 	function setMemberOrganizationPermissionsByUser(tenantId, userId, permissions) {}
 
-	// --- Cross-org grants ---
-	property var crossOrgGrantDocumentManager: null
-	property var crossOrgGrantsListDataProvider: null
 	property var tenantsListDataProvider: null
-	property var tenantRelationshipsListDataProvider: null
-	function revokeCrossOrgGrant(grantId) {}
-	function removeCrossOrgGrants(grantIds) {}
-
-	// --- Cooperation contracts ---
-	property var contractsModel: null
-	function fetchContracts(tenantId) {}
-	function createContract(relationshipId, sourceTenantId, targetTenantId, scope, validFrom, validUntil, description, terms) {}
-	function updateContractStatus(contractId, status) {}
-	function terminateContract(contractId) {}
+	// The groups of the organization, several chosen at once
+	property var groupsMultiSelectDataProvider: null
 
 	// --- Connection Code ---
 	function getConnectionCode(tenantId) {}
@@ -198,8 +167,8 @@ QtObject {
 	// --- Connection Requests ---
 	property var connectionRequestsModel: null
 	function fetchConnectionRequests(tenantId) {}
-	// The roles propose a relationship along (both or none); the source role is the one of the requesting organization
-	function createConnectionRequest(sourceTenantId, connectionCode, message, proposedSourceRole, proposedTargetRole, proposedScope) {}
+	// By the connection code of the organization, or to an organization of the directory by its id
+	function createConnectionRequest(sourceTenantId, connectionCode, message, targetTenantId) {}
 	function approveConnectionRequest(requestId, tenantId) {}
 	function rejectConnectionRequest(requestId, tenantId) {}
 	function cancelConnectionRequest(requestId, tenantId) {}
@@ -209,23 +178,11 @@ QtObject {
 	function fetchConnections(tenantId) {}
 	function removeConnection(connectionId, tenantId) {}
 
-	// --- Tenant Relationships ---
-	property var tenantRelationshipsModel: null
-	function fetchTenantRelationships(tenantId) {}
-	function removeTenantRelationship(tenantId, relationshipId) {}
-
-	// --- Relationship Proposals ---
-	property var relationshipProposalsModel: null
-	function fetchRelationshipProposals(tenantId) {}
-	function createRelationshipProposal(initiatorTenantId, counterpartyTenantId, proposalType, existingRelationshipId, proposedSourceRole, proposedTargetRole, proposedScope, proposedDescription) {}
-	function approveRelationshipProposal(proposalId, tenantId) {}
-	function rejectRelationshipProposal(proposalId, tenantId) {}
-	function cancelRelationshipProposal(proposalId, tenantId) {}
-
 	// --- Cross-tenant messages (phase 2) ---
 	property var crossTenantMessagesModel: null
 	function fetchCrossTenantMessages(tenantId, direction) {}
-	function sendCrossTenantMessage(sourceTenantId, targetTenantId, relationshipId, messageType, payload, sourceObjectId, customType, expiresAt) {}
+	// The link of the two organizations in the contract authorizes the message
+	function sendCrossTenantMessage(sourceTenantId, targetTenantId, contractId, linkId, messageType, payload, sourceObjectId, customType, expiresAt) {}
 	function updateCrossTenantMessageStatus(messageId, status, errorMessage) {}
 
 	// --- Order requests (phase 3) ---

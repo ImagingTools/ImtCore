@@ -32,7 +32,7 @@ public:
 		I_ASSIGN(m_userGroupInfoProviderCompPtr, "UserGroupInfoProvider", "User group info provider", true, "UserGroupInfoProvider");
 		I_ASSIGN(m_userInfoFactCompPtr, "UserFactory", "Factory used for creation of the new user instance", true, "UserFactory");
 		I_ASSIGN(m_hashCalculatorCompPtr, "HashCalculator", "Hash calculator", true, "HashCalculator");
-		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Optional delegated access resolver used to enrich the user with roles delegated via cross-org grants", false, "DelegatedAccessResolver");
+		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Permissions given to the users by the contracts of the organizations", false, "ContractDelegatedAccess");
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager for auto-adding membership on user creation", false, "MembershipManager");
 		I_ASSIGN(m_membershipCollectionCompPtr, "MembershipCollection", "Membership collection for direct purge of user memberships on delete", false, "MembershipCollection");
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager to prevent deletion of tenant owners", false, "TenantManager");

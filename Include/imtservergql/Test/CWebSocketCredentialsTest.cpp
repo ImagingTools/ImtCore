@@ -1300,6 +1300,8 @@ void CWebSocketCredentialsTest::RecipientChannelsAreDeclaredByCommand()
 	connectionCodes->InsertMultiAttr("CommandIds", QString("OnConnectionCodesNotification"));
 	connectionCodes->InitComponent();
 	QVERIFY(IsOpen(*connectionCodes, Controller::SK_RECIPIENT, request("OnConnectionCodesNotification")));
+	// The changes of the connections are addressed to the organization of the session
+	QVERIFY(IsOpen(*connectionCodes, Controller::SK_RECIPIENT, request("OnOrganizationConnectionsChanged")));
 	QVERIFY(!IsOpen(*connectionCodes, Controller::SK_RECIPIENT, request("OnMembershipNotification")));
 
 	icomp::TSimSharedComponentPtr<imtauthgql::CCrossTenantMessageNotificationPublisherComp> messages;
@@ -1318,6 +1320,7 @@ void CWebSocketCredentialsTest::RecipientChannelsAreDeclaredByCommand()
 	restrictedCodes->InsertMultiAttr("ReadPermissions", QByteArray("/Read"));
 	restrictedCodes->InitComponent();
 	QVERIFY(!IsOpen(*restrictedCodes, Controller::SK_RECIPIENT, request("OnConnectionCodesNotification")));
+	QVERIFY(!IsOpen(*restrictedCodes, Controller::SK_RECIPIENT, request("OnOrganizationConnectionsChanged")));
 
 	icomp::TSimSharedComponentPtr<imtauthgql::CCrossTenantMessageNotificationPublisherComp> restrictedMessages;
 	restrictedMessages->InsertMultiAttr("CommandIds", QString("OnCrossTenantMessageNotification"));

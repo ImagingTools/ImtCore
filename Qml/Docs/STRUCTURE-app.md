@@ -244,18 +244,6 @@
 
 - `updateGui()`
 
-<a id="type-imtauthgui-TenantCrossOrgGrantsPage"></a>
-#### `TenantCrossOrgGrantsPage`
-
-Экранная страница организации (tenant) — самостоятельный раздел интерфейса, встраиваемый в навигацию или рабочую область.
-
-- **Файл:** [Pages/TenantCrossOrgGrantsPage.qml](imtauthgui/Pages/TenantCrossOrgGrantsPage.qml)
-- **Базовый тип:** [`TenantSimpleCollectionPage`](#type-imtauthgui-TenantSimpleCollectionPage)
-
-**Функции**
-
-- `removeItems(ids)`
-
 <a id="type-imtauthgui-TenantGeneralPage"></a>
 #### `TenantGeneralPage`
 
@@ -362,7 +350,7 @@
 
 - **Файл:** [Pages/TenantSimpleCollectionPage.qml](imtauthgui/Pages/TenantSimpleCollectionPage.qml)
 - **Базовый тип:** [`ViewBase`](imtgui/View/ViewBase.qml)
-- **Наследники:** [`TenantContractsPage`](#type-imtauthgui-TenantContractsPage), [`TenantCrossOrgGrantsPage`](#type-imtauthgui-TenantCrossOrgGrantsPage), [`TenantGroupsPage`](#type-imtauthgui-TenantGroupsPage), [`TenantMembersPage`](#type-imtauthgui-TenantMembersPage), [`TenantMessagesPage`](#type-imtauthgui-TenantMessagesPage), [`TenantMyConnectionsPage`](#type-imtauthgui-TenantMyConnectionsPage), [`TenantRolesPage`](#type-imtauthgui-TenantRolesPage)
+- **Наследники:** [`TenantContractsPage`](#type-imtauthgui-TenantContractsPage), [`TenantGroupsPage`](#type-imtauthgui-TenantGroupsPage), [`TenantMembersPage`](#type-imtauthgui-TenantMembersPage), [`TenantMessagesPage`](#type-imtauthgui-TenantMessagesPage), [`TenantMyConnectionsPage`](#type-imtauthgui-TenantMyConnectionsPage), [`TenantRolesPage`](#type-imtauthgui-TenantRolesPage)
 
 **Свойства**
 
@@ -455,45 +443,27 @@
 <a id="type-imtauthgui-ContractView"></a>
 #### `ContractView`
 
-Визуальное представление контрактов: отображает данные и обрабатывает действия пользователя.
+Карточка контракта с точки зрения одной из сторон: условия, стороны с их состояниями и подписями, связи между сторонами, распределения прав, ссылки на другие контракты, документы, внутренние данные организации и журнал. Действия (отправка, согласование, подпись, отказ, уведомление о выходе, расторжение) предлагаются по состоянию контракта и стороны.
 
-- **Файл:** [Views/ContractView.qml](imtauthgui/Views/ContractView.qml)
-- **Базовый тип:** [`ViewBase`](imtgui/View/ViewBase.qml)
+- **Файл:** [ContractView.qml](../imtauthgui/ContractView.qml)
+- **Базовый тип:** `Item`
 
 **Свойства**
 
-- `apiClient: var`
-- `tenantData: var`
+- `tenantId: string`, `tenantName: string`
+- `contractId: string` — пусто для нового контракта
+- `contractsApiClient: var` — [`ContractsApiClient`](../imtauthgui/ContractsApiClient.qml)
+- `tenantApiClient: var` — `TenantManagementApiClient` (права и группы организации)
+- `stateManager: var`
 
 **Сигналы**
 
-- `contractCreated()`
+- `closeRequested()`
 
 **Функции**
 
-- `updateGui()`
-- `updateModel()`
-- `submitContract()`
-
-<a id="type-imtauthgui-CrossOrgGrantView"></a>
-#### `CrossOrgGrantView`
-
-Визуальное представление кросс-орг. грантов: отображает данные и обрабатывает действия пользователя.
-
-- **Файл:** [Views/CrossOrgGrantView.qml](imtauthgui/Views/CrossOrgGrantView.qml)
-- **Базовый тип:** [`ViewBase`](imtgui/View/ViewBase.qml)
-
-**Свойства**
-
-- `grantData: var`
-- `apiClient: var`
-- `isReadOnly: bool`
-
-**Функции**
-
-- `expiresAtToIndex(iso)`
-- `updateGui()`
-- `updateModel()`
+- `save()`
+- `run(command, comment)`
 
 <a id="type-imtauthgui-MessageView"></a>
 #### `MessageView`
@@ -598,25 +568,6 @@
 **Свойства**
 
 - `apiClient: var`
-
-<a id="type-imtauthgui-RelationshipView"></a>
-#### `RelationshipView`
-
-Визуальное представление связей организаций: отображает данные и обрабатывает действия пользователя.
-
-- **Файл:** [Views/RelationshipView.qml](imtauthgui/Views/RelationshipView.qml)
-- **Базовый тип:** [`ViewBase`](imtgui/View/ViewBase.qml)
-
-**Свойства**
-
-- `relationshipData: var`
-- `apiClient: var`
-- `tenantData: var`
-
-**Функции**
-
-- `updateGui()`
-- `updateModel()`
 
 <a id="type-imtauthgui-RoleCollectionView"></a>
 #### `RoleCollectionView`
@@ -1442,33 +1393,23 @@
 - `roleObjectTypeId: string`
 - `groupObjectTypeId: string`
 - `userObjectTypeId: string`
-- `crossOrgGrantObjectTypeId: string`
-- `contractObjectTypeId: string`
-- `relationshipObjectTypeId: string`
 - `crossTenantMessageObjectTypeId: string`
 - `roleDocumentManager: var` — только чтение
 - `groupDocumentManager: var` — только чтение
 - `userDocumentManager: var` — только чтение
-- `relationshipDocumentManager: var` — только чтение
-- `crossOrgGrantDocumentManager: var` — только чтение
 - `permissionsProvider: var` — только чтение
 - `allPermissions: var`
 - `tenantPermissions: var`
 - `organizationPermissions: var`
 - `memberOrganizationPermissions: var`
-- `contractsModel: ListModel`
-- `tenantRelationshipsModel: ListModel`
 - `connectionRequestsModel: ListModel`
 - `connectionsModel: ListModel`
-- `relationshipProposalsModel: ListModel`
 - `crossTenantMessagesModel: ListModel`
 - `orderRequestsModel: ListModel`
 - `roleListDataProvider: FilterableSelectGqlDataProvider`
 - `groupListDataProvider: FilterableSelectGqlDataProvider`
 - `invitableUsersListDataProvider: FilterableSelectGqlDataProvider`
 - `tenantsListDataProvider: FilterableSelectGqlDataProvider`
-- `tenantRelationshipsListDataProvider: FilterableSelectGqlDataProvider`
-- `crossOrgGrantsListDataProvider: FilterableSelectGqlDataProvider`
 - `connectionsDataProvider: FilterableSelectGqlDataProvider`
 
 **Сигналы**
@@ -1480,7 +1421,6 @@
 - `memberRemoved(string userId)`
 - `roleCreated()`
 - `rolesRemoved()`
-- `crossOrgGrantsRemoved()`
 - `roleUpdated(string roleId)`
 - `roleDataReceived(var data)`
 - `groupCreated()`
@@ -1527,13 +1467,6 @@
 - `connectionRequestsReceived()`
 - `connectionsReceived()`
 - `connectionRemoved(string connectionId)`
-- `tenantRelationshipRemoved()`
-- `tenantRelationshipsReceived()`
-- `relationshipProposalCreated()`
-- `relationshipProposalApproved(string relationshipId)`
-- `relationshipProposalRejected()`
-- `relationshipProposalCanceled()`
-- `relationshipProposalsReceived()`
 
 **Функции**
 
@@ -1550,12 +1483,7 @@
 - `fetchAllPermissions()`
 - `fetchTenantPermissions(tenantId)`
 - `fetchOrganizationPermissions(tenantId, userId)`
-- `revokeCrossOrgGrant(grantId)`
-- `removeCrossOrgGrants(grantIds)`
 - `fetchContracts(tenantId)`
-- `createContract(relationshipId, sourceTenantId, targetTenantId, scope, validFrom, validUntil, description, terms)`
-- `updateContractStatus(contractId, status)`
-- `terminateContract(contractId)`
 - `getConnectionCode(tenantId)`
 - `regenerateConnectionCode(tenantId)`
 - `setAllowConnectionsByCode(tenantId, allow)`
@@ -1566,15 +1494,8 @@
 - `cancelConnectionRequest(requestId, tenantId)`
 - `fetchConnections(tenantId)`
 - `removeConnection(connectionId, tenantId)`
-- `fetchTenantRelationships(tenantId)`
-- `removeTenantRelationship(tenantId, relationshipId)`
-- `fetchRelationshipProposals(tenantId)`
-- `createRelationshipProposal(connectionId, initiatorTenantId, proposalType, proposedSourceRole, proposedTargetRole, proposedScope, proposedDescription, message)`
-- `approveRelationshipProposal(proposalId, tenantId)`
-- `rejectRelationshipProposal(proposalId, tenantId)`
-- `cancelRelationshipProposal(proposalId, tenantId)`
 - `fetchCrossTenantMessages(tenantId, direction)`
-- `sendCrossTenantMessage(sourceTenantId, targetTenantId, relationshipId, messageType, payload, sourceObjectId, customType, expiresAt)`
+- `sendCrossTenantMessage(sourceTenantId, targetTenantId, contractId, linkId, messageType, payload, sourceObjectId, customType, expiresAt)`
 - `updateCrossTenantMessageStatus(messageId, status, errorMessage)`
 - `fetchOrderRequests(tenantId)`
 - `confirmOrderRequest(orderRequestId, note)`
@@ -1645,15 +1566,9 @@
 - `permissionsProvider: var`
 - `allPermissions: var`
 - `tenantPermissions: var`
-- `crossOrgGrantDocumentManager: var`
-- `crossOrgGrantsListDataProvider: var`
 - `tenantsListDataProvider: var`
-- `tenantRelationshipsListDataProvider: var`
-- `contractsModel: var`
 - `connectionRequestsModel: var`
 - `connectionsModel: var`
-- `tenantRelationshipsModel: var`
-- `relationshipProposalsModel: var`
 - `crossTenantMessagesModel: var`
 - `orderRequestsModel: var`
 
@@ -1676,7 +1591,6 @@
 - `userRemoved(string userId)`
 - `userUpdated(string userId)`
 - `userDataReceived(var data)`
-- `crossOrgGrantsRemoved()`
 - `contractCreated(string contractId)`
 - `contractStatusUpdated(string contractId)`
 - `contractTerminated(string contractId)`
@@ -1692,13 +1606,6 @@
 - `connectionRequestsReceived()`
 - `connectionsReceived()`
 - `connectionRemoved(string connectionId)`
-- `tenantRelationshipRemoved()`
-- `tenantRelationshipsReceived()`
-- `relationshipProposalCreated()`
-- `relationshipProposalApproved(string relationshipId)`
-- `relationshipProposalRejected()`
-- `relationshipProposalCanceled()`
-- `relationshipProposalsReceived()`
 - `crossTenantMessageSent(string messageId)`
 - `crossTenantMessageStatusUpdated(string messageId)`
 - `crossTenantMessagesReceived(var messages)`
@@ -1742,12 +1649,7 @@
 - `setRolePermissionsTenantId(tenantId)`
 - `fetchAllPermissions()`
 - `fetchTenantPermissions(tenantId)`
-- `revokeCrossOrgGrant(grantId)`
-- `removeCrossOrgGrants(grantIds)`
 - `fetchContracts(tenantId)`
-- `createContract(relationshipId, sourceTenantId, targetTenantId, scope, validFrom, validUntil, description, terms)`
-- `updateContractStatus(contractId, status)`
-- `terminateContract(contractId)`
 - `getConnectionCode(tenantId)`
 - `regenerateConnectionCode(tenantId)`
 - `setAllowConnectionsByCode(tenantId, allow)`
@@ -1758,15 +1660,8 @@
 - `cancelConnectionRequest(requestId, tenantId)`
 - `fetchConnections(tenantId)`
 - `removeConnection(connectionId, tenantId)`
-- `fetchTenantRelationships(tenantId)`
-- `removeTenantRelationship(tenantId, relationshipId)`
-- `fetchRelationshipProposals(tenantId)`
-- `createRelationshipProposal(connectionId, initiatorTenantId, proposalType, proposedSourceRole, proposedTargetRole, proposedScope, proposedDescription, message)`
-- `approveRelationshipProposal(proposalId, tenantId)`
-- `rejectRelationshipProposal(proposalId, tenantId)`
-- `cancelRelationshipProposal(proposalId, tenantId)`
 - `fetchCrossTenantMessages(tenantId, direction)`
-- `sendCrossTenantMessage(sourceTenantId, targetTenantId, relationshipId, messageType, payload, sourceObjectId, customType, expiresAt)`
+- `sendCrossTenantMessage(sourceTenantId, targetTenantId, contractId, linkId, messageType, payload, sourceObjectId, customType, expiresAt)`
 - `updateCrossTenantMessageStatus(messageId, status, errorMessage)`
 - `fetchOrderRequests(tenantId)`
 - `confirmOrderRequest(orderRequestId, note)`

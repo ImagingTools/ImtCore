@@ -12,6 +12,7 @@
 #include <iprm/CIdParam.h>
 
 // ImtCore includes
+#include <imtgql/imtgql.h>
 #include <imtauth/CUserInfo.h>
 #include <imtbase/COperationContext.h>
 #include <imtbase/CObjectCollection.h>
@@ -88,7 +89,6 @@ sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 
 	imtauth::ITenantEntityBindingManager* bindingPtr = m_bindingManagerCompPtr.IsValid() ? m_bindingManagerCompPtr.GetPtr() : nullptr;
 	imtauth::IDelegatedAccess* delPtr = m_delegatedAccessCompPtr.IsValid() ? m_delegatedAccessCompPtr.GetPtr() : nullptr;
-	imtauth::ITenantMembershipManager* memPtr = m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr;
 	imtauth::IRoleInfoProvider* roleProvPtr = m_roleInfoProviderCompPtr.IsValid() ? m_roleInfoProviderCompPtr.GetPtr() : nullptr;
 
 	istd::IChangeableUniquePtr adaptedPtr;
@@ -99,8 +99,6 @@ sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 				currentProductId,
 				bindingPtr,
 				delPtr,
-				memPtr,
-				roleProvPtr,
 				adaptedPtr);
 
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
@@ -151,9 +149,21 @@ sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 	// The collector walks parent roles without the tenant bindings, so only what is held in the tenant stays.
 	const QByteArrayList permissions = GetTenantUserPermissions(*effectiveUserPtr, currentTenantId, currentProductId, bindingPtr, roleProvPtr);
 	imtsdl::TElementList<sdl::V1_0::imtauth::CAssignment> permissionList;
+	QByteArrayList listedIds;
 	for (const istd::TNullableValue<sdl::V1_0::imtauth::CAssignment>& assignment : *profileData.permissions){
 		if (assignment.HasValue() && assignment->id && permissions.contains(*assignment->id)){
 			permissionList << *assignment;
+			listedIds << *assignment->id;
+		}
+	}
+
+	// The permissions the contracts of its organizations delegate come through no role or group of the user
+	for (const QByteArray& permissionId : permissions){
+		if (!listedIds.contains(permissionId)){
+			sdl::V1_0::imtauth::CAssignment assignment;
+			assignment.id = permissionId;
+			assignment.direct = false;
+			permissionList << assignment;
 		}
 	}
 
@@ -197,7 +207,7 @@ sdl::V1_0::imtauth::CGetUserOrganizationsPayload CProfileControllerComp::OnGetUs
 	}
 
 	if (!userId.isEmpty()){
-		response.organizations = CreateOrganizationList(userId);
+		response.organizations = CreateOrganizationList(userId, imtgql::GetRequestProductId(gqlRequest));
 	}
 
 	return response;
@@ -205,7 +215,7 @@ sdl::V1_0::imtauth::CGetUserOrganizationsPayload CProfileControllerComp::OnGetUs
 
 
 imtsdl::TElementList<sdl::V1_0::imtauth::CProfileTenantInfo> CProfileControllerComp::CreateOrganizationList(
-			const QByteArray& userId) const
+			const QByteArray& userId, const QByteArray& productId) const
 {
 	imtsdl::TElementList<sdl::V1_0::imtauth::CProfileTenantInfo> organizationList;
 
@@ -278,67 +288,29 @@ imtsdl::TElementList<sdl::V1_0::imtauth::CProfileTenantInfo> CProfileControllerC
 		organizationList << organizationInfo;
 	}
 
-	// Append delegated organizations via cross-org grants
-	if (m_crossOrgGrantCompPtr.IsValid() && m_membershipManagerCompPtr.IsValid()){
-		// The user's home tenants are checked for grants targeting them
-		for (const QByteArray& homeTenantId : homeTenantIds){
-			const imtauth::CrossOrgGrants grants = m_crossOrgGrantCompPtr->GetGrantsByTargetTenant(homeTenantId);
-			for (const imtauth::CrossOrgGrantInfo& grant : grants){
-				if (!grant.isActive){
-					continue;
-				}
-				QByteArray sourceTenantId = grant.sourceTenantId;
-				if (directTenantIds.contains(sourceTenantId)){
-					continue;
-				}
-
-				// Verify at least one role is effective
-				bool isEffective = false;
-				for (const QByteArray& roleId : grant.roleIds){
-					if (m_crossOrgGrantCompPtr->HasAccess(sourceTenantId, homeTenantId, roleId)){
-						isEffective = true;
-						break;
-					}
-				}
-				if (!isEffective && !grant.roleIds.isEmpty()){
-					continue;
-				}
-
-				// Check if already added from another home tenant
-				bool alreadyAdded = false;
-				for (int i = 0; i < organizationList.size(); ++i){
-					if (organizationList[i]->id.HasValue() && organizationList[i]->id == sourceTenantId){
-						alreadyAdded = true;
-						break;
-					}
-				}
-				if (alreadyAdded){
-					continue;
-				}
-
-				imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(sourceTenantId);
-				if (!tenantPtr.IsValid() || !tenantPtr->IsActive()){
-					continue;
-				}
-
-				sdl::V1_0::imtauth::CProfileTenantInfo organizationInfo;
-				organizationInfo.id = sourceTenantId;
-				organizationInfo.name = tenantPtr->GetTenantName();
-				organizationInfo.description = tenantPtr->GetTenantDescription();
-				organizationInfo.ownerId = tenantPtr->GetOwnerId();
-				organizationInfo.isOwner = false;
-				organizationInfo.isActive = tenantPtr->IsActive();
-				organizationInfo.isDelegated = true;
-				organizationInfo.role = QStringLiteral("Delegated Member");
-
-				imtsdl::TElementList<QString> delegatedRolesList;
-				for (const QByteArray& roleId : grant.roleIds){
-					delegatedRolesList << QString::fromUtf8(roleId);
-				}
-				organizationInfo.delegatedRoles = delegatedRolesList;
-
-				organizationList << organizationInfo;
+	// Organizations that give the user permissions by their contracts
+	if (m_delegatedAccessCompPtr.IsValid()){
+		for (const QByteArray& delegatingTenantId : m_delegatedAccessCompPtr->GetDelegatingTenantIds(userId, productId)){
+			if (directTenantIds.contains(delegatingTenantId)){
+				continue;
 			}
+
+			imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(delegatingTenantId);
+			if (!tenantPtr.IsValid() || !tenantPtr->IsActive()){
+				continue;
+			}
+
+			sdl::V1_0::imtauth::CProfileTenantInfo organizationInfo;
+			organizationInfo.id = delegatingTenantId;
+			organizationInfo.name = tenantPtr->GetTenantName();
+			organizationInfo.description = tenantPtr->GetTenantDescription();
+			organizationInfo.ownerId = tenantPtr->GetOwnerId();
+			organizationInfo.isOwner = false;
+			organizationInfo.isActive = true;
+			organizationInfo.isDelegated = true;
+			organizationInfo.role = QStringLiteral("Delegated Member");
+
+			organizationList << organizationInfo;
 		}
 	}
 

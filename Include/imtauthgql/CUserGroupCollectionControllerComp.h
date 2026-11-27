@@ -7,7 +7,6 @@
 #include <imtauth/IUserInfoProvider.h>
 #include <imtauth/IUserGroupInfoProvider.h>
 #include <imtauth/IDelegatedAccess.h>
-#include <imtauth/ITenantMembershipManager.h>
 #include <imtbase/IObjectCollection.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Groups_fwd.h>
 
@@ -26,8 +25,7 @@ public:
 		I_ASSIGN(m_userInfoProviderCompPtr, "UserInfoProvider", "User info provider", false, "UserInfoProvider");
 		I_ASSIGN(m_userGroupInfoProviderCompPtr, "UserGroupInfoProvider", "User group info provider", false, "UserGroupInfoProvider");
 		I_ASSIGN(m_userGroupInfoFactCompPtr, "UserGroupFactory", "Factory used for creation of the new group instance", true, "UserGroupFactory");
-		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Delegated access resolver for cross-org grants", false, "DelegatedAccessResolver");
-		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager", false, "TenantMembershipManager");
+		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Permissions given to the users by the contracts of the organizations", false, "ContractDelegatedAccess");
 	I_END_COMPONENT;
 
 protected:
@@ -89,7 +87,6 @@ protected:
 	I_REF(imtauth::IUserGroupInfoProvider, m_userGroupInfoProviderCompPtr);
 	I_FACT(imtauth::IUserGroupInfo, m_userGroupInfoFactCompPtr);
 	I_REF(imtauth::IDelegatedAccess, m_delegatedAccessCompPtr);
-	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 
 private:
 	/**

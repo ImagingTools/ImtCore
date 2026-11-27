@@ -155,9 +155,8 @@ Row{
 			if(value !== dateTimeInput.dateStr){
 				dateTimeInput.dateStr = value;
 
-				dateTimeInput.selectedDate.setFullYear(dateInput.selectedDate.getFullYear())
-				dateTimeInput.selectedDate.setMonth(dateInput.selectedDate.getMonth())
-				dateTimeInput.selectedDate.setDate(dateInput.selectedDate.getDate())
+				// At once: a day of the current month must not shift the month
+				dateTimeInput.selectedDate.setFullYear(dateInput.selectedDate.getFullYear(), dateInput.selectedDate.getMonth(), dateInput.selectedDate.getDate())
 
 				signalPause.restart();
 			}

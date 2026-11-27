@@ -18,7 +18,6 @@ type ProfileTenantInfo {
 	isOwner: Boolean
 	isActive: Boolean
 	isDelegated: Boolean
-	delegatedRoles: [String]
 }
 
 type ProfileData {

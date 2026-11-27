@@ -13,6 +13,8 @@ A notification is stored, so a user who is offline sees it after the next login.
 
 ## Where it runs
 
+Contract notifications belong to the immutable `ProductId` of the contract. They appear only in that product's inbox, including reminders. The responsible active member receives them; if that member is absent or inactive, the owner receives them. The actor receives no notification about their own action. Group withdrawal uses the same product as delivery. `OnContractNotification` is restricted to sessions of that product and party; `OnContractsChanged` carries `productId` and goes only to that product's server, so another product's caches stay unchanged; the server must present its server token, a product server without one keeps its caches until they expire. Other organization events may still have no product and remain visible across products.
+
 There is **one** notification center: on the authorization server (Puma). A product server forwards the inbox commands of its clients and relays the subscription, as it does for the tenant commands, and sends its own notifications to Puma with the account of the server.
 
 ```
@@ -47,7 +49,8 @@ There is **one** notification center: on the authorization server (Puma). A prod
 | Producer | Notifications | Inbox |
 |---|---|---|
 | `imtauthgql::CTenantNotificationPublisherComp` | invitation received / accepted / declined / withdrawn, ownership, permissions changed, membership ended, member left | invitation and end of membership: personal; others: the tenant in every product (no product is set) |
-| `imtauthgql::CConnectionCodesNotificationPublisherComp` | connection requests and relationship proposals received / approved / rejected, connection and relationship removed | the tenant of the owner |
+| `imtauthgql::CConnectionCodesNotificationPublisherComp` | address book requests received / approved / rejected, address book entry removed | the tenant of the owner |
+| `imtauthgql::CContractNotificationPublisherComp` | contract invitation, changed terms (review again), changes requested, removed from the contract, signed (initiator only, one grouped row per contract), declined, concluded, offer withdrawn, notice given / revoked, renewal stopped, party left, permissions received / taken back (with the giving party), superseded, reminders of `imtauth::CContractReminderComp` (the contract ends on a date, the last day to refuse its renewal). `imtauthgql::ContractNotificationPlan` decides what is told and withdrawn: what a party is to answer is grouped as `contract-pending:<id>` and withdrawn once it answered, the terms changed, it was removed or the negotiation ended; the signatures the initiator collects (`contract-signed:<id>`) are withdrawn when the terms change or the negotiation ends; a notice to leave (`contract-notice:<id>:<party>`) is withdrawn when it is revoked | in the tenant of the party: the user responsible for the contract while a member, otherwise the owner |
 | `imtauthgql::CCrossTenantMessageNotificationPublisherComp` | new message from another tenant | the target tenant |
 | `imtdeskgql::CTicketNotificationProducerComp` | new message of a ticket (reporter and assignees but the sender), assigned to a ticket; a removed assignee loses both (the reporter keeps the messages) | personal in the product |
 
@@ -69,7 +72,7 @@ Created ──► Delivered ──► Read ──► removed by the user or by r
 - **Delivered** means a session has received it (push or sync). Undelivered notifications pop up at the next login.
 - **Read** implies delivered.
 - A second `Send` with the same **dedup key** in the same inbox is ignored, also after the first one was grouped, read or removed by the user. Withdrawing a group forgets the dedup keys equal to its group key, so the event can be told again.
-- The **actor** never receives a notification about the own action. The organization, connection and relationship notifications take the user of the request as their actor (`TenantNotification::RequestUserLink`), so an owner who removes a member, hands the organization over or ends a relationship is not told about it, a member who leaves is not told that the membership ended, and the other party sees who did it.
+- The **actor** never receives a notification about the own action. The organization, address book and contract notifications take the user of the request as their actor (`TenantNotification::RequestUserLink`), so an owner who removes a member, hands the organization over or removes a partner is not told about it, a member who leaves is not told that the membership ended, and the other party sees who did it.
 
 ## Sending
 

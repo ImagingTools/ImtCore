@@ -38,6 +38,18 @@ DocumentViewBase {
 	 */
 	property var apiClient: null
 
+	// Injected transport implementing the ContractsApiClient contract: the contracts, their catalogs and the directory
+	property var contractsApiClient: null
+	property string contractToOpenId: ""
+	signal contractOpenHandled()
+
+	onContractToOpenIdChanged: container.showRequestedContract()
+
+	function showRequestedContract() {
+		if (container.contractToOpenId !== "" && multiPageView && multiPageView.getIndexById("Contracts") >= 0)
+			container.__openPage("Contracts")
+	}
+
 	/**
 	 * Exposed so that TenantCollectionView can bind commandsPanelVisible: isNewTenant.
 	 * After save, m_id is populated → isNewTenant becomes false → panel hides.
@@ -230,31 +242,79 @@ DocumentViewBase {
 				multiPageView.toggleExpanded("PeopleGroup")
 			}
 
-			var canSeeConnections = stateManager_.canViewOrganizationConnections || stateManager_.canViewOrganizationConnectionCode || stateManager_.canConnectOrganization
-			// The shares belong to the organization of the session, so only its own editor shows them
-			var canSeeShares = ApplicationInfoProvider.documentSharingEnabled
-						&& (stateManager_.isAdmin || stateManager_.canViewOrganizationConnections)
-						&& container.tenantData && String(container.tenantData.m_id) === AuthorizationController.getTenantId()
-			if (canSeeConnections || stateManager_.isCreator || canSeeShares) {
-				multiPageView.addPage("ExternalGroup", qsTr("External links"), null, "Icons/Participant")
-				if (stateManager_.canConnectOrganization || stateManager_.canViewOrganizationConnections)
-					multiPageView.addSubPage("ExternalGroup", "Partners", qsTr("Partners"), partnersPageComp)
-				if (stateManager_.canViewOrganizationConnectionCode)
-					multiPageView.addSubPage("ExternalGroup", "ConnectionCode", qsTr("Connection Code"), connectionCodePageComp)
-				if (stateManager_.isCreator)
-					multiPageView.addSubPage("ExternalGroup", "CrossOrgGrants", qsTr("Grants"), crossOrgGrantsPageComp)
+			// Partners: the address book, finding a partner, how the others find this organization, the shared documents
+			var hasContracts = !!container.contractsApiClient
+			var canSeeAddressBook = stateManager_.canConnectOrganization || stateManager_.canViewOrganizationConnections
+			var canSearch = stateManager_.canConnectOrganization && hasContracts && !!container.contractsApiClient.directoryDataProvider
+			var canSeeDiscovery = stateManager_.canViewOrganizationConnectionCode || (stateManager_.canEditDirectoryProfile && hasContracts)
+			var canSeeShares = container.__canSeeShares()
+			if (canSeeAddressBook || canSearch || canSeeDiscovery || canSeeShares) {
+				multiPageView.addPage("PartnersGroup", qsTr("Partners"), null, "Icons/Participant")
+				if (canSeeAddressBook)
+					multiPageView.addSubPage("PartnersGroup", "AddressBook", qsTr("Address book"), addressBookPageComp)
+				if (canSearch)
+					multiPageView.addSubPage("PartnersGroup", "DirectorySearch", qsTr("Find an organization"), directorySearchPageComp)
+				if (canSeeDiscovery)
+					multiPageView.addSubPage("PartnersGroup", "Discovery", qsTr("How others find you"), discoveryPageComp)
 				if (canSeeShares)
-					multiPageView.addSubPage("ExternalGroup", "DocumentShares", qsTr("Shared Documents"), documentSharesPageComp)
-				multiPageView.toggleExpanded("ExternalGroup")
+					multiPageView.addSubPage("PartnersGroup", "DocumentShares", qsTr("Shared documents"), documentSharesPageComp)
+				multiPageView.toggleExpanded("PartnersGroup")
+				container.__fetchConnectionRequests()
+			}
+
+			// Contracts: the contracts and what a new one is made of
+			var canSeeContracts = stateManager_.canViewContracts && hasContracts
+			var canSeeCatalogs = (stateManager_.canViewContracts || stateManager_.canEditPartyRoles || stateManager_.canEditContractTypes) && hasContracts
+			if (canSeeContracts || canSeeCatalogs) {
+				multiPageView.addPage("ContractsGroup", qsTr("Contracts"), null, "Icons/Assignment")
+				if (canSeeContracts)
+					multiPageView.addSubPage("ContractsGroup", "Contracts", qsTr("Contracts"), contractsPageComp)
+				if (canSeeCatalogs) {
+					multiPageView.addSubPage("ContractsGroup", "ContractTypes", qsTr("Types of contracts"), contractTypesPageComp)
+					multiPageView.addSubPage("ContractsGroup", "PartyRoles", qsTr("Roles of the parties"), partyRolesPageComp)
+				}
+				multiPageView.toggleExpanded("ContractsGroup")
 			}
 
 			multiPageView.currentIndex = 0
+			container.showRequestedContract()
 		}
 
 		Component.onCompleted: {
 			container.__builtPagesKey = container.__pagesKey()
 			multiPageView.updatePages()
 		}
+	}
+
+	function __openPage(pageId) {
+		multiPageView.activatePage(multiPageView.getIndexById(pageId))
+	}
+
+	function __fetchConnectionRequests() {
+		if (container.apiClient && container.tenantData && container.tenantData.m_id)
+			container.apiClient.fetchConnectionRequests(String(container.tenantData.m_id))
+	}
+
+	// The requests waiting for an answer of the organization are counted on the address book
+	function __updateAddressBookBadge() {
+		var count = 0
+		var tenantId = container.tenantData && container.tenantData.m_id ? String(container.tenantData.m_id) : ""
+		var requests = container.apiClient ? container.apiClient.connectionRequestsModel : null
+		if (requests) {
+			for (var i = 0; i < requests.count; ++i) {
+				var request = requests.get(i)
+				if (request.status === "Pending" && request.targetTenantId === tenantId)
+					count++
+			}
+		}
+		multiPageView.setPageBadge("AddressBook", count > 0 ? String(count) : "")
+	}
+
+	// The shares belong to the organization of the session, so only its own editor shows them
+	function __canSeeShares() {
+		return ApplicationInfoProvider.documentSharingEnabled
+			&& (stateManager_.isAdmin || stateManager_.canViewOrganizationConnections)
+			&& !!container.tenantData && String(container.tenantData.m_id) === AuthorizationController.getTenantId()
 	}
 
 	// The page list follows what the pages depend on, including the organization of the session for the shares
@@ -346,6 +406,9 @@ DocumentViewBase {
 
 	Connections {
 		target: container.apiClient
+		function onConnectionRequestsReceived() {
+			container.__updateAddressBookBadge()
+		}
 		function onInvitationCreated() {
 			PopupManager.addSuccessMessage(qsTr("Invitation created successfully"), true)
 		}
@@ -460,14 +523,51 @@ DocumentViewBase {
 		}
 	}
 
-	Component {
-		id: crossOrgGrantsPageComp
 
-		TenantCrossOrgGrantsPage {
+	Component {
+		id: addressBookPageComp
+
+		TenantPartnersPage {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
+			canFindInDirectory: multiPageView.getIndexById("DirectorySearch") >= 0
+
+			onFindInDirectoryRequested: {
+				container.__openPage("DirectorySearch")
+			}
+		}
+	}
+
+	Component {
+		id: directorySearchPageComp
+
+		TenantDirectorySearchPage {
+			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
+			contractsApiClient: container.contractsApiClient
+			canEditProfile: stateManager_.canEditDirectoryProfile
 			headerHost: container.__headerHost ? container : null
+
+			onProfileRequested: {
+				container.__openPage("Discovery")
+			}
+
+			onAddressBookRequested: {
+				container.__openPage("AddressBook")
+			}
+		}
+	}
+
+	Component {
+		id: discoveryPageComp
+
+		TenantConnectionCodePage {
+			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
+			contractsApiClient: container.contractsApiClient
 		}
 	}
 
@@ -485,27 +585,32 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
+			contractsApiClient: container.contractsApiClient
+			headerHost: container.__headerHost ? container : null
+			contractToOpenId: container.contractToOpenId
+			onContractOpenHandled: container.contractOpenHandled()
+		}
+	}
+
+	Component {
+		id: partyRolesPageComp
+
+		TenantPartyRolesPage {
+			model: container.tenantData
+			stateManager: stateManager_
+			contractsApiClient: container.contractsApiClient
 			headerHost: container.__headerHost ? container : null
 		}
 	}
 
 	Component {
-		id: connectionCodePageComp
+		id: contractTypesPageComp
 
-		TenantConnectionCodePage {
+		TenantContractTypesPage {
 			model: container.tenantData
 			stateManager: stateManager_
-			apiClient: container.apiClient
-		}
-	}
-
-	Component {
-		id: partnersPageComp
-
-		TenantPartnersPage {
-			model: container.tenantData
-			stateManager: stateManager_
-			apiClient: container.apiClient
+			contractsApiClient: container.contractsApiClient
+			headerHost: container.__headerHost ? container : null
 		}
 	}
 

@@ -16,6 +16,18 @@
         <Element ComponentName="UserSessionsSqlRepository" X="925" Y="650" Note=""/>
         <Element ComponentName="UserSettingsDatabaseDelegate" X="200" Y="650" Note=""/>
         <Element ComponentName="UserSqlRepository" X="775" Y="100" Note=""/>
+        <Element ComponentName="ContractSqlRepository" X="150" Y="850" Note=""/>
+        <Element ComponentName="TenantConnectionRequestSqlRepository" X="450" Y="850" Note=""/>
+        <Element ComponentName="TenantConnectionCodeSqlRepository" X="750" Y="850" Note=""/>
+        <Element ComponentName="TenantConnectionSqlRepository" X="1050" Y="850" Note=""/>
+        <Element ComponentName="CrossTenantMessageSqlRepository" X="1350" Y="850" Note=""/>
+        <Element ComponentName="OrderRequestSqlRepository" X="150" Y="1000" Note=""/>
+        <Element ComponentName="ContractPartyRecordSqlRepository" X="450" Y="1000" Note=""/>
+        <Element ComponentName="ContractEventSqlRepository" X="750" Y="1000" Note=""/>
+        <Element ComponentName="ContractPartyRoleSqlRepository" X="1050" Y="1000" Note=""/>
+        <Element ComponentName="ContractTypeSqlRepository" X="1350" Y="1000" Note=""/>
+        <Element ComponentName="TenantDirectoryProfileSqlRepository" X="150" Y="1150" Note=""/>
+        <Element ComponentName="ContractAttachmentSqlRepository" X="450" Y="1150" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

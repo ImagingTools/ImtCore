@@ -3,10 +3,50 @@
 
 // Qt includes
 #include <QtCore/QList>
+#include <QtCore/QDateTime>
+
+// ACF includes
+#include <istd/TNullableValue.h>
 
 
 namespace imtsdl
 {
+
+
+/**
+	A time of the schema: ISO text in UTC, empty for an unset time.
+*/
+inline QString ToSdlTime(const QDateTime& time)
+{
+	return time.isValid() ? time.toUTC().toString(Qt::ISODateWithMs) : QString();
+}
+
+
+inline QDateTime FromSdlTime(const QString& text)
+{
+	QDateTime retVal = QDateTime::fromString(text, Qt::ISODateWithMs);
+	if (!retVal.isValid()){
+		retVal = QDateTime::fromString(text, Qt::ISODate);
+	}
+
+	return retVal.isValid() ? retVal.toUTC() : QDateTime();
+}
+
+
+inline QDateTime FromSdlTime(const istd::TNullableValue<QString>& text)
+{
+	return FromSdlTime(text.value_or(QString()));
+}
+
+
+/**
+	An enumeration of the schema that lists its values in the order of the model enumeration.
+*/
+template <typename Target, typename Source>
+inline Target ConvertEnum(Source value)
+{
+	return static_cast<Target>(static_cast<int>(value));
+}
 
 
 enum KeyId

@@ -65,7 +65,7 @@ public:
 	// reimplemented (IOrderRequest)
 	virtual OrderRequestInfo GetOrderRequest(const QByteArray& orderRequestId) const override;
 	virtual OrderRequests GetOrderRequests(const QByteArray& targetTenantId) const override;
-	virtual OrderRequests GetOrderRequestsByRelationship(const QByteArray& relationshipId) const override;
+	virtual OrderRequests GetOrderRequestsByContract(const QByteArray& contractId) const override;
 	virtual bool ConfirmOrderRequest(const QByteArray& orderRequestId, const QString& note = QString()) override;
 	virtual bool RejectOrderRequest(const QByteArray& orderRequestId, const QString& reason = QString()) override;
 	virtual bool UpdateOrderRequestStatus(

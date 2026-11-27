@@ -12,6 +12,11 @@
 #include <QtCore/QUuid>
 
 
+namespace iqt
+{
+	class ITranslationManager;
+}
+
 
 /**
 	Basic functionality and interfaces
@@ -54,6 +59,12 @@ static const inline QByteArray s_permissionPathHeaderId = QByteArrayLiteral("per
 static const inline QByteArray s_languageIdHeaderId = QByteArrayLiteral("languageid");
 // Unique ID of a client request; e.g. a DocumentChanged notification names the request that made the change
 static const inline QByteArray s_requestIdHeaderId = QByteArrayLiteral("X-Request-ID");
+
+
+/**
+	A text of an .acc file in the given language: the texts of the attributes are translated in the context "Attribute".
+*/
+QString TranslateAttributeText(const iqt::ITranslationManager* translationManagerPtr, const QString& text, const QByteArray& languageId);
 
 
 inline bool isValidUuid(const QByteArray& value)
