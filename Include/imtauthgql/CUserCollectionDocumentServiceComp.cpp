@@ -120,6 +120,17 @@ sdl::V1_0::imtauth::CUserData CUserCollectionDocumentServiceComp::OnGetUserRepre
 		response.systemInfos->push_back(systemEntry);
 	}
 
+	// The lock is kept by the login, not by the document
+	if (m_accountLockoutControllerCompPtr.IsValid() && !userPtr->GetId().isEmpty()){
+		qint64 remainingSecs = 0;
+		sdl::V1_0::imtauth::CAccountLock accountLock;
+		accountLock.locked = m_accountLockoutControllerCompPtr->IsAccountLocked(userPtr->GetId(), &remainingSecs);
+		if (*accountLock.locked){
+			accountLock.remainingSecs = int(remainingSecs);
+		}
+		response.accountLock = accountLock;
+	}
+
 	return response;
 }
 

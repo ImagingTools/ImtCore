@@ -44,6 +44,13 @@ type SystemInfo {
 	enabled: Bool
 }
 
+# Lock of an account after consecutive invalid sign-in attempts.
+type AccountLock {
+	locked: Boolean!
+	# Seconds until the lock ends; -1 while it lasts until the superuser unlocks the account.
+	remainingSecs: Int
+}
+
 type UserData {
 	id: ID
 	productId: ID
@@ -59,6 +66,8 @@ type UserData {
 	enabled: Bool
 	# Read-only.
 	accessWarnings: [AccessWarning]
+	# Read-only; absent when the server limits no sign-in attempts.
+	accountLock: AccountLock
 }
 
 input UserDataInput {

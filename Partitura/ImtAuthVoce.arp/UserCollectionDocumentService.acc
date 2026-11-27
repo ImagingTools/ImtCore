@@ -193,6 +193,9 @@
         <Element Id="UserCollectionDocumentService" PackageId="ImtAuthGqlPck" ComponentId="UserCollectionDocumentService">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AccountLockoutController" Type="Reference" ExportId="AccountLockoutController">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="BindingManager" Type="Reference" ExportId="BindingManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

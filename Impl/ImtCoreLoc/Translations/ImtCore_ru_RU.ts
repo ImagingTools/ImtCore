@@ -2,6 +2,29 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ru_RU">
 <context>
+    <name>AccountLockBanner</name>
+    <message>
+        <location filename="../../../Qml/imtauthgui/AccountLockBanner.qml" line="+51"/>
+        <source>Account locked</source>
+        <translation>Учётная запись заблокирована</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Too many invalid sign-in attempts. Sign-in stays blocked until the account is unlocked.</source>
+        <translation>Слишком много неудачных попыток входа. Вход заблокирован до разблокировки учётной записи.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Too many invalid sign-in attempts. Sign-in is blocked for about %1 min.</source>
+        <translation>Слишком много неудачных попыток входа. Вход заблокирован примерно на %1 мин.</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>Unlock</source>
+        <translation>Разблокировать</translation>
+    </message>
+</context>
+<context>
     <name>AddressEditor</name>
     <message>
         <location filename="../../../Qml/imtgeogui/AddressEditor.qml" line="+15"/>
@@ -15751,6 +15774,16 @@
         <location line="+168"/>
         <source>The changes could not be saved</source>
         <translation>Не удалось сохранить изменения</translation>
+    </message>
+    <message>
+        <location line="+56"/>
+        <source>The account has been unlocked</source>
+        <translation>Учётная запись разблокирована</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>The account could not be unlocked</source>
+        <translation>Не удалось разблокировать учётную запись</translation>
     </message>
 </context>
 <context>

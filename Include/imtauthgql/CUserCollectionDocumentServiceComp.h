@@ -14,6 +14,7 @@
 #include <imtauth/ITenantEntityBindingManager.h>
 #include <imtauth/IDelegatedAccess.h>
 #include <imtauth/IPasswordPolicy.h>
+#include <imtauth/IAccountLockoutController.h>
 
 // Generated includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/UserCollectionDocumentService_fwd.h>
@@ -48,6 +49,7 @@ public:
 		I_ASSIGN(m_bindingManagerCompPtr, "BindingManager", "Tenant entity binding manager for tenant-scoped adaptation of user roles/groups/permissions", false, "TenantEntityBindingManager");
 		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Permissions given to the users by the contracts of the organizations", false, "ContractDelegatedAccess");
 		I_ASSIGN(m_passwordPolicyCompPtr, "PasswordPolicy", "Password policy checked for a password set in the user editor", false, "PasswordPolicy");
+		I_ASSIGN(m_accountLockoutControllerCompPtr, "AccountLockoutController", "Lockout after invalid sign-in attempts, shown in the user representation", false, "AccountLockoutController");
 	I_END_COMPONENT
 
 protected:
@@ -71,6 +73,7 @@ private:
 	I_REF(imtauth::ITenantEntityBindingManager, m_bindingManagerCompPtr);
 	I_REF(imtauth::IDelegatedAccess, m_delegatedAccessCompPtr);
 	I_REF(imtauth::IPasswordPolicy, m_passwordPolicyCompPtr);
+	I_REF(imtauth::IAccountLockoutController, m_accountLockoutControllerCompPtr);
 
 	mutable QMutex m_pendingTenantIdsMutex;
 	mutable QMap<QByteArray, QByteArray> m_pendingTenantIds; ///< documentId -> tenantId, stored during OnUpdateUserFromRepresentation
