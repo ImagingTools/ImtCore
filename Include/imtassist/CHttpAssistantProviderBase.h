@@ -12,6 +12,7 @@
 // ImtCore includes
 #include <imtassist/IAssistantProvider.h>
 #include <imtassist/IAssistantHttpTransport.h>
+#include <imtrest/HttpHeaderIds.h>
 
 
 namespace imtassist
@@ -51,7 +52,7 @@ public:
 		/**
 			Header that carries the API key, e.g. "Authorization", "x-api-key", "api-key".
 		*/
-		QByteArray authHeaderName = "Authorization";
+		QByteArray authHeaderName = imtrest::HttpHeaderIds::s_authorization;
 
 		/**
 			Prefix of the header value, e.g. "Bearer ".
@@ -133,7 +134,7 @@ public:
 	Settings GetSettings() const;
 
 	/**
-		Set the transport. Not owned; nullptr restores the built-in Qt transport.
+		Set the transport. Not owned; nullptr restores the built-in imtrest transport.
 	*/
 	void SetTransport(IAssistantHttpTransport* transportPtr);
 

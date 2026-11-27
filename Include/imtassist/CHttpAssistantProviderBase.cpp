@@ -9,7 +9,8 @@
 #include <QtCore/QSet>
 
 // ImtCore includes
-#include <imtassist/CQtHttpTransport.h>
+#include <imtassist/CRestHttpTransport.h>
+#include <imtrest/HttpHeaderIds.h>
 
 
 namespace imtassist
@@ -53,7 +54,7 @@ const QString CHttpAssistantProviderBase::s_clarificationToolName = QStringLiter
 
 
 CHttpAssistantProviderBase::CHttpAssistantProviderBase()
-	:m_defaultTransportPtr(std::make_shared<CQtHttpTransport>())
+	:m_defaultTransportPtr(std::make_shared<CRestHttpTransport>())
 {
 }
 
@@ -174,7 +175,7 @@ IAssistantProvider::Reply CHttpAssistantProviderBase::Complete(const Request& re
 	IAssistantHttpTransport::Request httpRequest;
 	httpRequest.url = settings.endpoint;
 	httpRequest.timeoutMs = request.timeoutMs;
-	httpRequest.headers.append(qMakePair(QByteArray("Content-Type"), QByteArray("application/json")));
+	httpRequest.headers.append(qMakePair(imtrest::HttpHeaderIds::s_contentType, QByteArray("application/json")));
 	httpRequest.headers.append(settings.extraHeaders);
 
 	if (!CreateHttpRequest(settings, request, toolNames, turns, httpRequest)){

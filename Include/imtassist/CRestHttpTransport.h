@@ -10,13 +10,12 @@ namespace imtassist
 
 
 /**
-	HTTP transport based on QNetworkAccessManager.
-	Each call uses its own network access manager and a local event loop, so it can be
-	used from any thread. The cancellation token is checked while the request is running.
+	HTTP transport based on imtrest::CHttpClientRequest and imtrest::CHttpClientRequestSender.
+	It can be used from any thread; the cancellation token is checked while the request runs.
 
 	\ingroup imtassist
 */
-class CQtHttpTransport: virtual public IAssistantHttpTransport
+class CRestHttpTransport: virtual public IAssistantHttpTransport
 {
 public:
 	enum
@@ -24,8 +23,7 @@ public:
 		/**
 			Maximum size of a response body; larger responses are treated as network errors.
 		*/
-		MAX_RESPONSE_SIZE = 8 * 1024 * 1024,
-		CANCELLATION_POLL_INTERVAL_MS = 50
+		MAX_RESPONSE_SIZE = 8 * 1024 * 1024
 	};
 
 	// reimplemented (imtassist::IAssistantHttpTransport)

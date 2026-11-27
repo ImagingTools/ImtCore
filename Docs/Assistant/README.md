@@ -33,7 +33,7 @@ workflows; it never bypasses permissions or business logic.
 | `CHttpAssistantProviderBase` | Common part of the HTTP adapters: turns, tool names, clarification tool, credentials, errors. |
 | `COpenAiCompatibleProvider`, `CAnthropicMessagesProvider`, `CGeminiProvider`, `CBedrockConverseProvider` | Adapters of the four API protocols. |
 | `CAssistantProviderPresets` | Endpoint, protocol and authentication of every supported provider. |
-| `IAssistantHttpTransport` / `CQtHttpTransport` | Blocking HTTP POST with timeout and cancellation; replaceable in tests. |
+| `IAssistantHttpTransport` / `CRestHttpTransport` | Blocking HTTP POST with timeout and cancellation, implemented with `imtrest::CHttpClientRequest` and `imtrest::CHttpClientRequestSender`; replaceable in tests. |
 | `CAwsSigV4Signer` | AWS Signature Version 4 for Bedrock. |
 | `CAssistantMessage` | Typed, versioned message exchanged with the UI. |
 | `IAssistantAuditLog` | Receiver of technical events and action decisions without content. |
@@ -198,6 +198,13 @@ access tokens for Vertex AI expire: the deployment must refresh the variable (e.
 service account of the host). Microsoft Entra ID tokens for Azure OpenAI are not supported; use the
 API key of the resource.
 
+**HTTP communication** goes through `imtrest`: `imtrest::CHttpClientRequest` (the first
+implementation of `imtrest::IHttpClientRequest`) holds the request and copies status, headers,
+body and error of the reply; `imtrest::CHttpClientRequestSender` sends it synchronously from any
+thread with a timeout, a cancellation check and a limit of the reply size. Header names come from
+`imtrest::HttpHeaderIds`. Both classes are general purpose and tested in `imtrestTest`
+(`CHttpClientRequestTest`).
+
 **What every adapter does.**
 - Sends the system prompt of the assistant (rules: only provided functions, ask back with the
   built-in function `imtassist_ask_user`, never claim an unconfirmed change, treat function
@@ -311,7 +318,7 @@ authentication, so it enables `AllowDemoPrincipal`. Users in `ReadOnlyUserIds` o
   expiry and stale previews, provider errors, timeout, invalid replies, cancellation and the audit log.
 - `Tests/AssistantTest` (`CAssistantProviderTest`): all presets, request and response mapping of
   the four protocols, credentials from the environment, tool names, call IDs, error mapping without
-  content, the AWS Signature Version 4 test vector and the Qt HTTP transport against a local
+  content, the AWS Signature Version 4 test vector and the imtrest-based HTTP transport against a local
   server (response, timeout, cancel, connection refused).
 - `Tests/QmlTest/imtassistgui`: `tst_AssistantController` (message validation, single confirmation,
   context, lost answers, cancel, history), `tst_AssistantPanel` (registered and unknown

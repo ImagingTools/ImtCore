@@ -22,7 +22,7 @@
 #include <imtassist/CBedrockConverseProvider.h>
 #include <imtassist/CGeminiProvider.h>
 #include <imtassist/COpenAiCompatibleProvider.h>
-#include <imtassist/CQtHttpTransport.h>
+#include <imtassist/CRestHttpTransport.h>
 
 
 using namespace imtassist;
@@ -987,7 +987,7 @@ void CAssistantProviderTest::testSigV4_AwsTestVector()
 }
 
 
-void CAssistantProviderTest::testQtTransport_ResponseTimeoutAndCancel()
+void CAssistantProviderTest::testRestTransport_ResponseTimeoutAndCancel()
 {
 	QTcpServer server;
 	QVERIFY(server.listen(QHostAddress::LocalHost));
@@ -1006,7 +1006,7 @@ void CAssistantProviderTest::testQtTransport_ResponseTimeoutAndCancel()
 		});
 	});
 
-	CQtHttpTransport transport;
+	CRestHttpTransport transport;
 
 	IAssistantHttpTransport::Request request;
 	request.url = QUrl(QStringLiteral("http://127.0.0.1:%1/v1/chat/completions").arg(server.serverPort()));

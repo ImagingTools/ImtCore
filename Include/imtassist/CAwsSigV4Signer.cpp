@@ -8,6 +8,9 @@
 #include <QtCore/QMessageAuthenticationCode>
 #include <QtCore/QUrlQuery>
 
+// ImtCore includes
+#include <imtrest/HttpHeaderIds.h>
+
 
 namespace imtassist
 {
@@ -57,7 +60,7 @@ void CAwsSigV4Signer::Sign(
 		host += ":" + QByteArray::number(url.port());
 	}
 
-	headers.append(qMakePair(QByteArray("Host"), host));
+	headers.append(qMakePair(imtrest::HttpHeaderIds::s_host, host));
 	headers.append(qMakePair(QByteArray("X-Amz-Date"), amzDate));
 	if (!credentials.sessionToken.isEmpty()){
 		headers.append(qMakePair(QByteArray("X-Amz-Security-Token"), credentials.sessionToken));
@@ -81,7 +84,7 @@ void CAwsSigV4Signer::Sign(
 				", SignedHeaders=" + signedHeaders +
 				", Signature=" + signature;
 
-	headers.append(qMakePair(QByteArray("Authorization"), authorization));
+	headers.append(qMakePair(imtrest::HttpHeaderIds::s_authorization, authorization));
 }
 
 

@@ -171,6 +171,7 @@ imtauthgql.depends = imtauthsdl
 
 SUBDIRS += imtassist
 imtassist.file = ../../Include/imtassist/QMake/imtassist.pro
+imtassist.depends = imtrest
 
 SUBDIRS += imtcrypt
 imtcrypt.file = ../../Include/imtcrypt/QMake/imtcrypt.pro
@@ -538,7 +539,7 @@ ImtHypeGuiPck.depends = imthypegui imthype imtwidgets imtgui
 
 SUBDIRS += ImtAssistPck
 ImtAssistPck.file = ../../Impl/ImtAssistPck/QMake/ImtAssistPck.pro
-ImtAssistPck.depends = imtassist
+ImtAssistPck.depends = imtassist imtrest imtcom
 
 SUBDIRS += ImtAssistGqlPck
 ImtAssistGqlPck.file = ../../Impl/ImtAssistGqlPck/QMake/ImtAssistGqlPck.pro

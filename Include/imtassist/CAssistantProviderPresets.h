@@ -42,7 +42,7 @@ public:
 		QString name;
 		Protocol protocol = P_OPENAI_COMPATIBLE;
 		QString endpointTemplate;
-		QByteArray authHeaderName = "Authorization";
+		QByteArray authHeaderName = imtrest::HttpHeaderIds::s_authorization;
 		QByteArray authValuePrefix = "Bearer ";
 		IAssistantHttpTransport::Headers extraHeaders;
 		bool allowsNoCredentials = false;

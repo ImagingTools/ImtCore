@@ -9,7 +9,7 @@
 /**
 	Tests of the HTTP provider adapters of imtassist: presets of all providers, request
 	and response mapping of the four API protocols, credentials, error mapping, AWS
-	Signature Version 4 and the Qt HTTP transport. No test contacts a real provider.
+	Signature Version 4 and the HTTP transport based on imtrest. No test contacts a real provider.
 */
 class CAssistantProviderTest: public QObject
 {
@@ -39,7 +39,7 @@ private slots:
 
 	// Signature and transport
 	void testSigV4_AwsTestVector();
-	void testQtTransport_ResponseTimeoutAndCancel();
+	void testRestTransport_ResponseTimeoutAndCancel();
 };
 
 
