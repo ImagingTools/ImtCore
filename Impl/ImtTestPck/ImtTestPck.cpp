@@ -30,6 +30,11 @@ I_EXPORT_COMPONENT(
             "Test object delegate for SQL table",
             "SQL Test Delegate");
 
+I_EXPORT_COMPONENT(
+            EnvironmentDatabaseSettings,
+            "Database access settings overridden by the environment variables of a build server, for test databases only",
+            "Database Settings Environment Test");
+
 
 
 } // namespace ImtTestPck

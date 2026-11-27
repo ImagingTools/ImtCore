@@ -7,6 +7,7 @@
 #include <icomp/TMakeComponentWrap.h>
 
 // ImtCore includes
+#include <imttest/CEnvironmentDatabaseSettingsComp.h>
 #include <imttest/CTestInfo.h>
 #include <imttest/CTestMetaInfoCreatorComp.h>
 #include <imttest/CTestDatabaseDelegateComp.h>
@@ -27,6 +28,7 @@ typedef icomp::TModelCompWrap<
 						istd::IChangeable>> TestInfo;
 typedef imttest::CTestMetaInfoCreatorComp TestMetaInfoCreator;
 typedef imttest::CTestDatabaseDelegateComp TestDatabaseDelegate;
+using EnvironmentDatabaseSettings = icomp::TModelCompWrap<imttest::CEnvironmentDatabaseSettingsComp>;
 
 
 } // namespace ImtTestPck

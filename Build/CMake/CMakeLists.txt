@@ -620,6 +620,9 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_subdirectory("${INCLUDE_DIR}/imtgqltest/CMake" "${AUX_INCLUDE_DIR}/imtgqltest")
 		add_dependencies(imtgqltest imtcom imtrest imtbase)
 
+		add_subdirectory("${INCLUDE_DIR}/imtpermtest/CMake" "${AUX_INCLUDE_DIR}/imtpermtest")
+		add_dependencies(imtpermtest imtlic)
+
 		add_subdirectory("${TESTS_DIR}/FileCollectionTest/CMake" "${AUX_INCLUDE_DIR}/FileCollectionTest")
 		add_dependencies(ImtCoreFileCollectionTest imtbase imtaccount imtauth imtrepo)
 
