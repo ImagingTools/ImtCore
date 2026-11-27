@@ -24,7 +24,8 @@
         "${IMTCOREDIR}/Qml/imtlicgui",
         "${IMTCOREDIR}/Qml/imtdeskgui",
         "${IMTCOREDIR}/Qml/imtnotifygui",
-        "${IMTCOREDIR}/Qml/imtchatgui"
+        "${IMTCOREDIR}/Qml/imtchatgui",
+        "${IMTCOREDIR}/Qml/imtassistgui"
     ],
     "translation_dir": "${IMTCOREDIR}/Impl/ImtCoreLoc/Translations"
 }

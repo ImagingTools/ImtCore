@@ -96,6 +96,12 @@ public:
 		Q_INIT_RESOURCE(imtlicguiqml);
 	}
 
+	// For applications that use the AI assistant panel (imtassistgui)
+	static void InitAssistantQml()
+	{
+		Q_INIT_RESOURCE(imtassistguiqml);
+	}
+
 	static void InitGeoQml()
 	{
 		Q_INIT_RESOURCE(imtgeoguiqml);

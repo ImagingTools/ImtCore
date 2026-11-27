@@ -338,6 +338,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		# QML libraries
 		add_subdirectory("${QML_DIR}/imtauthgui/CMake"		"${AUX_INCLUDE_DIR}/imtauthguiqml")
 		add_subdirectory("${QML_DIR}/imtchatgui/CMake"		"${AUX_INCLUDE_DIR}/imtchatguiqml")
+		add_subdirectory("${QML_DIR}/imtassistgui/CMake"	"${AUX_INCLUDE_DIR}/imtassistguiqml")
 		add_subdirectory("${QML_DIR}/imtcolgui/CMake"		"${AUX_INCLUDE_DIR}/imtcolguiqml")
 		add_subdirectory("${QML_DIR}/imtcontrols/CMake"		"${AUX_INCLUDE_DIR}/imtcontrolsqml")
 		add_subdirectory("${QML_DIR}/imtdeskgui/CMake"		"${AUX_INCLUDE_DIR}/imtdeskguiqml")
@@ -688,7 +689,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 			add_subdirectory("${TESTS_DIR}/QmlTest/CMake" "${AUX_INCLUDE_DIR}/QmlTest")
 			add_dependencies(ImtCoreQmlTest
 				imtbasesdl imtappsdl imtauthsdl imtcolorsdl imt2dsdl imtnotifysdl
-				imtstylecontrolsqml imtcontrolsqml imtguiqml imtguigqlqml imtcolguiqml imtdocguiqml imtauthguiqml imtlicguiqml imtnotifyguiqml
+				imtstylecontrolsqml imtcontrolsqml imtguiqml imtguigqlqml imtcolguiqml imtdocguiqml imtauthguiqml imtlicguiqml imtnotifyguiqml imtassistguiqml
 				imtstyle imtqml imtgql
 			)
 			imt_chain_windeploy_target(ImtCoreQmlTest)

@@ -27,6 +27,7 @@ static void InitQmlResources()
 	Q_INIT_RESOURCE(imtstylecontrolsqml);
 	DefaultImtCoreQmlInitializer::InitImtCoreSdl();
 	DefaultImtCoreQmlInitializer::InitQml();
+	DefaultImtCoreQmlInitializer::InitAssistantQml();
 }
 
 

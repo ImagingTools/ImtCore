@@ -349,6 +349,9 @@ SUBDIRS += imtdeskguiqml
 imtdeskguiqml.file = ../../Qml/imtdeskgui/QMake/imtdeskguiqml.pro
 imtdeskguiqml.depends = imtdesksdl
 
+SUBDIRS += imtassistguiqml
+imtassistguiqml.file = ../../Qml/imtassistgui/QMake/imtassistguiqml.pro
+
 SUBDIRS += imtchatguiqml
 imtchatguiqml.file = ../../Qml/imtchatgui/QMake/imtchatguiqml.pro
 imtchatguiqml.depends = imtchatsdl
