@@ -18,28 +18,15 @@ void qt_mac_set_menubar_icons(bool enable);
 #endif
 
 
+// Resources of a static library must be registered explicitly; the call has to be made in the global namespace
+static void InitQmlResources()
+{
+	Q_INIT_RESOURCE(imtqml);
+}
+
+
 namespace imtqml
 {
-
-
-const QByteArray CQuickApplicationComp::s_splashQml = QByteArrayLiteral(
-		"import QtQuick\nimport QtQuick.Window\n"
-		"Window { width: 480; height: 270; visible: true; color: '#2b2b2b'\n"
-		"flags: Qt.SplashScreen | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint\n"
-		"minimumWidth: width; maximumWidth: width; minimumHeight: height; maximumHeight: height\n"
-		"Text { width: parent.width; y: 85 - height / 2; horizontalAlignment: Text.AlignHCenter; color: 'white'; font.pixelSize: 24; text: Qt.application.name }\n"
-		"Text { width: parent.width; y: 175 - height / 2; horizontalAlignment: Text.AlignHCenter; color: '#bbbbbb'; font.pixelSize: 13; text: 'Initializing...' }\n"
-		"Item { id: spinner; width: 24; height: 24; x: (parent.width - width) / 2; y: 209 - height / 2\n"
-		"RotationAnimator on rotation { from: 0; to: 360; duration: 1000; loops: Animation.Infinite; running: true }\n"
-		"Repeater { model: 12; Rectangle { width: 3; height: 3; radius: 1.5; color: 'white'; opacity: (index + 1) / 12\n"
-		"x: spinner.width / 2 - 1.5 + 10.5 * Math.sin(index * Math.PI / 6); y: spinner.height / 2 - 1.5 - 10.5 * Math.cos(index * Math.PI / 6) } } } }");
-
-
-const QByteArray CQuickApplicationComp::s_splashHostQml = QByteArrayLiteral(
-		"import QtQuick\nimport QtQuick.Window\n"
-		"Window { width: 480; height: 270; color: 'transparent'\n"
-		"flags: Qt.SplashScreen | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint\n"
-		"minimumWidth: width; maximumWidth: width; minimumHeight: height; maximumHeight: height }");
 
 
 const QByteArray CQuickApplicationComp::s_settingsGroup = QByteArrayLiteral("MainWindow");
@@ -95,6 +82,8 @@ int CQuickApplicationComp::Execute(int argc, char** argv)
 {
 	int retVal = -1;
 
+	InitQmlResources();
+
 	if (BaseClass::InitializeApplication(argc, argv)){
 		m_runtimeStatus.SetRuntimeStatus(ibase::IRuntimeStatusProvider::RS_STARTING);
 		istd::TDelPtr<QQmlApplicationEngine> engine = new QQmlApplicationEngine(this);
@@ -103,43 +92,48 @@ int CQuickApplicationComp::Execute(int argc, char** argv)
 			engine->addImportPath("qrc:/qml");
 
 			QObject::connect(engine.GetPtr(), &QQmlApplicationEngine::quit, &QGuiApplication::quit);
+
 			// Fixed-size splash window, shown while the main QML tree is being created:
-			QObject* splashObjectPtr = nullptr;
 			imtqml::IQuickObject* splashQuickPtr = m_splashCompPtr.GetPtr();
 			bool isCustomSplash = false;
-			if (splashQuickPtr != nullptr){
-				QQmlComponent hostComponent(engine.GetPtr());
-				hostComponent.setData(s_splashHostQml, QUrl());
-				QObject* hostPtr = hostComponent.create();
-				QQuickWindow* hostWindowPtr = qobject_cast<QQuickWindow*>(hostPtr);
-				if (hostWindowPtr != nullptr && splashQuickPtr->CreateQuickItem(hostWindowPtr->contentItem()) && splashQuickPtr->GetQuickItem() != nullptr){
-					QQuickItem* splashItemPtr = splashQuickPtr->GetQuickItem();
+			QQmlComponent hostComponent(engine.GetPtr(), QUrl("qrc:/imtqml/SplashHostWindow.qml"));
+			QQuickWindow* hostWindowPtr = qobject_cast<QQuickWindow*>(hostComponent.create());
+			if (hostWindowPtr != nullptr){
+				QQuickItem* splashItemPtr = nullptr;
+				if (splashQuickPtr != nullptr){
+					if (splashQuickPtr->CreateQuickItem(hostWindowPtr->contentItem()) && splashQuickPtr->GetQuickItem() != nullptr){
+						splashItemPtr = splashQuickPtr->GetQuickItem();
+						isCustomSplash = true;
+					}
+					else{
+						qWarning() << "Unable to create the splash item";
+					}
+				}
+
+				if (splashItemPtr == nullptr){
+					QQmlComponent defaultSplashComponent(engine.GetPtr(), QUrl("qrc:/imtqml/DefaultSplashScreen.qml"));
+					splashItemPtr = qobject_cast<QQuickItem*>(defaultSplashComponent.create());
+					if (splashItemPtr != nullptr){
+						splashItemPtr->setParent(hostWindowPtr);
+						splashItemPtr->setParentItem(hostWindowPtr->contentItem());
+					}
+				}
+
+				if (splashItemPtr != nullptr){
 					if (splashItemPtr->implicitWidth() > 0 && splashItemPtr->implicitHeight() > 0){
 						hostWindowPtr->resize(qCeil(splashItemPtr->implicitWidth()), qCeil(splashItemPtr->implicitHeight()));
 					}
 					splashItemPtr->setSize(QSizeF(hostWindowPtr->width(), hostWindowPtr->height()));
 					hostWindowPtr->show();
-					splashObjectPtr = hostWindowPtr;
-					isCustomSplash = true;
 				}
-				else{
-					qWarning() << "Unable to create the splash item";
-					delete hostPtr;
-				}
-			}
-
-			if (splashObjectPtr == nullptr){
-				QQmlComponent splashComponent(engine.GetPtr());
-				splashComponent.setData(s_splashQml, QUrl());
-				splashObjectPtr = splashComponent.create();
 			}
 
 			auto releaseSplash = [&](){
 				if (isCustomSplash){
 					splashQuickPtr->DestroyQuickItem();
 				}
-				delete splashObjectPtr;
-				splashObjectPtr = nullptr;
+				delete hostWindowPtr;
+				hostWindowPtr = nullptr;
 			};
 			QGuiApplication::processEvents();
 
@@ -164,74 +158,71 @@ int CQuickApplicationComp::Execute(int argc, char** argv)
 			}
 
 			imtqml::IQuickObject* quickObjectPtr = m_mainQuickCompPtr.GetPtr();
-			if (quickObjectPtr != nullptr){
-				{
-					if (root != nullptr){
-						QQuickWindow* window = qobject_cast<QQuickWindow*>(root);
-						if (window != nullptr){
-						window->setOpacity(0);
-						if (m_windowWidthAttrPtr.IsValid()){
-							window->setWidth(*m_windowWidthAttrPtr);
-						}
-						if (m_windowHeightAttrPtr.IsValid()){
-							window->setHeight(*m_windowHeightAttrPtr);
-						}
-						if (m_minimumWindowWidthAttrPtr.IsValid()){
-							window->setMinimumWidth(*m_minimumWindowWidthAttrPtr);
-						}
-						if (m_minimumWindowHeightAttrPtr.IsValid()){
-							window->setMinimumHeight(*m_minimumWindowHeightAttrPtr);
-						}
-						if (m_visibilityAttrPtr.IsValid()){
-							window->setVisibility(QWindow::Visibility(*m_visibilityAttrPtr));
-						}
-						window->setWindowState(Qt::WindowMaximized);
-						window->setIcon(QGuiApplication::windowIcon());
-						window->setTitle(QGuiApplication::applicationName());
-
-						// Apply saved window geometry:
-						QSettings settings;
-						settings.beginGroup(QString::fromLatin1(s_settingsGroup));
-						if (settings.contains("geometry")){
-							const QRect geometry = settings.value("geometry").toRect();
-							window->setWindowState(Qt::WindowNoState);
-							if (geometry.isValid()){
-								window->setGeometry(geometry);
-							}
-							if (settings.value("maximized", true).toBool()){
-								window->setWindowState(Qt::WindowMaximized);
-							}
-						}
-						settings.endGroup();
-
-						QObject::connect(qApp, &QCoreApplication::aboutToQuit, window, [window](){
-							QSettings settings;
-							settings.beginGroup(QString::fromLatin1(s_settingsGroup));
-							const bool maximized = window->windowState() & Qt::WindowMaximized;
-							settings.setValue("maximized", maximized);
-							if (!maximized){
-								settings.setValue("geometry", window->geometry());
-							}
-							settings.endGroup();
-						});
-
-						window->show();
-						QGuiApplication::processEvents();
-
-						QQuickItem* mainItem = window->contentItem();
-						if (mainItem != nullptr){
-							quickObjectPtr->CreateQuickItem(mainItem);
-						}
-						QGuiApplication::processEvents();
-						window->setOpacity(1);
-						window->requestUpdate();
-						}
-					}
-				}
-			}
-			else{
+			if (quickObjectPtr == nullptr){
 				releaseSplash();
 				return -1;
+			}
+
+			if (root != nullptr){
+				QQuickWindow* window = qobject_cast<QQuickWindow*>(root);
+				if (window != nullptr){
+					window->setOpacity(0);
+					if (m_windowWidthAttrPtr.IsValid()){
+						window->setWidth(*m_windowWidthAttrPtr);
+					}
+					if (m_windowHeightAttrPtr.IsValid()){
+						window->setHeight(*m_windowHeightAttrPtr);
+					}
+					if (m_minimumWindowWidthAttrPtr.IsValid()){
+						window->setMinimumWidth(*m_minimumWindowWidthAttrPtr);
+					}
+					if (m_minimumWindowHeightAttrPtr.IsValid()){
+						window->setMinimumHeight(*m_minimumWindowHeightAttrPtr);
+					}
+					if (m_visibilityAttrPtr.IsValid()){
+						window->setVisibility(QWindow::Visibility(*m_visibilityAttrPtr));
+					}
+					window->setWindowState(Qt::WindowMaximized);
+					window->setIcon(QGuiApplication::windowIcon());
+					window->setTitle(QGuiApplication::applicationName());
+
+					// Apply saved window geometry:
+					QSettings settings;
+					settings.beginGroup(QString::fromLatin1(s_settingsGroup));
+					if (settings.contains("geometry")){
+						const QRect geometry = settings.value("geometry").toRect();
+						window->setWindowState(Qt::WindowNoState);
+						if (geometry.isValid()){
+							window->setGeometry(geometry);
+						}
+						if (settings.value("maximized", true).toBool()){
+							window->setWindowState(Qt::WindowMaximized);
+						}
+					}
+					settings.endGroup();
+
+					QObject::connect(qApp, &QCoreApplication::aboutToQuit, window, [window](){
+						QSettings settings;
+						settings.beginGroup(QString::fromLatin1(s_settingsGroup));
+						const bool maximized = window->windowState() & Qt::WindowMaximized;
+						settings.setValue("maximized", maximized);
+						if (!maximized){
+							settings.setValue("geometry", window->geometry());
+						}
+						settings.endGroup();
+					});
+
+					window->show();
+					QGuiApplication::processEvents();
+
+					QQuickItem* mainItem = window->contentItem();
+					if (mainItem != nullptr){
+						quickObjectPtr->CreateQuickItem(mainItem);
+					}
+					QGuiApplication::processEvents();
+					window->setOpacity(1);
+					window->requestUpdate();
+				}
 			}
 
 			releaseSplash();
@@ -274,7 +265,7 @@ void CQuickApplicationComp::OnEventLoopStarted()
 	m_runtimeStatus.SetRuntimeStatus(ibase::IRuntimeStatusProvider::RS_RUNNING);
 
 	InitializeComponents();
-	
+
 	Q_ASSERT(qApp->startingUp() == false);
 }
 

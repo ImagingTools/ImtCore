@@ -47,20 +47,30 @@ public:
 	virtual QString GetHelpText() const override;
 
 protected:
+	/**
+		Helper used to wait for the asynchronous creation of the main QML window.
+		The incubator quits the given event loop as soon as the object is ready or the creation has failed.
+		The created window is hidden, so that it is not shown before it is fully configured.
+	**/
 	class CLoopIncubator: public QQmlIncubator
 	{
 	public:
-		CLoopIncubator(QEventLoop& loop) : QQmlIncubator(QQmlIncubator::Asynchronous), m_loop(loop)
-		{}
+		explicit CLoopIncubator(QEventLoop& loop)
+			:QQmlIncubator(QQmlIncubator::Asynchronous),
+			m_loop(loop)
+		{
+		}
 
 	protected:
-		void statusChanged(Status status) override
+		// reimplemented (QQmlIncubator)
+		virtual void statusChanged(Status status) override
 		{
 			if (status == Ready || status == Error){
 				QQuickWindow* windowPtr = qobject_cast<QQuickWindow*>(object());
 				if (windowPtr != nullptr){
 					windowPtr->setVisible(false);
 				}
+
 				m_loop.quit();
 			}
 		}
@@ -69,8 +79,6 @@ protected:
 		QEventLoop& m_loop;
 	};
 
-	static const QByteArray s_splashQml;
-	static const QByteArray s_splashHostQml;
 	static const QByteArray s_settingsGroup;
 
 	// reimplemented (icomp::CComponentBase)
