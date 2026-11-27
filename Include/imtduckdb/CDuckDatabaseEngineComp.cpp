@@ -40,12 +40,11 @@ bool CDuckDatabaseEngineComp::BeginTransaction() const
 		return false;
 	}
 
-	auto resultPtr = m_connectionPtr->Query("BEGIN TRANSACTION");
-	if (!resultPtr || resultPtr->HasError()){
+	QString errorText;
+	if (!m_driverPtr->ExecuteStatement("BEGIN TRANSACTION", &errorText)){
 		m_connectionMutex.unlock();
 
-		SendErrorMessage(0, QStringLiteral("Unable to begin transaction. Error: '%1'")
-								.arg(resultPtr ? QString::fromStdString(resultPtr->GetError()) : QStringLiteral("unknown error")), __FILE__);
+		SendErrorMessage(0, QStringLiteral("Unable to begin transaction. Error: '%1'").arg(errorText), __FILE__);
 
 		return false;
 	}
@@ -86,7 +85,7 @@ QSqlQuery CDuckDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, Q
 
 	std::lock_guard<std::recursive_mutex> lock(m_connectionMutex);
 
-	QSqlQuery retVal(new CDuckSqlResult(m_driverPtr.get(), *m_connectionPtr));
+	QSqlQuery retVal(new CDuckSqlResult(m_driverPtr.get(), m_connection));
 
 	retVal.setForwardOnly(isForwardOnly);
 
@@ -129,7 +128,7 @@ QSqlQuery CDuckDatabaseEngineComp::ExecSqlQuery(
 
 	std::lock_guard<std::recursive_mutex> lock(m_connectionMutex);
 
-	QSqlQuery retVal(new CDuckSqlResult(m_driverPtr.get(), *m_connectionPtr));
+	QSqlQuery retVal(new CDuckSqlResult(m_driverPtr.get(), m_connection));
 
 	retVal.setForwardOnly(isForwardOnly);
 
@@ -199,15 +198,14 @@ std::unique_ptr<IDuckConnection> CDuckDatabaseEngineComp::CreateConnection() con
 
 	std::lock_guard<std::recursive_mutex> lock(m_connectionMutex);
 
-	try{
-		return std::make_unique<CDuckConnectionEngine>(*m_databasePtr);
-	}
-	catch (const std::exception& exception){
-		SendErrorMessage(0, QStringLiteral("DuckDB connection could not be created. Error: %1")
-							 .arg(QString(exception.what())), __FILE__);
+	duckdb_connection connection = nullptr;
+	if (duckdb_connect(m_database, &connection) != DuckDBSuccess){
+		SendErrorMessage(0, QStringLiteral("DuckDB connection could not be created"), __FILE__);
 
 		return nullptr;
 	}
+
+	return std::make_unique<CDuckConnectionEngine>(connection);
 }
 
 
@@ -226,9 +224,7 @@ void CDuckDatabaseEngineComp::OnComponentDestroyed()
 	{
 		std::lock_guard<std::recursive_mutex> lock(m_connectionMutex);
 
-		m_driverPtr.reset();
-		m_connectionPtr.reset();
-		m_databasePtr.reset();
+		CloseDatabase();
 
 		m_isTransactionActive = false;
 	}
@@ -247,47 +243,73 @@ bool CDuckDatabaseEngineComp::EnsureDatabaseOpen() const
 	*/
 	std::lock_guard<std::recursive_mutex> lock(m_connectionMutex);
 
-	if (m_connectionPtr){
+	if (m_connection != nullptr){
 		return true;
 	}
 
 	const QString databasePath = GetDatabasePath();
 	const bool readOnly = m_readOnlyAttrPtr.IsValid() && *m_readOnlyAttrPtr;
 
-	try{
-		duckdb::case_insensitive_map_t<duckdb::Value> configOptions;
+	QList<std::pair<QByteArray, QByteArray>> configOptions;
 
-		const QByteArray memoryLimit = m_memoryLimitAttrPtr.IsValid() ? *m_memoryLimitAttrPtr : QByteArray();
-		if (!memoryLimit.isEmpty()){
-			configOptions.emplace("memory_limit", duckdb::Value(memoryLimit.toStdString()));
-		}
-
-		const int threadCount = m_threadCountAttrPtr.IsValid() ? *m_threadCountAttrPtr : 0;
-		if (threadCount > 0){
-			configOptions.emplace("threads", duckdb::Value::BIGINT(threadCount));
-		}
-
-		const QByteArray checkpointThreshold = m_checkpointThresholdAttrPtr.IsValid() ? *m_checkpointThresholdAttrPtr : QByteArray();
-		if (!checkpointThreshold.isEmpty()){
-			configOptions.emplace("checkpoint_threshold", duckdb::Value(checkpointThreshold.toStdString()));
-		}
-
-		duckdb::DBConfig config(configOptions, readOnly);
-
-		m_databasePtr	= std::make_unique<duckdb::DuckDB>(databasePath.isEmpty() ? std::string() : databasePath.toStdString(), &config);
-		m_connectionPtr = std::make_unique<duckdb::Connection>(*m_databasePtr);
-		m_driverPtr		= std::make_unique<CDuckSqlDriver>(*m_connectionPtr);
+	const QByteArray memoryLimit = m_memoryLimitAttrPtr.IsValid() ? *m_memoryLimitAttrPtr : QByteArray();
+	if (!memoryLimit.isEmpty()){
+		configOptions.append({ QByteArrayLiteral("memory_limit"), memoryLimit });
 	}
-	catch (const std::exception& exception){
-		SendErrorMessage(0, QStringLiteral("DuckDB database '%1' could not be opened. Error: %2")
-							 .arg(databasePath, QString(exception.what())), __FILE__);
 
-		m_driverPtr.reset();
-		m_connectionPtr.reset();
-		m_databasePtr.reset();
+	const int threadCount = m_threadCountAttrPtr.IsValid() ? *m_threadCountAttrPtr : 0;
+	if (threadCount > 0){
+		configOptions.append({ QByteArrayLiteral("threads"), QByteArray::number(threadCount) });
+	}
+
+	const QByteArray checkpointThreshold = m_checkpointThresholdAttrPtr.IsValid() ? *m_checkpointThresholdAttrPtr : QByteArray();
+	if (!checkpointThreshold.isEmpty()){
+		configOptions.append({ QByteArrayLiteral("checkpoint_threshold"), checkpointThreshold });
+	}
+
+	if (readOnly){
+		configOptions.append({ QByteArrayLiteral("access_mode"), QByteArrayLiteral("READ_ONLY") });
+	}
+
+	QString errorText;
+
+	duckdb_config config = nullptr;
+	duckdb_create_config(&config);
+
+	for (const auto& [name, option] : std::as_const(configOptions)){
+		if (duckdb_set_config(config, name.constData(), option.constData()) != DuckDBSuccess){
+			errorText = QStringLiteral("Invalid value '%1' of the option '%2'").arg(QString(option), QString(name));
+
+			break;
+		}
+	}
+
+	/**
+		An empty path opens an in-memory database.
+	*/
+	const QByteArray path = databasePath.toUtf8();
+
+	char* openErrorPtr = nullptr;
+	if (errorText.isEmpty() && duckdb_open_ext(path.isEmpty() ? nullptr : path.constData(), &m_database, config, &openErrorPtr) != DuckDBSuccess){
+		errorText = openErrorPtr != nullptr ? QString::fromUtf8(openErrorPtr) : QStringLiteral("unknown error");
+	}
+
+	duckdb_free(openErrorPtr);
+	duckdb_destroy_config(&config);
+
+	if (errorText.isEmpty() && duckdb_connect(m_database, &m_connection) != DuckDBSuccess){
+		errorText = QStringLiteral("The connection could not be created");
+	}
+
+	if (!errorText.isEmpty()){
+		SendErrorMessage(0, QStringLiteral("DuckDB database '%1' could not be opened. Error: %2").arg(databasePath, errorText), __FILE__);
+
+		CloseDatabase();
 
 		return false;
 	}
+
+	m_driverPtr = std::make_unique<CDuckSqlDriver>(m_connection);
 
 	/**
 		A read-only database is expected to already be fully migrated; CREATE TABLE / DDL would fail on it.
@@ -318,12 +340,11 @@ bool CDuckDatabaseEngineComp::EndTransaction(const char* statement, const QStrin
 		return false;
 	}
 
-	auto resultPtr = m_connectionPtr->Query(statement);
+	QString errorText;
 
-	const bool isSuccessful = resultPtr && !resultPtr->HasError();
+	const bool isSuccessful = m_driverPtr->ExecuteStatement(statement, &errorText);
 	if (!isSuccessful){
-		SendErrorMessage(0, QStringLiteral("Unable to %1 transaction. Error: '%2'")
-							 .arg(actionName, resultPtr ? QString::fromStdString(resultPtr->GetError()) : QStringLiteral("unknown error")), __FILE__);
+		SendErrorMessage(0, QStringLiteral("Unable to %1 transaction. Error: '%2'").arg(actionName, errorText), __FILE__);
 	}
 
 	m_isTransactionActive = false;
@@ -441,6 +462,15 @@ QString CDuckDatabaseEngineComp::GetDatabasePath() const
 	}
 
 	return m_dbFilePathCompPtr->GetPath();
+}
+
+
+void CDuckDatabaseEngineComp::CloseDatabase() const
+{
+	m_driverPtr.reset();
+
+	duckdb_disconnect(&m_connection);
+	duckdb_close(&m_database);
 }
 
 

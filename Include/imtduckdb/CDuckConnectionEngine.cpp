@@ -16,10 +16,18 @@ namespace imtduckdb
 {
 
 
-CDuckConnectionEngine::CDuckConnectionEngine(duckdb::DuckDB& database)
-	:m_connectionPtr(std::make_unique<duckdb::Connection>(database))
+CDuckConnectionEngine::CDuckConnectionEngine(duckdb_connection connection)
+	:m_connection(connection),
+	m_driverPtr(std::make_unique<CDuckSqlDriver>(connection))
 {
-	m_driverPtr = std::make_unique<CDuckSqlDriver>(*m_connectionPtr);
+}
+
+
+CDuckConnectionEngine::~CDuckConnectionEngine()
+{
+	m_driverPtr.reset();
+
+	duckdb_disconnect(&m_connection);
 }
 
 
@@ -30,7 +38,7 @@ std::unique_ptr<IDuckAppender> CDuckConnectionEngine::CreateAppender(
 			const QString& schemaName,
 			QString* errorMessagePtr)
 {
-	return CDuckAppender::Create(*m_connectionPtr, tableName, schemaName, errorMessagePtr);
+	return CDuckAppender::Create(m_connection, tableName, schemaName, errorMessagePtr);
 }
 
 
@@ -47,9 +55,7 @@ bool CDuckConnectionEngine::SwapTable(
 
 bool CDuckConnectionEngine::BeginTransaction() const
 {
-	auto resultPtr = m_connectionPtr->Query("BEGIN TRANSACTION");
-
-	const bool retVal = resultPtr && !resultPtr->HasError();
+	const bool retVal = m_driverPtr->ExecuteStatement("BEGIN TRANSACTION");
 	m_isTransactionActive = m_isTransactionActive || retVal;
 
 	return retVal;
@@ -58,19 +64,19 @@ bool CDuckConnectionEngine::BeginTransaction() const
 
 bool CDuckConnectionEngine::FinishTransaction() const
 {
-	auto resultPtr = m_connectionPtr->Query("COMMIT");
+	const bool retVal = m_driverPtr->ExecuteStatement("COMMIT");
 	m_isTransactionActive = false;
 
-	return resultPtr && !resultPtr->HasError();
+	return retVal;
 }
 
 
 bool CDuckConnectionEngine::CancelTransaction() const
 {
-	auto resultPtr = m_connectionPtr->Query("ROLLBACK");
+	const bool retVal = m_driverPtr->ExecuteStatement("ROLLBACK");
 	m_isTransactionActive = false;
 
-	return resultPtr && !resultPtr->HasError();
+	return retVal;
 }
 
 
@@ -82,7 +88,7 @@ QByteArray CDuckConnectionEngine::GetDatabaseDriverId() const
 
 QSqlQuery CDuckConnectionEngine::ExecSqlQuery(const QByteArray& queryString, QSqlError* sqlErrorPtr, bool isForwardOnly) const
 {
-	QSqlQuery retVal(new CDuckSqlResult(m_driverPtr.get(), *m_connectionPtr));
+	QSqlQuery retVal(new CDuckSqlResult(m_driverPtr.get(), m_connection));
 
 	retVal.setForwardOnly(isForwardOnly);
 
@@ -110,7 +116,7 @@ QSqlQuery CDuckConnectionEngine::ExecSqlQuery(
 			QSqlError* sqlErrorPtr,
 			bool isForwardOnly) const
 {
-	QSqlQuery retVal(new CDuckSqlResult(m_driverPtr.get(), *m_connectionPtr));
+	QSqlQuery retVal(new CDuckSqlResult(m_driverPtr.get(), m_connection));
 
 	retVal.setForwardOnly(isForwardOnly);
 	retVal.prepare(queryString);

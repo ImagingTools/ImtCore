@@ -15,7 +15,7 @@ namespace imtduckdb
 
 
 /**
-	Bulk row-appender for a DuckDB table, backed by duckdb::Appender.
+	Bulk row-appender for a DuckDB table, backed by the appender of the DuckDB C API.
 
 	Unlike imtdb::IDatabaseEngine::ExecSqlQuery() (row-at-a-time INSERT through the SQL parser),
 	this interface is meant for high-throughput cache rebuilds: AppendRow() buffers rows in a

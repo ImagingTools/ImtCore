@@ -10,7 +10,7 @@ namespace imtduckdb
 {
 
 
-CDuckSqlDriver::CDuckSqlDriver(duckdb::Connection& connection)
+CDuckSqlDriver::CDuckSqlDriver(duckdb_connection connection)
 	:m_connection(connection)
 {
 	setOpen(true);
@@ -55,9 +55,20 @@ QSqlResult* CDuckSqlDriver::createResult() const
 }
 
 
-duckdb::Connection& CDuckSqlDriver::GetConnection() const
+bool CDuckSqlDriver::ExecuteStatement(const char* statement, QString* errorMessagePtr) const
 {
-	return m_connection;
+	duckdb_result result;
+	const bool retVal = duckdb_query(m_connection, statement, &result) == DuckDBSuccess;
+
+	if (!retVal && errorMessagePtr != nullptr){
+		const char* errorPtr = duckdb_result_error(&result);
+
+		*errorMessagePtr = errorPtr != nullptr ? QString::fromUtf8(errorPtr) : QStringLiteral("unknown error");
+	}
+
+	duckdb_destroy_result(&result);
+
+	return retVal;
 }
 
 
