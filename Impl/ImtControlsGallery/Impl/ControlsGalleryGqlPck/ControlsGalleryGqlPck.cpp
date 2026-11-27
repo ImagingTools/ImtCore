@@ -34,6 +34,21 @@ I_EXPORT_COMPONENT(
 		"Params set test controller",
 		"ParamsSet Test Controller");
 
+I_EXPORT_COMPONENT(
+		DemoTaskStore,
+		"In-memory tasks of the assistant example",
+		"Assistant Demo Task Store");
+
+I_EXPORT_COMPONENT(
+		DemoSearchTasksAction,
+		"Reading assistant action of the example: search tasks",
+		"Assistant Demo Action Search Tasks");
+
+I_EXPORT_COMPONENT(
+		DemoSetTaskStatusAction,
+		"Changing assistant action of the example: change the status of a task",
+		"Assistant Demo Action Task Status");
+
 
 } // namespace ControlsGalleryGqlPck
 

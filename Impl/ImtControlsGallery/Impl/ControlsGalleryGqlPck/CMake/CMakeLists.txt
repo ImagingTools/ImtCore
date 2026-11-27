@@ -5,5 +5,6 @@ include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	controlsgallerygql
+	imtassist
 )
 

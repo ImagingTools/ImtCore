@@ -5,9 +5,17 @@ Users describe a task in natural language, answer clarifying questions and work 
 results with registered application components. The assistant supports existing
 workflows; it never bypasses permissions or business logic.
 
-> **Status:** stage 1 of the implementation: the server-side core library `imtassist`
-> with tests. The GraphQL transport, the QML panel and the example application follow
-> in later stages (see [Roadmap](#roadmap)).
+> **Status:** MVP implemented: core library `imtassist`, GraphQL API `imtassistgql`,
+> QML panel `imtassistgui` and an example in the ControlsGallery. A production model
+> provider is not part of the MVP (see [Open decisions](#open-decisions-before-productive-use)).
+
+| Module | Content |
+|---|---|
+| `Include/imtassist` | Core library and ACF components |
+| `Include/imtassistgql` | GraphQL controller |
+| `Qml/imtassistgui` | QML panel, controller contract, GraphQL controller, standard representations |
+| `Impl/ImtAssistPck`, `Impl/ImtAssistGqlPck` | Component packages |
+| `Impl/ImtControlsGallery` | Example: demo tasks, actions, configuration and the page "Assistant" |
 
 ## Building blocks
 
@@ -25,8 +33,72 @@ workflows; it never bypasses permissions or business logic.
 | `IAssistantAuditLog` | Receiver of technical events and action decisions without content. |
 | `CAssistantRequestContext` | User, tenant, correlation ID and context released by the user. |
 
-The library depends only on Qt Core and ACF `istd`. It is independent of `imtchat`
-(Service Desk chat); no storage or data model is shared.
+The classes without the `Comp` suffix depend only on Qt Core and ACF `istd`. The module is
+independent of `imtchat` (Service Desk chat); no storage, data model or QML component is shared,
+and `imtchatgui` is unchanged.
+
+### Components (`ImtAssistPck`, `ImtAssistGqlPck`)
+
+| Component | Attributes |
+|---|---|
+| `ImtAssistPck/AssistantService` | `Enabled` (default `false`), `Provider`, `ActionRegistry`, `RepresentationRegistry`, `AuditLog`, `ProviderTimeout`, `MaxStepsPerTurn`, `PreviewTimeToLive` |
+| `ImtAssistPck/AssistantActionRegistry` | `Actions`: the action components of the application |
+| `ImtAssistPck/UiRepresentationRegistry` | `RegisterStandardRepresentations` (default `true`), `SchemaProviders` (`IUiRepresentationSchemaProvider`) |
+| `ImtAssistPck/FakeAssistantProvider` | rules: `RuleKeywords`, `RuleActionIds`, `RuleParameters` (JSON), `RuleReplies`, `RuleQuestions`; `DefaultReply`, `ToolResultReply` |
+| `ImtAssistPck/AssistantAuditLog` | writes events to the ACF log of the component |
+| `ImtAssistGqlPck/AssistantController` | `AssistantService`, `CommandIds` (the `Assistant*` commands), `CommandPermissions`, `PermissionChecker`; `AllowDemoPrincipal`, `DemoUserId`, `DemoTenantId` (demo only, see below) |
+
+Add the controller to the `SlaveGqlHandlers` of the GraphQL servlet and gate the commands
+with `CommandPermissions` like any other command of the application.
+
+### GraphQL API
+
+All commands take an `input` object. `messagesJson` is a JSON array of [messages](#messages).
+
+| Command | Input | Output |
+|---|---|---|
+| `AssistantStartConversation` (mutation) | – | `conversationId`, `messagesJson` |
+| `AssistantSendMessage` (mutation) | `conversationId`, `text`, `contextItems` [{`kind`, `label`, `dataJson`}] | `conversationId`, `messagesJson` |
+| `AssistantConfirmPreview` (mutation) | `previewId` | `messagesJson` |
+| `AssistantRejectPreview` (mutation) | `previewId` | `messagesJson` |
+| `AssistantCancelRequest` (mutation) | `conversationId` | `canceled` |
+| `AssistantGetHistory` (query) | `conversationId` | `conversationId`, `messagesJson` |
+| `AssistantCloseConversation` (mutation) | `conversationId` | `closed` |
+
+User and tenant come from `imtgql::IGqlContext`. A request without an authenticated user is
+answered as `Unauthorized`. Context items are limited to 10 per request, 16 KB of JSON data
+each, and a kind of letters, digits, `.`, `_`, `-`.
+
+`AllowDemoPrincipal` processes requests without an authenticated user as `DemoUserId` in
+`DemoTenantId`. It exists for demo applications without authentication, logs a warning at
+startup and must never be enabled in a product.
+
+### QML panel (`imtassistgui`)
+
+```qml
+import imtassistgui 1.0
+
+AssistantPanel {
+    controller: GqlBasedAssistantController {}
+}
+```
+
+- `AssistantController`: transport-independent state (messages, busy state, released context,
+  decisions on previews). It validates every message (`formatVersion`, known `kind`) before it is
+  shown and sends a confirmation or rejection at most once. Keep the controller outside the panel
+  to keep the conversation while the panel is hidden or re-created.
+- `GqlBasedAssistantController`: the GraphQL transport, one sender per command, so cancel and
+  confirm can be sent while a message is being processed.
+- `AssistantPanel`: history, input (Enter sends, Escape cancels), processing state with Cancel,
+  context chips that can be removed, preview cards with Confirm/Reject, error texts by code.
+  `addContext(kind, label, data)` releases application context for the next message.
+- `AssistantRepresentationRegistry`: QML components for structured results by `type` and
+  `version`. A component implements `setRepresentationData(data)` (returns `false` for invalid
+  data) and may emit `selectionHandedOver(kind, label, data)`. `imtassist.selectableList` v1
+  (`AssistantSelectableList`) is registered by default. Unknown types or invalid data are shown
+  as "The result cannot be displayed".
+
+Applications that use the panel call `DefaultImtCoreQmlInitializer::InitAssistantQml()` and link `imtassistguiqml`.
 
 ## Integration
 
@@ -134,21 +206,42 @@ The UI localizes texts by `code`; the `text` of errors is a technical fallback.
 | Max. conversations per user and tenant | 20 |
 | History | in memory, running session only, max. 200 messages per conversation |
 
+## Example (ControlsGallery)
+
+The page **Assistant** of the ControlsGallery shows the MVP flow end to end:
+
+1. "Show open tasks": the reading action `tasks.search` returns the tasks as `imtassist.selectableList`.
+2. Select a task and click **Hand over selection**: the task appears as context.
+3. "Mark it as done": the changing action `tasks.setStatus` prepares a preview (without a handed
+   over task, the assistant asks which task is meant).
+4. **Confirm** executes the change; **Reject** changes nothing.
+
+Server configuration: `Partitura/ImtControlsGalleryVoce.arp/ControlsGalleryHandlers.acc`
+(`AssistantController`, `AssistantService` with `Enabled`, `AssistantProvider` with rules,
+`DemoTaskStore`, `DemoSearchTasksAction`, `DemoSetTaskStatusAction`). The gallery has no
+authentication, so it enables `AllowDemoPrincipal`. Users in `ReadOnlyUserIds` of
+`DemoSetTaskStatusAction` are refused, to try a denied change.
+
 ## Tests
 
-`Tests/AssistantTest` (QtTest, deterministic `CFakeAssistantProvider`) covers schema and
-registry validation, enabling and configuration, the end-to-end flow (search, registered
-list, selection, preview, confirmation), permission, tenant and principal boundaries,
-prompt injection from tool data, confirmation including repetition, rejection, expiry and
-stale previews, provider errors, timeout, invalid replies, cancellation and the audit log.
+- `Tests/AssistantTest` (QtTest, deterministic `CFakeAssistantProvider`): schema and registry
+  validation, enabling and configuration, the end-to-end flow (search, registered list, selection,
+  preview, confirmation), the rules of the fake provider, permission, tenant and principal
+  boundaries, prompt injection from tool data, confirmation including repetition, rejection,
+  expiry and stale previews, provider errors, timeout, invalid replies, cancellation and the audit log.
+- `Tests/QmlTest/imtassistgui`: `tst_AssistantController` (message validation, single confirmation,
+  context, lost answers, cancel, history), `tst_AssistantPanel` (registered and unknown
+  representations, selection hand-over, context removal, explicit confirmation, cancel, re-created
+  panel) and `tst_GqlBasedAssistantController` (requests and answers through `GqlTestTransport`).
 
-## Roadmap
+## Known limitations
 
-1. **Core library `imtassist`** (this stage).
-2. **Transport:** ACF components for service, registries and audit log (bridge to `ilog`); GraphQL API (start conversation, send message, confirm, reject, cancel, history) in a new `imtassistgql` module, context from `IGqlContext`; asynchronous execution so that cancel can arrive while a turn runs.
-3. **QML panel** in a new `imtassistgui` module: dockable panel with history, input, processing state, cancel, preview with confirm/reject, visible and removable context, registry of known representation components; keyboard operation and localized texts. `imtchatgui` stays unchanged.
-4. **Example application** with one search, one selection and one confirmed change end to end; UI and integration tests with the fake provider.
-5. **Provider adapter** for the approved model provider.
+- Conversations, previews and their outcomes are kept in memory of the server process; a restart
+  ends them. A preview whose execution was interrupted by a crash stays in the state "executing".
+- A turn is processed synchronously inside the GraphQL request; cancel is a second request. There
+  is no streaming of partial answers.
+- The only provider is the fake provider; an adapter for a real provider follows after the
+  provider decision.
 
 ## Open decisions before productive use
 

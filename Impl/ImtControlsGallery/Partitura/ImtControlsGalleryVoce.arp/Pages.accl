@@ -8,6 +8,7 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="AssistantPage" X="375" Y="625" Note=""/>
         <Element ComponentName="ButtonsPage" X="150" Y="225" Note=""/>
         <Element ComponentName="CanvasPage" X="900" Y="225" Note=""/>
         <Element ComponentName="CollectionPage" X="950" Y="375" Note=""/>

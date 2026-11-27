@@ -27,6 +27,10 @@
 	The module is independent of \b imtchat (Service Desk chat); conversations are
 	kept in memory for the running session only.
 
+	\section imtassist_modules Related Modules
+	- \b imtassistgql — GraphQL API
+	- \b imtassistgui — QML panel
+
 	\see Docs/Assistant/README.md
 */
 namespace imtassist {}

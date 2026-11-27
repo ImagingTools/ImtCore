@@ -10,6 +10,33 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="AssistantPage" PackageId="ImtCoreVoce" ComponentId="SingleDocPage">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="FixedItemQmlPath" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="../../AssistantPage.qml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IconPath" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Product"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Assistant"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Assistant"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="ButtonsPage" PackageId="ImtCoreVoce" ComponentId="SingleDocPage">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -422,6 +449,7 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces/>
     <ExportedComponents>
+        <Component ExportedId="AssistantPage" ComponentId="AssistantPage"/>
         <Component ExportedId="ButtonsPage" ComponentId="ButtonsPage"/>
         <Component ExportedId="CanvasPage" ComponentId="CanvasPage"/>
         <Component ExportedId="CollectionPage" ComponentId="CollectionPage"/>

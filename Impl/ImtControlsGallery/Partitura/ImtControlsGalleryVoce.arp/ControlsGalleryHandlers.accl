@@ -9,7 +9,16 @@
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="ApplicationHandlers" X="575" Y="175" Note=""/>
+        <Element ComponentName="AssistantActions" X="1200" Y="375" Note=""/>
+        <Element ComponentName="AssistantAuditLog" X="1450" Y="575" Note=""/>
+        <Element ComponentName="AssistantController" X="1200" Y="175" Note=""/>
+        <Element ComponentName="AssistantProvider" X="1450" Y="375" Note=""/>
+        <Element ComponentName="AssistantRepresentations" X="1700" Y="375" Note=""/>
+        <Element ComponentName="AssistantService" X="1450" Y="175" Note=""/>
         <Element ComponentName="ContactInfoController" X="825" Y="375" Note=""/>
+        <Element ComponentName="DemoSearchTasksAction" X="1100" Y="575" Note=""/>
+        <Element ComponentName="DemoSetTaskStatusAction" X="1300" Y="575" Note=""/>
+        <Element ComponentName="DemoTaskStore" X="1200" Y="775" Note=""/>
         <Element ComponentName="Pages" X="575" Y="375" Note=""/>
         <Element ComponentName="ParamsSetTestController" X="300" Y="375" Note=""/>
         <Element ComponentName="SlaveControllers" X="950" Y="175" Note=""/>

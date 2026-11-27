@@ -40,6 +40,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	imtguigqlqml
 	imtauthguiqml
 	imtlicguiqml
+	imtassist
+	imtassistgql
+	imtassistguiqml
 )
 
 set(DEPLOY_QT_QML_DIRS "${IMTCOREDIR}/Qml")
