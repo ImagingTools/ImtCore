@@ -341,7 +341,9 @@ Steps for a server (Puma is the template; ProLife, Agentino, Dogma and Claire fo
    handlers of the servlet. Call `Init::InitAssistantDb()`.
 2. Permissions of the product: add the feature `Assistant` below `Administration` with `ViewPage`,
    `View` and `Edit` (`ViewPage` requires `View`, `Edit` requires `View`), and grant them to the
-   administrator roles.
+   administrator roles. New organizations get the three permissions in their default permission scope
+   (`CTenantManagerComp`), so their owners can configure the assistant; for existing organizations the
+   system administrator adds them to the scope of the organization.
 3. Client: link `imtassistguiqml`, call `InitAssistantQml()` and set the transport once, e.g. in the
    main QML file:
 

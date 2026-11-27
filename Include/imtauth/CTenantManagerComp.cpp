@@ -265,7 +265,9 @@ QByteArray CTenantManagerComp::CreateTenant(
 		QByteArrayLiteral("/Administration/Roles/Edit/Change"), QByteArrayLiteral("/Administration/Roles/Edit/Remove"),
 		QByteArrayLiteral("/Administration/Groups/ViewPage"), QByteArrayLiteral("/Administration/Groups/View"), QByteArrayLiteral("/Administration/Groups/Edit/Add"),
 		QByteArrayLiteral("/Administration/Groups/Edit/Change"), QByteArrayLiteral("/Administration/Groups/Edit/Remove"),
-		QByteArrayLiteral("/Administration/Users/Revisions/View"), QByteArrayLiteral("/Administration/Roles/Revisions/View"), QByteArrayLiteral("/Administration/Groups/Revisions/View")
+		QByteArrayLiteral("/Administration/Users/Revisions/View"), QByteArrayLiteral("/Administration/Roles/Revisions/View"), QByteArrayLiteral("/Administration/Groups/Revisions/View"),
+		// The organization configures its AI assistant itself (page Administration/Assistant of the products that have it)
+		QByteArrayLiteral("/Administration/Assistant/ViewPage"), QByteArrayLiteral("/Administration/Assistant/View"), QByteArrayLiteral("/Administration/Assistant/Edit")
 	};
 	tenantPtr->SetTenantPermissions(parentTenantId.isEmpty()
 				? defaultTenantPermissions
