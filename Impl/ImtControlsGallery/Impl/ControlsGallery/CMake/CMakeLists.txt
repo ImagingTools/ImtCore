@@ -45,6 +45,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 set(DEPLOY_QT_QML_DIRS "${IMTCOREDIR}/Qml")
 deploy_qt(TARGET ${PROJECT_NAME})
 
+if(WIN32 AND MSVC)
+	# GUI subsystem (no console window), the entry point stays the standard main()
+	target_link_options(${PROJECT_NAME} PRIVATE "/SUBSYSTEM:WINDOWS" "/ENTRY:mainCRTStartup")
+endif()
+
 
 if(WIN32 AND NOT USE_FIND_PACKAGE)
 	file(GLOB OPENSSL_DLLS

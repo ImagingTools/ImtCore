@@ -206,6 +206,9 @@
                     <AttributeInfo Id="MinimumWindowWidth" Type="Integer" ExportId="MinimumWindowWidth">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="SplashScreen" Type="Reference" ExportId="SplashScreen">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApplicationLocalization"/>
                     </AttributeInfo>
