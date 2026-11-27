@@ -505,6 +505,8 @@ class ListView extends Item {
             pos = Math.max(Math.min(pos, maxExtent), this.$flowBounds().min)
             this.$setPosition(pos)
             this.$fill()
+            // the highlight at the current item at once, then its animators again (resetHighlightPosition, updateHighlight)
+            this.$resetHighlightPosition()
             this.$updateHighlight()
         }
     }

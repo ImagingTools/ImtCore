@@ -15,6 +15,10 @@ import { dirname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Engine } from '../../src/engine.js';
 import { Project } from '../../src/project.js';
+import { Renderer } from '../../src/renderer.js';
+import { flushLazyViews } from '../../src/items.js';
+import { Scene } from '../../src/scene.js';
+import { Viewer } from '../../src/viewer.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const roots = [here, join(here, '..', 'jqml')];
@@ -166,7 +170,76 @@ function timersRunning(engine) {
 	return false;
 }
 
+// A case whose test.json says "pointer": true runs in a window (Scene and Viewer), so that the mouse of QtTest (mousePress, mouseMove,
+// mouseRelease, mouseClick) reaches the items and `wait` lets the time pass; the clock is the one of the window, it is no real time.
+async function runWebWindow(testDir, importDirs, size) {
+	const engine = new Engine();
+	const logs = [];
+	let quit = false;
+	engine.onLog = (line) => logs.push(line);
+	engine.onQuit = () => {
+		quit = true;
+	};
+	engine.lenient = true;
+	const realNow = performance.now;
+	let clock = 1000;
+	performance.now = () => clock;
+	try {
+		const importPaths = importDirs.map((dir) => resolve(testDir, dir)).reverse();
+		const scene = new Scene(new Renderer(null), engine);
+		const viewer = new Viewer(scene, engine, () => {});
+		scene.resize(size.width, size.height, 1);
+		const project = new Project(new DirFS(testDir), { importPaths });
+		await project.load('Main.qml');
+		const frame = () => {
+			clock += 16;
+			scene.drawFrame(clock / 1000);
+		};
+		engine.pointerDriver = {
+			down: (x, y, button) => scene.pointerDown(x, y, button === 2 ? 2 : button === 4 ? 1 : 0),
+			up: (x, y) => scene.pointerUp(x, y),
+			move: (x, y) => scene.pointerMove(x, y),
+			// the positions of the items are those of the layout of now
+			sync: () => {
+				for (let pass = 0; pass < 4; pass++) {
+					scene.root.$updateRequested = false;
+					scene.root.$layout();
+					engine.evaluateBindings();
+					flushLazyViews();
+					if (!scene.root.$updateRequested) break;
+				}
+			},
+			advance: (ms) => {
+				const end = clock + ms;
+				while (clock < end) {
+					const step = Math.min(16, end - clock);
+					clock += step;
+					scene.drawFrame(clock / 1000);
+				}
+			},
+		};
+		viewer.load(project);
+		for (let i = 0; i < 6; i++) frame();
+		const started = Date.now();
+		for (let i = 0; i < 2000 && !quit && Date.now() - started < TIMEOUT_MS; i++) {
+			if (!timersRunning(engine) && !scene.root.$updateRequested) break;
+			frame();
+		}
+		return { logs, errors: engine.errors.slice(), threw: '' };
+	} catch (error) {
+		return { logs, errors: engine.errors.concat(error.message), threw: error.message };
+	} finally {
+		performance.now = realNow;
+	}
+}
+
 async function runWeb(testDir, importDirs) {
+	try {
+		const config = JSON.parse((await new DirFS(testDir).readText('test.json')) || '{}');
+		if (config.pointer === true) return await runWebWindow(testDir, importDirs, { width: config.width || 600, height: config.height || 400 });
+	} catch {
+		// no test.json or no valid one: an ordinary case
+	}
 	const engine = new Engine();
 	const logs = [];
 	let quit = false;
@@ -267,6 +340,7 @@ async function main() {
 	const { writeFile } = await import('node:fs/promises');
 	await writeFile(reportPath, '');
 	let passed = 0;
+	let withoutReference = 0;
 
 	for (const { name, dir } of list) {
 		const mainFile = join(dir, 'Main.qml');
@@ -276,12 +350,23 @@ async function main() {
 		let webError = '';
 		let webErrors = [];
 		const importDirs = await readImportDirs(dir);
+		// "desktop": false and a "reason" in test.json: desktop Qt cannot load the case (it relies on what the engine is more lenient about, such
+		// as a type from the qmldir of a module that the file did not import), so there is nothing to compare with; the engine must still load it.
+		let noReference = '';
 		try {
-			const result = await runDesktop(qml, mainFile, importDirs);
-			desktop = result.lines;
-			desktopError = result.error;
-		} catch (error) {
-			desktopError = error.message;
+			const config = JSON.parse((await new DirFS(dir).readText('test.json')) || '{}');
+			if (config.desktop === false) noReference = String(config.reason || 'no reason given');
+		} catch {
+			noReference = '';
+		}
+		if (noReference === '') {
+			try {
+				const result = await runDesktop(qml, mainFile, importDirs);
+				desktop = result.lines;
+				desktopError = result.error;
+			} catch (error) {
+				desktopError = error.message;
+			}
 		}
 		try {
 			const result = await runWeb(dir, importDirs);
@@ -291,14 +376,15 @@ async function main() {
 		} catch (error) {
 			webError = error.message;
 		}
-		const ok = !desktopError && !webError && sameLines(desktop, web);
+		const ok = noReference !== '' ? !webError && webErrors.length === 0 : !desktopError && !webError && sameLines(desktop, web);
+		if (noReference !== '') withoutReference++;
 		if (ok) passed++;
-		const mark = ok ? `${color.green}[+]${color.reset}` : `${color.red}[-]${color.reset}`;
-		console.log(`${mark} ${name}`);
+		const mark = ok ? (noReference !== '' ? `${color.cyan}[~]${color.reset}` : `${color.green}[+]${color.reset}`) : `${color.red}[-]${color.reset}`;
+		console.log(`${mark} ${name}${noReference !== '' ? ` ${color.gray}(no desktop reference: ${noReference})${color.reset}` : ''}`);
 		await appendFile(reportPath, `${JSON.stringify({ name, ok, desktop, web, desktopError, webError, webErrors })}\n`);
 	}
 
-	console.log(`${color.yellow}[i] ${passed}/${list.length}${color.reset}`);
+	console.log(`${color.yellow}[i] ${passed}/${list.length}${withoutReference > 0 ? ` (${withoutReference} loaded without a desktop reference)` : ''}${color.reset}`);
 	process.exit(passed === list.length && list.length > 0 ? 0 : 1);
 }
 

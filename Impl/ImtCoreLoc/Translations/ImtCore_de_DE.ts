@@ -19191,6 +19191,10 @@ Fehler: 0</translation>
 <context>
     <name>ServiceDependencyView</name>
     <message>
+        <source>Download log</source>
+        <translation>Log herunterladen</translation>
+    </message>
+    <message>
         <location filename="../../../Qml/imtgui/Settings/ServiceDependencyView.qml" line="+66"/>
         <source>Connected</source>
         <translation>Verbunden</translation>

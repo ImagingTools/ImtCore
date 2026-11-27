@@ -77,6 +77,48 @@ What's **not** here, by design: any app's own business page objects (e.g. ProLif
 `DeviceCollectionPage`), its fixture users/roles, its DB seeding, or its CI script - those are
 app-specific and stay in the app's own repo.
 
+## JQML v4
+
+JQML v3 builds a DOM tree, and the kit finds the items of an application with CSS on `[objectName="..."]`. JQML v4
+draws the whole application on one canvas, so there is no such tree; every v4 build publishes `window.qmlTest`
+instead (`Docs/JQML/TestApi.md`). The kit works on both, with the same objectName paths, so a spec does not change:
+
+- `lib/qml.js` tells the backend of a page once the application is up (`window.qmlTest` means v4, `[objectName]`
+  elements mean v3) and keeps it per page. `waitForStable()` and `reload()` look it up; until a page is known to be
+  v3, `dom.locate()` hands out a `KitLocator`, which sends every call to Playwright on v3 and to `window.qmlTest` on
+  v4. Once a page is known to be v3, `dom.locate()` returns Playwright's own locator, so v3 runs the code it ran before.
+- The CSS the kit uses (`[objectName="X"]`, `^=`, `$=`, `*=`, `[visible]`, `input`, the descendant combinator and
+  comma lists) is translated to qmlTest selectors (`lib/qml.test.js` shows how). A comma list finds the items of all
+  its alternatives, in the order of the tree, as CSS does. A type name (`[objectName="MouseArea"]`) finds the items of
+  that type that have no objectName or that one, as v3 did, where a MouseArea with a name of its own is skipped.
+- `KitLocator` has the part of the Locator API the kit and the specs use: `locator`, `first`, `last`, `nth`, `count`,
+  `waitFor`, `isVisible`, `boundingBox` (null for an item that is not shown), `scrollIntoViewIfNeeded`,
+  `textContent`, `innerText`, `click`, `fill`. While a navigation is under way and the page has no
+  `window.qmlTest`, it finds nothing: `count()` is 0 and `waitFor()` goes on waiting.
+- Clicks stay real mouse clicks at the middle of the item, so the item on top at that point takes them, as for a user.
+  `fill()` types through `qmlTest.fill` (focus, select all, the keys), since a select-all shortcut sent from
+  Playwright is not reliable on the canvas. `waitForStable()` asks `qmlTest.whenIdle` instead of watching DOM
+  mutations. `checkElementScreenshot()` clips the page to the item's box, and `columnRects()` reads the same boxes
+  through qmlTest and masks them with the same geometry as on v3.
+- A page where the application never shows up is taken for v3 after the wait, once per address of the page.
+- The session is kept under `qml/AuthorizationController/...` on v4 (v3: `AuthorizationController/...`); global
+  setup and the permission check read both.
+
+Things to know about the selectors of qmlTest, if a spec uses them directly (`dom.isQml(page)` tells the backend,
+`dom.callQmlTest(page, method, ...args)` calls `window.qmlTest`):
+
+- The current qmlTest parser accepts non-ASCII names and `Save:visible` without quotes. Quote names containing
+  selector punctuation or spaces, for example `"Save as":visible`. `gui.qmlSelector(path, { visible: true })` builds
+  selectors for literal objectNames; it rejects names that the parser cannot express literally (wildcards or both
+  quote characters). Use `dom.locate()` for those names. Older runtimes can require quotes for more names.
+- An item without an objectName has an empty name on v4 (v3 named it after its type). Find it by type:
+  `@MouseArea`, `@TextInput`.
+- A ComboBox has no `text`; its value is `currentText` (`get(id, 'currentText')`).
+- Screenshot baselines of v3 do not fit v4 (other text rendering): keep them apart, or run v4 with `--ignore-snapshots`.
+
+A spec that reads the DOM itself (`page.evaluate` with `document.querySelector...`, `page.locator('[objectName=...]')`)
+does not work on v4; use `dom.locate()` and the kit's helpers instead.
+
 ## No permission model
 
 These suites do not describe who may do what. A test authenticates, drives the UI and compares

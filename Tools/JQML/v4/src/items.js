@@ -8,7 +8,7 @@
 import { CanvasContext, commandsExceed, replayCommands } from './canvas.js';
 import { fonts } from './fonts.js';
 import { layoutRichText, linkAtPoint, mightBeRichText, paintRichText, parseRichText } from './richtext.js';
-import { KEY, MODIFIERS, parseKeySequence, qtKeyToDom, STANDARD_KEYS } from './keys.js';
+import { KEY, MODIFIERS, parseKeySequence, pointerState, qtKeyToDom, STANDARD_KEYS } from './keys.js';
 import { QmlError } from './lexer.js';
 import { colorToString, parseColor, toColor, toFloat } from './util.js';
 
@@ -38,6 +38,8 @@ export const hooks = {
 	syncRepeater: null,
 	// (area) => void: a MouseArea waits for pressAndHold; () => seconds: the time of the engine.
 	watchHold: null,
+	// (flickable) => void: a Flickable runs on after the release (the engine calls its $flickTick with every frame).
+	watchFlick: null,
 	now: () => 0,
 	// (item) => void: a Binding or Connections item changed and must apply before the next statement.
 	syncBinding: null,
@@ -138,6 +140,19 @@ let activeSet = new Set();
 
 export function getFocusItem() {
 	return activeLeaf !== null ? activeLeaf : chainLeaf;
+}
+
+// Non-zero while the pointer press or click of the user is handled: forceActiveFocus() there is what the user asked for (a click on a row
+// of a list that is not active gives the row the active focus, so the keys go to it).
+let userGesture = 0;
+
+export function userGestureScope(fn) {
+	userGesture++;
+	try {
+		return fn();
+	} finally {
+		userGesture--;
+	}
 }
 
 export function resetFocus() {
@@ -861,7 +876,7 @@ export class Item {
 		this.$dirtyKids = null;
 		this.$scope = null;
 		this.$anchors = null;
-		if (this.$fnNames !== undefined) for (const name of this.$fnNames) this[name] = null; // the functions of the item hold its scope
+		if (this.$fnNames !== undefined) for (const name of this.$fnNames) this[name] = undefined; // the functions of the item hold its scope; a script that still has the item tests `item.fn !== undefined` (CustomTooltip.hide), and null would pass that test and then fail to be called
 		if (this.$sigs !== null) for (const signal of this.$sigs.values()) signal.handlers = [];
 		this.$owned = undefined;
 		if (this.$defScope !== undefined) this.$defScope = null; // a Component: the scope it was written in
@@ -1422,6 +1437,7 @@ export class Item {
 		// still-inactive view — that would activate the row when the dialog/popup takes focus.
 		const list = enclosingListView(this);
 		const scopedListCurrent =
+			userGesture === 0 &&
 			list !== null && list.$scopeFocus === this && !list.$focus && (activeLeaf === null || !focusHostOwnsList(list, activeLeaf));
 		if (!scopedListCurrent) {
 			let parent = this.$parent;
@@ -2216,7 +2232,10 @@ function textWidth(info, text) {
 	return width;
 }
 
-function wrapParagraphLines(info, para, limit) {
+// The lines of a paragraph in a width, broken as in Qt (measured) by the kind of wrapMode (wrapKind): 'word' at the spaces only, a word
+// wider than the line goes out of it; 'boundary' at the spaces, and a word wider than the line from a line of its own between its
+// characters; 'anywhere' every line is filled up to the width, between the characters of a word too. The space of a break is in no line.
+function wrapParagraphLines(info, para, limit, mode = 'word') {
 	if (para === '') return [''];
 	const space = info.advance(' ');
 	const words = para.split(' ');
@@ -2225,18 +2244,37 @@ function wrapParagraphLines(info, para, limit) {
 	let line = 0;
 	for (const word of words) {
 		const wordWidth = textWidth(info, word);
-		if (current === '') {
+		if (current !== '' && line + space + wordWidth <= limit) {
+			current += ` ${word}`;
+			line += space + wordWidth;
+			continue;
+		}
+		if (mode === 'word' || (mode === 'boundary' && wordWidth <= limit)) {
+			if (current !== '') lines.push(current);
 			current = word;
 			line = wordWidth;
 			continue;
 		}
-		if (line + space + wordWidth > limit) {
+		// The word is broken between its characters: on the same line after the space (anywhere) or from the next line (boundary)
+		let gap = current !== '' && mode === 'anywhere';
+		if (current !== '' && !gap) {
 			lines.push(current);
-			current = word;
-			line = wordWidth;
-		} else {
-			current += ` ${word}`;
-			line += space + wordWidth;
+			current = '';
+			line = 0;
+		}
+		for (const ch of word) {
+			const width = info.advance(ch);
+			if (current !== '' && line + (gap ? space : 0) + width > limit) {
+				lines.push(current);
+				current = '';
+				line = 0;
+			} else if (gap) {
+				current += ' ';
+				line += space;
+			}
+			gap = false;
+			current += ch;
+			line += width;
 		}
 	}
 	if (current !== '' || lines.length === 0) lines.push(current);
@@ -2247,12 +2285,13 @@ function wrapParagraph(info, para, limit) {
 	return wrapParagraphLines(info, para, limit).map((line) => textWidth(info, line));
 }
 
+// wrap: the kind of wrapMode (wrapKind)
 function blockLines(info, text, wrap, limit) {
 	const paras = text.split('\n');
 	const lines = [];
 	for (const para of paras) {
-		if (!wrap) lines.push(para);
-		else lines.push(...wrapParagraphLines(info, para, limit));
+		if (wrap === 'none') lines.push(para);
+		else lines.push(...wrapParagraphLines(info, para, limit, wrap));
 	}
 	return lines.length > 0 ? lines : [''];
 }
@@ -2313,6 +2352,13 @@ function elidedText(info, text, limit, mode) {
 function wraps(mode) {
 	if (typeof mode === 'number') return mode === 1 || mode === 3 || mode === 4;
 	return mode === 'WordWrap' || mode === 'Wrap' || mode === 'WrapAnywhere' || mode === 'WrapAtWordBoundaryOrAnywhere';
+}
+
+// How a wrapMode breaks the lines of a plain text: 'none', 'word' (WordWrap), 'anywhere' (WrapAnywhere) or 'boundary' (Wrap).
+function wrapKind(mode) {
+	if (!wraps(mode)) return 'none';
+	if (mode === 1 || mode === 'WordWrap') return 'word';
+	return mode === 3 || mode === 'WrapAnywhere' ? 'anywhere' : 'boundary';
 }
 
 class FontGroup {
@@ -2491,9 +2537,9 @@ export class Text extends Item {
 		const rich = false;
 		const source = this.$text;
 		const explicit = this.$layoutWidth();
-		const wrap = explicit > 0 && wraps(this.$wrap);
-		const limit = wrap ? explicit : Infinity;
-		const elideLimit = !rich && !wrap && (this.$elide === 0 || this.$elide === 1 || this.$elide === 2) ? explicit : 0;
+		const wrap = explicit > 0 ? wrapKind(this.$wrap) : 'none';
+		const limit = wrap !== 'none' ? explicit : Infinity;
+		const elideLimit = !rich && wrap === 'none' && (this.$elide === 0 || this.$elide === 1 || this.$elide === 2) ? explicit : 0;
 		if (
 			lay !== null &&
 			lay.version === fonts.version &&
@@ -2648,8 +2694,8 @@ export class Text extends Item {
 		// The width that the anchors give (`anchors.left` and `anchors.right`) wraps the text like a `width` does.
 		const explicit = this.$layoutWidth();
 		const wrap = explicit > 0 && wraps(this.$wrap);
-		const natural = blockMetrics(info, source, false, Infinity);
-		const laid = wrap ? blockMetrics(info, source, true, explicit) : natural;
+		const natural = blockMetrics(info, source, 'none', Infinity);
+		const laid = wrap ? blockMetrics(info, source, wrapKind(this.$wrap), explicit) : natural;
 		let contentWidth = laid.max;
 		if (!rich && !wrap && this.$elide !== 3 && this.$elide !== 'ElideNone' && explicit > 0 && natural.max > explicit + ELIDE_SLACK) contentWidth = textWidth(info, elidedText(info, source, explicit, this.$elide));
 		if (rich && explicit > 0) contentWidth = Math.max(explicit, laid.max);
@@ -2843,6 +2889,10 @@ export class Canvas extends Item {
 		this.$paintedHeight = -1;
 		this.$context = null;
 		this.$measureContext = null;
+		this.$images = new Map(); // address -> 'loading', 'ready' or 'error'
+		this.$pictures = new Map();
+		this.$drawWaits = new Set(); // addresses drawImage waits for
+		this.$announced = new Set(); // addresses loadImage() was called with: imageLoaded is sent for them
 		this.$renderTarget = 0; // Canvas.Image
 		this.$renderStrategy = 0; // Canvas.Immediate
 		this.$declareSignal('paint', []);
@@ -2854,15 +2904,26 @@ export class Canvas extends Item {
 	// The picture is kept for `createPattern(url, ...)`; the engine finds it from the address like the one of an Image.
 	loadImage(src) {
 		const url = toStr(src);
-		if (this.$images === undefined) {
-			this.$images = new Map();
-			this.$pictures = new Map();
-		}
 		const state = this.$images.get(url);
+		if (state !== 'ready') this.$announced.add(url);
 		if (state === 'ready' || state === 'loading') return;
 		this.$images.set(url, 'loading');
 		this.$painted = false;
 		this.$ensurePainted();
+		this.$requestPicture(url);
+	}
+
+	// drawImage() of an address that is not loaded: as in Qt the picture shows without a loadImage() call, here one paint later.
+	$drawRequest(url) {
+		const state = this.$images.get(url);
+		if (state === 'ready' || state === 'error') return;
+		this.$drawWaits.add(url);
+		if (state === 'loading') return;
+		this.$images.set(url, 'loading');
+		this.$requestPicture(url);
+	}
+
+	$requestPicture(url) {
 		const canvas = this;
 		hooks.loadImage(
 			{
@@ -2875,11 +2936,13 @@ export class Canvas extends Item {
 					if (canvas.$images.get(url) !== 'loading') return;
 					if (status === 3) {
 						canvas.$images.set(url, 'error');
+						canvas.$drawWaits.delete(url);
 						return;
 					}
 					if (picture !== null) canvas.$pictures.set(url, picture);
 					canvas.$images.set(url, 'ready');
-					canvas.$emit('imageLoaded');
+					if (canvas.$drawWaits.delete(url)) canvas.requestPaint();
+					if (canvas.$announced.delete(url)) canvas.$emit('imageLoaded');
 				},
 			},
 			url,
@@ -2887,18 +2950,16 @@ export class Canvas extends Item {
 	}
 
 	unloadImage(src) {
-		if (this.$images !== undefined) {
-			this.$images.delete(toStr(src));
-			this.$pictures.delete(toStr(src));
-		}
+		this.$images.delete(toStr(src));
+		this.$pictures.delete(toStr(src));
 	}
 
 	isImageLoaded(src) {
-		return this.$images !== undefined && this.$images.get(toStr(src)) === 'ready';
+		return this.$images.get(toStr(src)) === 'ready';
 	}
 
 	isImageLoading(src) {
-		return this.$images !== undefined && this.$images.get(toStr(src)) === 'loading';
+		return this.$images.get(toStr(src)) === 'loading';
 	}
 
 	// Inside onPaint this is the recording context. Outside of it (e.g. a hidden canvas used only
@@ -2924,7 +2985,7 @@ export class Canvas extends Item {
 		this.$cmds = [];
 		const signal = this.$sigs.get('paint');
 		if (signal.handlers.length > 0) {
-			this.$context = new CanvasContext(this.$aw, this.$ah, this.$cmds, this.$pictures === undefined ? null : this.$pictures);
+			this.$context = new CanvasContext(this.$aw, this.$ah, this.$cmds, this.$pictures, (url) => this.$drawRequest(url));
 			try {
 				this.$emit('paint');
 			} finally {
@@ -3000,6 +3061,7 @@ export class MouseArea extends Item {
 		this.$holdInterval = 800;
 		this.$holdDeadline = 0; // seconds of the engine time at which pressAndHold is sent; 0 when it is not awaited
 		this.$held = false;
+		this.$wheelPassed = false; // true while a wheel event it did not accept looks for the item below it
 		this.$declareSignal('clicked', ['mouse']);
 		this.$declareSignal('pressed', ['mouse']);
 		this.$declareSignal('released', ['mouse']);
@@ -3014,7 +3076,7 @@ export class MouseArea extends Item {
 
 	$mouseEvent() {
 		const button = this.$pressButton === 2 ? 'RightButton' : 'LeftButton';
-		return { x: this.$mouseX, y: this.$mouseY, button, buttons: button, modifiers: 0, accepted: true, wasHeld: this.$held, isClick: true };
+		return { x: this.$mouseX, y: this.$mouseY, button, buttons: button, modifiers: pointerState.modifiers, accepted: true, wasHeld: this.$held, isClick: true };
 	}
 
 	get $acceptsMouse() {
@@ -3023,6 +3085,21 @@ export class MouseArea extends Item {
 
 	$acceptsButton(button) {
 		return button < 0 || (this.$buttons & (button === 2 ? 2 : button === 1 ? 4 : 1)) !== 0;
+	}
+
+	// As in Qt the area takes the wheel only when something listens to `wheel`.
+	get $acceptsWheel() {
+		if (this.$wheelPassed || this.$sigs === null || !itemEnabled(this)) return false;
+		const signal = this.$sigs.get('wheel');
+		return signal !== undefined && signal.handlers.length > 0;
+	}
+
+	// True when a handler left the event accepted.
+	$mouseWheel(notches, x, y, horizontalNotches = 0) {
+		if (!this.$acceptsWheel) return false;
+		const event = { x: x - this.$sx, y: y - this.$sy, angleDelta: { x: horizontalNotches * 120, y: notches * 120 }, pixelDelta: { x: 0, y: 0 }, buttons: 0, modifiers: pointerState.modifiers, inverted: false, accepted: true };
+		this.$emit('wheel', [event]);
+		return event.accepted;
 	}
 
 	$mousePressAt(sceneX, sceneY) {
@@ -3060,6 +3137,11 @@ export class MouseArea extends Item {
 			if (!item.$visible) return true;
 		}
 		return false;
+	}
+
+	// An area that moves a target by the drag keeps the drag of the pointer: a Flickable below it does not take it (Qt, measured).
+	get $dragsTarget() {
+		return this.$mouseDrag.$target !== null;
 	}
 
 	// The press is taken away (the area was hidden, another item took the drag): `canceled`, and no `released` or `clicked` follow.
@@ -4031,7 +4113,357 @@ function sizeUnresolved(item) {
 	return false;
 }
 
-export class ListView extends Item {
+// ----- Flickable -----
+
+// Qt (measured): the pointer goes farther than this (px) before a drag starts; the content is thrown only above this velocity (px/s),
+// and not when the pointer rested for FLICK_IDLE seconds before the release.
+const FLICK_DRAG_THRESHOLD = 10;
+const FLICK_MIN_VELOCITY = 75;
+const FLICK_IDLE = 0.1;
+
+// A viewport onto its children: they are shifted by (-contentX, -contentY). Scrolls with the wheel and by
+// dragging an empty part of the viewport (a child that accepts the mouse keeps its own presses); no kinetic flick.
+class FlickableContentItem extends Item {
+	constructor(view) {
+		super();
+		this.$flickable = view;
+	}
+
+	// The content item moves against the scroll position (read-only here: the Flickable moves it).
+	get x() {
+		return -this.$flickable.contentX;
+	}
+
+	set x(value) {}
+
+	get y() {
+		return -this.$flickable.contentY;
+	}
+
+	set y(value) {}
+
+
+	get $implicitWidth() {
+		return this.$flickable.$aw;
+	}
+
+	get $implicitHeight() {
+		return this.$flickable.$ah;
+	}
+}
+
+export class Flickable extends Item {
+	constructor() {
+		super();
+		this.$typeName = 'Flickable';
+		this.$contentX = 0;
+		this.$contentY = 0;
+		this.$contentW = 0;
+		this.$contentH = 0;
+		this.$dragFrom = null;
+		this.$initFlick();
+		this.$initContent();
+	}
+
+	// As in Qt the visual children live in contentItem, which is the only entry of `children`. A view (ListView, GridView) keeps
+	// its delegates in itself and has no content item of this kind.
+	$initContent() {
+		this.$content = new FlickableContentItem(this);
+		super.$adopt(this.$content);
+	}
+
+	// The state of the drag and the flick; a Flickable and the views (ListView, GridView) share it.
+	$initFlick() {
+		this.$interactive = true;
+		this.$flickDeceleration = 1500;
+		this.$maximumFlickVelocity = 2500;
+		// the press that may become a drag: { x, y, cx, cy, ax, ay, samples, exceeded: [x, y], started: [x, y] }
+		this.$press = null;
+		// the flick of an axis after the release: null, or { start, from, v (signed, px/s), dur, bound }
+		this.$flickAxis = [null, null];
+		this.$flags = { dragging: false, flicking: false, moving: false };
+		this.$velocity = [0, 0];
+		this.$declareSignal('movementStarted', []);
+		this.$declareSignal('movementEnded', []);
+		this.$declareSignal('flickStarted', []);
+		this.$declareSignal('flickEnded', []);
+		this.$declareSignal('dragStarted', []);
+		this.$declareSignal('dragEnded', []);
+	}
+
+	// The scroll range of the axes that the user can drag: [x, y].
+	$flickRange() {
+		return [this.$maxContentX, this.$maxContentY];
+	}
+
+	// The scroll views below the pointer that may take its drag (see Scene.pointerDown).
+	get $isFlickView() {
+		return true;
+	}
+
+	// Sets moving, dragging or flicking and tells those who wait for it.
+	$setFlag(name, value) {
+		if (this.$flags[name] === value) return;
+		this.$flags[name] = value;
+		noteWrite(this, name);
+		const signal = name + 'Changed';
+		if (this.$sigs !== null && this.$sigs.has(signal)) this.$emit(signal, []);
+	}
+
+	// Qt (measured with QtTest): `moving` is set by the start of a drag and ends with the drag when nothing flicks on, otherwise with the flick.
+	$beginMovement() {
+		if (this.$flags.moving) return;
+		this.$setFlag('moving', true);
+		this.$emit('movementStarted', []);
+	}
+
+	$endMovement() {
+		if (!this.$flags.moving) return;
+		this.$setFlag('moving', false);
+		this.$emit('movementEnded', []);
+	}
+
+	$setVelocity(x, y) {
+		if (this.$velocity[0] !== x) {
+			this.$velocity[0] = x;
+			noteWrite(this, 'horizontalVelocity');
+		}
+		if (this.$velocity[1] !== y) {
+			this.$velocity[1] = y;
+			noteWrite(this, 'verticalVelocity');
+		}
+	}
+
+	get contentItem() {
+		return this.$content;
+	}
+
+	// The items declared in a Flickable (and a Repeater, a visual item in Qt, whose delegates share its parent) go to the content item.
+	// An item that gets the Flickable as its parent from a script (`parent = flick`, `createObject(flick)`) stays a child of the Flickable.
+	$adopt(child, fromScript = false) {
+		if (fromScript || child === this.$content || (child.$nonVisual && !(child instanceof Repeater))) super.$adopt(child);
+		else this.$content.$adopt(child);
+	}
+
+	get $maxContentX() {
+		return Math.max(0, this.$contentW - this.$aw);
+	}
+
+	get $maxContentY() {
+		return Math.max(0, this.$contentH - this.$ah);
+	}
+
+	get $ox() {
+		return this.$contentX;
+	}
+
+	get $oy() {
+		return this.$contentY;
+	}
+
+	$renderContent(r, opacity) {
+		this.$paint(r, opacity);
+		let clipToken = null;
+		if (this.$clip) {
+			clipToken = r.beginClip(this.$aw, this.$ah);
+			if (clipToken === null) return;
+		}
+		const a = r.ma, b = r.mb, c = r.mc, d = r.md, e = r.me, f = r.mf;
+		r.translate(-this.$contentX, -this.$contentY);
+		const children = this.$hasZOrder() ? this.$childrenByZ() : this.$children;
+		for (let i = 0; i < children.length; i++) children[i].$render(r, opacity);
+		r.setMatrix(a, b, c, d, e, f);
+		this.$paintOverlay(r, opacity);
+		if (clipToken !== null) r.endClip(clipToken);
+	}
+
+	get $acceptsMouse() {
+		return this.$interactive && (this.$maxContentX > 0 || this.$maxContentY > 0);
+	}
+
+	get $acceptsWheel() {
+		return this.$interactive;
+	}
+
+	$mouseWheel(notches, x, y, horizontalNotches = 0) {
+		if (!this.$interactive) return false;
+		const vertical = wheelAxis(this, 'contentY', this.$contentY, this.$maxContentY, notches);
+		const horizontal = wheelAxis(this, 'contentX', this.$contentX, this.$maxContentX, horizontalNotches);
+		return vertical || horizontal;
+	}
+
+	// True when the press stopped a flick that was running: Qt (measured) keeps that press for the Flickable, the item below does not get it.
+	$mousePressAt(sceneX, sceneY) {
+		this.$dragFrom = { x: sceneX, y: sceneY, cx: this.$contentX, cy: this.$contentY };
+		if (!this.$interactive) return false;
+		const stopped = this.$flags.flicking;
+		if (stopped) {
+			// the content stops, the movement goes on until the release
+			this.$flickAxis = [null, null];
+			this.$setVelocity(0, 0);
+			this.$setFlag('flicking', false);
+			this.$emit('flickEnded', []);
+		}
+		this.$press = { x: sceneX, y: sceneY, cx: this.$contentX, cy: this.$contentY, ax: sceneX, ay: sceneY, samples: [], exceeded: [false, false], started: [false, false] };
+		return stopped;
+	}
+
+	// Qt (measured with QtTest): the drag of an axis starts at the first move after the one that went farther than 10 px from the press;
+	// the content follows the pointer from the place of that move.
+	$mouseMoveAt(sceneX, sceneY) {
+		const press = this.$press;
+		if (press === null || !this.$interactive) return;
+		const now = performance.now() / 1000;
+		press.samples.push({ t: now, x: sceneX, y: sceneY });
+		if (press.samples.length > 12) press.samples.shift();
+		const range = this.$flickRange();
+		const pointer = [sceneX, sceneY];
+		const origin = [press.x, press.y];
+		for (let axis = 0; axis < 2; axis++) {
+			if (range[axis] <= 0 || press.started[axis]) continue;
+			if (press.exceeded[axis]) {
+				press.started[axis] = true;
+				if (axis === 0) {
+					press.ax = sceneX;
+					press.cx = this.$contentX;
+				} else {
+					press.ay = sceneY;
+					press.cy = this.$contentY;
+				}
+				const first = !this.$flags.dragging;
+				this.$setFlag('dragging', true);
+				this.$beginMovement();
+				if (first) this.$emit('dragStarted', []);
+			} else if (Math.abs(pointer[axis] - origin[axis]) > FLICK_DRAG_THRESHOLD) {
+				press.exceeded[axis] = true;
+			}
+		}
+		if (press.started[0]) this.contentX = clamp(press.cx - (sceneX - press.ax), 0, range[0]);
+		if (press.started[1]) this.contentY = clamp(press.cy - (sceneY - press.ay), 0, range[1]);
+	}
+
+	$pressChanged(pressed) {
+		if (pressed) return;
+		this.$dragFrom = null;
+		const press = this.$press;
+		this.$press = null;
+		if (press === null) return;
+		if (!this.$flags.dragging) {
+			// a press that only stopped a flick: the movement ends with the release
+			if (this.$flags.moving && !this.$flags.flicking) this.$endMovement();
+			return;
+		}
+		const now = performance.now() / 1000;
+		this.$setFlag('dragging', false);
+		this.$emit('dragEnded', []);
+		const velocity = [0, 0];
+		const samples = press.samples;
+		// the pointer that rested for 100 ms or more does not throw the content
+		if (samples.length > 1 && now - samples[samples.length - 1].t < FLICK_IDLE) {
+			for (let axis = 0; axis < 2; axis++) {
+				if (!press.started[axis]) continue;
+				let sum = 0;
+				let weights = 0;
+				for (let i = 1; i < samples.length; i++) {
+					const dt = samples[i].t - samples[i - 1].t;
+					if (dt <= 0 || samples[samples.length - 1].t - samples[i].t >= FLICK_IDLE) continue;
+					const delta = axis === 0 ? samples[i].x - samples[i - 1].x : samples[i].y - samples[i - 1].y;
+					sum += i * clamp(-delta / dt, -this.$maximumFlickVelocity, this.$maximumFlickVelocity);
+					weights += i;
+				}
+				velocity[axis] = weights > 0 ? sum / weights : 0;
+			}
+		}
+		if (!this.$startFlick(velocity[0], velocity[1])) this.$endMovement();
+	}
+
+	// Starts the flick of the axes whose velocity (px/s of the content) is above 75; true if one runs.
+	$startFlick(vx, vy) {
+		const velocity = [vx, vy];
+		const position = [this.$contentX, this.$contentY];
+		const range = this.$flickRange();
+		const start = hooks.now();
+		let any = false;
+		for (let axis = 0; axis < 2; axis++) {
+			this.$flickAxis[axis] = null;
+			const v = clamp(velocity[axis], -this.$maximumFlickVelocity, this.$maximumFlickVelocity);
+			if (Math.abs(v) <= FLICK_MIN_VELOCITY || range[axis] <= 0 || this.$flickDeceleration <= 0) continue;
+			const room = v > 0 ? range[axis] - position[axis] : position[axis];
+			if (room <= 0) continue;
+			// the content stops at its end exactly: Qt keeps the velocity and takes the deceleration that the distance needs
+			const free = (v * v) / (2 * this.$flickDeceleration);
+			const bound = free > room;
+			const dur = bound ? (2 * room) / Math.abs(v) : Math.abs(v) / this.$flickDeceleration;
+			this.$flickAxis[axis] = { start, from: position[axis], v, dur, bound };
+			any = true;
+		}
+		if (!any) return false;
+		this.$beginMovement();
+		this.$setFlag('flicking', true);
+		this.$emit('flickStarted', []);
+		if (hooks.watchFlick !== null) hooks.watchFlick(this);
+		this.$update();
+		return true;
+	}
+
+	// The engine calls it with every frame while the content runs on; false when it came to rest.
+	$flickTick(seconds) {
+		let running = false;
+		const velocity = [0, 0];
+		for (let axis = 0; axis < 2; axis++) {
+			const state = this.$flickAxis[axis];
+			if (state === null) continue;
+			const t = clamp(seconds - state.start, 0, state.dur);
+			const speed = Math.abs(state.v);
+			const sign = state.v > 0 ? 1 : -1;
+			const decel = state.bound ? speed / state.dur : this.$flickDeceleration;
+			const travelled = speed * t - (decel * t * t) / 2;
+			const target = clamp(state.from + sign * travelled, 0, this.$flickRange()[axis]);
+			if (axis === 0) this.contentX = target;
+			else this.contentY = target;
+			if (t >= state.dur) {
+				this.$flickAxis[axis] = null;
+			} else {
+				running = true;
+				velocity[axis] = sign * (speed - decel * t);
+			}
+		}
+		this.$setVelocity(velocity[0], velocity[1]);
+		if (running) return true;
+		this.$finishFlick();
+		return false;
+	}
+
+	$finishFlick() {
+		this.$flickAxis = [null, null];
+		this.$setVelocity(0, 0);
+		if (!this.$flags.flicking) return;
+		this.$setFlag('flicking', false);
+		this.$emit('flickEnded', []);
+		this.$endMovement();
+	}
+
+	// Qt: the arguments are the velocity of the content (a positive one scrolls towards the start)
+	flick(xVelocity, yVelocity) {
+		if (this.$flags.flicking) this.cancelFlick();
+		this.$startFlick(-toFloat(xVelocity), -toFloat(yVelocity));
+	}
+
+	cancelFlick() {
+		if (this.$flags.flicking) this.$finishFlick();
+	}
+
+	returnToBounds() {
+		this.contentX = clamp(this.$contentX, 0, this.$maxContentX);
+		this.contentY = clamp(this.$contentY, 0, this.$maxContentY);
+	}
+}
+
+const POSITION_MODES = ['Beginning', 'Center', 'End', 'Visible', 'Contain'];
+
+// Qt: ListView and GridView are Flickables (QQuickItemView is a QQuickFlickable): the drag, the flick, their signals and properties are
+// those of Flickable. The view keeps its delegates in itself and scrolls them by its own layout (contentX, contentY, $arrange).
+export class ListView extends Flickable {
 	// The delegates are the children of the view itself.
 	get contentItem() {
 		return this.$viewContent !== undefined ? this.$viewContent : (this.$viewContent = new ViewContent(this));
@@ -4212,6 +4644,87 @@ export class ListView extends Item {
 
 	get $acceptsWheel() {
 		return true;
+	}
+
+	// The delegates are the children of the view, a content item does not exist.
+	$initContent() {}
+
+	$adopt(child, fromScript = false) {
+		Item.prototype.$adopt.call(this, child, fromScript);
+	}
+
+	// The layout of the view moves the delegates; nothing is shifted when drawing.
+	get $ox() {
+		return 0;
+	}
+
+	get $oy() {
+		return 0;
+	}
+
+	$renderContent(r, opacity) {
+		Item.prototype.$renderContent.call(this, r, opacity);
+	}
+
+	// A list is dragged along its own axis only.
+	$flickRange() {
+		return this.$horizontal ? [this.$maxContentX, 0] : [0, this.$maxContentY];
+	}
+
+	get $isFlickView() {
+		return true;
+	}
+
+	get $acceptsMouse() {
+		if (!this.$interactive || !itemEnabled(this)) return false;
+		const range = this.$flickRange();
+		return range[0] > 0 || range[1] > 0;
+	}
+
+	// The place of a row along the main axis: { pos, size }.
+	$indexSpan(index) {
+		const spacing = Math.max(0, this.$spacing);
+		if (this.$oddExtents === 0) {
+			const base = this.$rowHeight > 0 ? this.$rowHeight : 40;
+			return { pos: index * (base + spacing), size: base };
+		}
+		let pos = 0;
+		for (let i = 0; i < index; i++) pos += this.$extentAt(i) + spacing;
+		return { pos, size: this.$extentAt(index) };
+	}
+
+	// ListView.Beginning, Center, End, Visible, Contain (Qt, measured): the view moves so that the row is there; Visible and Contain
+	// move it as little as possible (Visible only when no part of the row shows); the position stays inside the content.
+	positionViewAtIndex(index, mode) {
+		// the enum of the engine is the name of the value (ListView.Contain is 'Contain'), Qt's is its number
+		if (typeof mode === 'string') mode = POSITION_MODES.indexOf(mode);
+		index = toFloat(index);
+		if (!(index >= 0 && index < this.$rowCount)) return;
+		const { pos, size } = this.$indexSpan(Math.floor(index));
+		const horizontal = this.$horizontal;
+		const view = horizontal ? this.$aw : this.$ah;
+		const current = horizontal ? this.$contentX : this.$contentY;
+		const max = horizontal ? this.$maxContentX : this.$maxContentY;
+		let target = current;
+		if (mode === 0) target = pos;
+		else if (mode === 1) target = pos + size / 2 - view / 2;
+		else if (mode === 2) target = pos + size - view;
+		else if (mode === 3 && (pos + size <= current || pos >= current + view)) target = pos < current ? pos : pos + size - view;
+		else if (mode === 4) target = pos < current ? pos : pos + size > current + view ? pos + size - view : current;
+		this.$scrollTo(clamp(target, 0, max));
+	}
+
+	positionViewAtBeginning() {
+		this.$scrollTo(0);
+	}
+
+	positionViewAtEnd() {
+		this.$scrollTo(this.$horizontal ? this.$maxContentX : this.$maxContentY);
+	}
+
+	$scrollTo(value) {
+		if (this.$horizontal) this.contentX = value;
+		else this.contentY = value;
 	}
 
 	// A list scrolls along its own axis only: a vertical wheel does not move a horizontal list (Qt).
@@ -4665,9 +5178,6 @@ defineReadOnly(ListView.prototype, 'originX', function () {
 defineReadOnly(ListView.prototype, 'originY', function () {
 	return 0;
 });
-for (const name of ['positionViewAtIndex', 'positionViewAtBeginning', 'positionViewAtEnd']) {
-	ListView.prototype[name] = function () {};
-}
 ListView.prototype.forceLayout = function () {
 	this.$arrange();
 };
@@ -4868,8 +5378,9 @@ export class GridView extends ListView {
 		}
 	}
 
-	positionViewAtBeginning() {
-		this.contentY = 0;
+	// A grid places a cell by the row that holds it.
+	$indexSpan(index) {
+		return { pos: Math.floor(index / this.$columns()) * this.$cellHeight, size: this.$cellHeight };
 	}
 }
 
@@ -5303,136 +5814,24 @@ defineReadOnly(ImageItem.prototype, 'paintedHeight', function () {
 	return this.$fit().h;
 });
 
-// ----- Flickable -----
-
-// A viewport onto its children: they are shifted by (-contentX, -contentY). Scrolls with the wheel and by
-// dragging an empty part of the viewport (a child that accepts the mouse keeps its own presses); no kinetic flick.
-class FlickableContentItem extends Item {
-	constructor(view) {
-		super();
-		this.$flickable = view;
-	}
-
-	// The content item moves against the scroll position (read-only here: the Flickable moves it).
-	get x() {
-		return -this.$flickable.contentX;
-	}
-
-	set x(value) {}
-
-	get y() {
-		return -this.$flickable.contentY;
-	}
-
-	set y(value) {}
-
-
-	get $implicitWidth() {
-		return this.$flickable.$aw;
-	}
-
-	get $implicitHeight() {
-		return this.$flickable.$ah;
-	}
-}
-
-export class Flickable extends Item {
-	constructor() {
-		super();
-		this.$typeName = 'Flickable';
-		this.$contentX = 0;
-		this.$contentY = 0;
-		this.$contentW = 0;
-		this.$contentH = 0;
-		this.$interactive = true;
-		this.$dragFrom = null;
-		// As in Qt the visual children live in contentItem, which is the only entry of `children`.
-		this.$content = new FlickableContentItem(this);
-		super.$adopt(this.$content);
-	}
-
-	get contentItem() {
-		return this.$content;
-	}
-
-	// The items declared in a Flickable (and a Repeater, a visual item in Qt, whose delegates share its parent) go to the content item.
-	// An item that gets the Flickable as its parent from a script (`parent = flick`, `createObject(flick)`) stays a child of the Flickable.
-	$adopt(child, fromScript = false) {
-		if (fromScript || child === this.$content || (child.$nonVisual && !(child instanceof Repeater))) super.$adopt(child);
-		else this.$content.$adopt(child);
-	}
-
-	get $maxContentX() {
-		return Math.max(0, this.$contentW - this.$aw);
-	}
-
-	get $maxContentY() {
-		return Math.max(0, this.$contentH - this.$ah);
-	}
-
-	get $ox() {
-		return this.$contentX;
-	}
-
-	get $oy() {
-		return this.$contentY;
-	}
-
-	$renderContent(r, opacity) {
-		this.$paint(r, opacity);
-		let clipToken = null;
-		if (this.$clip) {
-			clipToken = r.beginClip(this.$aw, this.$ah);
-			if (clipToken === null) return;
-		}
-		const a = r.ma, b = r.mb, c = r.mc, d = r.md, e = r.me, f = r.mf;
-		r.translate(-this.$contentX, -this.$contentY);
-		const children = this.$hasZOrder() ? this.$childrenByZ() : this.$children;
-		for (let i = 0; i < children.length; i++) children[i].$render(r, opacity);
-		r.setMatrix(a, b, c, d, e, f);
-		this.$paintOverlay(r, opacity);
-		if (clipToken !== null) r.endClip(clipToken);
-	}
-
-	get $acceptsMouse() {
-		return this.$interactive && (this.$maxContentX > 0 || this.$maxContentY > 0);
-	}
-
-	get $acceptsWheel() {
-		return this.$interactive;
-	}
-
-	$mouseWheel(notches, x, y, horizontalNotches = 0) {
-		if (!this.$interactive) return false;
-		const vertical = wheelAxis(this, 'contentY', this.$contentY, this.$maxContentY, notches);
-		const horizontal = wheelAxis(this, 'contentX', this.$contentX, this.$maxContentX, horizontalNotches);
-		return vertical || horizontal;
-	}
-
-	$mousePressAt(sceneX, sceneY) {
-		this.$dragFrom = { x: sceneX, y: sceneY, cx: this.$contentX, cy: this.$contentY };
-	}
-
-	$mouseMoveAt(sceneX, sceneY) {
-		const from = this.$dragFrom;
-		if (from === null || !this.$interactive) return;
-		this.contentX = clamp(from.cx - (sceneX - from.x), 0, this.$maxContentX);
-		this.contentY = clamp(from.cy - (sceneY - from.y), 0, this.$maxContentY);
-	}
-
-	$pressChanged(pressed) {
-		if (!pressed) this.$dragFrom = null;
-	}
-
-	flick() {}
-
-	cancelFlick() {}
-
-	returnToBounds() {
-		this.contentX = clamp(this.$contentX, 0, this.$maxContentX);
-		this.contentY = clamp(this.$contentY, 0, this.$maxContentY);
-	}
-}
+// The drag and the flick of the views are those of a Flickable (Qt: a ListView and a GridView are Flickables).
+defineReadOnly(Flickable.prototype, 'moving', function () {
+	return this.$flags.moving;
+});
+defineReadOnly(Flickable.prototype, 'dragging', function () {
+	return this.$flags.dragging;
+});
+defineReadOnly(Flickable.prototype, 'flicking', function () {
+	return this.$flags.flicking;
+});
+defineReadOnly(Flickable.prototype, 'horizontalVelocity', function () {
+	return this.$velocity[0];
+});
+defineReadOnly(Flickable.prototype, 'verticalVelocity', function () {
+	return this.$velocity[1];
+});
+defineField(Flickable.prototype, 'flickDeceleration', '$flickDeceleration', toFloat);
+defineField(Flickable.prototype, 'maximumFlickVelocity', '$maximumFlickVelocity', toFloat);
 
 function defineContent(name, field, sizeField = null) {
 	defineProp(
@@ -6804,6 +7203,56 @@ export class TestCase extends Item {
 	keyClick(key, modifiers = 0) {
 		this.$send(toFloat(key), toFloat(modifiers), true);
 		this.$send(toFloat(key), toFloat(modifiers), false);
+	}
+
+	// The mouse of a test: the pointer of a window that the comparison runner provides (`engine.pointerDriver`), the positions are in the
+	// coordinates of `item`, a delay (ms) lets the time of the window pass before the event, and `wait` lets it pass.
+	$pointer() {
+		const driver = this.$engine.pointerDriver;
+		if (driver === null || driver === undefined) // without a window the mouse of QtTest fails as it does under offscreen qml (see the `mouseMove` of the globals)
+			throw new Error('QtQuickTest::fail');
+		return driver;
+	}
+
+	$pointerAt(item, x, y) {
+		this.$pointer().sync();
+		return [item.$sx + toFloat(x), item.$sy + toFloat(y)];
+	}
+
+	// Qt.LeftButton is the name 'LeftButton' in the engine, 1 in Qt: the number of Qt (1 left, 2 right, 4 middle) goes on.
+	$buttonNumber(button) {
+		if (typeof button === 'string') return { LeftButton: 1, RightButton: 2, MiddleButton: 4 }[button] || 1;
+		return toFloat(button);
+	}
+
+	mousePress(item, x = 0, y = 0, button = 1, modifiers = 0, delay = -1) {
+		const driver = this.$pointer();
+		if (delay > 0) driver.advance(delay);
+		const [px, py] = this.$pointerAt(item, x, y);
+		driver.down(px, py, this.$buttonNumber(button));
+	}
+
+	mouseRelease(item, x = 0, y = 0, button = 1, modifiers = 0, delay = -1) {
+		const driver = this.$pointer();
+		if (delay > 0) driver.advance(delay);
+		const [px, py] = this.$pointerAt(item, x, y);
+		driver.up(px, py, this.$buttonNumber(button));
+	}
+
+	mouseMove(item, x = 0, y = 0, delay = -1, buttons = 0) {
+		const driver = this.$pointer();
+		if (delay > 0) driver.advance(delay);
+		const [px, py] = this.$pointerAt(item, x, y);
+		driver.move(px, py);
+	}
+
+	mouseClick(item, x = 0, y = 0, button = 1, modifiers = 0, delay = -1) {
+		this.mousePress(item, x, y, button, modifiers, delay);
+		this.mouseRelease(item, x, y, button, modifiers, delay);
+	}
+
+	wait(ms = 0) {
+		this.$pointer().advance(toFloat(ms));
 	}
 }
 defineProp(
@@ -11204,7 +11653,7 @@ export class WheelHandler extends PointerHandler {
 		}
 		const px = x - item.$sx;
 		const py = y - item.$sy;
-		this.$emit('wheel', [{ x: px, y: py, angleDelta: { x: vertical ? 0 : angle, y: vertical ? angle : 0 }, pixelDelta: { x: 0, y: 0 }, modifiers: 0, inverted: false, accepted: true, position: { x: px, y: py }, scenePosition: { x, y } }]);
+		this.$emit('wheel', [{ x: px, y: py, angleDelta: { x: vertical ? 0 : angle, y: vertical ? angle : 0 }, pixelDelta: { x: 0, y: 0 }, modifiers: pointerState.modifiers, inverted: false, accepted: true, position: { x: px, y: py }, scenePosition: { x, y } }]);
 		return true;
 	}
 }

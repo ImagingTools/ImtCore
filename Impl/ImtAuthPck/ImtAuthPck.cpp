@@ -136,6 +136,11 @@ I_EXPORT_COMPONENT(
 			"Ldap User Collection Joiner");
 
 I_EXPORT_COMPONENT(
+			LdapUserGroupSynchronizer,
+			"Ldap user group synchronizer",
+			"Ldap User Group Hierarchy Synchronizer");
+
+I_EXPORT_COMPONENT(
 			UserChangeGenerator,
 			"User change generator",
 			"User Change Generator");

@@ -11,7 +11,7 @@
 #include <QtSql/QSqlQuery>
 
 // 3rdParty includes
-#include <duckdb.hpp>
+#include <duckdb.h>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -42,7 +42,7 @@ public:
 	DuckDB-backed implementation of imtdb::IDatabaseEngine.
 
 	Unlike imtdb::CDatabaseEngineComp (which this component does *not* derive from), queries are
-	executed through the DuckDB C++ API (duckdb.hpp) instead of a QSqlDatabase driver. Results are
+	executed through the DuckDB C API (duckdb.h) instead of a QSqlDatabase driver. Results are
 	still exposed as QSqlQuery/QSqlError (via CDuckSqlDriver/CDuckSqlResult), so the component is a
 	drop-in replacement wherever only imtdb::IDatabaseEngine is used.
 */
@@ -112,6 +112,10 @@ private:
 	int GetDatabaseVersion() const;
 
 	QString GetDatabasePath() const;
+	/**
+		Closes the shared connection and the database. Connections handed out by CreateConnection() must be gone by then.
+	*/
+	void CloseDatabase() const;
 
 	bool EndTransaction(const char* statement, const QString& actionName) const;
 	bool ReadSqlFile(const QString& filePath, QByteArray& queryString, QSqlError* sqlErrorPtr) const;
@@ -127,8 +131,8 @@ private:
 
 private:
 	mutable std::recursive_mutex m_connectionMutex;
-	mutable std::unique_ptr<duckdb::DuckDB> m_databasePtr;
-	mutable std::unique_ptr<duckdb::Connection> m_connectionPtr;
+	mutable duckdb_database m_database = nullptr;
+	mutable duckdb_connection m_connection = nullptr;
 	mutable std::unique_ptr<CDuckSqlDriver> m_driverPtr;
 	mutable bool m_isTransactionActive = false;
 };

@@ -5,12 +5,12 @@
 // STL includes
 #include <memory>
 
+// 3rdParty includes
+#include <duckdb.h>
+
 // ImtCore includes
 #include <imtduckdb/CDuckSqlDriver.h>
 #include <imtduckdb/IDuckConnection.h>
-
-// 3rdParty includes
-#include <duckdb.hpp>
 
 
 namespace imtduckdb
@@ -18,11 +18,11 @@ namespace imtduckdb
 
 
 /**
-	IDuckConnection implementation owning its own duckdb::Connection to an already-open
-	duckdb::DuckDB instance.
+	IDuckConnection implementation owning its own DuckDB connection to an already-open
+	DuckDB database.
 
-	duckdb::Connection is not thread-safe, but duckdb::DuckDB is, so concurrent workers (one per
-	GraphQL request, or a cache builder running off-thread) each take their own Connection and run
+	A DuckDB connection is not thread-safe, but the database is, so concurrent workers (one per
+	GraphQL request, or a cache builder running off-thread) each take their own connection and run
 	in parallel under DuckDB's MVCC instead of serializing on CDuckDatabaseEngineComp's shared
 	connection. Created via CDuckDatabaseEngineComp::CreateConnection(); carries no mutex of its own
 	- exclusive use by one thread at a time is the contract - and must not outlive the database it
@@ -31,7 +31,11 @@ namespace imtduckdb
 class CDuckConnectionEngine: public IDuckConnection
 {
 public:
-	explicit CDuckConnectionEngine(duckdb::DuckDB& database);
+	/**
+		Takes over \a connection, which is disconnected when this object is destroyed.
+	*/
+	explicit CDuckConnectionEngine(duckdb_connection connection);
+	virtual ~CDuckConnectionEngine() override;
 
 	// reimplemented (imtduckdb::IDuckConnection)
 	virtual std::unique_ptr<IDuckAppender> CreateAppender(
@@ -54,7 +58,7 @@ public:
 	virtual QSqlQuery ExecSqlQueryFromFile(const QString& filePath, const QVariantMap& bindValues, QSqlError* sqlError = nullptr, bool isForwardOnly = false) const override;
 
 private:
-	std::unique_ptr<duckdb::Connection> m_connectionPtr;
+	duckdb_connection m_connection;
 	std::unique_ptr<CDuckSqlDriver> m_driverPtr;
 	mutable bool m_isTransactionActive = false;
 };

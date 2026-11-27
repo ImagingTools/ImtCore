@@ -377,7 +377,7 @@ ICollectionInfo::Ids CCachedObjectCollectionComp::GetElementIds(
 	}
 
 	// The source was not read: the caller must not take the empty list for an empty selection
-	if (logPtr != nullptr && m_objectCollectionCompPtr.IsValid()){
+	if (logPtr != nullptr){
 		logPtr->AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, QStringLiteral("The source collection could not be read."), QStringLiteral("CCachedObjectCollectionComp"))));
 	}
 

@@ -13,6 +13,8 @@ QtObject {
 	}
 	
 	property var supportedParamEditors: ({})
+	// Components shown below the parameters of a settings page, key is the ID of the page parameter
+	property var pageExtensionComps: ({})
 	property var registeredControllers: ({})
 	
 	property Component textParamEditorComp: Component { TextParamEditor {} }
@@ -74,6 +76,23 @@ QtObject {
 	
 	function getParamEditor(typeId){
 		return supportedParamEditors[typeId]
+	}
+	
+	// Register a component shown below the parameters of the settings page with the given ID.
+	// The loaded item gets the JSON data of the page parameters in the property 'pageData' (if declared).
+	function registerPageExtension(pageId, pageExtensionComp){
+		let pageExtensions = {}
+		for (let id in pageExtensionComps){
+			pageExtensions[id] = pageExtensionComps[id]
+		}
+		pageExtensions[pageId] = pageExtensionComp
+		
+		// Assigned as new object to update the bindings of the pages
+		pageExtensionComps = pageExtensions
+	}
+	
+	function getPageExtension(pageId){
+		return pageExtensionComps[pageId] || null
 	}
 	
 	function registerParamsSetController(id, name, controller){

@@ -30,6 +30,8 @@ QtObject {
 	property bool documentSharingEnabled: false;
 
 	signal updated();
+	// The request failed, e.g. the server cannot check the session while the authorization service is down
+	signal updateFailed();
 
 	signal userModeReceived(string userMode);
 	signal superuserExistResult(string status, string error);
@@ -65,6 +67,8 @@ QtObject {
 
 		onFinished: {
 			if (status !== 1){
+				root.updateFailed();
+
 				return;
 			}
 
@@ -104,6 +108,7 @@ QtObject {
 			root.superuserStatus = "UNKNOWN";
 			root.superuserMessage = message || qsTr("Unable to reach server");
 			root.superuserExistResult(root.superuserStatus, root.superuserMessage);
+			root.updateFailed();
 		}
 	}
 }

@@ -1,4 +1,4 @@
-import QtQuick 2.0
+﻿import QtQuick 2.0
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
@@ -64,10 +64,11 @@ ParamsSetController {
 
 			let child = node.createDependenciesArrayElement()
 			child.m_serviceId = dependency.m_serviceId ? String(dependency.m_serviceId) : ""
-			child.m_status = dependency.m_status ? String(dependency.m_status) : "UNKNOWN"
-			child.m_credentialStatus = dependency.m_credentialStatus ? String(dependency.m_credentialStatus) : "NOT_USED"
+			child.m_status = dependency.m_status ? String(dependency.m_status) : ServiceStatusEnum.s_uNKNOWN
+			child.m_credentialStatus = dependency.m_credentialStatus ? String(dependency.m_credentialStatus) : ServerCredentialStatusEnum.s_nOT_USED
 			child.m_applicationName = dependency.m_applicationName ? String(dependency.m_applicationName) : ""
 			child.m_version = formatVersion(dependency.m_version, dependency.m_versionKind, dependency.m_buildTime)
+			child.m_logId = dependency.m_logId ? String(dependency.m_logId) : ""
 
 			if (dependency.m_dependencies && dependency.m_dependencies.getItemsCount() > 0){
 				addDependencies(child, dependency.m_dependencies)
@@ -83,7 +84,7 @@ ParamsSetController {
 		// The server is the root of the tree, so its version is shown once, a server without dependencies is a single row
 		if (root.serverName !== "" || root.serverVersion !== ""){
 			root.serviceTree.m_applicationName = root.serverName
-			root.serviceTree.m_status = "CONNECTED"
+			root.serviceTree.m_status = ServiceStatusEnum.s_cONNECTED
 			root.serviceTree.m_version = root.serverVersion
 			if (root.dependencies && root.dependencies.getItemsCount() > 0){
 				addDependencies(root.serviceTree, root.dependencies)
@@ -94,7 +95,5 @@ ParamsSetController {
 
 			addParam("ServiceDependency", "Services", qsTr("Services"), "", root.serviceTree.toJson())
 		}
-
-		addParam("ServerLog", "ServerLog", qsTr("Server Log"), "", "")
 	}
 }

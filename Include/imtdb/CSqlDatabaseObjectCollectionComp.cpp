@@ -455,6 +455,11 @@ imtbase::IObjectCollectionUniquePtr CSqlDatabaseObjectCollectionComp::CreateSubC
 
 		QSqlError sqlError;
 		QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError, true);
+		if (sqlError.type() != QSqlError::NoError){
+			SendErrorMessage(0, sqlError.text(), "Database collection");
+
+			return nullptr;
+		}
 
 		while (sqlQuery.next()){
 			istd::IChangeableUniquePtr dataPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(sqlQuery.record());

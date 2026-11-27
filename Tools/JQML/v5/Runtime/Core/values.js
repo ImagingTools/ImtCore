@@ -2,6 +2,17 @@
 // Coercion rules are the ones of the current runtime (QtQml/Int.js, Real.js, Bool.js, String.js).
 
 const kinds = {
+    // list<T> of a QML document (QQmlListProperty of QQmlVMEMetaObject): an empty list until set; an array is copied,
+    // one object is a list of it
+    list: {
+        initial: null,
+        coerce(value){
+            if(value === undefined || value === null) return []
+            if(Array.isArray(value)) return value.slice()
+            if(typeof value === 'object' && typeof value.length === 'number' && typeof value !== 'string') return Array.from(value)
+            return [value]
+        },
+    },
     // QQmlScriptString: { fn, scope } made by the compiler, run on demand
     script: {
         initial: null,

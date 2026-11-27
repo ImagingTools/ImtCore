@@ -75,6 +75,25 @@ sdl::V1_0::imtauth::CGroupData CGroupCollectionDocumentServiceComp::OnGetGroupRe
 	collector.CollectGroup(*groupPtr, groupPtr->GetObjectUuid(), productId, getGroupRepresentationRequest.GetRequestInfo().isUsersRequested);
 	collector.FillGroup(response);
 
+	imtsdl::TElementList<sdl::V1_0::imtauth::CGroupSystemInfo> systemInfoList;
+	for (const imtauth::IUserGroupInfo::SystemInfo& systemInfo : groupPtr->GetSystemInfos()){
+		sdl::V1_0::imtauth::CGroupSystemInfo info;
+
+		info.id = QByteArray(systemInfo.systemId);
+
+		if (systemInfo.systemId.isEmpty()){
+			info.name = QStringLiteral("Internal");
+		}
+		else{
+			info.name = QString(systemInfo.systemName);
+		}
+
+		info.enabled = bool(systemInfo.enabled);
+
+		systemInfoList << info;
+	}
+	response.systemInfos = std::move(systemInfoList);
+
 	return response;
 }
 
@@ -176,6 +195,11 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CGroupCollectionDocumentServiceComp
 	}
 	if (!CheckGrantedPermissions(gqlRequest.GetRequestContext(), hasNewUsers ? QByteArrayList() : previousPermissions, groupPtr->GetPermissions(contextProductId), errorMessage)){
 		return response;
+	}
+
+	// The system of a group is never taken from the client: a group without a system is internal.
+	if (groupPtr->GetSystemInfos().isEmpty()){
+		groupPtr->AddToSystem(imtauth::IUserGroupInfo::SystemInfo());
 	}
 
 	if (m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr) != imtdoc::IDocumentService::OS_OK){

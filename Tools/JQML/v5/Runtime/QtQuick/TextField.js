@@ -251,16 +251,18 @@ let pressedNoSelect = null
 function dragSelectionMove(e){
     let field = selectionDrag
     if(!field || !(e.buttons & 1)) return
-    engine.batch(() => field.$dragSelectTo(e.clientX))
+    engine.batch(() => field.$dragSelectTo(e.clientX, e.clientY))
 }
 
 function listenMouse(){
     if(listenMouse.done) return
     listenMouse.done = true
     window.addEventListener('mousemove', dragSelectionMove, true)
-    window.addEventListener('mouseup', () => {
+    window.addEventListener('mouseup', (e) => {
+        let field = selectionDrag
         selectionDrag = null
         pressedNoSelect = null
+        if(field && field.$mouseUp) engine.batch(() => field.$mouseUp(e))
     }, true)
 }
 
@@ -454,7 +456,9 @@ class TextField extends Item {
             if(event.detail > 1) event.preventDefault()
             return
         }
-        if(this.$input.tagName === 'TEXTAREA' || event.detail !== 1) return
+        // a text area selects natively, unless the field lays its text out itself ($selectsByMouse)
+        let own = this.$selectsByMouse && this.$selectsByMouse()
+        if((this.$input.tagName === 'TEXTAREA' && !own) || (event.detail !== 1 && !own)) return
         // the browser neither focuses nor selects: QQuickTextInput::mousePressEvent takes the focus, then moves the
         // cursor there, keeping the anchor with Shift (moveCursor(pos, mark))
         event.preventDefault()
@@ -463,25 +467,31 @@ class TextField extends Item {
             if(input.focus) input.focus({ preventScroll: true })
             if(!this.$v[Item.ACTIVEFOCUS]) this.forceActiveFocus()
         }
-        let position = this.$positionAtClientX(event.clientX)
+        let position = this.$positionAtClient(event.clientX, event.clientY)
+        if(event.detail > 1 && this.$multiClick){
+            engine.batch(() => this.$multiClick(position, event.detail))
+            return
+        }
         engine.batch(() => {
             if(event.shiftKey) this.moveCursorSelection(position, 0)
             else this.$applySelection(position, position, true)
+            if(this.$pressed) this.$pressed(event)
         })
         selectionDrag = this
     }
 
-    // the position at the x of the mouse (in the viewport), on the middle of the line: a single-line field
-    $positionAtClientX(clientX){
+    // the position at the point of the mouse (in the viewport); a single-line field takes the middle of its line
+    $positionAtClient(clientX, clientY){
         let rect = this.$input.getBoundingClientRect()
         return this.$positionAtPoint(clientX - rect.left, (rect.bottom - rect.top) / 2, false)
     }
 
     // QQuickTextInput::mouseMoveEvent: moveCursorSelection(positionAt(mouse), mouseSelectionMode)
-    $dragSelectTo(clientX){
+    $dragSelectTo(clientX, clientY){
         if(this.$f & engine.DESTROYED || !this.$input) return
         let C = this.constructor
-        this.moveCursorSelection(this.$positionAtClientX(clientX), this.$v[C.MOUSESELECTIONMODE] || 0)
+        this.moveCursorSelection(this.$positionAtClient(clientX, clientY), this.$v[C.MOUSESELECTIONMODE] || 0)
+        if(this.$multiline()) return
         // QQuickTextInputPrivate::updateHorizontalScroll: the text scrolls just enough to show the cursor
         let x = this.$caretRect(this.$v[C.CURSORPOSITION]).x
         let left = this.$padding('LEFTPADDING'), right = this.$v[Item.WIDTH] - this.$padding('RIGHTPADDING') - 1
@@ -738,7 +748,9 @@ class TextField extends Item {
         if(!data) return
         if(start === end && this.$v[this.constructor.OVERWRITEMODE] && !this.$mask){
             let content = this.$content()
-            let stop = content.indexOf('\n', start)
+            // the end of the line, or of the block of a rich text (QTextCursor::atBlockEnd)
+            let stop = content.slice(start).search(/[\n\u2029]/)
+            if(stop >= 0) stop += start
             end = Math.min(stop < 0 ? content.length : stop, start + data.length)
         }
         this.$userEdit(start, end, data, kind)
@@ -1177,7 +1189,7 @@ class TextField extends Item {
     }
 
     isRightToLeft(start, end){
-        let text = this.$v[this.constructor.TEXT].slice(Math.min(start, end), Math.max(start, end))
+        let text = this.$content().slice(Math.min(start, end), Math.max(start, end))
         for(let c of text){
             if(RTL.test(c)) return true
             if(/\p{L}/u.test(c)) return false

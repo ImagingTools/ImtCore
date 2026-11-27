@@ -210,7 +210,13 @@ class FileModel {
                 def.valueAt = valueAt(value)
                 let inner = value && value[0] === 'stat' ? value[1] : null
                 if(inner && inner[0] === 'qmlelem') def.elementNode = inner
-                else if(value){
+                else if(inner && inner[0] === 'array' && inner[1].length && inner[1].every(item => item[0] === 'qmlelem')){
+                    // `property list<QtObject> extras: [ QtObject {}, ... ]`: the declaration, then the objects assigned
+                    // to it as a list (as `children: [ ... ]`)
+                    el.propdefs.push(def)
+                    el.assigns.push({ name: def.name, elementNodes: inner[1], line, col })
+                    return
+                } else if(value){
                     def.value = value
                     def.raw = cleanRaw(m[5])
                 }

@@ -71,6 +71,43 @@ function isDefined(name){
     return definedNames.has(name)
 }
 
+// the list of a list<T> property as JavaScript sees it (QmlListWrapper): an array whose changes (push, splice, an
+// index or the length written) are changes of the property
+const LIST_MUTATORS = new Set(['push', 'pop', 'shift', 'unshift', 'splice', 'reverse', 'sort', 'fill', 'copyWithin'])
+const listViews = new WeakMap()
+function listOf(owner, array, signal){
+    let view = listViews.get(array)
+    if(view) return view
+    let inMethod = 0
+    let changed = () => { if(!(owner.$f & engine.DESTROYED)) engine.emit(owner, signal, array, array) }
+    view = new Proxy(array, {
+        get(target, key){
+            let value = target[key]
+            if(typeof key === 'string' && LIST_MUTATORS.has(key) && typeof value === 'function'){
+                return function(...args){
+                    inMethod++
+                    let result
+                    try {
+                        result = value.apply(target, args)
+                    } finally {
+                        inMethod--
+                    }
+                    changed()
+                    return result === target ? view : result
+                }
+            }
+            return value
+        },
+        set(target, key, value){
+            target[key] = value
+            if(!inMethod) changed()
+            return true
+        },
+    })
+    listViews.set(array, view)
+    return view
+}
+
 function defineType(Class, spec = {}){
     definedNames.add(Class.name)
     let base = Object.getPrototypeOf(Class).$type || null
@@ -117,11 +154,17 @@ function defineType(Class, spec = {}){
             })
         } else {
             Object.defineProperty(Class.prototype, name, {
-                get: def.get || function(){
+                get: def.get || (def.kind === 'list' ? function(){
+                    if(this.$pending) engine.flushPending(this, id)
+                    engine.track(this, signal)
+                    // each object its own empty list
+                    let value = this.$v[id] || (this.$v[id] = [])
+                    return listOf(this, value, signal)
+                } : function(){
                     if(this.$pending) engine.flushPending(this, id)
                     engine.track(this, signal)
                     return this.$v[id]
-                },
+                }),
                 set: def.set || (def.readonly
                     ? function(){ throw new TypeError('Cannot assign to read-only property "' + name + '"') }
                     : function(value){ this.$assign(id, value) }),

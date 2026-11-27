@@ -11,6 +11,9 @@ const isMac = () => typeof navigator !== 'undefined' && !!navigator && /Mac|iPho
 
 const NoButton = 0, LeftButton = 1
 
+// QtQuickTest::lastMouseTimestamp (quicktestevent.cpp): the timestamps of the mouse events of the tests
+let lastMouseTimestamp = 0
+
 class TestFailError extends Error {}
 class TestSkipError extends Error {}
 
@@ -259,37 +262,61 @@ class TestCase extends Item {
         return { x: pos.x + x, y: pos.y + y }
     }
 
-    mousePress(item, x, y, button = LeftButton, modifiers = 0){
+    // QtQuickTest::mouseEvent: a delay (-1: QTest::defaultMouseDelay, 0) passes first (qWait) and goes into the
+    // timestamps; each event is a millisecond after the one before, a release 500 more (no double click)
+    $mouseDelay(delay){
+        delay = Number(delay)
+        if(!(delay > 0)) return
+        this.sleep(delay)
+        lastMouseTimestamp += delay
+    }
+
+    $mouseEvent(deliver, release = false){
+        mouse.scene.eventTime = ++lastMouseTimestamp
+        try {
+            deliver()
+        } finally {
+            mouse.scene.eventTime = null
+        }
+        if(release) lastMouseTimestamp += 500
+    }
+
+    mousePress(item, x, y, button = LeftButton, modifiers = 0, delay = -1){
         let p = this.$scene(item, x, y)
+        this.$mouseDelay(delay)
         this.$pressedButtons |= button
-        mouse.press(p.x, p.y, button, this.$pressedButtons, modifiers, false)
+        this.$mouseEvent(() => mouse.press(p.x, p.y, button, this.$pressedButtons, modifiers, false))
     }
 
-    mouseRelease(item, x, y, button = LeftButton, modifiers = 0){
+    mouseRelease(item, x, y, button = LeftButton, modifiers = 0, delay = -1){
         let p = this.$scene(item, x, y)
+        this.$mouseDelay(delay)
         this.$pressedButtons &= ~button
-        mouse.release(p.x, p.y, button, this.$pressedButtons, modifiers)
+        this.$mouseEvent(() => mouse.release(p.x, p.y, button, this.$pressedButtons, modifiers), true)
     }
 
-    mouseMove(item, x, y, delay, buttons = NoButton, modifiers = 0){
+    mouseMove(item, x, y, delay = -1, buttons = NoButton, modifiers = 0){
         let p = this.$scene(item, x, y)
-        mouse.move(p.x, p.y, buttons || this.$pressedButtons, modifiers)
+        this.$mouseDelay(delay)
+        this.$mouseEvent(() => mouse.move(p.x, p.y, buttons || this.$pressedButtons, modifiers))
     }
 
-    mouseClick(item, x, y, button = LeftButton, modifiers = 0){
+    mouseClick(item, x, y, button = LeftButton, modifiers = 0, delay = -1){
         let p = this.$scene(item, x, y)
         // a native control is focused by the browser on a real press
         if(item.$input) item.$input.focus()
-        mouse.press(p.x, p.y, button, button | this.$pressedButtons, modifiers, false)
-        mouse.release(p.x, p.y, button, this.$pressedButtons, modifiers)
+        this.$mouseDelay(delay)
+        this.$mouseEvent(() => mouse.press(p.x, p.y, button, button | this.$pressedButtons, modifiers, false))
+        this.$mouseEvent(() => mouse.release(p.x, p.y, button, this.$pressedButtons, modifiers), true)
     }
 
-    mouseDoubleClickSequence(item, x, y, button = LeftButton, modifiers = 0){
+    mouseDoubleClickSequence(item, x, y, button = LeftButton, modifiers = 0, delay = -1){
         let p = this.$scene(item, x, y)
-        mouse.press(p.x, p.y, button, button, modifiers, false)
-        mouse.release(p.x, p.y, button, NoButton, modifiers)
-        mouse.press(p.x, p.y, button, button, modifiers, true)
-        mouse.release(p.x, p.y, button, NoButton, modifiers)
+        this.$mouseDelay(delay)
+        this.$mouseEvent(() => mouse.press(p.x, p.y, button, button, modifiers, false))
+        this.$mouseEvent(() => mouse.release(p.x, p.y, button, NoButton, modifiers), true)
+        this.$mouseEvent(() => mouse.press(p.x, p.y, button, button, modifiers, true))
+        this.$mouseEvent(() => mouse.release(p.x, p.y, button, NoButton, modifiers), true)
     }
 
     // deprecated in Qt 5: a lone MouseButtonDblClick event

@@ -1844,6 +1844,8 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
       subtype = S.token.value;
       next();
       expect_token("operator", ">");
+      // `list<QtObject>`: the type with its element type
+      type += "<" + subtype + ">";
     }
 
     // `property int : 1` has no name (QQmlJS: "Expected token `identifier'")

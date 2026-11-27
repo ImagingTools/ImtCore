@@ -1,0 +1,46 @@
+transform order 255,0,0,255 0,0,0,0
+setTransform 0,0,255,255 0,0,0,0
+singular 0,0,0,0
+singular reset 255,0,0,255
+singular setTransform 255,0,0,255
+inPath line true false
+inPath border true true false
+inPath translated true false
+arcTo 0,0,0,255 0,0,0,255 0,0,0,0 0,0,0,0
+arc 3pi 0,0,0,255 0,0,0,255
+arc -7.5 0,0,0,0 0,0,0,0 0,0,0,0 0,0,0,0
+arc r0 0,0,0,255 0,0,0,0
+gradient getter true object
+gradient snapshot 255,0,0,255
+stroke object object {}
+addColorStop returns true true
+pattern getter #ff0000
+pattern dense4 0,0,0,0 255,0,0,255 255,0,0,255 0,0,0,0
+pattern hor 0,0,255,255 0,0,0,0 0,0,255,255
+pattern none 0,0,0,0 #0000ff
+pattern texture 255,0,0,255 0,0,255,255 255,0,0,255 0,0,0,0
+pattern few ok undefined
+pattern item ok 0,0,0,0 #000000
+put 7 ok true
+put 7 px 255,0,0,255 0,0,0,0 0,0,0,0 0,0,0,0
+put 7 neg ok true
+put 7 neg px 0,0,0,0 0,0,0,0 0,0,0,0
+put 7 empty ok undefined
+put not object throws 17 Context2D::putImageData, the image data type mismatch
+put nan throws 9 putImageData() : Invalid arguments
+put alpha state 255,0,0,126
+put transform 0,0,0,0 255,0,0,255
+getImageData region 8 8 255 0 256
+getImageData frac ok 3x2
+clip intersect 0,0,0,0 255,0,0,255 0,0,0,0
+clip restored 0,0,255,255 0,0,255,255
+clip reset 0,128,0,255
+path across restore 0,0,0,255 0,0,0,255 0,0,0,255
+measure int true true
+text center top true true true
+text path true 0,0,0,0
+textBaseline/Align after reset start alphabetic sans-serif,-1,10,5,400,0,0,0,0,0,0,0,0,0,0,1,,0,0
+painted so far true
+END
+painted total true
+DONE

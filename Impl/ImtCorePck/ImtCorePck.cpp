@@ -230,6 +230,16 @@ I_EXPORT_COMPONENT(
 			"Implementation of an ordered object collection facade",
 			"Object Data Model Collection Container Composition Order");
 
+I_EXPORT_COMPONENT(
+			CollectionStorageResolver,
+			"Storage resolver of the storage links on top of an object collection",
+			"Storage Link Resolver Object Collection");
+
+I_EXPORT_COMPONENT(
+			StorageResolverRegistry,
+			"Application-wide registry of the storage resolvers by the logical storage ID",
+			"Storage Link Resolver Registry Provider");
+
 
 } // namespace ImtCorePck
 

@@ -65,6 +65,10 @@ property, signal and method of every control exists and has the default of Qt.
 | `SpinBox.value` is bound to `from .. to` only once the spin box is complete | `doublespinbox.qml` |
 | a right press no item takes is a context menu event (`ContextMenu`) | `contextmenu.qml` |
 | `Grid` positioner, `ObjectModel`, `Locale.firstDayOfWeek / dayName / monthName` | `grid.qml`, `objectmodel.qml`, `calendar.qml` |
+| a MouseArea in a Flickable, ListView or GridView: the view takes a drag past the threshold (`canceled`, no `released`/`clicked`) unless `preventStealing` or `drag.target`; no flick after a rest of 100 ms; a press stops a flick; the hover stays while the pointer is over the area. The mouse functions of `TestCase` keep QtTest's timestamps (each event a millisecond later, `delay` waited and added, a release 500 more), which the Flickable takes for its velocity | `flick_mouse_*.qml`, `listview_scroll.qml` |
+| `SmoothedAnimation` as `QSmoothedAnimation` (the velocity profile, the velocity kept on a new target, `reversingMode`); the highlight of a ListView moves by it, and `positionViewAtIndex` puts it at the current item at once, so the view follows the keys | `listview_follow_after_position.qml`, `listview_row_focus_click.qml` |
+| `property list<T>`: an empty list until set; `[ Object {} ]` in the declaration or in a use of the type; arrays, one object, `push` and the other changes of the list notify; the objects declared in it, like the object value of any property (`property QtObject helper: QtObject {}`), belong to the object, which destroys them before its children | `property_list/`, `destruction_order.qml` |
+| a `Binding` does not write again over a script that wrote its target | `binding_script_write_wins.qml` |
 
 ## Tests
 

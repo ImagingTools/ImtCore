@@ -28,6 +28,12 @@ const clock = {
 
 const AXES = ['x', 'y']
 
+// QQuickFlickablePrivate::computeCurrentTime: the timestamp of the event, else the clock
+function eventNow(){
+    let time = require('./PointerDelivery').scene.eventTime
+    return time === null || time === undefined ? clock.now() : time
+}
+
 function flickState(view){
     if(view.$fs) return view.$fs
     let axis = () => ({ pressPos: 0, dragStartOffset: 0, previousDragDelta: 0, velocity: 0, samples: [], moved: false, flicking: false,
@@ -219,9 +225,14 @@ function fixup(view, axis, immediate = false){
     if(!view.$flickAxis(axis) && !view.$fixupTarget) return endIfIdle(view)
     let pos = view.$contentPos(axis)
     let { min, max } = bounds(view, axis)
-    let target = pos < min ? min : pos > max ? max : Math.round(pos)
+    let inside = pos >= min && pos <= max
+    // within the bounds a part of a pixel is no animation: set at once, rounded on in the direction of the motion
+    let rounded = Math.abs(Math.round(pos) - pos) < 0.25 ? Math.round(pos)
+        : s[axis].smoothVelocity > 0 ? Math.ceil(pos) : s[axis].smoothVelocity < 0 ? Math.floor(pos) : Math.round(pos)
+    let target = pos < min ? min : pos > max ? max : rounded
     if(view.$fixupTarget) target = view.$fixupTarget(axis, target, s[axis])
     if(target === pos) return endIfIdle(view)
+    if(inside && target === rounded) immediate = true
     resetTimeline(view, axis)
     if(immediate){
         setPos(view, axis, target)
@@ -286,7 +297,7 @@ function flick(view, axis, v){
 
 function pressFlick(view, x, y){
     let s = flickState(view)
-    let now = clock.now()
+    let now = eventNow()
     let fast = AXES.some((axis) => s[axis].animation && Math.abs(s[axis].smoothVelocity) > RETAIN_GRAB_VELOCITY && !s[axis].fixingUp)
     // pressed again while flicking: the press stops the flick and is not given to the children
     s.stealMouse = view.$v[view.constructor.INTERACTIVE] && fast
@@ -348,7 +359,7 @@ function dragAxis(view, axis, delta, overThreshold, elapsedSincePress){
 function moveFlick(view, x, y, buttons){
     let s = flickState(view)
     if(!view.$v[view.constructor.INTERACTIVE] || s.lastPosTime === -1 || !(buttons & 1)) return false
-    let now = clock.now()
+    let now = eventNow()
     let dx = x - s.pressX, dy = y - s.pressY
     let overThreshold = s.moving
         || (view.$flickAxis('y') && Math.abs(dy) > DRAG_THRESHOLD) || (view.$flickAxis('x') && Math.abs(dx) > DRAG_THRESHOLD)
@@ -396,7 +407,7 @@ function releaseFlick(view, x, y, grabbed){
     s.stealMouse = false
     s.keepMouseGrab = false
     s.pressed = false
-    let elapsed = clock.now() - s.lastPosTime
+    let elapsed = eventNow() - s.lastPosTime
     for(let axis of AXES){
         let a = s[axis]
         a.velocity = a.samples.length ? a.samples.reduce((sum, v) => sum + v, 0) / a.samples.length : 0

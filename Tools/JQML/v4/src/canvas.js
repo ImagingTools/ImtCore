@@ -436,6 +436,42 @@ function tilePage(tile) {
 	return tile.page;
 }
 
+// The texture pages of the pictures that drawImage draws, by the picture and then by the part and the size in device pixels:
+// a vector picture is rasterized at the size it is shown at.
+const drawnPages = new WeakMap();
+const MAX_DRAWN_SIZES = 16;
+const MAX_DRAWN_PIXELS = 2048;
+
+function imagePage(r, c) {
+	if (typeof document === 'undefined') return null;
+	const pw = Math.min(MAX_DRAWN_PIXELS, Math.max(1, Math.round(c.w * Math.hypot(r.ma, r.mb) * r.dpr)));
+	const ph = Math.min(MAX_DRAWN_PIXELS, Math.max(1, Math.round(c.h * Math.hypot(r.mc, r.md) * r.dpr)));
+	const nearest = r.mb === 0 && r.mc === 0;
+	const key = `${c.sx},${c.sy},${c.sw},${c.sh},${pw}x${ph}:${nearest ? 1 : 0}`;
+	let pages = drawnPages.get(c.picture);
+	if (pages === undefined) drawnPages.set(c.picture, (pages = new Map()));
+	let page = pages.get(key);
+	if (page !== undefined) return page;
+	const canvas = document.createElement('canvas');
+	canvas.width = pw;
+	canvas.height = ph;
+	const context = canvas.getContext('2d');
+	context.drawImage(c.picture, c.sx, c.sy, c.sw, c.sh, 0, 0, pw, ph);
+	try {
+		context.getImageData(0, 0, 1, 1);
+	} catch {
+		return null; // a picture of another site: the canvas is tainted and cannot be a texture
+	}
+	if (pages.size >= MAX_DRAWN_SIZES) {
+		const oldest = pages.keys().next().value;
+		r.dropPage(pages.get(oldest));
+		pages.delete(oldest);
+	}
+	page = { canvas, context: null, texture: null, dirty: true, size: Math.max(pw, ph), nearest };
+	pages.set(key, page);
+	return page;
+}
+
 // The part of a convex polygon (flat x, y list) inside a rectangle.
 function clipToRect(points, x0, y0, x1, y1) {
 	let poly = points;
@@ -466,12 +502,14 @@ function clipToRect(points, x0, y0, x1, y1) {
 // drawing call is recorded into `output` as a command; `output === null` makes a detached
 // context that only measures text (getContext() outside of onPaint).
 export class CanvasContext {
-	// `pictures`: the pictures `Canvas.loadImage()` has loaded, by their address (for createPattern).
-	constructor(width, height, output, pictures = null) {
+	// `pictures`: the pictures `Canvas.loadImage()` has loaded, by their address (for createPattern and drawImage).
+	// `request(url)`: asks for a picture that drawImage did not find there.
+	constructor(width, height, output, pictures = null, request = null) {
 		this.$output = output;
 		this.$width = width;
 		this.$height = height;
 		this.$pictures = pictures;
+		this.$request = request;
 		this.$init();
 	}
 
@@ -1246,10 +1284,38 @@ export class CanvasContext {
 
 	// ----- images -----
 
-	// Images are not supported yet: nothing is loaded and drawImage() draws nothing.
 	loadImage() {}
 
-	drawImage() {}
+	// `drawImage(image, dx, dy)`, `(image, dx, dy, dw, dh)` or `(image, sx, sy, sw, sh, dx, dy, dw, dh)`; `image` is an address or an
+	// Image item. An address that is not loaded yet draws nothing now: it is asked for and the canvas paints again when it is there.
+	drawImage(image, ...args) {
+		if (this.$output === null || image === null || image === undefined) return;
+		let picture = null;
+		if (typeof image === 'object' && image.$img !== undefined) {
+			picture = image.$img;
+		} else if (this.$pictures !== null) {
+			const url = String(image);
+			picture = this.$pictures.get(url) ?? null;
+			if (picture === null && url !== '' && this.$request !== null) this.$request(url);
+		}
+		if (picture === null) return;
+		const width = picture.naturalWidth || picture.width || 0;
+		const height = picture.naturalHeight || picture.height || 0;
+		const values = args.map(toFloat);
+		let sx = 0;
+		let sy = 0;
+		let sw = width;
+		let sh = height;
+		let x;
+		let y;
+		let w = width;
+		let h = height;
+		if (values.length >= 8) [sx, sy, sw, sh, x, y, w, h] = values;
+		else if (values.length >= 4) [x, y, w, h] = values;
+		else [x, y] = values;
+		if (!(width > 0 && height > 0 && sw > 0 && sh > 0 && w > 0 && h > 0)) return;
+		this.$emit({ k: 'image', picture, sx, sy, sw, sh, x, y, w, h, alpha: this.$alpha });
+	}
 
 	// ----- rectangles -----
 
@@ -1285,7 +1351,7 @@ export class CanvasContext {
 export function commandsExceed(commands, w, h) {
 	const eps = 0.5;
 	for (const c of commands) {
-		if (c.k !== 'poly' && c.k !== 'gpoly' && c.k !== 'tpoly' && c.k !== 'bitmap' && c.k !== 'rect') continue;
+		if (c.k !== 'poly' && c.k !== 'gpoly' && c.k !== 'tpoly' && c.k !== 'bitmap' && c.k !== 'rect' && c.k !== 'image') continue;
 		const m = c.m;
 		const outside = (x, y) => {
 			const tx = m[0] * x + m[2] * y + m[4];
@@ -1296,7 +1362,7 @@ export function commandsExceed(commands, w, h) {
 			if (outside(c.x, c.y) || outside(c.x + c.w, c.y) || outside(c.x + c.w, c.y + c.h) || outside(c.x, c.y + c.h)) return true;
 			continue;
 		}
-		if (c.k === 'rect') {
+		if (c.k === 'rect' || c.k === 'image') {
 			if (outside(c.x, c.y) || outside(c.x + c.w, c.y) || outside(c.x + c.w, c.y + c.h) || outside(c.x, c.y + c.h)) return true;
 			continue;
 		}
@@ -1393,6 +1459,12 @@ export function replayCommands(r, commands, opacity, aa) {
 				if (hidden > 0) break;
 				if (c.page === null) c.page = pagePixels(c.w, c.h, c.data);
 				if (c.page !== null) r.image(c.page, c.x, c.y, c.w, c.h, 0, 0, 1, 1, opacity * c.alpha);
+				break;
+			}
+			case 'image': {
+				if (hidden > 0) break;
+				const page = imagePage(r, c);
+				if (page !== null) r.image(page, c.x, c.y, c.w, c.h, 0, 0, 1, 1, opacity * c.alpha);
 				break;
 			}
 			case 'text': {

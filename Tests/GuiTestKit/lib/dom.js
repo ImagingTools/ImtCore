@@ -6,6 +6,11 @@
 //
 // A "path" is an array of objectNames from an outer container to the target; the descendant combinator
 // means intermediate nesting is allowed, so you only list the meaningful anchors.
+//
+// On JQML v4 there is no DOM: locate() hands out a locator that runs the same selectors through window.qmlTest
+// (see qml.js), so the functions below work on both.
+
+const { locate, isQml, callQmlTest, qmlSelector } = require('./qml');
 
 const OBJ = (name) => `[objectName="${cssEscape(name)}"]`;
 
@@ -34,7 +39,7 @@ function selectorForPath(path) {
  * @returns {import('@playwright/test').Locator}
  */
 function byPath(page, path) {
-  return page.locator(`${selectorForPath(path)}[visible]`).first();
+  return locate(page, `${selectorForPath(path)}[visible]`).first();
 }
 
 /**
@@ -43,7 +48,7 @@ function byPath(page, path) {
  * @param {string[]} path
  */
 function byPathAnyVisibility(page, path) {
-  return page.locator(selectorForPath(path)).first();
+  return locate(page, selectorForPath(path)).first();
 }
 
 /**
@@ -53,7 +58,7 @@ function byPathAnyVisibility(page, path) {
  * @param {string[]} path
  */
 function mouseAreaOf(page, path) {
-  return page.locator(`${selectorForPath(path)} [objectName="MouseArea"][visible]`).first();
+  return locate(page, `${selectorForPath(path)} [objectName="MouseArea"][visible]`).first();
 }
 
 /**
@@ -73,7 +78,7 @@ function popupItem(page, text) {
  * @param {number} index  zero-based position among the popup's selectable (non-separator) rows
  */
 function popupItemByIndex(page, index) {
-  return page.locator('[objectName="PopupMenuDialog"] [objectName="MouseArea"][visible]').nth(index);
+  return locate(page, '[objectName="PopupMenuDialog"] [objectName="MouseArea"][visible]').nth(index);
 }
 
 /**
@@ -82,7 +87,7 @@ function popupItemByIndex(page, index) {
  * @param {import('@playwright/test').Page} page
  */
 function popupItemLast(page) {
-  return page.locator('[objectName="PopupMenuDialog"] [objectName="MouseArea"][visible]').last();
+  return locate(page, '[objectName="PopupMenuDialog"] [objectName="MouseArea"][visible]').last();
 }
 
 /**
@@ -92,7 +97,7 @@ function popupItemLast(page) {
  * @param {string[]} path
  */
 async function countVisible(page, path) {
-  return page.locator(`${selectorForPath(path)}[visible]`).count();
+  return locate(page, `${selectorForPath(path)}[visible]`).count();
 }
 
 /**
@@ -102,7 +107,7 @@ async function countVisible(page, path) {
  * @param {string[]} path
  */
 async function countAny(page, path) {
-  return page.locator(selectorForPath(path)).count();
+  return locate(page, selectorForPath(path)).count();
 }
 
 /**
@@ -160,7 +165,7 @@ const OFFER_FALLBACK_TIMEOUT = 10000;
 /** How many VISIBLE elements match a raw attribute selector, optionally inside an objectName path. */
 async function countVisibleMatching(page, selector, scope = []) {
   const prefix = scope.length ? `${selectorForPath(scope)} ` : '';
-  return page.locator(`${prefix}${selector}[visible]`).count();
+  return locate(page, `${prefix}${selector}[visible]`).count();
 }
 
 /**
@@ -208,77 +213,136 @@ async function isOffered(page, path, options) {
  * @returns {Promise<{x:number,y:number,width:number,height:number}[]>}
  */
 async function columnRects(page, headerIds) {
-  return page.evaluate((ids) => {
-    const rows = Array.from(document.querySelectorAll('[objectName^="TableRow_"][visible]'));
-    if (!rows.length) return [];
+  const layout = await ((await isQml(page)) ? page.evaluate(columnLayoutQml, headerIds) : page.evaluate(columnLayoutDom, headerIds));
 
-    const groups = new Map();
-    for (const row of rows) {
-      const scope = row.closest('[objectName="Dialog"]') || document.body;
-      if (!groups.has(scope)) groups.set(scope, []);
-      groups.get(scope).push(row);
-    }
+  return maskColumns(layout, headerIds);
+}
 
-    // [visible] filter: a dismissed Dialog can linger in the DOM and subtracting it would punch a hole.
-    const dialogEls = Array.from(document.querySelectorAll('[objectName="Dialog"][visible]'));
+/**
+ * Runs in the page (JQML v3): the edges of what columnRects() needs, per group of rows (rows grouped by their nearest
+ * enclosing `[objectName="Dialog"]`, or the page root): the group's scope, its table, its rows, the cells of each
+ * requested column (the first per row) and the other open dialogs. An edge set is { left, right, top, bottom }.
+ */
+function columnLayoutDom(ids) {
+  const edges = (element) => {
+    const r = element.getBoundingClientRect();
+    return { left: r.left, right: r.right, top: r.top, bottom: r.bottom };
+  };
+  const rows = Array.from(document.querySelectorAll('[objectName^="TableRow_"][visible]'));
+  const groups = new Map();
+  for (const row of rows) {
+    const scope = row.closest('[objectName="Dialog"]') || document.body;
+    if (!groups.has(scope)) groups.set(scope, []);
+    groups.get(scope).push(row);
+  }
 
-    // Subtract `occluder` from `rect` (same x-range only) - returns 0, 1, or 2 (split above/below) rects.
-    function subtractOccluder(rect, occluder) {
-      const overlapsX = rect.x < occluder.right && rect.x + rect.width > occluder.left;
-      if (!overlapsX) return [rect];
-      const pieces = [];
-      if (rect.y < occluder.top) {
-        pieces.push({ ...rect, height: Math.min(rect.y + rect.height, occluder.top) - rect.y });
-      }
-      const bottom = rect.y + rect.height;
-      if (bottom > occluder.bottom) {
-        const y = Math.max(rect.y, occluder.bottom);
-        pieces.push({ ...rect, y, height: bottom - y });
-      }
-      return pieces.filter((p) => p.height > 0);
-    }
+  // [visible] filter: a dismissed Dialog can linger in the DOM and subtracting it would punch a hole.
+  const dialogEls = Array.from(document.querySelectorAll('[objectName="Dialog"][visible]'));
 
-    const rects = [];
-    for (const [scope, groupRows] of groups.entries()) {
-      const scopeRect = scope.getBoundingClientRect();
-      // Clamp to the nearest enclosing Table (the clipped row viewport) when there is one, so the mask
-      // stops at the table's real bottom rather than bleeding through the dialog's title bar/footer.
+  return {
+    viewportHeight: window.innerHeight,
+    groups: Array.from(groups.entries()).map(([scope, groupRows]) => {
+      // Clamp to the nearest enclosing Table (the clipped row viewport) when there is one.
       const tableEl = groupRows[0].closest('[objectName="Table"]');
-      const containerRect = tableEl ? tableEl.getBoundingClientRect() : scopeRect;
-      const rowRects = groupRows.map((r) => r.getBoundingClientRect());
-      const rawTop = Math.min(...rowRects.map((r) => r.top));
-      const rawBottom = Math.max(...rowRects.map((r) => r.bottom));
-      // Never past the scope's or the table container's own visible bounds, nor the viewport.
-      const groupTop = Math.max(rawTop, scopeRect.top, containerRect.top, 0);
-      const groupBottom = Math.min(rawBottom, scopeRect.bottom, containerRect.bottom, window.innerHeight);
-      if (groupBottom <= groupTop) continue;
-
-      const occluders = dialogEls.filter((d) => d !== scope).map((d) => d.getBoundingClientRect());
-
+      const cells = {};
       for (const id of ids) {
-        // The WIDEST cell in the column, not the first found: a cell can render slightly past its
-        // neighbours, and a mask cut to one row would leave a few pixels of another timestamp showing.
-        let left = null;
-        let right = null;
-        for (const row of groupRows) {
-          const cell = row.querySelector(`[objectName="${id}"][visible]`);
-          if (!cell) continue;
-          const r = cell.getBoundingClientRect();
-          if (r.width <= 0) continue;
-          left = left === null ? r.x : Math.min(left, r.x);
-          right = right === null ? r.x + r.width : Math.max(right, r.x + r.width);
-        }
-        if (left === null || right - left <= 0) continue;
-
-        let pieces = [{ x: left, y: groupTop, width: right - left, height: groupBottom - groupTop }];
-        for (const occluder of occluders) {
-          pieces = pieces.flatMap((p) => subtractOccluder(p, occluder));
-        }
-        rects.push(...pieces);
+        cells[id] = groupRows.map((row) => row.querySelector(`[objectName="${id}"][visible]`)).filter(Boolean).map(edges);
       }
+      return {
+        scope: edges(scope),
+        container: edges(tableEl || scope),
+        rows: groupRows.map(edges),
+        cells,
+        occluders: dialogEls.filter((d) => d !== scope).map(edges),
+      };
+    }),
+  };
+}
+
+/** Runs in the page (JQML v4): columnLayoutDom() read through window.qmlTest; the scope of rows in no dialog is the viewport. */
+function columnLayoutQml(ids) {
+  const t = window.qmlTest;
+  const edges = (handle) => {
+    const box = t.info(handle.id).box;
+    return { left: box.x, right: box.x + box.width, top: box.y, bottom: box.y + box.height };
+  };
+  const viewport = { left: 0, right: window.innerWidth, top: 0, bottom: window.innerHeight };
+  const groups = new Map();
+  for (const row of t.find(null, '"TableRow_*":visible')) {
+    const dialog = t.closest(row.id, '"Dialog"');
+    const key = dialog ? dialog.id : '';
+    if (!groups.has(key)) groups.set(key, { dialog, rows: [] });
+    groups.get(key).rows.push(row);
+  }
+  const dialogs = t.find(null, '"Dialog":visible');
+
+  return {
+    viewportHeight: window.innerHeight,
+    groups: Array.from(groups.entries()).map(([key, group]) => {
+      const scope = group.dialog ? edges(group.dialog) : viewport;
+      const table = t.closest(group.rows[0].id, '"Table"');
+      const cells = {};
+      for (const id of ids) {
+        cells[id] = group.rows.map((row) => t.find(row.id, '*:visible').find((handle) => handle.objectName === id)).filter(Boolean).map(edges);
+      }
+      return {
+        scope,
+        container: table ? edges(table) : scope,
+        rows: group.rows.map(edges),
+        cells,
+        occluders: dialogs.filter((d) => d.id !== key).map(edges),
+      };
+    }),
+  };
+}
+
+/** Subtract `occluder` from `rect` (same x-range only) - returns 0, 1, or 2 (split above/below) rects. */
+function subtractOccluder(rect, occluder) {
+  const overlapsX = rect.x < occluder.right && rect.x + rect.width > occluder.left;
+  if (!overlapsX) return [rect];
+  const pieces = [];
+  if (rect.y < occluder.top) {
+    pieces.push({ ...rect, height: Math.min(rect.y + rect.height, occluder.top) - rect.y });
+  }
+  const bottom = rect.y + rect.height;
+  if (bottom > occluder.bottom) {
+    const y = Math.max(rect.y, occluder.bottom);
+    pieces.push({ ...rect, y, height: bottom - y });
+  }
+  return pieces.filter((p) => p.height > 0);
+}
+
+/**
+ * The mask rects of columnRects() from the layout one of the column readers gives: per group, the span of its rows
+ * clamped to its scope, its table and the viewport, cut to the widest cell of each column, minus the other dialogs.
+ */
+function maskColumns({ viewportHeight, groups }, headerIds) {
+  const rects = [];
+  for (const group of groups) {
+    const groupTop = Math.max(Math.min(...group.rows.map((r) => r.top)), group.scope.top, group.container.top, 0);
+    const groupBottom = Math.min(Math.max(...group.rows.map((r) => r.bottom)), group.scope.bottom, group.container.bottom, viewportHeight);
+    if (groupBottom <= groupTop) continue;
+
+    for (const id of headerIds) {
+      // The WIDEST cell in the column, not the first found: a cell can render slightly past its
+      // neighbours, and a mask cut to one row would leave a few pixels of another timestamp showing.
+      let left = null;
+      let right = null;
+      for (const cell of group.cells[id]) {
+        if (cell.right - cell.left <= 0) continue;
+        left = left === null ? cell.left : Math.min(left, cell.left);
+        right = right === null ? cell.right : Math.max(right, cell.right);
+      }
+      if (left === null || right - left <= 0) continue;
+
+      let pieces = [{ x: left, y: groupTop, width: right - left, height: groupBottom - groupTop }];
+      for (const occluder of group.occluders) {
+        pieces = pieces.flatMap((p) => subtractOccluder(p, occluder));
+      }
+      rects.push(...pieces);
     }
-    return rects;
-  }, headerIds);
+  }
+  return rects;
 }
 
 module.exports = {
@@ -301,4 +365,9 @@ module.exports = {
   countAny,
   isVisible,
   columnRects,
+  maskColumns,
+  locate,
+  isQml,
+  callQmlTest,
+  qmlSelector,
 };
