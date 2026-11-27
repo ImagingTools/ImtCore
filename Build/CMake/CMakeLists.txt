@@ -189,6 +189,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 	add_subdirectory("${INCLUDE_DIR}/imtaccount/CMake"		"${AUX_INCLUDE_DIR}/imtaccount")
 	add_subdirectory("${INCLUDE_DIR}/imtauth/CMake"			"${AUX_INCLUDE_DIR}/imtauth")
 	add_subdirectory("${INCLUDE_DIR}/imtapp/CMake"			"${AUX_INCLUDE_DIR}/imtapp")
+	add_subdirectory("${INCLUDE_DIR}/imtassist/CMake"		"${AUX_INCLUDE_DIR}/imtassist")
 	add_subdirectory("${INCLUDE_DIR}/imtcrypt/CMake"		"${AUX_INCLUDE_DIR}/imtcrypt")
 	add_subdirectory("${INCLUDE_DIR}/imtdesk/CMake"			"${AUX_INCLUDE_DIR}/imtdesk")
 	add_subdirectory("${INCLUDE_DIR}/imtdev/CMake"			"${AUX_INCLUDE_DIR}/imtdev")
@@ -649,6 +650,9 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 		add_subdirectory("${TESTS_DIR}/PasswordPolicyTest/CMake" "${AUX_INCLUDE_DIR}/PasswordPolicyTest")
 		add_dependencies(PasswordPolicyTest imtbase imtauth)
+
+		add_subdirectory("${TESTS_DIR}/AssistantTest/CMake" "${AUX_INCLUDE_DIR}/AssistantTest")
+		add_dependencies(AssistantTest imtassist)
 
 		add_subdirectory("${TESTS_DIR}/UserAccountStateTest/CMake" "${AUX_INCLUDE_DIR}/UserAccountStateTest")
 		add_dependencies(UserAccountStateTest imtbase imtauth)

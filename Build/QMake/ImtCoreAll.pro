@@ -169,6 +169,9 @@ SUBDIRS += imtauthgql
 imtauthgql.file = ../../Include/imtauthgql/QMake/imtauthgql.pro
 imtauthgql.depends = imtauthsdl 
 
+SUBDIRS += imtassist
+imtassist.file = ../../Include/imtassist/QMake/imtassist.pro
+
 SUBDIRS += imtcrypt
 imtcrypt.file = ../../Include/imtcrypt/QMake/imtcrypt.pro
 

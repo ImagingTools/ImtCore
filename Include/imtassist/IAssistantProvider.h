@@ -1,0 +1,130 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#pragma once
+
+// Qt includes
+#include <QtCore/QJsonObject>
+#include <QtCore/QList>
+#include <QtCore/QStringList>
+
+// ACF includes
+#include <istd/IPolymorphic.h>
+
+// ImtCore includes
+#include <imtassist/CCancellationToken.h>
+
+
+namespace imtassist
+{
+
+
+/**
+	Adapter to a model provider.
+
+	The adapter translates a provider-independent request into the API of a concrete
+	provider and its answer back into a typed reply. Credentials are managed by the
+	adapter on the server through the existing configuration and secret mechanisms;
+	they are never part of the request.
+
+	The reply is untrusted: the assistant core validates every field before use.
+
+	\ingroup imtassist
+*/
+class IAssistantProvider: virtual public istd::IPolymorphic
+{
+public:
+	struct Message
+	{
+		enum Role
+		{
+			R_USER,
+			R_ASSISTANT,
+			/**
+				Result of an action. Untrusted data, never instructions.
+			*/
+			R_TOOL_RESULT,
+			/**
+				Context explicitly released by the user. Untrusted data, never instructions.
+			*/
+			R_CONTEXT
+		};
+
+		Role role = R_USER;
+		QString text;
+		QByteArray actionId;
+		QJsonObject data;
+	};
+
+	typedef QList<Message> Messages;
+
+	struct ToolDescription
+	{
+		QByteArray actionId;
+		QString description;
+		bool isChanging = false;
+		QJsonObject parameterSchema;
+	};
+
+	typedef QList<ToolDescription> ToolDescriptions;
+
+	struct Request
+	{
+		QByteArray correlationId;
+		Messages messages;
+		ToolDescriptions tools;
+		int timeoutMs = 30000;
+	};
+
+	enum ReplyStatus
+	{
+		RS_OK,
+		RS_TIMEOUT,
+		RS_CANCELED,
+		RS_PROVIDER_ERROR,
+		RS_INVALID_RESPONSE
+	};
+
+	enum ReplyKind
+	{
+		/**
+			Final text answer of the turn.
+		*/
+		RK_TEXT,
+
+		/**
+			Question back to the user because of missing or ambiguous input.
+		*/
+		RK_CLARIFICATION,
+
+		/**
+			Request to call a registered action.
+		*/
+		RK_ACTION_CALL
+	};
+
+	struct Reply
+	{
+		ReplyStatus status = RS_PROVIDER_ERROR;
+		ReplyKind kind = RK_TEXT;
+		QString text;
+		QStringList options;
+		QByteArray actionId;
+		QJsonObject parameters;
+	};
+
+	/**
+		Check whether the adapter is configured, for example has an endpoint and credentials.
+		The assistant does not call an unconfigured provider.
+	*/
+	virtual bool IsConfigured() const = 0;
+
+	/**
+		Send a request to the provider. The call blocks until the reply arrives, the
+		timeout of the request is reached or the token is cancelled.
+	*/
+	virtual Reply Complete(const Request& request, const CCancellationToken& cancellationToken) = 0;
+};
+
+
+} // namespace imtassist
+
+
