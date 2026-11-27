@@ -107,8 +107,10 @@ instead (`Docs/JQML/TestApi.md`). The kit works on both, with the same objectNam
 Things to know about the selectors of qmlTest, if a spec uses them directly (`dom.isQml(page)` tells the backend,
 `dom.callQmlTest(page, method, ...args)` calls `window.qmlTest`):
 
-- Quote names: `"Save":visible`. Unquoted, `Save:visible` is read as ONE name (`:` is a character of a name), and a
-  name that is not ASCII (`"ПользовательElementView"`) is refused unless it is quoted.
+- The current qmlTest parser accepts non-ASCII names and `Save:visible` without quotes. Quote names containing
+  selector punctuation or spaces, for example `"Save as":visible`. `gui.qmlSelector(path, { visible: true })` builds
+  selectors for literal objectNames; it rejects names that the parser cannot express literally (wildcards or both
+  quote characters). Use `dom.locate()` for those names. Older runtimes can require quotes for more names.
 - An item without an objectName has an empty name on v4 (v3 named it after its type). Find it by type:
   `@MouseArea`, `@TextInput`.
 - A ComboBox has no `text`; its value is `currentText` (`get(id, 'currentText')`).

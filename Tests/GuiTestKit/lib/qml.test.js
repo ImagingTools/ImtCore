@@ -1,8 +1,8 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
 
-const { KitLocator, compoundToQml, playwrightLocator, qmlSelectors } = require('./qml');
-const { maskColumns } = require('./dom');
+const { KitLocator, compoundToQml, playwrightLocator, qmlSelector, qmlSelectors } = require('./qml');
+const { columnRects, maskColumns } = require('./dom');
 
 function createQmlPage(items) {
   const children = new Map([[null, []], ...items.map((item) => [item.id, []])]);
@@ -220,4 +220,71 @@ test('maskColumns: a group whose rows are all outside its table gives nothing', 
     ],
   };
   assert.deepEqual(maskColumns(layout, ['Added']), []);
+});
+
+test('direct selectors preserve literal names and reject unsupported names', async () => {
+  const { readFile } = require('node:fs/promises');
+  const { resolve } = require('node:path');
+  const source = await readFile(resolve(__dirname, '../../../Tools/JQML/v4/src/testapi.js'), 'utf8');
+  const { parseSelector } = await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
+  const steps = parseSelector(qmlSelector(['Пользователь', 'say "hi"', 'a\\b'], { visible: true }));
+  assert.deepEqual(steps.map((step) => step.compound.name), ['Пользователь', 'say "hi"', 'a\\b']);
+  assert.equal(steps[2].compound.visible, true);
+  assert.throws(() => qmlSelector(['Unit?']), /cannot be represented/);
+  assert.throws(() => qmlSelector([`both " and '`]), /cannot be represented/);
+  assert.equal(require('./dom').qmlSelector, qmlSelector);
+});
+
+test('cell texts select literal names among descendants', async () => {
+  const page = createQmlPage([
+    { id: 'row', objectName: 'TableRow_1', type: 'Item', visible: true },
+    { id: 'wrong', objectName: 'Unit1', type: 'Item', visible: true, parent: 'row', text: 'wrong' },
+    { id: 'right', objectName: 'Unit?', type: 'Item', visible: true, parent: 'row', text: 'right' },
+    { id: 'quoted', objectName: 'say "hi"\\there', type: 'Item', visible: true, parent: 'row', text: 'quoted' },
+  ]);
+  const rows = new KitLocator(page, [{ css: '[objectName^="TableRow_"]', pick: null }]);
+  assert.deepEqual(await rows.run('cellTexts', { cell: 'Unit?' }), ['right']);
+  assert.deepEqual(await rows.run('cellTexts', { cell: 'say "hi"\\there' }), ['quoted']);
+});
+
+test('column masks select visible cells by exact objectName', async () => {
+  const cells = [{ id: 'wrong', objectName: 'Unit1' }, { id: 'right', objectName: 'Unit?' }, { id: 'quote', objectName: '"x"\\y' }];
+  const qmlTest = {
+    find(scope, selector) {
+      if (scope === null && selector === '"TableRow_*":visible') return [{ id: 'row' }];
+      if (scope === null && selector === '"Dialog":visible') return [];
+      if (scope === 'row' && selector === '*:visible') return cells;
+      throw new Error(`unexpected ${scope} ${selector}`);
+    },
+    closest() { return null; },
+    info(id) { return { box: id === 'row' ? { x: 0, y: 0, width: 100, height: 20 } : { x: id === 'wrong' ? 5 : id === 'right' ? 30 : 60, y: 0, width: 10, height: 20 } }; },
+  };
+  const page = {
+    url: () => 'test:mask',
+    async evaluate(fn, arg) {
+      const previous = global.window;
+      global.window = { qmlTest, innerWidth: 100, innerHeight: 100 };
+      try { return await fn(arg); } finally { global.window = previous; }
+    },
+  };
+  assert.deepEqual(await columnRects(page, ['Unit?', '"x"\\y']), [
+    { x: 30, y: 0, width: 10, height: 20 },
+    { x: 60, y: 0, width: 10, height: 20 },
+  ]);
+});
+
+test('zero timeout waits through backend detection and until the QML item appears', async () => {
+  let detections = 0;
+  let states = 0;
+  let polls = 0;
+  const page = {
+    url: () => 'test:unlimited',
+    async evaluate(fn, arg) {
+      if (!arg) return ++detections >= 3 ? 'qml' : null;
+      return ++states >= 3 ? { attached: true, visible: true } : { attached: false, visible: false };
+    },
+    async waitForTimeout(ms) { assert.ok(ms > 0 && ms <= 100); polls++; },
+  };
+  await new KitLocator(page, [{ css: '[objectName="item"]', pick: null }]).waitFor({ timeout: 0 });
+  assert.equal(polls, 4);
 });

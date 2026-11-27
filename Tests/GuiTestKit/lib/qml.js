@@ -267,6 +267,22 @@ function qmlSelectors(css) {
   );
 }
 
+/** Build a direct qmlTest selector for a path of literal objectNames. */
+function qmlSelector(path, options = {}) {
+  if (!Array.isArray(path) || path.length === 0 || path.some((name) => typeof name !== 'string')) {
+    throw new Error('qmlSelector: path must be a non-empty array of strings');
+  }
+  const compounds = path.map((name) => {
+    if (/[*?]/.test(name) || (name.includes('"') && name.includes("'"))) {
+      throw new Error('qmlSelector: this objectName cannot be represented literally by qmlTest');
+    }
+    const quote = name.includes('"') ? "'" : '"';
+    return `${quote}${name}${quote}`;
+  });
+  if (options.visible) compounds[compounds.length - 1] += ':visible';
+  return compounds.join(' ');
+}
+
 // ----- in the page -------------------------------------------------------------------------------------------------
 
 /**
@@ -401,7 +417,7 @@ async function inPage({ op, steps, args, notReady }) {
       return t.type(args.text);
     case 'cellTexts':
       return list
-        .map((row) => t.find(row.id, args.cell)[0])
+        .map((row) => t.find(row.id, '*').find((handle) => handle.objectName === args.cell))
         .filter(Boolean)
         .map((cell) => textOf(cell.id, false).trim());
     default:
@@ -503,15 +519,14 @@ class KitLocator {
       if (remaining === 0) throw timeoutError(`locator.waitFor ${this}`, timeout);
       return this.playwright().waitFor({ ...options, timeout: remaining });
     }
-    const qmlDeadline = deadline === null ? Date.now() : deadline;
     const state = options.state || 'visible';
     for (;;) {
       const now = await this.runOrNothing({ attached: false, visible: false }, 'state');
       const reached =
         state === 'attached' ? now.attached : state === 'detached' ? !now.attached : state === 'hidden' ? !now.visible : now.visible;
       if (reached) return;
-      if (Date.now() >= qmlDeadline) throw timeoutError(`locator.waitFor (${state}) ${this}`, timeout);
-      await this.page.waitForTimeout(Math.min(POLL_MS, Math.max(0, qmlDeadline - Date.now())));
+      if (deadline !== null && Date.now() >= deadline) throw timeoutError(`locator.waitFor (${state}) ${this}`, timeout);
+      await this.page.waitForTimeout(deadline === null ? POLL_MS : Math.min(POLL_MS, Math.max(0, deadline - Date.now())));
     }
   }
 
@@ -595,6 +610,7 @@ module.exports = {
   isQml,
   compoundToQml,
   qmlSelectors,
+  qmlSelector,
   playwrightLocator: (locator) => (locator instanceof KitLocator ? locator.playwright() : locator),
   locate,
   callQmlTest,
