@@ -1,9 +1,10 @@
 /**
 	Runs the API test suite described by suite.json against a freshly started server.
 
-	The steps are the same on every platform and for every product: drop the test database, clear the server's run
-	files, start the sims and the server (it creates and migrates the database), check that it uses the test database,
-	run the newman collection and the Node scripts, stop the server. Nothing here is specific to one product; suite.json
+	The steps are the same on every platform and for every product: drop the test databases, clear the servers' run
+	files, start the sims, the services the server depends on (the "services" list of suite.json) and the server (they
+	create and migrate their databases), check that they use the test databases, run the newman collection and the
+	Node scripts, stop the servers in the reverse order. Nothing here is specific to one product; suite.json
 	carries the names, ports and files. The server and its database are the TestServer of the kit.
 
 	A suite folder keeps only a run-tests.mjs of two lines:
@@ -101,6 +102,26 @@ function RunScript(suiteRoot, resultsDir, server, options, script)
 
 
 /**
+	The --service-bin <name>=<path> options as an object by the service names; a name has to be a service of the suite.
+*/
+function ParseServiceBinaries(suite, entries)
+{
+	const retVal = {};
+	for (const entry of entries ?? []){
+		const separator = entry.indexOf('=');
+		const name = entry.slice(0, separator);
+		if (separator <= 0 || !(suite.services ?? []).some((service) => service.name === name)){
+			throw new Error(`--service-bin expects <name>=<path> with the name of a service of the suite, got ${entry}`);
+		}
+
+		retVal[name] = entry.slice(separator + 1);
+	}
+
+	return retVal;
+}
+
+
+/**
 	Runs the suite of the folder of the given script (import.meta.url of its run-tests.mjs) and ends the process:
 	0 when every test passed, 1 when some failed, 2 when the run itself failed.
 */
@@ -112,6 +133,7 @@ export function RunApiSuite(scriptUrl)
 		options: {
 			'suite': { type: 'string', default: path.join(suiteDir, 'suite.json') },
 			'bin': { type: 'string' },
+			'service-bin': { type: 'string', multiple: true },
 			'folder': { type: 'string', multiple: true },
 			'include-opt-in': { type: 'boolean', default: false },
 			'results': { type: 'string' },
@@ -124,10 +146,13 @@ export function RunApiSuite(scriptUrl)
 		console.log(`Usage: node run-tests.mjs [options]
 
   --bin <path>          Server executable (default: the newest one found under the suite's bin search folders)
+  --service-bin <name>=<path>
+                        Executable of a service of the suite; repeatable (default: the newest one found under
+                        the service's bin search folders)
   --folder <name>       Run only this collection folder; repeatable
   --include-opt-in      Also run the opt-in folders and scripts (known findings, expected to fail)
   --results <dir>       Where reports and logs go (default: results next to suite.json)
-  --keep-server         Leave the server and the sims running after the tests, for debugging
+  --keep-server         Leave the servers and the sims running after the tests, for debugging
   --suite <file>        Suite description (default: suite.json next to this script)`);
 		process.exit(0);
 	}
@@ -139,6 +164,7 @@ export function RunApiSuite(scriptUrl)
 
 	const server = new TestServer(suite, suiteRoot, {
 		bin: options.bin,
+		serviceBins: ParseServiceBinaries(suite, options['service-bin']),
 		resultsDir,
 		keepServer: options['keep-server'],
 	});

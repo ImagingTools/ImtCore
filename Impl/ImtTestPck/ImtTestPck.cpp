@@ -35,6 +35,11 @@ I_EXPORT_COMPONENT(
             "Database access settings overridden by the environment variables of a build server, for test databases only",
             "Database Settings Environment Test");
 
+I_EXPORT_COMPONENT(
+            EnvironmentIdParam,
+            "Id taken from an environment variable of the test run",
+            "Id Environment Test");
+
 
 
 } // namespace ImtTestPck

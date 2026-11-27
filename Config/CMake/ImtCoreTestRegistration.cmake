@@ -53,13 +53,16 @@ function(add_qml_tests testName)
 endfunction()
 
 
-# add_node_test_suite(<name> DIRECTORY <dir> LABEL <label> [SERVER <target>] [TIMEOUT <seconds>])
+# add_node_test_suite(<name> DIRECTORY <dir> LABEL <label> [SERVER <target>] [SERVICES <name>=<path>...]
+#		[TIMEOUT <seconds>])
 #
 # Registers a Node.js test suite: `npm ci` in DIRECTORY as a fixture, then `node run-tests.mjs`. SERVER passes the
-# built program of that target to the runner (--bin); without it, the runner looks the server up by itself. Without
-# Node.js or npm the suite is not registered.
+# built program of that target to the runner (--bin); without it, the runner looks the server up by itself. SERVICES
+# passes the programs of the services the suite starts before the server, such as the authorization server of the
+# product, each as <name>=<path> (--service-bin); a service that is not listed is looked up by the runner as well.
+# Without Node.js or npm the suite is not registered.
 function(add_node_test_suite suiteName)
-	cmake_parse_arguments(PARSE_ARGV 1 ARG "" "DIRECTORY;SERVER;LABEL;TIMEOUT" "")
+	cmake_parse_arguments(PARSE_ARGV 1 ARG "" "DIRECTORY;SERVER;LABEL;TIMEOUT" "SERVICES")
 	if(NOT ARG_DIRECTORY OR NOT ARG_LABEL)
 		message(FATAL_ERROR "add_node_test_suite: DIRECTORY and LABEL are required")
 	endif()
@@ -95,6 +98,10 @@ function(add_node_test_suite suiteName)
 	if(ARG_SERVER)
 		list(APPEND runnerArguments --bin "$<TARGET_FILE:${ARG_SERVER}>")
 	endif()
+
+	foreach(service IN LISTS ARG_SERVICES)
+		list(APPEND runnerArguments --service-bin "${service}")
+	endforeach()
 
 	add_test(NAME ${suiteName} COMMAND "${NODE_EXECUTABLE}" ${runnerArguments} WORKING_DIRECTORY "${ARG_DIRECTORY}")
 	# The runner loads the node test kit from the ImtCore checkout (Tests/NodeTestKit)
