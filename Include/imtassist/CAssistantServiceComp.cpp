@@ -8,6 +8,18 @@ namespace imtassist
 
 // protected methods
 
+// reimplemented (imtassist::CAssistantService)
+
+bool CAssistantServiceComp::IsAssistantEnabled() const
+{
+	if (m_enabledParamCompPtr.IsValid()){
+		return m_enabledParamCompPtr->IsEnabled();
+	}
+
+	return CAssistantService::IsAssistantEnabled();
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CAssistantServiceComp::OnComponentCreated()
@@ -34,7 +46,7 @@ void CAssistantServiceComp::OnComponentCreated()
 	bool isEnabled = m_isEnabledAttrPtr.IsValid() && *m_isEnabledAttrPtr;
 	SetEnabled(isEnabled);
 
-	if (isEnabled && !m_providerCompPtr.IsValid()){
+	if (IsEnabled() && !m_providerCompPtr.IsValid()){
 		SendWarningMessage(0, QStringLiteral("The assistant is enabled, but no provider is configured; requests are rejected."), "AssistantService");
 	}
 }

@@ -663,7 +663,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 		if(USE_QTDB)
 			add_subdirectory("${TESTS_DIR}/AssistantTest/CMake" "${AUX_INCLUDE_DIR}/AssistantTest")
-			add_dependencies(AssistantTest imtassist imtrest)
+			add_dependencies(AssistantTest imtassist imtrest imtcrypt)
 		endif()
 
 		add_subdirectory("${TESTS_DIR}/UserAccountStateTest/CMake" "${AUX_INCLUDE_DIR}/UserAccountStateTest")

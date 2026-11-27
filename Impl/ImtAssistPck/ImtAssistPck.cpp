@@ -41,6 +41,11 @@ I_EXPORT_COMPONENT(
 			"Assistant AI Provider HTTP OpenAI Anthropic Gemini Bedrock Mistral");
 
 I_EXPORT_COMPONENT(
+			AssistantProviderList,
+			"The supported model providers as options for the provider selection in the server settings",
+			"Assistant AI Provider List Options Settings");
+
+I_EXPORT_COMPONENT(
 			AssistantAuditLog,
 			"Writes assistant audit events without content to the log",
 			"Assistant AI Audit Log");

@@ -57,7 +57,7 @@ bool CAssistantService::IsEnabled() const
 {
 	QMutexLocker lock(&m_mutex);
 
-	return m_isEnabled;
+	return IsAssistantEnabled();
 }
 
 
@@ -135,7 +135,7 @@ QByteArray CAssistantService::StartConversation(const CAssistantRequestContext& 
 
 	QMutexLocker lock(&m_mutex);
 
-	if (!m_isEnabled){
+	if (!IsAssistantEnabled()){
 		lock.unlock();
 		Log(IAssistantAuditLog::ET_REQUEST_REJECTED, context, "AssistantDisabled");
 
@@ -202,7 +202,7 @@ AssistantMessages CAssistantService::SendUserMessage(
 
 		QByteArray rejectionCode;
 		QString rejectionText;
-		if (!m_isEnabled){
+		if (!IsAssistantEnabled()){
 			rejectionCode = "AssistantDisabled";
 			rejectionText = "The assistant is not enabled.";
 		}
@@ -447,7 +447,7 @@ AssistantMessages CAssistantService::ConfirmPreview(const CAssistantRequestConte
 	{
 		QMutexLocker lock(&m_mutex);
 
-		if (!m_isEnabled){
+		if (!IsAssistantEnabled()){
 			lock.unlock();
 			Log(IAssistantAuditLog::ET_PREVIEW_CONFIRMED, context, "AssistantDisabled", QByteArray(), previewId);
 			retVal.append(CreateError(context, QByteArray(), "AssistantDisabled", "The assistant is not enabled."));
@@ -652,6 +652,14 @@ bool CAssistantService::CloseConversation(const CAssistantRequestContext& contex
 	m_conversations.erase(iter);
 
 	return true;
+}
+
+
+// protected methods
+
+bool CAssistantService::IsAssistantEnabled() const
+{
+	return m_isEnabled;
 }
 
 

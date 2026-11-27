@@ -47,10 +47,11 @@ and `imtchatgui` is unchanged.
 
 | Component | Attributes |
 |---|---|
-| `ImtAssistPck/AssistantService` | `Enabled` (default `false`), `Provider`, `ActionRegistry`, `RepresentationRegistry`, `AuditLog`, `ProviderTimeout`, `MaxStepsPerTurn`, `PreviewTimeToLive` |
+| `ImtAssistPck/AssistantService` | `Enabled` (default `false`), `EnabledParam` (server setting), `Provider`, `ActionRegistry`, `RepresentationRegistry`, `AuditLog`, `ProviderTimeout`, `MaxStepsPerTurn`, `PreviewTimeToLive` |
 | `ImtAssistPck/AssistantActionRegistry` | `Actions`: the action components of the application |
 | `ImtAssistPck/UiRepresentationRegistry` | `RegisterStandardRepresentations` (default `true`), `SchemaProviders` (`IUiRepresentationSchemaProvider`) |
-| `ImtAssistPck/HttpAssistantProvider` | `Preset`, `Model`, `Endpoint`, `Region`, `Project`, `Resource`, `ApiKeyVariable`, `AwsAccessKeyIdVariable`, `AwsSecretAccessKeyVariable`, `AwsSessionTokenVariable`, `MaxOutputTokens`, `AdditionalInstructions` (see [Model providers](#model-providers)) |
+| `ImtAssistPck/HttpAssistantProvider` | `Preset`, `Model`, `Endpoint`, `Region`, `Project`, `Resource`, `ApiKeyVariable`, `AwsAccessKeyIdVariable`, `AwsSecretAccessKeyVariable`, `AwsSessionTokenVariable`, `MaxOutputTokens`, `AdditionalInstructions` (see [Model providers](#model-providers)); the `...Param` references to the [server settings](#server-settings) |
+| `ImtAssistPck/AssistantProviderList` | – (the presets as options for the provider selection) |
 | `ImtAssistPck/FakeAssistantProvider` | rules: `RuleKeywords`, `RuleActionIds`, `RuleParameters` (JSON), `RuleReplies`, `RuleQuestions`; `DefaultReply`, `ToolResultReply` |
 | `ImtAssistPck/AssistantAuditLog` | writes events to the ACF log of the component |
 | `ImtAssistGqlPck/AssistantController` | `AssistantService`, `CommandIds` (the `Assistant*` commands), `CommandPermissions`, `PermissionChecker`; `AllowDemoPrincipal`, `DemoUserId`, `DemoTenantId` (demo only, see below) |
@@ -227,6 +228,52 @@ local processing is possible with `azure-openai`, `bedrock`, `vertex-*` (EU regi
 check the data processing terms of the provider. Only the conversation, the context released by
 the user and the results of the called functions are sent.
 
+## Server settings
+
+The provider can be configured in the server settings, like the LDAP or session settings of
+PumaServer: the composite `ImtAssistVoce/AssistantSettings` is a `ComposedParamsSet` named
+`Assistant` that the server adds to its `Preferences`. It is stored with the other server settings
+(`FileAutoPersistence`) and shown by the generic settings editor of the server configurator.
+
+| Setting (parameter ID) | Type | Overrides |
+|---|---|---|
+| `AssistantEnabled` | `EnableableParam`, default off | `AssistantService/Enabled` |
+| `Provider` | `SelectionParam` with the list of all presets (`ImtAssistPck/AssistantProviderList`) | `HttpAssistantProvider/Preset` |
+| `Model`, `Endpoint`, `Region`, `Project`, `Resource` | `TextParam` | the attributes of the same name |
+| `ApiKey` | `ImtCryptPck/ProtectedTextParam` (secret) | `HttpAssistantProvider/ApiKeyVariable` |
+| `MaxOutputTokens` | `TextParam`, default `1024` | `MaxOutputTokens` |
+| `AdditionalInstructions` | `TextParam` | `AdditionalInstructions` |
+
+An empty or unset setting falls back to the attribute, so a server without the settings works as
+before. The provider reads the settings at every request; a change takes effect without restart.
+
+**The API key** is a secret parameter (`imtcrypt::ISecretTextParam`):
+- it is stored protected by `ImtCryptPck/SystemSecretProtector` (on Windows the data protection
+  API binds it to the account of the server; elsewhere it is stored as is and the settings file
+  must be readable by the server account only, as for the other server secrets). If it cannot be
+  protected, it is not stored at all;
+- it is never sent to the settings editor: `ImtServerAppPck/SecretTextParamRepresentationController`
+  shows a placeholder for a stored key, keeps the key when the placeholder comes back, removes it
+  when the field is emptied and replaces it otherwise. The plain `TextParamRepresentationController`
+  ignores secret parameters, so without the secret controller the field is not shown (fail closed);
+- without a key in the settings, the environment variable of `ApiKeyVariable` is used.
+
+**Integration into a server** (example: the structure of PumaServer):
+
+1. `PumaSettings.acc`: add an element `AssistantSettings` (`ImtAssistVoce/AssistantSettings`), add
+   `AssistantSettings/Assistant` to `Preferences/Parameters` with the ID `Assistant` and the name
+   `AI assistant`, and export the parameters (`AssistantEnabled`, `Provider`, `Model`, `ApiKey`,
+   `Endpoint`, `Region`, `Project`, `Resource`, `MaxOutputTokens`, `AdditionalInstructions`).
+2. `PumaSettingsRepresentation.acc`: add an element `SecretTextParamRepresentation`
+   (`ImtServerAppPck/SecretTextParamRepresentationController`) to
+   `SettingsRepresentation/ParamRepresentationControllers`. The controllers for `EnableableParam`,
+   `SelectionParam` and `TextParam` are already there.
+3. Server composition (e.g. `PumaServerBase.acc`): reference the settings from the components, e.g.
+   `AssistantService/EnabledParam = PumaSettings/AssistantEnabled`,
+   `AssistantProvider/ProviderParam = PumaSettings/Provider`, `ModelParam = PumaSettings/Model`,
+   `ApiKeyParam = PumaSettings/ApiKey` and so on for `EndpointParam`, `RegionParam`,
+   `ProjectParam`, `ResourceParam`, `MaxOutputTokensParam`, `AdditionalInstructionsParam`.
+
 ## Data flow of a turn
 
 ```
@@ -316,6 +363,8 @@ authentication, so it enables `AllowDemoPrincipal`. Users in `ReadOnlyUserIds` o
   preview, confirmation), the rules of the fake provider, permission, tenant and principal
   boundaries, prompt injection from tool data, confirmation including repetition, rejection,
   expiry and stale previews, provider errors, timeout, invalid replies, cancellation and the audit log.
+- `Tests/AssistantTest` (`CAssistantSettingsTest`): provider list, settings overriding attributes,
+  changes without restart, enabling by the setting, protected storage of the API key.
 - `Tests/AssistantTest` (`CAssistantProviderTest`): all presets, request and response mapping of
   the four protocols, credentials from the environment, tool names, call IDs, error mapping without
   content, the AWS Signature Version 4 test vector and the imtrest-based HTTP transport against a local

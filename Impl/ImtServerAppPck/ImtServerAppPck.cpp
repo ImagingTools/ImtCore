@@ -76,6 +76,11 @@ I_EXPORT_COMPONENT(
 			"Password Param Representation Controller");
 
 I_EXPORT_COMPONENT(
+			SecretTextParamRepresentationController,
+			"Representation of a secret text parameter that never discloses the stored value",
+			"Secret Text Param Representation Controller Password API Key");
+
+I_EXPORT_COMPONENT(
 			ParamSetRepresentationController,
 			"ParamSet representation controller",
 			"ParamsSet Controller Parameter");

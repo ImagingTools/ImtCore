@@ -77,6 +77,13 @@ public:
 	virtual AssistantMessages GetHistory(const CAssistantRequestContext& context, const QByteArray& conversationId) const override;
 	virtual bool CloseConversation(const CAssistantRequestContext& context, const QByteArray& conversationId) override;
 
+protected:
+	/**
+		Check whether the assistant is enabled. Called with the internal lock held;
+		an override must not call back into the service.
+	*/
+	virtual bool IsAssistantEnabled() const;
+
 private:
 	struct Conversation
 	{

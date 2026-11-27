@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
+#include <iprm/IEnableableParam.h>
 
 // ImtCore includes
 #include <imtassist/CAssistantService.h>
@@ -27,7 +28,8 @@ public:
 
 	I_BEGIN_COMPONENT(CAssistantServiceComp);
 		I_REGISTER_INTERFACE(IAssistantService);
-		I_ASSIGN(m_isEnabledAttrPtr, "Enabled", "Enable the assistant. While disabled, no request is sent to a provider", true, false);
+		I_ASSIGN(m_isEnabledAttrPtr, "Enabled", "Enable the assistant. While disabled, no request is sent to a provider; overridden by EnabledParam", true, false);
+		I_ASSIGN(m_enabledParamCompPtr, "EnabledParam", "Setting of the server that enables the assistant; Enabled when unset", false, "EnabledParam");
 		I_ASSIGN(m_providerCompPtr, "Provider", "Adapter to the model provider", false, "Provider");
 		I_ASSIGN(m_actionRegistryCompPtr, "ActionRegistry", "Registry of the actions available to the assistant", true, "ActionRegistry");
 		I_ASSIGN(m_representationRegistryCompPtr, "RepresentationRegistry", "Registry of the known UI representation types", false, "RepresentationRegistry");
@@ -38,12 +40,16 @@ public:
 	I_END_COMPONENT;
 
 protected:
+	// reimplemented (imtassist::CAssistantService)
+	virtual bool IsAssistantEnabled() const override;
+
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
 
 private:
 	I_ATTR(bool, m_isEnabledAttrPtr);
+	I_REF(iprm::IEnableableParam, m_enabledParamCompPtr);
 	I_REF(IAssistantProvider, m_providerCompPtr);
 	I_REF(IAssistantActionRegistry, m_actionRegistryCompPtr);
 	I_REF(IUiRepresentationRegistry, m_representationRegistryCompPtr);
