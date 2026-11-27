@@ -1,6 +1,6 @@
 // The scene: the root item, the frame (layout, bindings, painting) and the mouse input.
 
-import { DragHandler, flushLazyViews, updateDrags, getFocusItem, userGestureScope, Item, setDestroyObserver, setFocusItem, setFrameLoop, WheelHandler } from './items.js';
+import { DragHandler, flushLazyViews, updateDrags, getFocusItem, userGestureScope, Item, setDestroyObserver, setFocusItem, setFrameLoop, MouseArea, WheelHandler } from './items.js';
 
 const MAX_PASSES = 10;
 
@@ -297,9 +297,22 @@ export class Scene {
 			if (taken) break;
 		}
 		if (taken) return;
-		for (let item = this.root.$itemAt(x, y, true); item !== null; item = item.$parent) {
-			if (item.$mouseWheel(notches, x, y, horizontalNotches)) return;
+		// A MouseArea that does not accept the event hands it to what is below it, a sibling underneath as well (Qt).
+		const passed = [];
+		let target = this.root.$itemAt(x, y, true);
+		while (target instanceof MouseArea) {
+			if (target.$mouseWheel(notches, x, y, horizontalNotches)) {
+				target = null;
+				break;
+			}
+			target.$wheelPassed = true;
+			passed.push(target);
+			target = this.root.$itemAt(x, y, true);
 		}
+		for (let item = target; item !== null; item = item.$parent) {
+			if (item.$mouseWheel(notches, x, y, horizontalNotches)) break;
+		}
+		for (const area of passed) area.$wheelPassed = false;
 	}
 
 	// Key events go to the item with the active focus; true if a handler accepted the event.

@@ -8,7 +8,7 @@
 import { CanvasContext, commandsExceed, replayCommands } from './canvas.js';
 import { fonts } from './fonts.js';
 import { layoutRichText, linkAtPoint, mightBeRichText, paintRichText, parseRichText } from './richtext.js';
-import { KEY, MODIFIERS, parseKeySequence, qtKeyToDom, STANDARD_KEYS } from './keys.js';
+import { KEY, MODIFIERS, parseKeySequence, pointerState, qtKeyToDom, STANDARD_KEYS } from './keys.js';
 import { QmlError } from './lexer.js';
 import { colorToString, parseColor, toColor, toFloat } from './util.js';
 
@@ -3046,6 +3046,7 @@ export class MouseArea extends Item {
 		this.$holdInterval = 800;
 		this.$holdDeadline = 0; // seconds of the engine time at which pressAndHold is sent; 0 when it is not awaited
 		this.$held = false;
+		this.$wheelPassed = false; // true while a wheel event it did not accept looks for the item below it
 		this.$declareSignal('clicked', ['mouse']);
 		this.$declareSignal('pressed', ['mouse']);
 		this.$declareSignal('released', ['mouse']);
@@ -3060,7 +3061,7 @@ export class MouseArea extends Item {
 
 	$mouseEvent() {
 		const button = this.$pressButton === 2 ? 'RightButton' : 'LeftButton';
-		return { x: this.$mouseX, y: this.$mouseY, button, buttons: button, modifiers: 0, accepted: true, wasHeld: this.$held, isClick: true };
+		return { x: this.$mouseX, y: this.$mouseY, button, buttons: button, modifiers: pointerState.modifiers, accepted: true, wasHeld: this.$held, isClick: true };
 	}
 
 	get $acceptsMouse() {
@@ -3069,6 +3070,21 @@ export class MouseArea extends Item {
 
 	$acceptsButton(button) {
 		return button < 0 || (this.$buttons & (button === 2 ? 2 : button === 1 ? 4 : 1)) !== 0;
+	}
+
+	// As in Qt the area takes the wheel only when something listens to `wheel`.
+	get $acceptsWheel() {
+		if (this.$wheelPassed || this.$sigs === null || !itemEnabled(this)) return false;
+		const signal = this.$sigs.get('wheel');
+		return signal !== undefined && signal.handlers.length > 0;
+	}
+
+	// True when a handler left the event accepted.
+	$mouseWheel(notches, x, y, horizontalNotches = 0) {
+		if (!this.$acceptsWheel) return false;
+		const event = { x: x - this.$sx, y: y - this.$sy, angleDelta: { x: horizontalNotches * 120, y: notches * 120 }, pixelDelta: { x: 0, y: 0 }, buttons: 0, modifiers: pointerState.modifiers, inverted: false, accepted: true };
+		this.$emit('wheel', [event]);
+		return event.accepted;
 	}
 
 	$mousePressAt(sceneX, sceneY) {
@@ -11622,7 +11638,7 @@ export class WheelHandler extends PointerHandler {
 		}
 		const px = x - item.$sx;
 		const py = y - item.$sy;
-		this.$emit('wheel', [{ x: px, y: py, angleDelta: { x: vertical ? 0 : angle, y: vertical ? angle : 0 }, pixelDelta: { x: 0, y: 0 }, modifiers: 0, inverted: false, accepted: true, position: { x: px, y: py }, scenePosition: { x, y } }]);
+		this.$emit('wheel', [{ x: px, y: py, angleDelta: { x: vertical ? 0 : angle, y: vertical ? angle : 0 }, pixelDelta: { x: 0, y: 0 }, modifiers: pointerState.modifiers, inverted: false, accepted: true, position: { x: px, y: py }, scenePosition: { x, y } }]);
 		return true;
 	}
 }
