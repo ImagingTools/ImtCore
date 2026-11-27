@@ -51,6 +51,7 @@ type FileSystemEntry
 	entryType: FileSystemEntryType!
 	# Byte counts are LongLong: files and volumes overflow a 32-bit Int.
 	size: LongLong
+	# An ISO 8601 timestamp in UTC (e.g. "2024-06-05T12:34:56Z").
 	lastModified: String
 	# Volume capacity, sent for Drive entries only.
 	totalBytes: LongLong
