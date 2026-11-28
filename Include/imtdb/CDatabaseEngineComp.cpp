@@ -6,6 +6,7 @@
 #include <QtCore/QDataStream>
 #include <QtCore/QFileInfo>
 #include <QtCore/QRegularExpression>
+#include <QtCore/QStringList>
 #include <QtCore/QThread>
 #include <QtCore/QUuid>
 
@@ -86,7 +87,8 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 			*sqlErrorPtr = queryError;
 		}
 
-		SendErrorMessage(0, QStringLiteral("Database query failed: '%1', SQL-statement: '%2'").arg(queryError.text(), queryString), __FILE__);
+		SendErrorMessage(0, QStringLiteral("Database query failed: '%1'").arg(queryError.text()), __FILE__);
+		SendVerboseMessage(QStringLiteral("Failed SQL-statement: '%1'").arg(QString::fromUtf8(queryString)), __FILE__);
 
 		return QSqlQuery();
 	}
@@ -100,8 +102,8 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 		qCritical() << __FILE__ << __LINE__
 					<< "\n\t| what() sqlError Occured"
 					<< "\n\t| Database error" << dbError.text()
-					<< "\n\t| Query error" << queryError.text()
-					<< "\n\t| Executed query" << queryString;
+					<< "\n\t| Query error" << queryError.text();
+		qDebug() << "\n\t| Executed query" << queryString;
 	}
 
 	return retVal;
@@ -141,8 +143,8 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(
 		qCritical() << __FILE__ << __LINE__
 					<< "\n\t| what(): sqlError Occured"
 					<< "\n\t| Database error" << dbError.text()
-					<< "\n\t| Query error" << queryError.text()
-					<< "\n\t| Executed query" << queryString
+					<< "\n\t| Query error" << queryError.text();
+		qDebug() << "\n\t| Executed query" << queryString
 					<< "\n\t| Bind Values" << bindValues
 					<< "\n\t| Bound Values" << retVal.boundValues()
 					<< "\n\t| Executed query" << retVal.executedQuery();
@@ -639,8 +641,6 @@ bool CDatabaseEngineComp::CreateDatabaseInstance() const
 		return false;
 	}
 
-	qDebug() << GetHostName() << GetUserName() << GetDatabaseName();
-
 	bool retVal = false;
 	QSqlDatabase maintainanceDb = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, *m_maintenanceDatabaseNameAttrPtr);
 
@@ -809,7 +809,7 @@ QString CDatabaseEngineComp::GetPassword() const
 		return m_databaseAccessSettingsCompPtr->GetPassword();
 	}
 
-	return *m_paswordAttrPtr;
+	return *m_passwordAttrPtr;
 }
 
 
@@ -844,19 +844,19 @@ int CDatabaseEngineComp::GetDatabaseVersion() const
 
 QString CDatabaseEngineComp::GetConnectionOptionsString(const QByteArray& databaseDriverId) const
 {
-	if (!m_databaseAccessSettingsCompPtr.IsValid()){
-		return QString();
+	QStringList options;
+
+	// libpq applies the last occurrence of a parameter, so the explicit options must follow the flag-based ones.
+	const int flags = m_databaseAccessSettingsCompPtr.IsValid() ? m_databaseAccessSettingsCompPtr->GetConnectionFlags() : 0;
+	if ((databaseDriverId == QByteArrayLiteral("QPSQL")) && (flags & imtdb::IDatabaseLoginSettings::COF_SSL)){
+		options << QStringLiteral("sslmode=require");
 	}
 
-	QString retVal;
-	int flags = m_databaseAccessSettingsCompPtr->GetConnectionFlags();
-	if (flags > 0){
-		if (databaseDriverId == QStringLiteral("PSQL") && (flags & imtdb::IDatabaseLoginSettings::COF_SSL)){
-			retVal += QStringLiteral("requiressl=1");
-		}
+	if (m_connectOptionsAttrPtr.IsValid() && !(*m_connectOptionsAttrPtr).isEmpty()){
+		options << *m_connectOptionsAttrPtr;
 	}
 
-	return retVal;
+	return options.join(';');
 }
 
 

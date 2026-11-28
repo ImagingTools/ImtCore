@@ -70,8 +70,8 @@
                     <AttributeInfo Id="MigrationController" Type="Reference" ExportId="MigrationController">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Pasword" Type="Id" ExportId="Password">
-                        <Data IsEnabled="true" Value="root"/>
+                    <AttributeInfo Id="Password" Type="Id" ExportId="Password">
+                        <Data IsEnabled="true" Value=""/>
                     </AttributeInfo>
                     <AttributeInfo Id="Port" Type="Integer" ExportId="PgPort">
                         <Data IsEnabled="true" Value="5432"/>
