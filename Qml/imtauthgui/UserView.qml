@@ -74,6 +74,15 @@ DocumentViewBase {
 	// Emitted after a change of the direct assignments that other ones are inherited through.
 	signal assignmentsChanged()
 
+	// The superuser asked to lift the lock after invalid sign-in attempts.
+	signal unlockAccountRequested()
+
+	function setAccountUnlocking(unlocking){
+		var generalPageInstance = multiPageView.getPageByIndex(0)
+		if (generalPageInstance)
+			generalPageInstance.setAccountUnlocking(unlocking)
+	}
+
 	// The inherited assignments are being recalculated.
 	property bool assignmentsUpdating: false
 
@@ -195,6 +204,10 @@ DocumentViewBase {
 
 			function inputsAcceptable(){
 				return userGeneralEditor.inputsAcceptable();
+			}
+
+			function setAccountUnlocking(unlocking){
+				userGeneralEditor.accountUnlocking = unlocking;
 			}
 
 			function revealValidationErrors(){
@@ -325,6 +338,10 @@ DocumentViewBase {
 						
 						onEmitUpdateGui: {
 							container.doUpdateGui();
+						}
+
+						onUnlockAccountRequested: {
+							container.unlockAccountRequested();
 						}
 					}
 					

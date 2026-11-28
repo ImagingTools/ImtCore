@@ -722,6 +722,43 @@ QtObject {
 				function onAssignmentsChanged(){
 					userReprController.assignmentsRefresher.request()
 				}
+
+				function onUnlockAccountRequested(){
+					userReprController.unlockUserInput.m_login = userReprController.representationModel.m_username
+					userReprController.view.setAccountUnlocking(true)
+					userReprController.unlockUserRequest.send(userReprController.unlockUserInput)
+				}
+			}
+
+			property UnlockUserInput unlockUserInput: UnlockUserInput {}
+
+			// The lock is not part of the document: the representation is read again to show that it is gone.
+			property GqlSdlRequestSender unlockUserRequest: GqlSdlRequestSender {
+				permissionPath: root.permissionPath
+				gqlCommandId: ImtauthUsersSdlCommandIds.s_unlockUser
+				requestType: 1
+				sdlObjectComp: Component {
+					UnlockUserPayload {
+						onFinished: {
+							if (userReprController.view)
+								userReprController.view.setAccountUnlocking(false)
+
+							if (m_success){
+								PopupManager.addSuccessMessage(qsTr("The account has been unlocked"), true)
+								userReprController.updateRepresentationFromDocument()
+							}
+							else{
+								PopupManager.addErrorMessage(m_message !== "" ? m_message : qsTr("The account could not be unlocked"), true)
+							}
+						}
+					}
+				}
+
+				function onError(message, type){
+					if (userReprController.view)
+						userReprController.view.setAccountUnlocking(false)
+					PopupManager.addErrorMessage(message, true)
+				}
 			}
 
 			property GqlSdlRequestSender getUserAssignmentsRequest: GqlSdlRequestSender {

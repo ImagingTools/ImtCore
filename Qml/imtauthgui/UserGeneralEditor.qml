@@ -17,6 +17,10 @@ Column {
 
 	signal emitUpdateModel();
 	signal emitUpdateGui();
+	signal unlockAccountRequested();
+
+	// The unlock request of the superuser is running.
+	property alias accountUnlocking: accountLockBanner.unlocking;
 
 	property alias usernameInput: usernameInput_;
 	property alias nameInput: nameInput_;
@@ -68,6 +72,10 @@ Column {
 			enabledSwitch_.checked = container.userData.m_enabled === false ? false : true;
 		}
 
+		let accountLock = container.userData.hasAccountLock() ? container.userData.m_accountLock : null;
+		accountLockBanner.locked = accountLock ? accountLock.m_locked === true : false;
+		accountLockBanner.remainingSecs = accountLock && accountLock.hasRemainingSecs() ? accountLock.m_remainingSecs : -1;
+
 		container.updatingGui = false;
 	}
 
@@ -95,6 +103,19 @@ Column {
 		}
 		if (container.accountEnabledAvailable){
 			container.userData.m_enabled = enabledSwitch_.checked;
+		}
+	}
+
+	AccountLockBanner {
+		id: accountLockBanner;
+
+		objectName: "AccountLockBanner";
+		width: parent.width;
+		// Mirrors the server side guard of UnlockUser
+		canUnlock: AuthorizationController.loggedUserIsSuperuser() && !container.readOnly;
+
+		onUnlockRequested: {
+			container.unlockAccountRequested();
 		}
 	}
 

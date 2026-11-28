@@ -933,7 +933,7 @@ bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQ
 		return false;
 	}
 
-	QStringList queryList = QString::fromUtf8(sqlQuery).split(';');
+	QStringList queryList = imtdb::SplitSqlStatements(QString::fromUtf8(sqlQuery));
 
 	if (AreInternalTransactionsEnabled()){
 		if (!m_dbEngineCompPtr->BeginTransaction()){

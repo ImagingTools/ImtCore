@@ -777,6 +777,7 @@
                                             <Value>UpdateRoleFromRepresentation</Value>
                                             <Value>GetUserRepresentation</Value>
                                             <Value>UpdateUserFromRepresentation</Value>
+                                            <Value>UnlockUser</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>

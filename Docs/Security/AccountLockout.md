@@ -69,11 +69,38 @@ mutation {
 ```
 
 It is handled by `imtauthgql::CUserControllerComp` (optional `AccountLockoutController`
-reference) and is subject to the standard permission checks — unlike e.g. `RegisterUser`,
-it is not accessible anonymously.
+reference) and is accepted from the superuser only.
 
 An account also unlocks automatically after `LockoutDuration` seconds when a non-zero
 duration is configured.
+
+## Lock State in the User Editor
+
+The user representation (`GetUserRepresentation`, type `UserData`) carries the read-only field
+`accountLock { locked remainingSecs }`; `remainingSecs` is `-1` while the lock lasts until an
+administrator unlocks the account. `imtauthgql::CUserCollectionDocumentServiceComp` fills it when
+its optional `AccountLockoutController` reference is set; without it the field is absent. The
+field is not written back by `UpdateUserFromRepresentation` and is no part of the user document,
+so it creates no undo step.
+
+The user editor (`Qml/imtauthgui/UserGeneralEditor.qml`, `AccountLockBanner.qml`) shows the lock
+with the remaining time; the superuser gets the **Unlock** button, which sends `UnlockUser` and
+reads the representation again.
+
+## Wiring
+
+The same controller instance must be given to the authorization controller, which counts the
+attempts, and to the components that show and lift the lock:
+
+- `ImtUserAdministrationVoce.arp/UsersPage.acc` exports `AccountLockoutController` of its
+  `UserController` (which also lists `UnlockUser` in its `CommandIds`).
+- `ImtAuthVoce.arp/UserCollectionDocumentService.acc` exports `AccountLockoutController` of the
+  document service.
+- `ImtGraphQlVoce.arp/PumaGQLClientEngine.acc` forwards `UnlockUser` to the authorization server,
+  where the lock is kept.
+
+In Puma the controller lives in `Authorization.acc` and is exported through `RootDataController`
+and `PumaHandlers` to `PumaServerBase`.
 
 ## Notes
 

@@ -5,6 +5,7 @@
 // Qt includes
 #include <QtCore/QDateTime>
 #include <QtCore/QString>
+#include <QtCore/QStringList>
 
 // ImtCore includes
 #include <imtbase/ITimeFilterParam.h>
@@ -182,6 +183,18 @@ QString UtcNow();
  * \endcode
  */
 QString EscapeSql(const QString& value);
+
+
+/**
+ * \brief Splits an SQL script into its statements at the semicolons outside of literals, identifiers and comments.
+ *
+ * A semicolon inside a '...' literal, a "..." identifier, a -- comment or a block comment does not end a statement,
+ * so values escaped with EscapeSql() keep their semicolons. Empty statements are not returned.
+ *
+ * \param sqlQuery The SQL script.
+ * \return The statements without their terminating semicolons.
+ */
+QStringList SplitSqlStatements(const QString& sqlQuery);
 
 
 /**

@@ -97,6 +97,21 @@ Item {
 `), ['alias', 'child'])
 })
 
+// An alias two levels deep (id.objectProperty.property) emits its change signal whenever the property changes
+// (doc.qt.io/qt-6/qtqml-syntax-objectattributes.html, Property Aliases)
+test('an alias through an object property notifies its change', () => {
+    assert.deepEqual(changes(`import QtQuick 2.15
+Item {
+    id: root
+    property int v: 1
+    property var log: []
+    property QtObject inner: QtObject { property int p: root.v }
+    property alias ap: root.inner.p
+    onApChanged: root.log.push("alias " + root.ap)
+}
+`), ['alias 5'])
+})
+
 test('a binding of a bindable property (x) is set after the other bindings', () => {
     assert.deepEqual(changes(`import QtQuick 2.15
 Item {

@@ -47,6 +47,100 @@ QString EscapeSql(const QString& value)
 }
 
 
+QStringList SplitSqlStatements(const QString& sqlQuery)
+{
+	enum State
+	{
+		S_CODE,
+		S_LITERAL,
+		S_IDENTIFIER,
+		S_LINE_COMMENT,
+		S_BLOCK_COMMENT
+	};
+
+	QStringList statements;
+	QString statement;
+	State state = S_CODE;
+
+	const int length = sqlQuery.length();
+	for (int i = 0; i < length; ++i){
+		const QChar character = sqlQuery.at(i);
+		const QChar nextCharacter = (i + 1 < length) ? sqlQuery.at(i + 1) : QChar();
+
+		switch (state){
+		case S_CODE:
+			if (character == ';'){
+				if (!statement.trimmed().isEmpty()){
+					statements.append(statement);
+				}
+				statement.clear();
+
+				continue;
+			}
+
+			if (character == '\''){
+				state = S_LITERAL;
+			}
+			else if (character == '"'){
+				state = S_IDENTIFIER;
+			}
+			else if (character == '-' && nextCharacter == '-'){
+				state = S_LINE_COMMENT;
+			}
+			else if (character == '/' && nextCharacter == '*'){
+				// Both characters are taken, so "/*/" does not end the comment
+				state = S_BLOCK_COMMENT;
+				statement.append(character);
+				statement.append(nextCharacter);
+				++i;
+
+				continue;
+			}
+			break;
+
+		case S_LITERAL:
+		case S_IDENTIFIER:
+			if (character == ((state == S_LITERAL) ? '\'' : '"')){
+				// A doubled quote is an escaped one and stays inside
+				if (nextCharacter == character){
+					statement.append(character);
+					++i;
+				}
+				else{
+					state = S_CODE;
+				}
+			}
+			break;
+
+		case S_LINE_COMMENT:
+			if (character == '\n'){
+				state = S_CODE;
+			}
+			break;
+
+		case S_BLOCK_COMMENT:
+			if (character == '*' && nextCharacter == '/'){
+				state = S_CODE;
+				statement.append(character);
+				statement.append(nextCharacter);
+				++i;
+
+				continue;
+			}
+			break;
+		}
+
+		statement.append(character);
+	}
+
+	if (!statement.trimmed().isEmpty()){
+		statements.append(statement);
+	}
+
+	return statements;
+}
+
+
 QString QuoteIdentifier(const QString& identifier)
 {
 	QString escaped = identifier;

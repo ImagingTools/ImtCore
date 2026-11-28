@@ -661,10 +661,10 @@ class Codegen {
         if(isFileType && defaultAlias && defaultAlias.path.length === 2 && (defaultAlias.path[1] === 'data' || defaultAlias.path[1] === 'children')){
             let slot = el.scope.ids.get(defaultAlias.path[0])
             if(slot !== undefined) this.out.push(className + '.$defaultParent=(o)=>o.$s_' + className + '[' + slot + '];')
-        } else if(isFileType && defaultAlias && defaultAlias.path.length === 2){
+        } else if(isFileType && defaultAlias && defaultAlias.path.length >= 2){
             // `default property alias content: pane.contentItem`: a child is assigned to that property
             let slot = el.scope.ids.get(defaultAlias.path[0])
-            if(slot !== undefined) this.out.push(className + '.$defaultAssign=(o,c)=>{o.$s_' + className + '[' + slot + '].' + defaultAlias.path[1] + '=c};')
+            if(slot !== undefined) this.out.push(className + '.$defaultAssign=(o,c)=>{o.$s_' + className + '[' + slot + '].' + defaultAlias.path.slice(1).join('.') + '=c};')
         }
         if(listAliases.length){
             this.out.push(className + '.$listAliases=Object.assign({},' + base + '.$listAliases,{' + listAliases.join(',') + '});')
@@ -1195,6 +1195,7 @@ class Codegen {
         for(let type = typeRef; type; type = type.kind === 'qml' ? type.file.root.typeRef : null){
             if(type.kind === 'builtin') return false
             let alias = type.file.root.defaultAlias
+            if(alias && alias.path.length > 2) return true
             if(alias && alias.path.length === 2) return alias.path[1] !== 'data' && alias.path[1] !== 'children'
             if(type.file.root.propdefs.some(p => p.defaultProp)) return false
         }
