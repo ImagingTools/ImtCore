@@ -1,0 +1,27 @@
+{
+	"editableDir": "Docs/Assistant/Knowledge",
+	"blocks": [
+		{
+			"prefix": "/AssistantApi",
+			"directories": [
+				{"path": "Sdl/imtauth/1.0", "suffix": ".sdl", "aliasPrefix": "imtauth/"},
+				{"path": "Sdl/imtbase/1.0", "suffix": ".sdl", "aliasPrefix": "imtbase/"}
+			]
+		},
+		{
+			"prefix": "/AssistantKnowledge/ImtCore",
+			"directories": [{"path": "Docs/Assistant/Knowledge", "suffix": ".md"}],
+			"extraFiles": {
+				"Permissions-Rules.en.md": "Docs/Permissions-Rules.en.md",
+				"AccountLockout.md": "Docs/Security/AccountLockout.md",
+				"ExternalLogin.md": "Docs/Security/ExternalLogin.md",
+				"LdapGroupSynchronization.md": "Docs/Security/LdapGroupSynchronization.md",
+				"PasswordPolicy.md": "Docs/Security/PasswordPolicy.md",
+				"ServerTokens.md": "Docs/Security/ServerTokens.md",
+				"NotificationCenter.md": "Docs/Notifications/NotificationCenter.md",
+				"Contracts.ru.md": "Docs/Organizations/Contracts.ru.md"
+			}
+		}
+	],
+	"qrcFiles": ["Include/imtassistgql/imtassistgql.qrc"]
+}

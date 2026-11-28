@@ -339,6 +339,26 @@ preview and the confirmation is written with the data of the plan.
 who does not know the product: concepts, rules, typical tasks and the commands they need, especially the
 commands that replace whole objects.
 
+## Keeping the knowledge current
+
+Production servers have no access to GitHub: the knowledge and the SDL catalog exist for them only as Qt
+resources compiled into the servers. `.github/workflows/assistant-knowledge.yml` keeps them current, in
+ImtCore and in every product repository that copies it:
+
+- After every merged pull request, Claude reads the change (instructions:
+  `.github/assistant-knowledge/prompt.md`) and, if the assistant must know about it, opens a pull request
+  **Assistant knowledge: update for #N** that changes only the knowledge directory (`editableDir` of
+  `.github/assistant-knowledge/config.json`), with a summary and suggestions. The update runs from the default
+  branch (`workflow_dispatch`), never with the code of a pull request. A person reviews and merges it; the
+  next build compiles the texts in.
+- On every pull request, `update_qrc.py --check` verifies that the resources list all knowledge files and SDL
+  files of the configured directories. After adding a file, run `python3 .github/assistant-knowledge/update_qrc.py`.
+- Set up once per repository: the secret `ANTHROPIC_API_KEY` and "Allow GitHub Actions to create and approve
+  pull requests".
+
+For a product: copy the workflow, `update_qrc.py`, and write `config.json` (knowledge directory, extra
+documents, the `.qrc` files of its servers) and `prompt.md` (what the product is, which files matter).
+
 ## Administration actions
 
 Shared actions for every server with the user administration of ImtCore (`ImtAssistGqlPck`):

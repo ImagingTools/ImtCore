@@ -1,0 +1,141 @@
+# Keeps the knowledge of the AI assistant in step with the product.
+#
+# After every merged pull request, Claude reads the change and, when the assistant must know about it,
+# updates the knowledge (editableDir of .github/assistant-knowledge/config.json) in a new pull request for
+# review; the instructions are in .github/assistant-knowledge/prompt.md. Production servers have no access to GitHub:
+# the knowledge reaches them only as Qt resources compiled into the servers, so merging the knowledge pull
+# request and building the servers delivers it.
+#
+# Also checks on every pull request that the resources contain all knowledge files.
+#
+# Needs the secret ANTHROPIC_API_KEY and, in the settings of the repository, "Allow GitHub Actions to create
+# and approve pull requests".
+
+name: Assistant knowledge
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: "Number of the merged pull request to read"
+        required: true
+
+concurrency:
+  group: assistant-knowledge-${{ github.event.pull_request.number || inputs.pr }}
+  cancel-in-progress: false
+
+jobs:
+  check-resources:
+    if: github.event_name == 'pull_request' && github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Knowledge files are compiled into the servers
+        run: python3 .github/assistant-knowledge/update_qrc.py --check
+
+  # A merged pull request starts the update. workflow_dispatch runs in the context of the default branch,
+  # so the update never runs code of a pull request with the secrets.
+  dispatch:
+    if: >-
+      github.event_name == 'pull_request' && github.event.action == 'closed' &&
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      !startsWith(github.event.pull_request.head.ref, 'assistant-knowledge/')
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Start the update of the knowledge
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: gh workflow run assistant-knowledge.yml --repo "$GITHUB_REPOSITORY" --ref "${{ github.event.repository.default_branch }}" -f pr="$PR_NUMBER"
+
+  update:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read the merged pull request
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ inputs.pr }}
+        run: |
+          case "$PR_NUMBER" in (''|*[!0-9]*) echo "Invalid pull request number"; exit 1;; esac
+          gh pr view "$PR_NUMBER" --json state,mergeCommit,title,headRefName > pr.json
+          state=$(jq -r .state pr.json)
+          if [ "$state" != "MERGED" ]; then echo "Pull request $PR_NUMBER is not merged"; exit 1; fi
+          echo "merge_commit=$(jq -r .mergeCommit.oid pr.json)" >> "$GITHUB_OUTPUT"
+          echo "branch=assistant-knowledge/pr-$PR_NUMBER" >> "$GITHUB_OUTPUT"
+          jq -r .title pr.json | tr -d '\r' | head -c 200 > pr-title.txt
+          rm pr.json
+
+      - name: Prepare the branch
+        env:
+          BRANCH: ${{ steps.pr.outputs.branch }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+
+      - name: Update the knowledge with Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ github.token }}
+          prompt: |
+            Merged pull request: #${{ inputs.pr }}, merge commit ${{ steps.pr.outputs.merge_commit }}.
+            Its title is in pr-title.txt.
+
+            Follow the instructions in .github/assistant-knowledge/prompt.md.
+          claude_args: >-
+            --allowedTools "Read,Write,Edit,Glob,Grep,Bash(git show:*),Bash(git diff:*),Bash(git log:*)"
+            --disallowedTools "Bash(git push:*),Bash(git commit:*)"
+            --max-turns 40
+
+      - name: Create the pull request with the knowledge
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ steps.pr.outputs.branch }}
+          PR_NUMBER: ${{ inputs.pr }}
+        run: |
+          rm -f pr-title.txt
+          summary=".assistant-knowledge-summary.md"
+          body="$(cat "$summary" 2>/dev/null || echo "No summary was written.")"
+          rm -f "$summary"
+
+          # Only the knowledge is taken over; any other change is dropped.
+          config=.github/assistant-knowledge/config.json
+          knowledge_dir=$(jq -r .editableDir "$config")
+          git add -A "$knowledge_dir"
+          git checkout -- . 2>/dev/null || true
+          git clean -fdq -e "$knowledge_dir"
+
+          if git diff --cached --quiet; then
+            echo "The knowledge needs no update for #$PR_NUMBER."
+            echo "$body" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          # New knowledge files must be compiled into the servers.
+          python3 .github/assistant-knowledge/update_qrc.py
+          jq -r '.qrcFiles[]' "$config" | xargs git add --
+
+          git commit -q -m "Assistant knowledge: update for #$PR_NUMBER"
+          git push -q origin "$BRANCH"
+          gh pr create --base "${{ github.event.repository.default_branch }}" --head "$BRANCH" \
+            --title "Assistant knowledge: update for #$PR_NUMBER" \
+            --body "$(printf 'Update of the knowledge of the AI assistant after #%s, written by Claude. Please review: the texts are compiled into the servers.\n\n%s\n' "$PR_NUMBER" "$body")"

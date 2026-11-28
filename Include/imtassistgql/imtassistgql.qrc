@@ -42,14 +42,14 @@
         <file alias="imtbase/UndoManager.sdl">../../Sdl/imtbase/1.0/UndoManager.sdl</file>
     </qresource>
     <qresource prefix="/AssistantKnowledge/ImtCore">
-        <file alias="Administration.md">../../Docs/Assistant/Knowledge/Administration.md</file>
-        <file alias="Permissions-Rules.en.md">../../Docs/Permissions-Rules.en.md</file>
         <file alias="AccountLockout.md">../../Docs/Security/AccountLockout.md</file>
+        <file alias="Administration.md">../../Docs/Assistant/Knowledge/Administration.md</file>
+        <file alias="Contracts.ru.md">../../Docs/Organizations/Contracts.ru.md</file>
         <file alias="ExternalLogin.md">../../Docs/Security/ExternalLogin.md</file>
         <file alias="LdapGroupSynchronization.md">../../Docs/Security/LdapGroupSynchronization.md</file>
-        <file alias="PasswordPolicy.md">../../Docs/Security/PasswordPolicy.md</file>
-        <file alias="ServerTokens.md">../../Docs/Security/ServerTokens.md</file>
         <file alias="NotificationCenter.md">../../Docs/Notifications/NotificationCenter.md</file>
-        <file alias="Contracts.ru.md">../../Docs/Organizations/Contracts.ru.md</file>
+        <file alias="PasswordPolicy.md">../../Docs/Security/PasswordPolicy.md</file>
+        <file alias="Permissions-Rules.en.md">../../Docs/Permissions-Rules.en.md</file>
+        <file alias="ServerTokens.md">../../Docs/Security/ServerTokens.md</file>
     </qresource>
 </RCC>
