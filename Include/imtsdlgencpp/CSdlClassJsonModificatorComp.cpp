@@ -432,12 +432,22 @@ void CSdlClassJsonModificatorComp::AddUnionFieldValueReadFromObject(
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream, hIndents);
-		stream << QStringLiteral("if (!");
-		stream << GetContainerObjectVariableName();
-		stream << QStringLiteral(".value(\"");
-		stream << field.GetId();
-		stream << QStringLiteral("\").isObject()");
-		stream << QStringLiteral(" || !");
+		stream << QStringLiteral("if (");
+		if (hasScalarTypes){
+			// scalar alternatives are stored directly, only objects require typename
+			stream << GetContainerObjectVariableName();
+			stream << QStringLiteral(".value(\"");
+			stream << field.GetId();
+			stream << QStringLiteral("\").isObject() && !");
+		}
+		else{
+			stream << '!';
+			stream << GetContainerObjectVariableName();
+			stream << QStringLiteral(".value(\"");
+			stream << field.GetId();
+			stream << QStringLiteral("\").isObject()");
+			stream << QStringLiteral(" || !");
+		}
 		stream << tempDataPtrVarName;
 		stream << QStringLiteral(".contains(\"__typename\")");
 

@@ -1,0 +1,44 @@
+schema {
+	namespace: sdlgentestunion
+	version: 1.0
+}
+
+
+## The union of all scalar types, that are allowed in unions.
+## It is used by the C++ integration test (CSdlGenScalarUnionTest.cpp) and by the QML test (Tests/QmlTest/imtsdlgenqml/tst_ScalarUnion.qml):
+## both of them check the same JSON, so the data written by C++ is read by QML and vice versa.
+## The namespace differs from 'sdlgentest': the name of the QML module is built from it and from the name of the library (see ImtCoreGetStaticQmlDeps)
+union ScalarValue = Double | String | Int | Bool
+
+
+type ScalarUnionPayload
+{
+	requiredValue: ScalarValue!
+	optionalValue: ScalarValue
+}
+
+
+type ScalarUnionLink
+{
+	url: String!
+}
+
+
+## Scalar alternatives together with an object alternative
+union MixedValue = ScalarUnionLink | Int | String
+
+
+type MixedUnionPayload
+{
+	value: MixedValue
+}
+
+
+## The integer alternatives must keep their native types
+union IntegerValue = Int | LongLong
+
+
+type IntegerUnionPayload
+{
+	value: IntegerValue
+}

@@ -42,6 +42,18 @@ private Q_SLOTS:
 	void TestNoObjectsEnumMetaObject();
 	void TestNoObjectsJsonRoundTrip();
 	void TestNoObjectsImportedSchemaJsonRoundTrip();
+	void TestScalarUnionRoundTrip_data();
+	void TestScalarUnionRoundTrip();
+	void TestScalarUnionQObjectBridge_data();
+	void TestScalarUnionQObjectBridge();
+	void TestScalarUnionIntegralDoubleIsReadAsInt();
+	void TestScalarUnionOptionalValueMissing();
+	void TestScalarUnionMixedRoundTrip();
+	void TestScalarUnionMixedQObjectBridge();
+	void TestScalarUnionIntegerTypesArePreserved_data();
+	void TestScalarUnionIntegerTypesArePreserved();
+	void TestScalarUnionIntegerFallback_data();
+	void TestScalarUnionIntegerFallback();
 
 private:
 	QTemporaryDir m_arraySerializationOutputDirectory;
