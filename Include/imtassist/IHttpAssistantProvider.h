@@ -99,14 +99,21 @@ public:
 	};
 
 	/**
+		Set HTTP and model-related configuration.
+	*/
+	virtual void SetSettings(const Settings& settings) = 0;
+
+	/**
+		Get current HTTP and model-related configuration.
+	*/
+	virtual Settings GetSettings() const = 0;
+
+	/**
 		Receiver of technical problems, e.g. HTTP status and error type. Never gets content or credentials.
 	*/
 	typedef std::function<void(const QString& problem)> ProblemHandler;
 
-	virtual void SetSettings(const Settings& settings) = 0;
-	virtual Settings GetSettings() const = 0;
-
-	/**
+/**
 		Set the transport. Not owned; nullptr restores the built-in transport.
 	*/
 	virtual void SetTransport(IAssistantHttpTransport* transportPtr) = 0;
