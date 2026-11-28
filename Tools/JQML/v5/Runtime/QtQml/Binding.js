@@ -1,7 +1,7 @@
 const engine = require('../Core/engine')
 const { QtObject } = require('../Core/QtObject')
 const { defineType } = require('../Core/type')
-const { aliasValue, withAliasField } = require('./AliasValue')
+const { aliasValue, withAliasField, resolveAliasTarget } = require('./AliasValue')
 
 // "When the binding becomes inactive again, any direct bindings that were previously set on the property will be restored."
 const RestoreNone = 0, RestoreBinding = 1, RestoreValue = 2, RestoreBindingOrValue = 3
@@ -26,9 +26,9 @@ class Binding extends QtObject {
         if(!target || !name || !target.constructor || !target.constructor.$type) return null
         let prop = target.constructor.$type.propByName.get(name)
         if(prop) return { target, id: prop.id }
-        const resolve = target.constructor.$aliases?.[name]
-        if(!resolve) return null
-        const [owner, id, field, kind] = resolve(target)
+        const alias = resolveAliasTarget(target, name)
+        if(!alias) return null
+        const [owner, id, field, kind] = alias
         return { target: owner, id, field, kind }
     }
 

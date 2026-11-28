@@ -2,7 +2,7 @@ const engine = require('../Core/engine')
 const { QtObject, writeBypassingInterceptor } = require('../Core/QtObject')
 const { defineType } = require('../Core/type')
 const { Item } = require('./Item')
-const { aliasValue, withAliasField } = require('../QtQml/AliasValue')
+const { aliasValue, withAliasField, resolveAliasTarget } = require('../QtQml/AliasValue')
 
 const STOPPED = 0, PAUSED = 1, RUNNING = 2
 
@@ -62,7 +62,7 @@ function resolveProperty(target, name, allowAliasField = false){
     let prop = obj.constructor?.$type?.propByName.get(last)
     let field, valueKind
     if(!prop){
-        const alias = obj.constructor?.$aliases?.[last]?.(obj)
+        const alias = resolveAliasTarget(obj, last)
         if(!alias || (!allowAliasField && alias[2] !== undefined)) return null
         obj = alias[0]
         prop = obj.constructor.$type.props[alias[1]]
