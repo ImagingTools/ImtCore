@@ -54,12 +54,11 @@ bool CSecretTextParamRepresentationControllerComp::GetDataModelFromSdlRepresenta
 		return true;
 	}
 
-	secretParamPtr->SetText(text.trimmed());
+	secretParamPtr->SetText(text);
 
 	return true;
 }
 
 
 } // namespace imtserverapp
-
 

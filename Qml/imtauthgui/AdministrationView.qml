@@ -44,7 +44,8 @@ Item {
 
 		if (!administrationContainer.assistantSupported){
 			administrationContainer.assistantSupported = true;
-			multiPageView.updateModel();
+			multiPageView.addSubPage("Assistant", qsTr("Assistant"), assistantSettingsComp, "Icons/Magic");
+			multiPageView.updateNavigationPaths();
 		}
 	}
 
@@ -291,6 +292,15 @@ Item {
 			multiPageView.addPage(pageId, pageName, pageComp, pageIcon);
 		}
 
+		function updateNavigationPaths(){
+			let pageIds = [];
+			for (let i = 0; i < multiPageView.pagesModel.count; ++i){
+				pageIds.push(multiPageView.pagesModel.get(i).id);
+			}
+
+			adminNavigation.paths = pageIds;
+		}
+
 		Button {
 			id: assistantButton;
 			objectName: "AdministrationAssistantButton";
@@ -301,7 +311,7 @@ Item {
 			anchors.bottomMargin: Style.marginM;
 			z: 1;
 
-			width: multiPageView.panelWidth - 2 * Style.marginM;
+			width: multiPageView.compact ? Style.iconSizeS : multiPageView.panelWidth - 2 * Style.marginM;
 			visible: administrationContainer.assistantActive;
 			text: multiPageView.compact ? "" : qsTr("Ask the assistant");
 			iconSource: "qrc:/" + Style.getIconPath("Icons/Magic", Icon.State.On, Icon.Mode.Normal);
@@ -335,12 +345,7 @@ Item {
 			multiPageView.block = false;
 
 			// Every sub-page can be navigated to, the ones of the product too. A path waiting for one is delivered now.
-			let pageIds = [];
-			for (let i = 0; i < multiPageView.pagesModel.count; ++i){
-				pageIds.push(multiPageView.pagesModel.get(i).id);
-			}
-
-			adminNavigation.paths = pageIds;
+			multiPageView.updateNavigationPaths();
 		}
 	}
 }

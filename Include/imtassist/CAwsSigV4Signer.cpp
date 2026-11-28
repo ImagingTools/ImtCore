@@ -12,6 +12,9 @@
 #include <QtCore/QMessageAuthenticationCode>
 #include <QtCore/QUrlQuery>
 
+// STL includes
+#include <algorithm>
+
 // ImtCore includes
 #include <imtrest/HttpHeaderIds.h>
 
@@ -112,7 +115,6 @@ QByteArray CAwsSigV4Signer::CreateCanonicalRequest(
 	for (const QPair<QString, QString>& item: query.queryItems(QUrl::FullyDecoded)){
 		queryItems.append(qMakePair(UriEncode(item.first.toUtf8(), true), UriEncode(item.second.toUtf8(), true)));
 	}
-
 	std::sort(queryItems.begin(), queryItems.end(), [](const QPair<QByteArray, QByteArray>& left, const QPair<QByteArray, QByteArray>& right){
 		if (left.first != right.first){
 			return left.first < right.first;

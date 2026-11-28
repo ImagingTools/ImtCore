@@ -67,6 +67,10 @@ TestCase {
 		verify(testCase.states.length > 0)
 		verify(testCase.states[testCase.states.length - 1].active)
 
+		let previousStateCount = testCase.states.length
+		controller.handleStatus(true)
+		compare(testCase.states.length, previousStateCount + 1)
+
 		// Views created later ask for the state
 		testCase.states = []
 		Events.sendEvent("AssistantStateRequested")

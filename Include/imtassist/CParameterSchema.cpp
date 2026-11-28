@@ -257,6 +257,9 @@ QJsonObject CParameterSchema::ToJson() const
 		if (!field.description.isEmpty()){
 			fieldObject["description"] = field.description;
 		}
+		if (!field.pattern.isEmpty()){
+			fieldObject["pattern"] = field.pattern;
+		}
 
 		if (field.type == FT_ENUM){
 			fieldObject["values"] = QJsonArray::fromStringList(field.enumValues);

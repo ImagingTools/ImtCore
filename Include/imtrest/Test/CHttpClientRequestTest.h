@@ -34,7 +34,9 @@ private slots:
 	void HttpErrorStatusTest();
 	void TimeoutTest();
 	void CancelTest();
+	void PreCanceledReusedRequestClearsReplyTest();
 	void TooLargeReplyTest();
+	void InvalidMaxReplySizeTest();
 	void InvalidUrlTest();
 	void ConnectionRefusedTest();
 
@@ -48,5 +50,3 @@ private:
 	bool m_shouldAnswer = true;
 	QByteArray m_receivedRequest;
 };
-
-
