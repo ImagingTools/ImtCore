@@ -35,9 +35,9 @@ public:
 		I_ASSIGN(m_actionRegistryCompPtr, "ActionRegistry", "Registry of the actions available to the assistant", true, "ActionRegistry");
 		I_ASSIGN(m_representationRegistryCompPtr, "RepresentationRegistry", "Registry of the known UI representation types", false, "RepresentationRegistry");
 		I_ASSIGN(m_auditLogCompPtr, "AuditLog", "Receiver of technical events and action decisions", false, "AuditLog");
-		I_ASSIGN(m_providerTimeoutAttrPtr, "ProviderTimeout", "Timeout of one provider call in milliseconds", true, int(CAssistantService::DEFAULT_PROVIDER_TIMEOUT_MS));
-		I_ASSIGN(m_maxStepsPerTurnAttrPtr, "MaxStepsPerTurn", "Maximum number of provider calls in one turn", true, int(CAssistantService::DEFAULT_MAX_STEPS_PER_TURN));
-		I_ASSIGN(m_previewTimeToLiveAttrPtr, "PreviewTimeToLive", "Time to live of a prepared change in seconds", true, int(CActionPreviewStore::DEFAULT_TIME_TO_LIVE_SEC));
+		I_ASSIGN(m_providerTimeoutAttrPtr, "ProviderTimeout", "Timeout of one provider call in milliseconds", true, CAssistantService::DEFAULT_PROVIDER_TIMEOUT_MS);
+		I_ASSIGN(m_maxStepsPerTurnAttrPtr, "MaxStepsPerTurn", "Maximum number of provider calls in one turn", true, CAssistantService::DEFAULT_MAX_STEPS_PER_TURN);
+		I_ASSIGN(m_previewTimeToLiveAttrPtr, "PreviewTimeToLive", "Time to live of a prepared change in seconds", true, CActionPreviewStore::DEFAULT_TIME_TO_LIVE_SEC);
 	I_END_COMPONENT;
 
 protected:
