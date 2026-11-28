@@ -56,8 +56,17 @@ IAssistantHttpTransport::Response CRestHttpTransport::Post(const Request& reques
 		return retVal;
 	}
 
+	// A successful status with a network error means an incomplete body; error statuses keep the body for the error mapping.
+	int httpStatusCode = httpStatus.toInt();
+	QNetworkReply::NetworkError errorType = clientRequest.GetErrorType();
+	if ((httpStatusCode >= 200) && (httpStatusCode < 300) && (errorType != QNetworkReply::NoError)){
+		retVal.status = (errorType == QNetworkReply::TimeoutError) ? TS_TIMEOUT : TS_NETWORK_ERROR;
+
+		return retVal;
+	}
+
 	retVal.status = TS_RESPONSE;
-	retVal.httpStatus = httpStatus.toInt();
+	retVal.httpStatus = httpStatusCode;
 	retVal.body = clientRequest.GetReplyBody();
 
 	return retVal;

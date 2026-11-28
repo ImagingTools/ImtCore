@@ -21,7 +21,7 @@ bool CAssistantActionRegistry::RegisterAction(IAssistantAction* actionPtr)
 		return false;
 	}
 
-	if (actionPtr->GetParameterSchema().GetVersion() <= 0){
+	if ((actionPtr->GetParameterSchema().GetVersion() <= 0) || (actionPtr->GetResultSchema().GetVersion() <= 0)){
 		return false;
 	}
 

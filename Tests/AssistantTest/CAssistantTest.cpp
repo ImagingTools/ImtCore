@@ -226,6 +226,25 @@ private:
 };
 
 
+class CUnversionedResultAction: public CSearchTasksAction
+{
+public:
+	explicit CUnversionedResultAction(CTaskDomain& domain)
+		:CSearchTasksAction(domain)
+	{
+	}
+
+	// reimplemented (imtassist::IAssistantAction)
+	virtual const CParameterSchema& GetResultSchema() const override
+	{
+		return m_resultSchema;
+	}
+
+private:
+	CParameterSchema m_resultSchema;
+};
+
+
 class CSetTaskStatusAction: virtual public IAssistantAction
 {
 public:
@@ -616,9 +635,11 @@ void CAssistantTest::testActionRegistry_RejectsInvalidRegistrations()
 	CTaskDomain domain;
 	CSearchTasksAction searchAction(domain);
 	CSearchTasksAction duplicateAction(domain);
+	CUnversionedResultAction unversionedResultAction(domain);
 
 	CAssistantActionRegistry registry;
 	QVERIFY(!registry.RegisterAction(nullptr));
+	QVERIFY(!registry.RegisterAction(&unversionedResultAction));
 	QVERIFY(registry.RegisterAction(&searchAction));
 	QVERIFY(!registry.RegisterAction(&duplicateAction));
 	QCOMPARE(registry.GetActionIds(), QByteArrayList() << "tasks.search");

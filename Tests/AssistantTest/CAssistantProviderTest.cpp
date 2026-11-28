@@ -993,14 +993,16 @@ void CAssistantProviderTest::testRestTransport_ResponseTimeoutAndCancel()
 	QVERIFY(server.listen(QHostAddress::LocalHost));
 
 	bool shouldAnswer = true;
+	bool shouldTruncate = false;
 	QByteArray receivedRequest;
-	QObject::connect(&server, &QTcpServer::newConnection, [&server, &shouldAnswer, &receivedRequest](){
+	QObject::connect(&server, &QTcpServer::newConnection, [&server, &shouldAnswer, &shouldTruncate, &receivedRequest](){
 		QTcpSocket* socketPtr = server.nextPendingConnection();
-		QObject::connect(socketPtr, &QTcpSocket::readyRead, [socketPtr, &shouldAnswer, &receivedRequest](){
+		QObject::connect(socketPtr, &QTcpSocket::readyRead, [socketPtr, &shouldAnswer, &shouldTruncate, &receivedRequest](){
 			receivedRequest += socketPtr->readAll();
 			if (shouldAnswer && receivedRequest.contains("\r\n\r\n") && receivedRequest.endsWith("}")){
 				QByteArray body = "{\"ok\":true}";
-				socketPtr->write("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + QByteArray::number(body.size()) + "\r\nConnection: close\r\n\r\n" + body);
+				int contentLength = shouldTruncate ? (body.size() + 10) : body.size();
+				socketPtr->write("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " + QByteArray::number(contentLength) + "\r\nConnection: close\r\n\r\n" + body);
 				socketPtr->disconnectFromHost();
 			}
 		});
@@ -1021,6 +1023,13 @@ void CAssistantProviderTest::testRestTransport_ResponseTimeoutAndCancel()
 	QCOMPARE(response.body, QByteArray("{\"ok\":true}"));
 	QVERIFY(receivedRequest.startsWith("POST /v1/chat/completions"));
 	QVERIFY(receivedRequest.contains("Bearer local"));
+
+	// A successful status with an incomplete body is a network error, not a response.
+	shouldTruncate = true;
+	receivedRequest.clear();
+	response = transport.Post(request, CCancellationToken());
+	QCOMPARE(response.status, IAssistantHttpTransport::TS_NETWORK_ERROR);
+	shouldTruncate = false;
 
 	// A server that does not answer runs into the timeout.
 	shouldAnswer = false;

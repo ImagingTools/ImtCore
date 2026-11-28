@@ -169,15 +169,10 @@ imtassist::IAssistantAction::ExecutionStatus CAssistantApiPlanActionComp::Prepar
 	preview.targetId = "api.planChanges";
 
 	for (int i = 0; i < steps.size(); ++i){
-		// The input is shown as it will be sent, so the user sees what the step really does.
-		QString inputText = steps[i].inputText;
-		if (inputText.size() > MAX_PREVIEW_INPUT_LENGTH){
-			inputText = inputText.left(MAX_PREVIEW_INPUT_LENGTH) + QStringLiteral("...");
-		}
-
+		// The complete input is shown as it will be sent, so the user sees everything the step really does.
 		QJsonObject change;
 		change["field"] = QStringLiteral("%1. %2 (%3)").arg(i + 1).arg(steps[i].description, steps[i].command);
-		change["newValue"] = inputText;
+		change["newValue"] = steps[i].inputText;
 		preview.changes.append(change);
 	}
 
