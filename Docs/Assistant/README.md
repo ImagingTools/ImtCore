@@ -537,6 +537,13 @@ authentication, so it enables `AllowDemoPrincipal`. Users in `ReadOnlyUserIds` o
   `tst_AssistantSettingsPage` (loading without key, saving with keep, set and clear of the key, refusal,
   read-only).
 
+## Rolling back applied changes
+
+Design, not implemented yet: a change set journal links each confirmed change set to the
+revisions it produced, so the change set can be rolled back as a whole. Today only users, groups
+and roles have revisions. Details, conflicts, permissions and irreversible commands are in
+[Rollback.md](Rollback.md).
+
 ## MCP server
 
 An MCP endpoint, so that customers can connect their own AI agents to our servers, is deferred
