@@ -8,7 +8,7 @@
 #include <QtCore/QStringList>
 
 // ImtCore includes
-#include <imtassist/CHttpAssistantProviderBase.h>
+#include <imtassist/IHttpAssistantProvider.h>
 
 
 namespace imtassist
@@ -82,12 +82,12 @@ public:
 	/**
 		Fill the provider settings from a preset. Credentials are not touched.
 	*/
-	static bool ApplyPreset(const Preset& preset, const Parameters& parameters, CHttpAssistantProviderBase::Settings& settings, QString* errorPtr = nullptr);
+	static bool ApplyPreset(const Preset& preset, const Parameters& parameters, IHttpAssistantProvider::Settings& settings, QString* errorPtr = nullptr);
 
 	/**
 		Create the adapter of a protocol.
 	*/
-	static std::shared_ptr<CHttpAssistantProviderBase> CreateProvider(Protocol protocol);
+	static std::shared_ptr<IHttpAssistantProvider> CreateProvider(Protocol protocol);
 };
 
 

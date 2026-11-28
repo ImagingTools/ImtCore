@@ -21,7 +21,7 @@ bool CTenantAssistantProviderComp::IsConfigured() const
 
 IAssistantProvider::Reply CTenantAssistantProviderComp::Complete(const Request& request, const CCancellationToken& cancellationToken)
 {
-	std::shared_ptr<CHttpAssistantProviderBase> providerPtr = GetProvider(request.tenantId);
+	std::shared_ptr<IHttpAssistantProvider> providerPtr = GetProvider(request.tenantId);
 	if (!providerPtr || !providerPtr->IsConfigured()){
 		Reply retVal;
 		retVal.status = RS_NOT_CONFIGURED;
@@ -50,7 +50,7 @@ bool CTenantAssistantProviderComp::Entry::IsSameConfiguration(const Entry& other
 }
 
 
-std::shared_ptr<CHttpAssistantProviderBase> CTenantAssistantProviderComp::GetProvider(const QByteArray& tenantId)
+std::shared_ptr<IHttpAssistantProvider> CTenantAssistantProviderComp::GetProvider(const QByteArray& tenantId)
 {
 	if (tenantId.isEmpty() || !m_configurationStoreCompPtr.IsValid()){
 		return nullptr;
@@ -88,7 +88,7 @@ std::shared_ptr<CHttpAssistantProviderBase> CTenantAssistantProviderComp::GetPro
 	}
 
 	CAssistantProviderPresets::Preset preset;
-	CHttpAssistantProviderBase::Settings settings;
+	IHttpAssistantProvider::Settings settings;
 	if (!CAssistantProviderPresets::FindPreset(entry.presetId, preset) || !CAssistantProviderPresets::ApplyPreset(preset, entry.parameters, settings)){
 		return nullptr;
 	}
@@ -131,7 +131,7 @@ std::shared_ptr<CHttpAssistantProviderBase> CTenantAssistantProviderComp::GetPro
 	settings.additionalInstructions = instructions.join(QStringLiteral("\n\n"));
 
 	const QByteArray presetId = entry.presetId;
-	std::shared_ptr<CHttpAssistantProviderBase> providerPtr = CAssistantProviderPresets::CreateProvider(preset.protocol);
+	std::shared_ptr<IHttpAssistantProvider> providerPtr = CAssistantProviderPresets::CreateProvider(preset.protocol);
 	providerPtr->SetSettings(settings);
 	providerPtr->SetProblemHandler([this, tenantId, presetId](const QString& problem){
 		SendWarningMessage(

@@ -234,7 +234,7 @@ bool CAssistantProviderPresets::ResolveEndpoint(const QString& endpointTemplate,
 }
 
 
-bool CAssistantProviderPresets::ApplyPreset(const Preset& preset, const Parameters& parameters, CHttpAssistantProviderBase::Settings& settings, QString* errorPtr)
+bool CAssistantProviderPresets::ApplyPreset(const Preset& preset, const Parameters& parameters, IHttpAssistantProvider::Settings& settings, QString* errorPtr)
 {
 	QString endpointTemplate = parameters.endpoint.isEmpty() ? preset.endpointTemplate : parameters.endpoint;
 	if (endpointTemplate.isEmpty()){
@@ -266,7 +266,7 @@ bool CAssistantProviderPresets::ApplyPreset(const Preset& preset, const Paramete
 }
 
 
-std::shared_ptr<CHttpAssistantProviderBase> CAssistantProviderPresets::CreateProvider(Protocol protocol)
+std::shared_ptr<IHttpAssistantProvider> CAssistantProviderPresets::CreateProvider(Protocol protocol)
 {
 	switch (protocol){
 	case P_OPENAI_COMPATIBLE:
@@ -279,7 +279,7 @@ std::shared_ptr<CHttpAssistantProviderBase> CAssistantProviderPresets::CreatePro
 		return std::make_shared<CBedrockConverseProvider>();
 	}
 
-	return std::shared_ptr<CHttpAssistantProviderBase>();
+	return std::shared_ptr<IHttpAssistantProvider>();
 }
 
 

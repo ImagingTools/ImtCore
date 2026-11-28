@@ -17,7 +17,7 @@ namespace imtassist
 
 bool CHttpAssistantProviderComp::IsConfigured() const
 {
-	std::shared_ptr<CHttpAssistantProviderBase> providerPtr = GetProvider();
+	std::shared_ptr<IHttpAssistantProvider> providerPtr = GetProvider();
 
 	return providerPtr && providerPtr->IsConfigured();
 }
@@ -25,7 +25,7 @@ bool CHttpAssistantProviderComp::IsConfigured() const
 
 IAssistantProvider::Reply CHttpAssistantProviderComp::Complete(const Request& request, const CCancellationToken& cancellationToken)
 {
-	std::shared_ptr<CHttpAssistantProviderBase> providerPtr = GetProvider();
+	std::shared_ptr<IHttpAssistantProvider> providerPtr = GetProvider();
 	if (!providerPtr){
 		Reply retVal;
 		retVal.status = RS_PROVIDER_ERROR;
@@ -111,7 +111,7 @@ CHttpAssistantProviderComp::Configuration CHttpAssistantProviderComp::ReadConfig
 }
 
 
-std::shared_ptr<CHttpAssistantProviderBase> CHttpAssistantProviderComp::GetProvider() const
+std::shared_ptr<IHttpAssistantProvider> CHttpAssistantProviderComp::GetProvider() const
 {
 	Configuration configuration = ReadConfiguration();
 
@@ -132,7 +132,7 @@ std::shared_ptr<CHttpAssistantProviderBase> CHttpAssistantProviderComp::GetProvi
 		return m_providerPtr;
 	}
 
-	CHttpAssistantProviderBase::Settings settings;
+	IHttpAssistantProvider::Settings settings;
 	QString error;
 	if (!CAssistantProviderPresets::ApplyPreset(preset, configuration.parameters, settings, &error)){
 		SendErrorMessage(0, QStringLiteral("Assistant provider '%1' is not configured: %2").arg(QString::fromUtf8(configuration.presetId), error), "HttpAssistantProvider");
@@ -150,7 +150,7 @@ std::shared_ptr<CHttpAssistantProviderBase> CHttpAssistantProviderComp::GetProvi
 
 	QByteArray presetId = configuration.presetId;
 
-	std::shared_ptr<CHttpAssistantProviderBase> providerPtr = CAssistantProviderPresets::CreateProvider(preset.protocol);
+	std::shared_ptr<IHttpAssistantProvider> providerPtr = CAssistantProviderPresets::CreateProvider(preset.protocol);
 	providerPtr->SetSettings(settings);
 	providerPtr->SetProblemHandler([this, presetId](const QString& problem){
 		SendWarningMessage(0, QStringLiteral("Assistant provider '%1': %2").arg(QString::fromUtf8(presetId), problem), "HttpAssistantProvider");

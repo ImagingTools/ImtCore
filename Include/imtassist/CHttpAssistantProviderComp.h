@@ -80,7 +80,7 @@ private:
 		Get the provider for the current configuration; it is recreated when the configuration changed.
 		\return nullptr if the configuration is invalid.
 	*/
-	std::shared_ptr<CHttpAssistantProviderBase> GetProvider() const;
+	std::shared_ptr<IHttpAssistantProvider> GetProvider() const;
 
 	static QString ReadText(const iprm::ITextParam* paramPtr);
 
@@ -101,7 +101,7 @@ private:
 	mutable QMutex m_mutex;
 	mutable bool m_hasConfiguration = false;
 	mutable Configuration m_configuration;
-	mutable std::shared_ptr<CHttpAssistantProviderBase> m_providerPtr;
+	mutable std::shared_ptr<IHttpAssistantProvider> m_providerPtr;
 };
 
 

@@ -259,7 +259,7 @@ bool CAssistantConfigurationStoreComp::ValidateConfiguration(const IAssistantCon
 	parameters.project = configuration.GetProject().trimmed().toUtf8();
 	parameters.resource = configuration.GetResource().trimmed().toUtf8();
 
-	CHttpAssistantProviderBase::Settings settings;
+	IHttpAssistantProvider::Settings settings;
 	QString presetError;
 	if (!CAssistantProviderPresets::ApplyPreset(preset, parameters, settings, &presetError)){
 		// The texts of the preset name the missing placeholder only, never a value.

@@ -91,11 +91,11 @@ public:
 };
 
 
-std::shared_ptr<CHttpAssistantProviderBase> CreateProvider(const QByteArray& presetId, CFakeTransport& transport, const QByteArray& apiKey = "secret-key")
+std::shared_ptr<IHttpAssistantProvider> CreateProvider(const QByteArray& presetId, CFakeTransport& transport, const QByteArray& apiKey = "secret-key")
 {
 	CAssistantProviderPresets::Preset preset;
 	if (!CAssistantProviderPresets::FindPreset(presetId, preset)){
-		return std::shared_ptr<CHttpAssistantProviderBase>();
+		return std::shared_ptr<IHttpAssistantProvider>();
 	}
 
 	CAssistantProviderPresets::Parameters parameters;
@@ -107,14 +107,14 @@ std::shared_ptr<CHttpAssistantProviderBase> CreateProvider(const QByteArray& pre
 		parameters.endpoint = "https://inference.example.com/v1/chat/completions";
 	}
 
-	CHttpAssistantProviderBase::Settings settings;
+	IHttpAssistantProvider::Settings settings;
 	if (!CAssistantProviderPresets::ApplyPreset(preset, parameters, settings)){
-		return std::shared_ptr<CHttpAssistantProviderBase>();
+		return std::shared_ptr<IHttpAssistantProvider>();
 	}
 
 	settings.apiKey = apiKey;
 
-	std::shared_ptr<CHttpAssistantProviderBase> providerPtr = CAssistantProviderPresets::CreateProvider(preset.protocol);
+	std::shared_ptr<IHttpAssistantProvider> providerPtr = CAssistantProviderPresets::CreateProvider(preset.protocol);
 	providerPtr->SetSettings(settings);
 	providerPtr->SetTransport(&transport);
 
@@ -304,7 +304,7 @@ void CAssistantProviderTest::testPresets_AllProvidersResolve()
 
 	for (const QByteArray& presetId: expectedIds){
 		CFakeTransport transport;
-		std::shared_ptr<CHttpAssistantProviderBase> providerPtr = CreateProvider(presetId, transport);
+		std::shared_ptr<IHttpAssistantProvider> providerPtr = CreateProvider(presetId, transport);
 		QVERIFY2(providerPtr, presetId.constData());
 		QVERIFY2(providerPtr->IsConfigured(), presetId.constData());
 
@@ -325,7 +325,7 @@ void CAssistantProviderTest::testPresets_AllProvidersResolve()
 	parameters.resource = "my-resource";
 	parameters.project = "my-project";
 
-	CHttpAssistantProviderBase::Settings settings;
+	IHttpAssistantProvider::Settings settings;
 	QVERIFY(CAssistantProviderPresets::FindPreset("bedrock", preset));
 	QVERIFY(CAssistantProviderPresets::ApplyPreset(preset, parameters, settings));
 	QCOMPARE(settings.endpoint.host(), QString("bedrock-runtime.eu-central-1.amazonaws.com"));
@@ -348,7 +348,7 @@ void CAssistantProviderTest::testPresets_RejectInvalidConfiguration()
 	CAssistantProviderPresets::Preset preset;
 	QVERIFY(!CAssistantProviderPresets::FindPreset("unknown", preset));
 
-	CHttpAssistantProviderBase::Settings settings;
+	IHttpAssistantProvider::Settings settings;
 	CAssistantProviderPresets::Parameters parameters;
 	parameters.model = "model-1";
 
@@ -379,7 +379,7 @@ void CAssistantProviderTest::testPresets_RejectInvalidConfiguration()
 void CAssistantProviderTest::testNotConfigured_NoRequest()
 {
 	CFakeTransport transport;
-	std::shared_ptr<CHttpAssistantProviderBase> providerPtr = CreateProvider("openai", transport, QByteArray());
+	std::shared_ptr<IHttpAssistantProvider> providerPtr = CreateProvider("openai", transport, QByteArray());
 	QVERIFY(providerPtr);
 	QVERIFY(!providerPtr->IsConfigured());
 
@@ -400,11 +400,11 @@ void CAssistantProviderTest::testNotConfigured_NoRequest()
 	QCOMPARE(transport.requests.size(), 0);
 
 	// A local model server needs no credentials.
-	std::shared_ptr<CHttpAssistantProviderBase> localPtr = CreateProvider("ollama", transport, QByteArray());
+	std::shared_ptr<IHttpAssistantProvider> localPtr = CreateProvider("ollama", transport, QByteArray());
 	QVERIFY(localPtr->IsConfigured());
 
 	// Bedrock without API key needs region and access key.
-	std::shared_ptr<CHttpAssistantProviderBase> bedrockPtr = CreateProvider("bedrock", transport, QByteArray());
+	std::shared_ptr<IHttpAssistantProvider> bedrockPtr = CreateProvider("bedrock", transport, QByteArray());
 	QVERIFY(!bedrockPtr->IsConfigured());
 }
 
@@ -412,9 +412,9 @@ void CAssistantProviderTest::testNotConfigured_NoRequest()
 void CAssistantProviderTest::testCredentials_FromEnvironment()
 {
 	CFakeTransport transport;
-	std::shared_ptr<CHttpAssistantProviderBase> providerPtr = CreateProvider("mistral", transport, QByteArray());
+	std::shared_ptr<IHttpAssistantProvider> providerPtr = CreateProvider("mistral", transport, QByteArray());
 
-	CHttpAssistantProviderBase::Settings settings = providerPtr->GetSettings();
+	IHttpAssistantProvider::Settings settings = providerPtr->GetSettings();
 	settings.apiKeyVariable = "IMT_ASSISTANT_TEST_KEY";
 	providerPtr->SetSettings(settings);
 
@@ -443,7 +443,7 @@ void CAssistantProviderTest::testCredentials_FromEnvironment()
 void CAssistantProviderTest::testOpenAi_Request()
 {
 	CFakeTransport transport;
-	std::shared_ptr<CHttpAssistantProviderBase> providerPtr = CreateProvider("openai", transport);
+	std::shared_ptr<IHttpAssistantProvider> providerPtr = CreateProvider("openai", transport);
 	transport.AddJsonResponse(TextResponse("Hello"));
 	providerPtr->Complete(CreateConversation(), CCancellationToken());
 
@@ -489,14 +489,14 @@ void CAssistantProviderTest::testOpenAi_Request()
 	QCOMPARE(tools.at(1).toObject().value("function").toObject().value("name").toString(), QString("imtassist_ask_user"));
 
 	// Providers without the parallel flag and with max_tokens.
-	std::shared_ptr<CHttpAssistantProviderBase> ionosPtr = CreateProvider("ionos", transport);
+	std::shared_ptr<IHttpAssistantProvider> ionosPtr = CreateProvider("ionos", transport);
 	transport.AddJsonResponse(TextResponse("Hello"));
 	ionosPtr->Complete(CreateConversation(), CCancellationToken());
 	QVERIFY(!transport.LastBody().contains("parallel_tool_calls"));
 	QCOMPARE(transport.LastBody().value("max_tokens").toInt(), 1024);
 
 	// Azure uses the api-key header.
-	std::shared_ptr<CHttpAssistantProviderBase> azurePtr = CreateProvider("azure-openai", transport);
+	std::shared_ptr<IHttpAssistantProvider> azurePtr = CreateProvider("azure-openai", transport);
 	transport.AddJsonResponse(TextResponse("Hello"));
 	azurePtr->Complete(CreateConversation(), CCancellationToken());
 	QCOMPARE(transport.LastHeader("api-key"), QByteArray("secret-key"));
@@ -507,7 +507,7 @@ void CAssistantProviderTest::testOpenAi_Request()
 void CAssistantProviderTest::testOpenAi_Response()
 {
 	CFakeTransport transport;
-	std::shared_ptr<CHttpAssistantProviderBase> providerPtr = CreateProvider("openai", transport);
+	std::shared_ptr<IHttpAssistantProvider> providerPtr = CreateProvider("openai", transport);
 	IAssistantProvider::Request request = CreateConversation();
 
 	transport.AddJsonResponse(ToolCallResponse("tasks_search", "{\"status\":\"done\"}", "call_abc"));
@@ -551,7 +551,7 @@ void CAssistantProviderTest::testOpenAi_Response()
 void CAssistantProviderTest::testAnthropic_Request()
 {
 	CFakeTransport transport;
-	std::shared_ptr<CHttpAssistantProviderBase> providerPtr = CreateProvider("anthropic", transport);
+	std::shared_ptr<IHttpAssistantProvider> providerPtr = CreateProvider("anthropic", transport);
 	transport.AddResponse(500, QByteArray());
 	providerPtr->Complete(CreateConversation(), CCancellationToken());
 
@@ -583,7 +583,7 @@ void CAssistantProviderTest::testAnthropic_Request()
 	QCOMPARE(body.value("tools").toArray().at(0).toObject().value("input_schema").toObject().value("type").toString(), QString("object"));
 
 	// Claude on Vertex AI: version in the body, model in the URL, bearer token.
-	std::shared_ptr<CHttpAssistantProviderBase> vertexPtr = CreateProvider("vertex-anthropic", transport);
+	std::shared_ptr<IHttpAssistantProvider> vertexPtr = CreateProvider("vertex-anthropic", transport);
 	transport.AddResponse(500, QByteArray());
 	vertexPtr->Complete(CreateConversation(), CCancellationToken());
 	QVERIFY(!transport.LastBody().contains("model"));
@@ -596,7 +596,7 @@ void CAssistantProviderTest::testAnthropic_Request()
 void CAssistantProviderTest::testAnthropic_Response()
 {
 	CFakeTransport transport;
-	std::shared_ptr<CHttpAssistantProviderBase> providerPtr = CreateProvider("anthropic", transport);
+	std::shared_ptr<IHttpAssistantProvider> providerPtr = CreateProvider("anthropic", transport);
 
 	QJsonObject toolUse;
 	toolUse["type"] = QStringLiteral("tool_use");
@@ -636,7 +636,7 @@ void CAssistantProviderTest::testAnthropic_Response()
 void CAssistantProviderTest::testGemini_RequestAndSignatureRoundTrip()
 {
 	CFakeTransport transport;
-	std::shared_ptr<CHttpAssistantProviderBase> providerPtr = CreateProvider("gemini", transport);
+	std::shared_ptr<IHttpAssistantProvider> providerPtr = CreateProvider("gemini", transport);
 
 	// The model calls a function with a thought signature.
 	QJsonObject functionCall;
@@ -705,7 +705,7 @@ void CAssistantProviderTest::testBedrock_ApiKeyAndSigV4()
 {
 	CFakeTransport transport;
 
-	std::shared_ptr<CHttpAssistantProviderBase> apiKeyPtr = CreateProvider("bedrock", transport);
+	std::shared_ptr<IHttpAssistantProvider> apiKeyPtr = CreateProvider("bedrock", transport);
 	QVERIFY(apiKeyPtr->IsConfigured());
 	transport.AddResponse(500, QByteArray());
 	apiKeyPtr->Complete(CreateConversation(), CCancellationToken());
@@ -719,8 +719,8 @@ void CAssistantProviderTest::testBedrock_ApiKeyAndSigV4()
 	QCOMPARE(messages.at(2).toObject().value("content").toArray().at(0).toObject().value("toolResult").toObject().value("toolUseId").toString(), QString("call00001"));
 	QCOMPARE(body.value("toolConfig").toObject().value("tools").toArray().at(0).toObject().value("toolSpec").toObject().value("name").toString(), QString("tasks_search"));
 
-	std::shared_ptr<CHttpAssistantProviderBase> sigV4Ptr = CreateProvider("bedrock", transport, QByteArray());
-	CHttpAssistantProviderBase::Settings settings = sigV4Ptr->GetSettings();
+	std::shared_ptr<IHttpAssistantProvider> sigV4Ptr = CreateProvider("bedrock", transport, QByteArray());
+	IHttpAssistantProvider::Settings settings = sigV4Ptr->GetSettings();
 	settings.awsAccessKeyId = "AKIDEXAMPLE";
 	settings.awsSecretAccessKey = "secret-access-key";
 	settings.awsSessionToken = "session-token";
@@ -743,7 +743,7 @@ void CAssistantProviderTest::testBedrock_ApiKeyAndSigV4()
 void CAssistantProviderTest::testBedrock_Response()
 {
 	CFakeTransport transport;
-	std::shared_ptr<CHttpAssistantProviderBase> providerPtr = CreateProvider("bedrock", transport);
+	std::shared_ptr<IHttpAssistantProvider> providerPtr = CreateProvider("bedrock", transport);
 
 	QJsonObject toolUse;
 	toolUse["toolUseId"] = QStringLiteral("tooluse_1");
@@ -776,7 +776,7 @@ void CAssistantProviderTest::testBedrock_Response()
 void CAssistantProviderTest::testToolNames_SanitizedAndUnique()
 {
 	CFakeTransport transport;
-	std::shared_ptr<CHttpAssistantProviderBase> providerPtr = CreateProvider("openai", transport);
+	std::shared_ptr<IHttpAssistantProvider> providerPtr = CreateProvider("openai", transport);
 
 	IAssistantProvider::Request request;
 	request.tools << CreateTool("tasks.search") << CreateTool("tasks_search") << CreateTool("imtassist.ask.user") << CreateTool(QByteArray(100, 'x'));
@@ -809,7 +809,7 @@ void CAssistantProviderTest::testToolNames_SanitizedAndUnique()
 void CAssistantProviderTest::testTurns_EventsAndMissingResults()
 {
 	CFakeTransport transport;
-	std::shared_ptr<CHttpAssistantProviderBase> providerPtr = CreateProvider("openai", transport);
+	std::shared_ptr<IHttpAssistantProvider> providerPtr = CreateProvider("openai", transport);
 
 	// A call whose result is missing gets a result before the next message.
 	IAssistantProvider::Request request;
@@ -859,7 +859,7 @@ void CAssistantProviderTest::testTurns_EventsAndMissingResults()
 void CAssistantProviderTest::testErrors_Mapping()
 {
 	CFakeTransport transport;
-	std::shared_ptr<CHttpAssistantProviderBase> providerPtr = CreateProvider("openai", transport);
+	std::shared_ptr<IHttpAssistantProvider> providerPtr = CreateProvider("openai", transport);
 
 	QStringList problems;
 	providerPtr->SetProblemHandler([&problems](const QString& problem){
@@ -901,7 +901,7 @@ void CAssistantProviderTest::testErrors_Mapping()
 void CAssistantProviderTest::testService_ToolResultLinkedToCall()
 {
 	CFakeTransport transport;
-	std::shared_ptr<CHttpAssistantProviderBase> providerPtr = CreateProvider("openai", transport);
+	std::shared_ptr<IHttpAssistantProvider> providerPtr = CreateProvider("openai", transport);
 
 	CSimpleReadAction action;
 	CAssistantActionRegistry registry;

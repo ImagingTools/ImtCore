@@ -68,7 +68,7 @@ private:
 		QByteArray protectedApiKey;
 		int maxOutputTokens = 0;
 		QString additionalInstructions;
-		std::shared_ptr<CHttpAssistantProviderBase> providerPtr;
+		std::shared_ptr<IHttpAssistantProvider> providerPtr;
 
 		bool IsSameConfiguration(const Entry& other) const;
 	};
@@ -76,7 +76,7 @@ private:
 	/**
 		Get the adapter of the tenant; nullptr if the tenant has no valid configuration.
 	*/
-	std::shared_ptr<CHttpAssistantProviderBase> GetProvider(const QByteArray& tenantId);
+	std::shared_ptr<IHttpAssistantProvider> GetProvider(const QByteArray& tenantId);
 
 private:
 	I_REF(IAssistantConfigurationStore, m_configurationStoreCompPtr);
