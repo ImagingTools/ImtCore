@@ -133,14 +133,18 @@ TestCase {
 		let valid = message("assistantText", {"text": "Hello"})
 		let wrongVersion = message("assistantText", {"text": "Hello", "formatVersion": 2})
 		let unknownKind = message("qmlComponent", {"text": "Item {}"})
+		let missingPreviewId = message("actionPreview", {"actionId": "tasks.setStatus"})
+		let malformedChange = message("actionPreview", {"previewId": "p-2", "actionId": "tasks.setStatus", "data": {"changes": [null]}})
 
-		controller.handleResponse("AssistantSendMessage", "c-1", messagesJson([valid, wrongVersion, unknownKind, "text"]))
+		controller.handleResponse("AssistantSendMessage", "c-1", messagesJson([valid, wrongVersion, unknownKind, "text", missingPreviewId, malformedChange]))
 
-		compare(controller.messagesModel.count, 4)
+		compare(controller.messagesModel.count, 6)
 		compare(messageAt(controller, 0).kind, "assistantText")
 		compare(messageAt(controller, 1).code, "InvalidMessage")
 		compare(messageAt(controller, 2).code, "InvalidMessage")
 		compare(messageAt(controller, 3).code, "InvalidMessage")
+		compare(messageAt(controller, 4).code, "InvalidMessage")
+		compare(messageAt(controller, 5).code, "InvalidMessage")
 	}
 
 	function test_invalidResponseIsVisible(){
@@ -155,7 +159,7 @@ TestCase {
 	function test_confirmationIsSentOnce(){
 		let controller = startedController()
 
-		let preview = message("actionPreview", {"previewId": "p-1", "text": "Change status"})
+		let preview = message("actionPreview", {"previewId": "p-1", "actionId": "tasks.setStatus", "text": "Change status"})
 		controller.handleResponse("AssistantSendMessage", "c-1", messagesJson([preview]))
 		compare(controller.getPreviewState("p-1"), "")
 
@@ -231,12 +235,52 @@ TestCase {
 		controller.refreshHistory()
 		compare(controller.lastRequest().commandId, "AssistantGetHistory")
 
-		let preview = message("actionPreview", {"previewId": "p-1"})
+		let preview = message("actionPreview", {"previewId": "p-1", "actionId": "tasks.setStatus"})
 		let executed = message("actionExecuted", {"previewId": "p-1", "code": "stale"})
 		controller.handleResponse("AssistantGetHistory", "c-1", messagesJson([preview, executed]))
 
 		compare(controller.messagesModel.count, 2)
 		compare(controller.getPreviewState("p-1"), "decided")
+	}
+
+	function test_historyPreservesPendingDecision(){
+		let controller = startedController()
+		controller.confirmPreview("p-1")
+
+		controller.refreshHistory()
+		let preview = message("actionPreview", {"previewId": "p-1", "actionId": "tasks.setStatus"})
+		controller.handleResponse("AssistantGetHistory", "c-1", messagesJson([preview]))
+
+		compare(controller.getPreviewState("p-1"), "confirming")
+
+		let expired = message("error", {"previewId": "p-1", "code": "PreviewExpired"})
+		controller.handleResponse("AssistantGetHistory", "c-1", messagesJson([expired]))
+		compare(controller.getPreviewState("p-1"), "decided")
+	}
+
+	function test_oldConversationResponsesAndErrorsAreIgnored(){
+		let controller = startedController()
+		controller.confirmPreview("p-1")
+		let requestGeneration = controller.conversationGeneration
+
+		controller.newConversation()
+		controller.handleResponse("AssistantConfirmPreview", "c-1", messagesJson([message("actionExecuted", {"previewId": "p-1", "code": "succeeded"})]), requestGeneration)
+		controller.handleError("AssistantGetHistory", "Network error", requestGeneration)
+
+		compare(controller.conversationId, "")
+		compare(controller.messagesModel.count, 0)
+	}
+
+	function test_cancelAndHistoryErrorsAreVisible(){
+		let controller = startedController()
+		controller.sendMessage("Hello")
+		controller.cancel()
+		controller.handleError("AssistantCancelRequest", "Network error")
+		compare(messageAt(controller, 0).code, "CancellationStatusUnknown")
+
+		controller.refreshHistory()
+		controller.handleError("AssistantGetHistory", "Network error")
+		compare(messageAt(controller, 1).code, "HistoryReloadFailed")
 	}
 
 	function test_newConversationClearsState(){

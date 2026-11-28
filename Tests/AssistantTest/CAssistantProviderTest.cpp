@@ -675,6 +675,17 @@ void CAssistantProviderTest::testGemini_RequestAndSignatureRoundTrip()
 	QVERIFY(!ContainsKeyRecursively(body.value("tools"), "additionalProperties"));
 	QCOMPARE(body.value("contents").toArray().at(1).toObject().value("role").toString(), QString("model"));
 
+	CParameterSchema keywordParameterSchema("tasks.search.parameters", 1);
+	keywordParameterSchema.AddString("additionalProperties", true, 32);
+	IAssistantProvider::Request keywordRequest = CreateConversation();
+	keywordRequest.tools[0].parameterSchema = keywordParameterSchema.ToJsonSchema();
+	providerPtr->Complete(keywordRequest, CCancellationToken());
+
+	QJsonObject keywordParameters = transport.LastBody().value("tools").toArray().at(0).toObject()
+				.value("functionDeclarations").toArray().at(0).toObject().value("parameters").toObject();
+	QVERIFY(!keywordParameters.contains("additionalProperties"));
+	QVERIFY(keywordParameters.value("properties").toObject().contains("additionalProperties"));
+
 	// The signature is sent back with the call in the next request.
 	IAssistantProvider::Request request = CreateConversation();
 	request.messages[2].providerState = reply.providerState;
@@ -984,6 +995,14 @@ void CAssistantProviderTest::testSigV4_AwsTestVector()
 				QByteArray(),
 				signedHeaders);
 	QVERIFY(canonical.startsWith("POST\n/model/a.b-v1%253A0/converse\n"));
+
+	canonical = CAwsSigV4Signer::CreateCanonicalRequest(
+				"GET",
+				QUrl("https://bedrock-runtime.eu-central-1.amazonaws.com/model?b=2&a=2&a=1"),
+				CAwsSigV4Signer::Headers(),
+				QByteArray(),
+				signedHeaders);
+	QCOMPARE(canonical.split('\n').at(2), QByteArray("a=1&a=2&b=2"));
 }
 
 
@@ -1062,5 +1081,3 @@ void CAssistantProviderTest::testRestTransport_ResponseTimeoutAndCancel()
 
 
 I_ADD_TEST(CAssistantProviderTest);
-
-

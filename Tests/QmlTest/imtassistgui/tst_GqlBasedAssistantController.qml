@@ -171,4 +171,34 @@ TestCase {
 		compare(message.kind, "error")
 		compare(message.code, "ConfirmationStatusUnknown")
 	}
+
+	function test_lateConfirmationFromClosedConversationIsIgnored(){
+		let controller = startedController()
+		let executed = [{"formatVersion": 1, "id": "m-old", "kind": "actionExecuted", "previewId": "p-1", "code": "succeeded"}]
+		GqlTestTransport.queueDelay("AssistantConfirmPreview", 100)
+		GqlTestTransport.queueResponse("AssistantConfirmPreview", response("AssistantConfirmPreview", {"conversationId": "c-1", "messagesJson": JSON.stringify(executed)}))
+
+		controller.confirmPreview("p-1")
+		waitForCommand("AssistantConfirmPreview")
+		controller.newConversation()
+		wait(200)
+
+		compare(controller.conversationId, "")
+		compare(controller.messagesModel.count, 0)
+	}
+
+	function test_lateHistoryErrorFromClosedConversationIsIgnored(){
+		let controller = startedController()
+		GqlTestTransport.queueDelay("AssistantGetHistory", 100)
+		GqlTestTransport.queueStatus("AssistantGetHistory", 500)
+		GqlTestTransport.queueResponse("AssistantGetHistory", failure("AssistantGetHistory"))
+
+		controller.refreshHistory()
+		waitForCommand("AssistantGetHistory")
+		controller.newConversation()
+		wait(200)
+
+		compare(controller.conversationId, "")
+		compare(controller.messagesModel.count, 0)
+	}
 }

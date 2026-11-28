@@ -35,6 +35,13 @@ bool IsValidContextKind(const QString& kind)
 	return true;
 }
 
+bool IsValidPreviewId(const QByteArray& previewId)
+{
+	QUuid previewUuid = QUuid::fromString(QString::fromUtf8(previewId));
+
+	return previewUuid.toString(QUuid::WithoutBraces).toLatin1() == previewId;
+}
+
 
 } // namespace
 
@@ -218,10 +225,22 @@ QJsonObject CAssistantControllerComp::CreateInternalResponse(const imtgql::CGqlR
 	}
 
 	if (commandId == s_confirmPreviewCommandId){
+		if (!IsValidPreviewId(previewId)){
+			errorMessage = QStringLiteral("Invalid preview ID");
+
+			return QJsonObject();
+		}
+
 		return CreateMessagesResponse(conversationId, servicePtr->ConfirmPreview(context, previewId));
 	}
 
 	if (commandId == s_rejectPreviewCommandId){
+		if (!IsValidPreviewId(previewId)){
+			errorMessage = QStringLiteral("Invalid preview ID");
+
+			return QJsonObject();
+		}
+
 		return CreateMessagesResponse(conversationId, servicePtr->RejectPreview(context, previewId));
 	}
 
@@ -265,5 +284,3 @@ void CAssistantControllerComp::OnComponentCreated()
 
 
 } // namespace imtassistgql
-
-

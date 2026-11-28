@@ -124,6 +124,21 @@ Rectangle {
 			}
 		}
 
+		Button {
+			id: reloadHistoryButton
+			objectName: "AssistantReloadHistory"
+			anchors.right: newConversationButton.left
+			anchors.rightMargin: Style.spacingS
+			anchors.verticalCenter: parent.verticalCenter
+			text: qsTr("Reload")
+			enabled: assistantPanel.controller !== null && assistantPanel.controller.conversationId !== ""
+			visible: enabled
+
+			onClicked: {
+				assistantPanel.controller.refreshHistory()
+			}
+		}
+
 		ToolButton {
 			id: closeButton
 			objectName: "AssistantClose"
@@ -217,6 +232,7 @@ Rectangle {
 						anchors.leftMargin: Style.marginXS
 						anchors.verticalCenter: parent.verticalCenter
 						text: modelData.label
+						textFormat: Text.PlainText
 					}
 
 					Button {

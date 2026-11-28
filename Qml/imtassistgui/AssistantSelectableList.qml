@@ -34,8 +34,28 @@ Rectangle {
 		return item !== null && typeof item === "object" && typeof item.id === "string" && item.id !== "" && typeof item.label === "string"
 	}
 
+	function isValidSelectionKind(kind){
+		if (typeof kind !== "string" || kind.length === 0 || kind.length > 64){
+			return false
+		}
+
+		for (let i = 0; i < kind.length; i++){
+			let code = kind.charCodeAt(i)
+			if (!((code >= 48 && code <= 57) || (code >= 65 && code <= 90) || (code >= 97 && code <= 122) ||
+					code === 46 || code === 95 || code === 45)){
+				return false
+			}
+		}
+
+		return true
+	}
+
 	function setRepresentationData(data){
 		if (data === null || typeof data !== "object" || !Array.isArray(data.items)){
+			return false
+		}
+
+		if (data.selectionKind !== undefined && data.selectionKind !== null && !selectableList.isValidSelectionKind(data.selectionKind)){
 			return false
 		}
 
@@ -131,6 +151,7 @@ Rectangle {
 			width: parent.width
 			visible: selectableList.title !== ""
 			text: selectableList.title
+			textFormat: Text.PlainText
 			font.bold: true
 			wrapMode: Text.WordWrap
 		}
@@ -159,6 +180,9 @@ Rectangle {
 				height: Math.max(Style.controlHeightM, itemTexts.height + Style.marginXS * 2)
 				radius: Style.radiusS
 				color: selectableList.isSelected(modelData.id) ? Style.selectedColor : "transparent"
+				activeFocusOnTab: true
+				border.color: itemRow.activeFocus ? Style.imagingToolsAccentColor : "transparent"
+				border.width: itemRow.activeFocus ? 1 : 0
 
 				CheckBox {
 					id: itemCheckBox
@@ -180,6 +204,7 @@ Rectangle {
 					BaseText {
 						width: parent.width
 						text: modelData.label
+						textFormat: Text.PlainText
 						elide: Text.ElideRight
 					}
 
@@ -187,6 +212,7 @@ Rectangle {
 						width: parent.width
 						visible: typeof modelData.description === "string" && modelData.description !== ""
 						text: typeof modelData.description === "string" ? modelData.description : ""
+						textFormat: Text.PlainText
 						color: Style.inactiveTextColor
 						font.pixelSize: Style.fontSizeS
 						elide: Text.ElideRight
@@ -198,8 +224,14 @@ Rectangle {
 					cursorShape: Qt.PointingHandCursor
 
 					onClicked: {
+						itemRow.forceActiveFocus()
 						selectableList.toggleSelection(modelData.id)
 					}
+				}
+
+				Keys.onSpacePressed: {
+					selectableList.toggleSelection(modelData.id)
+					event.accepted = true
 				}
 			}
 		}

@@ -524,7 +524,11 @@ AssistantMessages CAssistantLogicController::ConfirmPreview(const CAssistantRequ
 
 	if (!errorCode.isEmpty()){
 		Log(IAssistantAuditLog::ET_PREVIEW_CONFIRMED, context, errorCode, preview.actionId, previewId);
-		retVal.append(CreateError(context, preview.conversationId, errorCode, errorText));
+		CAssistantMessage errorMessage = CreateError(context, preview.conversationId, errorCode, errorText);
+		if (errorCode != "PreviewInProgress"){
+			errorMessage.SetPreviewId(previewId);
+		}
+		retVal.append(errorMessage);
 
 		return retVal;
 	}
@@ -1057,5 +1061,4 @@ QByteArray CAssistantLogicController::GetExecutionStatusCode(IAssistantAction::E
 
 
 } // namespace imtassist
-
 

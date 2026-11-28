@@ -73,16 +73,15 @@ QtObject {
 	function startConversation(){
 		root.busy = true
 		root.busyCommand = "AssistantStartConversation"
-		root.sendRequest("AssistantStartConversation", {})
+		root.sendConversationRequest("AssistantStartConversation", {})
 	}
 
 	function newConversation(){
-		root.requestGeneration++
-
 		if (root.conversationId !== ""){
-			root.sendRequest("AssistantCloseConversation", {"conversationId": root.conversationId})
+			root.sendRequest("AssistantCloseConversation", {"conversationId": root.conversationId, "requestGeneration": root.requestGeneration})
 		}
 
+		root.requestGeneration++
 		root.conversationId = ""
 		root.messagesModel.clear()
 		root.previewStates = {}
@@ -90,6 +89,12 @@ QtObject {
 		root.__pendingText = ""
 		root.busy = false
 		root.busyCommand = ""
+	}
+
+	function sendConversationRequest(commandId, input){
+		let requestInput = Object.assign({}, input)
+		requestInput.requestGeneration = root.requestGeneration
+		root.sendRequest(commandId, requestInput)
 	}
 
 	function sendMessage(text){
@@ -113,7 +118,7 @@ QtObject {
 
 		root.busy = true
 		root.busyCommand = "AssistantSendMessage"
-		root.sendRequest("AssistantSendMessage", {"conversationId": root.conversationId, "text": trimmed, "contextItems": items})
+		root.sendConversationRequest("AssistantSendMessage", {"conversationId": root.conversationId, "text": trimmed, "contextItems": items})
 		root.clearContextItems()
 
 		return true
@@ -127,7 +132,7 @@ QtObject {
 			return
 		}
 
-		root.sendRequest("AssistantGetHistory", {"conversationId": root.conversationId})
+		root.sendConversationRequest("AssistantGetHistory", {"conversationId": root.conversationId})
 	}
 
 	function cancel(){
@@ -135,7 +140,7 @@ QtObject {
 			return
 		}
 
-		root.sendRequest("AssistantCancelRequest", {"conversationId": root.conversationId})
+		root.sendConversationRequest("AssistantCancelRequest", {"conversationId": root.conversationId})
 	}
 
 	function confirmPreview(previewId){
@@ -144,7 +149,7 @@ QtObject {
 		}
 
 		root.setPreviewState(previewId, "confirming")
-		root.sendRequest("AssistantConfirmPreview", {"conversationId": root.conversationId, "previewId": previewId})
+		root.sendConversationRequest("AssistantConfirmPreview", {"conversationId": root.conversationId, "previewId": previewId})
 	}
 
 	function rejectPreview(previewId){
@@ -153,7 +158,7 @@ QtObject {
 		}
 
 		root.setPreviewState(previewId, "rejecting")
-		root.sendRequest("AssistantRejectPreview", {"conversationId": root.conversationId, "previewId": previewId})
+		root.sendConversationRequest("AssistantRejectPreview", {"conversationId": root.conversationId, "previewId": previewId})
 	}
 
 	function getPreviewState(previewId){
@@ -198,7 +203,7 @@ QtObject {
 	}
 
 	function isValidMessage(message){
-		if (message === null || typeof message !== "object"){
+		if (message === null || typeof message !== "object" || Array.isArray(message)){
 			return false
 		}
 
@@ -206,7 +211,79 @@ QtObject {
 			return false
 		}
 
-		return root.knownKinds.indexOf(message.kind) >= 0
+		if (root.knownKinds.indexOf(message.kind) < 0){
+			return false
+		}
+
+		if (message.text !== undefined && typeof message.text !== "string"){
+			return false
+		}
+
+		if (message.options !== undefined){
+			if (!Array.isArray(message.options)){
+				return false
+			}
+			for (let i = 0; i < message.options.length; i++){
+				if (typeof message.options[i] !== "string"){
+					return false
+				}
+			}
+		}
+
+		if (message.kind === "error" || message.kind === "status" || message.kind === "actionExecuted"){
+			if (typeof message.code !== "string" || message.code === ""){
+				return false
+			}
+		}
+
+		if (message.kind === "actionPreview"){
+			if (typeof message.previewId !== "string" || message.previewId === "" || typeof message.actionId !== "string" || message.actionId === ""){
+				return false
+			}
+		}
+
+		if (message.kind === "actionExecuted" || message.kind === "status"){
+			if (typeof message.previewId !== "string" || message.previewId === ""){
+				return false
+			}
+		}
+
+		if (message.data !== undefined && (message.data === null || typeof message.data !== "object" || Array.isArray(message.data))){
+			return false
+		}
+
+		if (message.data !== undefined && message.data.changes !== undefined){
+			if (!Array.isArray(message.data.changes)){
+				return false
+			}
+			for (let i = 0; i < message.data.changes.length; i++){
+				let change = message.data.changes[i]
+				if (change === null || typeof change !== "object" || Array.isArray(change)){
+					return false
+				}
+				if (change.field !== undefined && typeof change.field !== "string"){
+					return false
+				}
+				if (change.oldValue !== undefined && change.oldValue !== null && typeof change.oldValue === "object"){
+					return false
+				}
+				if (change.newValue !== undefined && change.newValue !== null && typeof change.newValue === "object"){
+					return false
+				}
+			}
+		}
+
+		if (message.representation !== undefined){
+			let representation = message.representation
+			if (representation === null || typeof representation !== "object" || Array.isArray(representation) ||
+					typeof representation.type !== "string" || typeof representation.version !== "number" ||
+					Math.floor(representation.version) !== representation.version || representation.version <= 0 ||
+					representation.data === null || typeof representation.data !== "object" || Array.isArray(representation.data)){
+				return false
+			}
+		}
+
+		return true
 	}
 
 	function appendMessage(message){
@@ -232,6 +309,10 @@ QtObject {
 			return
 		}
 
+		if (commandId !== "AssistantStartConversation" && commandId !== "AssistantCloseConversation" && conversationId !== root.conversationId){
+			return
+		}
+
 		let messages = []
 		if (messagesJson !== undefined && messagesJson !== ""){
 			try {
@@ -248,7 +329,6 @@ QtObject {
 
 		if (commandId === "AssistantGetHistory" && Array.isArray(messages)){
 			root.messagesModel.clear()
-			root.previewStates = {}
 		}
 
 		if (!Array.isArray(messages)){
@@ -289,7 +369,21 @@ QtObject {
 			return
 		}
 
-		if (commandId === "AssistantCancelRequest" || commandId === "AssistantCloseConversation" || commandId === "AssistantGetHistory"){
+		if (commandId === "AssistantCloseConversation"){
+			return
+		}
+
+		if (commandId === "AssistantCancelRequest"){
+			root.appendLocalError("CancellationStatusUnknown")
+			root.messagesAppended()
+
+			return
+		}
+
+		if (commandId === "AssistantGetHistory"){
+			root.appendLocalError("HistoryReloadFailed")
+			root.messagesAppended()
+
 			return
 		}
 

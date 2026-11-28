@@ -9,7 +9,7 @@ import imtassistgui 1.0
 	GqlBasedAssistantController
 
 	AssistantController that talks to imtassistgql::CAssistantControllerComp over GraphQL.
-	Every command has its own sender, so that a cancel or a confirmation can be sent while
+	Each command has its own sender, so that a cancel or a confirmation can be sent while
 	a message is still being processed.
 */
 AssistantController {
@@ -21,28 +21,28 @@ AssistantController {
 	function sendRequest(commandId, input){
 		let requestParams = Object.assign({}, input, {"requestGeneration": root.requestGeneration})
 		if (commandId === "AssistantGetStatus"){
-			statusSender.send(requestParams)
+			root.statusSender.send(requestParams)
 		}
 		else if (commandId === "AssistantStartConversation"){
-			startSender.send(requestParams)
+			root.startSender.send(requestParams)
 		}
 		else if (commandId === "AssistantSendMessage"){
-			sendMessageSender.send(requestParams)
+			root.sendMessageSender.send(requestParams)
 		}
 		else if (commandId === "AssistantConfirmPreview"){
-			confirmSender.send(requestParams)
+			root.confirmSender.send(requestParams)
 		}
 		else if (commandId === "AssistantRejectPreview"){
-			rejectSender.send(requestParams)
+			root.rejectSender.send(requestParams)
 		}
 		else if (commandId === "AssistantCancelRequest"){
-			cancelSender.send(requestParams)
+			root.cancelSender.send(requestParams)
 		}
 		else if (commandId === "AssistantGetHistory"){
-			historySender.send(requestParams)
+			root.historySender.send(requestParams)
 		}
 		else if (commandId === "AssistantCloseConversation"){
-			closeSender.send(requestParams)
+			root.closeSender.send(requestParams)
 		}
 		else{
 			console.warn("GqlBasedAssistantController: unsupported command", commandId)

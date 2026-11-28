@@ -217,6 +217,28 @@ void CHttpClientRequestTest::CancelTest()
 }
 
 
+void CHttpClientRequestTest::PreCanceledReusedRequestClearsReplyTest()
+{
+	StartServer(CreateResponse(200, "OK", "{\"ok\":true}", "X-Request-Id: r-1\r\n"));
+
+	imtrest::CHttpClientRequest request;
+	request.SetRequest(QNetworkRequest(GetServerUrl("/reused")));
+	QCOMPARE(imtrest::CHttpClientRequestSender::Send(request, 5000), imtrest::CHttpClientRequestSender::SR_FINISHED);
+	QCOMPARE(request.GetReplyBody(), QByteArray("{\"ok\":true}"));
+	QVERIFY(request.GetAttribute(QNetworkRequest::HttpStatusCodeAttribute).isValid());
+	QCOMPARE(request.GetHeader("x-request-id"), QByteArray("r-1"));
+
+	QByteArray receivedRequest = m_receivedRequest;
+	QCOMPARE(imtrest::CHttpClientRequestSender::Send(request, 5000, [](){ return true; }), imtrest::CHttpClientRequestSender::SR_CANCELED);
+
+	QVERIFY(request.GetReplyBody().isEmpty());
+	QVERIFY(!request.GetAttribute(QNetworkRequest::HttpStatusCodeAttribute).isValid());
+	QVERIFY(request.GetHeader("x-request-id").isEmpty());
+	QCOMPARE(request.GetErrorType(), QNetworkReply::OperationCanceledError);
+	QCOMPARE(m_receivedRequest, receivedRequest);
+}
+
+
 void CHttpClientRequestTest::TooLargeReplyTest()
 {
 	StartServer(CreateResponse(200, "OK", QByteArray(4096, 'x')));
@@ -294,4 +316,3 @@ QUrl CHttpClientRequestTest::GetServerUrl(const QString& path) const
 
 
 I_ADD_TEST(CHttpClientRequestTest);
-

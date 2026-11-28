@@ -24,6 +24,8 @@ CHttpClientRequestSender::SendResult CHttpClientRequestSender::Send(
 			const CancellationCheck& isCanceled,
 			qint64 maxReplySize)
 {
+	request.SetReply(nullptr);
+
 	if (maxReplySize < 0 || maxReplySize == std::numeric_limits<qint64>::max()){
 		request.SetState(IHttpClientRequest::RS_FINISHED | IHttpClientRequest::RS_ERROR);
 
@@ -75,7 +77,7 @@ CHttpClientRequestSender::SendResult CHttpClientRequestSender::Send(
 		return SR_INVALID_REQUEST;
 	}
 
-	replyPtr->setReadBufferSize(maxReplySize + 1);
+	replyPtr->setReadBufferSize(maxReplySize < std::numeric_limits<qint64>::max() ? maxReplySize + 1 : maxReplySize);
 	request.SetReply(replyPtr);
 
 	QEventLoop eventLoop;
@@ -145,4 +147,3 @@ CHttpClientRequestSender::SendResult CHttpClientRequestSender::Send(
 
 
 } // namespace imtrest
-
