@@ -64,14 +64,8 @@ protected:
 private:
 	bool GetDrivesListing(const FileSystemQuery& query, FileSystemListing& result) const;
 	void FillParent(const QString& canonicalPath, FileSystemListing& result) const;
-	// Builds entries from infoList, applies nameFilter + sort, then offset/limit.
+	// Builds entries from infoList and applies the query to them (CFileSystemQueryTools).
 	void AppendPage(const QFileInfoList& infoList, const FileSystemQuery& query, bool drivesRoot, FileSystemListing& result) const;
-	void ApplyNameFilter(QList<FileSystemEntry>& entries, const QString& nameFilter) const;
-	// Drops files whose extension is not in the whitelist; containers always pass.
-	void ApplyExtensionFilter(QList<FileSystemEntry>& entries, const QStringList& extensions) const;
-	void SortEntries(QList<FileSystemEntry>& entries, const FileSystemQuery& query) const;
-	static qint64 SortKeySize(const FileSystemEntry& entry);
-	static qint64 SortKeyDate(const FileSystemEntry& entry);
 	FileSystemEntry MakeEntry(const QFileInfo& fileInfo) const;
 	FileSystemEntry MakeDriveEntry(const QFileInfo& driveInfo) const;
 

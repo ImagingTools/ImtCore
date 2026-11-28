@@ -8,6 +8,7 @@
 
 // ImtCore includes
 #include <imtfile/IFileSystemStructureProvider.h>
+#include <imtfile/IFileDownloadLinkProvider.h>
 #include <imtservergql/CFileSystemControllerComp.h>
 #include <imtgql/CGqlRequest.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/FileSystem.h>
@@ -19,12 +20,14 @@ public:
 	bool failNext = false;
 	QString failMessage = QStringLiteral("mock failure");
 	FileSystemListing nextListing;
+	mutable QString lastPath;
 
 	virtual bool GetEntries(
-				const FileSystemQuery& /*query*/,
+				const FileSystemQuery& query,
 				FileSystemListing& result,
 				QString& error) const override
 	{
+		lastPath = query.path;
 		if (failNext){
 			error = failMessage;
 			result = FileSystemListing();
@@ -49,6 +52,33 @@ public:
 };
 
 
+class CMockDownloadLinkProvider: virtual public imtfile::IFileDownloadLinkProvider
+{
+public:
+	bool failNext = false;
+	QString failMessage = QStringLiteral("mock failure");
+	DownloadLink nextLink;
+	mutable QString lastPath;
+
+	virtual bool GetDownloadLink(
+				const QString& path,
+				DownloadLink& link,
+				QString& error) const override
+	{
+		lastPath = path;
+		if (failNext){
+			error = failMessage;
+
+			return false;
+		}
+
+		link = nextLink;
+
+		return true;
+	}
+};
+
+
 class CTestableFileSystemController: public imtservergql::CFileSystemControllerComp
 {
 public:
@@ -57,13 +87,19 @@ public:
 		m_providerPtr = providerPtr;
 	}
 
+	void SetDownloadLinkProvider(imtfile::IFileDownloadLinkProvider* providerPtr)
+	{
+		m_downloadLinkProviderPtr = providerPtr;
+	}
+
 	void SetPermissionsAllowed(bool allowed)
 	{
 		m_permissionsAllowed = allowed;
 	}
 
-	// Expose OnGetFileSystemEntries for direct unit testing
+	// Expose the command handlers for direct unit testing
 	using BaseClass::OnGetFileSystemEntries;
+	using BaseClass::OnGetDownloadLink;
 
 	// reimplemented (CPermissibleGqlRequestHandlerComp)
 	virtual bool CheckPermissions(
@@ -79,8 +115,14 @@ protected:
 		return m_providerPtr;
 	}
 
+	virtual imtfile::IFileDownloadLinkProvider* GetDownloadLinkProvider() const override
+	{
+		return m_downloadLinkProviderPtr;
+	}
+
 private:
 	imtfile::IFileSystemStructureProvider* m_providerPtr = nullptr;
+	imtfile::IFileDownloadLinkProvider* m_downloadLinkProviderPtr = nullptr;
 	bool m_permissionsAllowed = true;
 };
 
@@ -93,5 +135,11 @@ private slots:
 	void MissingProviderFailsTest();
 	void ProviderErrorIsPropagatedTest();
 	void HappyPathMapsPayloadTest();
+	void LargeSizesAreNotTruncatedTest();
 	void PermissionDeniedCreateResponseTest();
+	void DownloadLinkWithoutProviderIsRefusedTest();
+	void DownloadLinkMapsAllFieldsTest();
+	void DownloadLinkOmitsUnknownFieldsTest();
+	void DownloadLinkProviderErrorIsPropagatedTest();
+	void DownloadLinkFailureWithoutMessageIsAnErrorTest();
 };

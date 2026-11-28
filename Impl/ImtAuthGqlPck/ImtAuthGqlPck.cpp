@@ -216,6 +216,11 @@ I_EXPORT_COMPONENT(
 			"Remote Server Token Issuer");
 
 I_EXPORT_COMPONENT(
+			RemoteSession,
+			"Session of this application with a remote server under its own account, signed in by login and password",
+			"Remote Session");
+
+I_EXPORT_COMPONENT(
 			PublishedPermissionsProvider,
 			"Answers permission tree requests from the published trees",
 			"Published Permissions Provider");

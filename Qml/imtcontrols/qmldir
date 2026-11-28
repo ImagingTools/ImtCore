@@ -11,6 +11,7 @@ singleton DesignScheme 1.0 ./Base/DesignScheme.qml
 
 Icon 1.0 ./Base/Icon.js
 ButtonType 1.0 ./Base/ButtonType.js
+FileNameTools 1.0 ./Base/FileNameTools.js
 
 BaseClass 1.0 ./Base/BaseClass.qml
 BaseModel 1.0 ./Base/BaseModel.qml

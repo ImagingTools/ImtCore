@@ -171,6 +171,9 @@ bool CSubscriptionManagerComp::UnregisterSubscription(
 			const imtclientgql::IGqlSubscriptionClient& subscriptionClient)
 {
 	std::shared_ptr<ClientRegistration> registrationPtr;
+	// The subscription of the last client ends at the server as well
+	bool isEnded = false;
+	imtgql::CGqlRequest endedRequest;
 
 	{
 		QMutexLocker locker(&m_registeredClientsMutex);
@@ -189,12 +192,27 @@ bool CSubscriptionManagerComp::UnregisterSubscription(
 		}
 
 		if (foundIt->m_clients.isEmpty()){
+			// The server knows the subscription once it is sent over the connection, unless it refused it.
+			// Not for the subscriptions routed to the clients of this server (RequestManager): their WebSocket client
+			// does not handle a stop, and one sent to a client gone offline would only be reported as an error.
+			isEnded = m_subscriptionSenderCompPtr.IsValid()
+						&& foundIt->m_isRegistrationSent
+						&& foundIt->m_status != IGqlSubscriptionClient::SS_REFUSED;
+			if (isEnded){
+				endedRequest = foundIt->m_request;
+			}
+
 			m_registeredClients.erase(foundIt);
 		}
 	}
 
 	if (registrationPtr == nullptr){
 		return false;
+	}
+
+	// Sent outside the lock, see ReregisterSubscriptions()
+	if (isEnded){
+		SubscriptionUnregister(endedRequest, subscriptionId);
 	}
 
 	// Dropping the registration stops new callbacks; taking dispatchMutex waits out one

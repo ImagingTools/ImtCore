@@ -27,6 +27,7 @@ private Q_SLOTS:
 	void TestComplexUnion();
 	void TestArrayNullabilityParsing();
 	void TestImportedEnumArrayQObjectSetter();
+	void TestLongLongQObjectSetter();
 	void TestTreeModelExplicitNullKey();
 	void TestNestedFieldNameCollision();
 	void PrinterTest();

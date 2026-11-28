@@ -530,7 +530,7 @@ QString CSdlGenTools::GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
 			retVal += QStringLiteral("bool");
 		}
 		else if (sdlField.GetType() == "LongLong" || sdlField.GetType() == "longLong"){
-			retVal += QStringLiteral("int");
+			retVal += QStringLiteral("qlonglong");
 		}
 		else if (sdlField.GetType() == "ID"){
 			retVal += QStringLiteral("QString");

@@ -2,6 +2,7 @@ schema {
 	namespace: imtbase
 	version: 1.0
 	query: Query
+	subscription: Subscription
 }
 
 enum FileSystemEntryType {
@@ -48,13 +49,13 @@ type FileSystemEntry
 	name: String!
 	path: String!
 	entryType: FileSystemEntryType!
-	size: Int
+	# Byte counts are LongLong: files and volumes overflow a 32-bit Int.
+	size: LongLong
+	# An ISO 8601 timestamp in UTC (e.g. "2024-06-05T12:34:56Z").
 	lastModified: String
-	# Volume capacity, sent for Drive entries only. Double (not Int) because a
-	# byte count of a drive overflows 32 bits; Double holds exact integers well
-	# past any real volume size.
-	totalBytes: Double
-	freeBytes: Double
+	# Volume capacity, sent for Drive entries only.
+	totalBytes: LongLong
+	freeBytes: LongLong
 }
 
 type GetFileSystemEntriesPayload
@@ -66,6 +67,54 @@ type GetFileSystemEntriesPayload
 	hasMore: Boolean!
 }
 
+input GetDownloadLinkInput
+{
+	# Path of a file as GetFileSystemEntries returns it.
+	path: String!
+}
+
+type DownloadLink
+{
+	# Self-contained URL: a plain GET without other credentials.
+	url: String!
+	# Other URLs of the same content by priority. Not sent when there are none.
+	alternativeUrls: [String!]
+	# Until when the URLs are valid, ISO 8601 in UTC (e.g. "2024-06-05T12:34:56Z").
+	# A hint only: the clocks of the client and of the source may differ.
+	expiresAt: String
+	size: LongLong
+	# SHA-256 of the content, lowercase hex.
+	sha256: String
+	# Strong entity tag exactly as it goes in the ETag header, with the quotes.
+	# The provider forms it; clients compare it as an opaque string.
+	# Not sent when the source cannot resume a download.
+	etag: String
+}
+
+type GetDownloadLinkPayload
+{
+	link: DownloadLink
+}
+
+input FileSystemSubscriptionInput
+{
+	# Path of a folder as GetFileSystemEntries returns it; empty for the root.
+	path: String
+}
+
+# The content of the watched folder or the folder itself changed: the subscriber reads the folder again.
+# The event carries no content, and events are not kept: after a reconnection the subscriber reads the folder again too.
+type FileSystemChangedEvent
+{
+	# The path of the subscription.
+	path: String!
+}
+
 type Query {
 	GetFileSystemEntries(input: GetFileSystemEntriesInput): GetFileSystemEntriesPayload!
+	GetDownloadLink(input: GetDownloadLinkInput): GetDownloadLinkPayload!
+}
+
+type Subscription {
+	OnFileSystemChanged(input: FileSystemSubscriptionInput): FileSystemChangedEvent!
 }

@@ -225,6 +225,11 @@ I_EXPORT_COMPONENT(
 			"File system controller for browsing the folder hierarchy",
 			"File System Controller Folder Browser");
 
+I_EXPORT_COMPONENT(
+			FileSystemPublisher,
+			"Publishes the changes of the folders a subscriber watches",
+			"File System Publisher Subscription");
+
 
 } // namespace ImtServerGqlPck
 

@@ -23,6 +23,9 @@ import imtbaseFileSystemSdl 1.0
       above it can be opened.
     - showOnlyFolders: the files of a folder are not listed, only folders (links,
       drives). Without it files are listed and pathKind decides what is pickable.
+    - watchChanges: the open folder is listed again when the server reports a
+      change of it (subscription OnFileSystemChanged). A server without the
+      subscription refuses it, and the dialog works as without the option.
 */
 
 Dialog {
@@ -61,6 +64,9 @@ Dialog {
 	// not shown at all. Default false: files are listed too (pickable only when
 	// pathKind allows files).
 	property bool showOnlyFolders: false
+	// The open folder is listed again when the server reports a change of it. Default
+	// false: the listing changes only by navigation and Refresh.
+	property bool watchChanges: false
 
 	property string currentPath: ""
 	// Whether a parent exists, kept apart from parentPath: an EMPTY parentPath is
@@ -127,6 +133,12 @@ Dialog {
 	property Item filterFieldItem: null
 	// Set when the filter changes while a request is in flight; applied after load.
 	property bool __pendingFilterRefresh: false
+	// Set when the server reports a change of the folder while a request is in flight; applied after load.
+	property bool __pendingChangeRefresh: false
+	// The folder the change subscription watches (watchChanges), kept apart from
+	// its emptiness, since "" is a real address (the virtual drives root).
+	property string __watchedPath: ""
+	property bool __isWatching: false
 	// Set for a same-folder reload (sort / filter / refresh): keep the current
 	// selection instead of resetting it, and re-focus a still-visible selected row.
 	property bool __preserveSelection: false
@@ -594,6 +606,58 @@ Dialog {
 		}
 	}
 
+	// ─── Change subscription (watchChanges) ─────────────────────────────────
+
+	FileSystemSubscriptionInput {
+		id: subscriptionInput
+	}
+
+	SubscriptionClient {
+		id: changeSubscription
+
+		gqlCommandId: ImtbaseFileSystemSdlCommandIds.s_onFileSystemChanged
+		autoSubscribe: false
+		sdlInputObject: subscriptionInput
+
+		function getHeaders(){
+			return root.resolveHeaders()
+		}
+
+		onMessageReceived: {
+			root.onFolderChanged()
+		}
+
+		// Changes may have been missed while the connection was lost
+		onRefreshRequired: {
+			root.onFolderChanged()
+		}
+	}
+
+	// The subscription follows the folder on screen: it is moved after each listing of another folder.
+	function watchCurrentFolder(){
+		if (!root.watchChanges)
+			return
+		if (root.__isWatching && root.__watchedPath === root.currentPath)
+			return
+
+		if (root.__isWatching)
+			changeSubscription.unRegisterSubscription()
+
+		subscriptionInput.m_path = root.currentPath
+		root.__watchedPath = root.currentPath
+		root.__isWatching = true
+		changeSubscription.registerSubscription()
+	}
+
+	// Same-folder reload, like Refresh; a listing in flight is followed by one more.
+	function onFolderChanged(){
+		if (root.isLoading){
+			root.__pendingChangeRefresh = true
+			return
+		}
+		root.browse(root.currentPath, false)
+	}
+
 	function browse(path, append){
 		if (root.isLoading)
 			return
@@ -635,6 +699,8 @@ Dialog {
 		root.__appending = false
 		root.__preserveSelection = false
 		root.errorText = message
+		// A change of the folder on screen reported meanwhile stays pending: a reload now
+		// would hide the error at once. The next listing applies it.
 	}
 
 	// Repeats the navigation that just failed (offered only while nothing has
@@ -758,8 +824,13 @@ Dialog {
 
 		root.__appending = false
 
-		if (root.__pendingFilterRefresh){
+		if (freshLoad)
+			root.watchCurrentFolder()
+
+		// One reload serves both: it lists the folder on screen with the current filter
+		if (root.__pendingFilterRefresh || root.__pendingChangeRefresh){
 			root.__pendingFilterRefresh = false
+			root.__pendingChangeRefresh = false
 			root.browse(root.currentPath, false)
 		}
 	}
