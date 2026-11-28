@@ -31,11 +31,40 @@ Rectangle {
 	signal selectionHandedOver(string contextKind, string contextLabel, var contextData)
 
 	function isValidItem(item){
-		return item !== null && typeof item === "object" && typeof item.id === "string" && item.id !== "" && typeof item.label === "string"
+		return item !== null &&
+				typeof item === "object" &&
+				!Array.isArray(item) &&
+				typeof item.id === "string" &&
+				item.id !== "" &&
+				typeof item.label === "string" &&
+				(item.description === undefined || typeof item.description === "string")
+	}
+
+	function isValidSelectionKind(kind){
+		if (typeof kind !== "string" || kind.length === 0 || kind.length > 64){
+			return false
+		}
+
+		for (let i = 0; i < kind.length; i++){
+			let character = kind.charAt(i)
+			let isAsciiLetterOrNumber = (character >= "a" && character <= "z") ||
+					(character >= "A" && character <= "Z") ||
+					(character >= "0" && character <= "9")
+			if (!isAsciiLetterOrNumber && character !== "." && character !== "_" && character !== "-"){
+				return false
+			}
+		}
+
+		return true
 	}
 
 	function setRepresentationData(data){
-		if (data === null || typeof data !== "object" || !Array.isArray(data.items)){
+		if (data === null ||
+				typeof data !== "object" ||
+				Array.isArray(data) ||
+				!Array.isArray(data.items) ||
+				(data.title !== undefined && typeof data.title !== "string") ||
+				(data.selectionMode !== undefined && data.selectionMode !== "single" && data.selectionMode !== "multiple")){
 			return false
 		}
 
@@ -45,10 +74,14 @@ Rectangle {
 			}
 		}
 
+		if (data.selectionKind !== undefined && !selectableList.isValidSelectionKind(data.selectionKind)){
+			return false
+		}
+
 		selectableList.items = data.items
 		selectableList.title = typeof data.title === "string" ? data.title : ""
 		selectableList.multiSelection = data.selectionMode === "multiple"
-		selectableList.selectionKind = typeof data.selectionKind === "string" && data.selectionKind !== "" ? data.selectionKind : "selection"
+		selectableList.selectionKind = data.selectionKind === undefined ? "selection" : data.selectionKind
 		selectableList.selectedIds = []
 		selectableList.updateFilter()
 
@@ -131,6 +164,7 @@ Rectangle {
 			width: parent.width
 			visible: selectableList.title !== ""
 			text: selectableList.title
+			textFormat: Text.PlainText
 			font.bold: true
 			wrapMode: Text.WordWrap
 		}
@@ -159,6 +193,15 @@ Rectangle {
 				height: Math.max(Style.controlHeightM, itemTexts.height + Style.marginXS * 2)
 				radius: Style.radiusS
 				color: selectableList.isSelected(modelData.id) ? Style.selectedColor : "transparent"
+				border.color: activeFocus ? Style.imagingToolsAccentColor : "transparent"
+				border.width: activeFocus ? 1 : 0
+				focus: true
+				activeFocusOnTab: true
+
+				Keys.onSpacePressed: {
+					selectableList.toggleSelection(modelData.id)
+					event.accepted = true
+				}
 
 				CheckBox {
 					id: itemCheckBox
@@ -180,6 +223,7 @@ Rectangle {
 					BaseText {
 						width: parent.width
 						text: modelData.label
+						textFormat: Text.PlainText
 						elide: Text.ElideRight
 					}
 
@@ -187,6 +231,7 @@ Rectangle {
 						width: parent.width
 						visible: typeof modelData.description === "string" && modelData.description !== ""
 						text: typeof modelData.description === "string" ? modelData.description : ""
+						textFormat: Text.PlainText
 						color: Style.inactiveTextColor
 						font.pixelSize: Style.fontSizeS
 						elide: Text.ElideRight

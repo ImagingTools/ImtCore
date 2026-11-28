@@ -17,35 +17,77 @@ AssistantController {
 
 	property string permissionPath: ""
 
+	Component {
+		id: requestSenderComponent
+
+		GqlRequestSender {
+			id: requestSender
+
+			property string commandId: ""
+			property int requestGeneration: 0
+			property string requestConversationId: ""
+
+			gqlCommandId: requestSender.commandId
+			requestType: commandId === "AssistantGetStatus" || commandId === "AssistantGetHistory" ? 0 : 1
+			permissionPath: root.permissionPath
+
+			function createQueryParams(query, params){
+				query.AddParam(root.createInput(params))
+
+				if (requestSender.commandId === "AssistantGetStatus"){
+					query.AddField(Gql.GqlObject("available"))
+				}
+				else if (requestSender.commandId === "AssistantCancelRequest"){
+					query.AddField(Gql.GqlObject("canceled"))
+				}
+				else if (requestSender.commandId === "AssistantCloseConversation"){
+					query.AddField(Gql.GqlObject("closed"))
+				}
+				else{
+					root.addMessageFields(query)
+				}
+			}
+
+			function onResult(data){
+				if (requestSender.commandId === "AssistantGetStatus"){
+					root.handleStatus(data && data.containsKey("available") && data.getData("available") === true)
+				}
+				else if (requestSender.commandId !== "AssistantCancelRequest" && requestSender.commandId !== "AssistantCloseConversation"){
+					root.handleResponse(
+								requestSender.commandId,
+								root.readString(data, "conversationId"),
+								root.readString(data, "messagesJson"),
+								requestSender.requestGeneration)
+				}
+
+				requestSender.destroy()
+			}
+
+			function onError(message, type){
+				root.handleError(
+							requestSender.commandId,
+							message,
+							requestSender.requestConversationId,
+							requestSender.requestGeneration)
+				requestSender.destroy()
+			}
+		}
+	}
+
 	// reimplemented (AssistantController)
 	function sendRequest(commandId, input){
-		if (commandId === "AssistantGetStatus"){
-			statusSender.send(input)
-		}
-		else if (commandId === "AssistantStartConversation"){
-			startSender.send(input)
-		}
-		else if (commandId === "AssistantSendMessage"){
-			sendMessageSender.send(input)
-		}
-		else if (commandId === "AssistantConfirmPreview"){
-			confirmSender.send(input)
-		}
-		else if (commandId === "AssistantRejectPreview"){
-			rejectSender.send(input)
-		}
-		else if (commandId === "AssistantCancelRequest"){
-			cancelSender.send(input)
-		}
-		else if (commandId === "AssistantGetHistory"){
-			historySender.send(input)
-		}
-		else if (commandId === "AssistantCloseConversation"){
-			closeSender.send(input)
-		}
-		else{
+		if (["AssistantGetStatus", "AssistantStartConversation", "AssistantSendMessage", "AssistantConfirmPreview",
+				"AssistantRejectPreview", "AssistantCancelRequest", "AssistantGetHistory", "AssistantCloseConversation"].indexOf(commandId) < 0){
 			console.warn("GqlBasedAssistantController: unsupported command", commandId)
+
+			return
 		}
+
+		let requestSender = requestSenderComponent.createObject(root)
+		requestSender.commandId = commandId
+		requestSender.requestConversationId = input.conversationId === undefined ? "" : input.conversationId
+		requestSender.requestGeneration = root.conversationGeneration
+		requestSender.send(input)
 	}
 
 	function createInput(params){
@@ -91,153 +133,4 @@ AssistantController {
 		return ""
 	}
 
-	property GqlRequestSender statusSender: GqlRequestSender {
-		requestType: 0
-		gqlCommandId: "AssistantGetStatus"
-		permissionPath: root.permissionPath
-
-		function createQueryParams(query, params){
-			query.AddParam(root.createInput(params))
-			query.AddField(Gql.GqlObject("available"))
-		}
-
-		function onResult(data){
-			root.handleStatus(data && data.containsKey("available") && data.getData("available") === true)
-		}
-
-		function onError(message, type){
-			root.handleError("AssistantGetStatus", message)
-		}
-	}
-
-	property GqlRequestSender startSender: GqlRequestSender {
-		requestType: 1
-		gqlCommandId: "AssistantStartConversation"
-		permissionPath: root.permissionPath
-
-		function createQueryParams(query, params){
-			query.AddParam(root.createInput(params))
-			root.addMessageFields(query)
-		}
-
-		function onResult(data){
-			root.handleResponse("AssistantStartConversation", root.readString(data, "conversationId"), root.readString(data, "messagesJson"))
-		}
-
-		function onError(message, type){
-			root.handleError("AssistantStartConversation", message)
-		}
-	}
-
-	property GqlRequestSender sendMessageSender: GqlRequestSender {
-		requestType: 1
-		gqlCommandId: "AssistantSendMessage"
-		permissionPath: root.permissionPath
-
-		function createQueryParams(query, params){
-			query.AddParam(root.createInput(params))
-			root.addMessageFields(query)
-		}
-
-		function onResult(data){
-			root.handleResponse("AssistantSendMessage", root.conversationId, root.readString(data, "messagesJson"))
-		}
-
-		function onError(message, type){
-			root.handleError("AssistantSendMessage", message)
-		}
-	}
-
-	property GqlRequestSender confirmSender: GqlRequestSender {
-		requestType: 1
-		gqlCommandId: "AssistantConfirmPreview"
-		permissionPath: root.permissionPath
-
-		function createQueryParams(query, params){
-			query.AddParam(root.createInput(params))
-			root.addMessageFields(query)
-		}
-
-		function onResult(data){
-			root.handleResponse("AssistantConfirmPreview", root.conversationId, root.readString(data, "messagesJson"))
-		}
-
-		function onError(message, type){
-			root.handleError("AssistantConfirmPreview", message)
-		}
-	}
-
-	property GqlRequestSender rejectSender: GqlRequestSender {
-		requestType: 1
-		gqlCommandId: "AssistantRejectPreview"
-		permissionPath: root.permissionPath
-
-		function createQueryParams(query, params){
-			query.AddParam(root.createInput(params))
-			root.addMessageFields(query)
-		}
-
-		function onResult(data){
-			root.handleResponse("AssistantRejectPreview", root.conversationId, root.readString(data, "messagesJson"))
-		}
-
-		function onError(message, type){
-			root.handleError("AssistantRejectPreview", message)
-		}
-	}
-
-	property GqlRequestSender cancelSender: GqlRequestSender {
-		requestType: 1
-		gqlCommandId: "AssistantCancelRequest"
-		permissionPath: root.permissionPath
-
-		function createQueryParams(query, params){
-			query.AddParam(root.createInput(params))
-			query.AddField(Gql.GqlObject("canceled"))
-		}
-
-		function onResult(data){
-		}
-
-		function onError(message, type){
-			root.handleError("AssistantCancelRequest", message)
-		}
-	}
-
-	property GqlRequestSender historySender: GqlRequestSender {
-		requestType: 0
-		gqlCommandId: "AssistantGetHistory"
-		permissionPath: root.permissionPath
-
-		function createQueryParams(query, params){
-			query.AddParam(root.createInput(params))
-			root.addMessageFields(query)
-		}
-
-		function onResult(data){
-			root.handleResponse("AssistantGetHistory", root.conversationId, root.readString(data, "messagesJson"))
-		}
-
-		function onError(message, type){
-			root.handleError("AssistantGetHistory", message)
-		}
-	}
-
-	property GqlRequestSender closeSender: GqlRequestSender {
-		requestType: 1
-		gqlCommandId: "AssistantCloseConversation"
-		permissionPath: root.permissionPath
-
-		function createQueryParams(query, params){
-			query.AddParam(root.createInput(params))
-			query.AddField(Gql.GqlObject("closed"))
-		}
-
-		function onResult(data){
-		}
-
-		function onError(message, type){
-			root.handleError("AssistantCloseConversation", message)
-		}
-	}
 }

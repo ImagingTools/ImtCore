@@ -82,6 +82,7 @@ Rectangle {
 		BaseText {
 			width: parent.width
 			text: previewCard.summary
+			textFormat: Text.PlainText
 			wrapMode: Text.WordWrap
 		}
 
@@ -89,6 +90,7 @@ Rectangle {
 			width: parent.width
 			visible: previewCard.targetLabel !== ""
 			text: qsTr("Object: %1").arg(previewCard.targetLabel)
+			textFormat: Text.PlainText
 			wrapMode: Text.WordWrap
 		}
 
@@ -98,6 +100,7 @@ Rectangle {
 			BaseText {
 				width: cardColumn.width
 				text: previewCard.changeText(modelData)
+				textFormat: Text.PlainText
 				wrapMode: Text.WordWrap
 			}
 		}
@@ -106,6 +109,7 @@ Rectangle {
 			width: parent.width
 			visible: previewCard.impact !== ""
 			text: qsTr("Impact: %1").arg(previewCard.impact)
+			textFormat: Text.PlainText
 			wrapMode: Text.WordWrap
 			color: Style.inactiveTextColor
 		}

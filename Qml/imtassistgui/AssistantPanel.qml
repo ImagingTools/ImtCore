@@ -217,6 +217,7 @@ Rectangle {
 						anchors.leftMargin: Style.marginXS
 						anchors.verticalCenter: parent.verticalCenter
 						text: modelData.label
+						textFormat: Text.PlainText
 					}
 
 					Button {
@@ -265,6 +266,18 @@ Rectangle {
 				onClicked: {
 					assistantPanel.cancelRequest()
 				}
+			}
+		}
+
+		Button {
+			id: reloadHistoryButton
+			objectName: "AssistantReloadHistory"
+			visible: assistantPanel.controller !== null && assistantPanel.controller.conversationId !== ""
+			enabled: visible && !assistantPanel.busy
+			text: qsTr("Reload conversation")
+
+			onClicked: {
+				assistantPanel.controller.refreshHistory()
 			}
 		}
 

@@ -7,6 +7,7 @@
 
 // Qt includes
 #include <QtCore/QJsonArray>
+#include <QtCore/QRegularExpression>
 
 
 namespace imtassist
@@ -111,6 +112,19 @@ CParameterSchema& CParameterSchema::AddString(const QString& name, bool isRequir
 	field.type = FT_STRING;
 	field.isRequired = isRequired;
 	field.maxLength = maxLength;
+
+	return AddField(field);
+}
+
+
+CParameterSchema& CParameterSchema::AddStringPattern(const QString& name, bool isRequired, int maxLength, const QString& pattern)
+{
+	Field field;
+	field.name = name;
+	field.type = FT_STRING;
+	field.isRequired = isRequired;
+	field.maxLength = maxLength;
+	field.pattern = pattern;
 
 	return AddField(field);
 }
@@ -284,6 +298,9 @@ QJsonObject CParameterSchema::ToJsonSchema(bool useAdditionalProperties) const
 		case FT_STRING:
 			property["type"] = QStringLiteral("string");
 			property["maxLength"] = field.maxLength;
+			if (!field.pattern.isEmpty()){
+				property["pattern"] = field.pattern;
+			}
 			break;
 
 		case FT_ID:
@@ -366,6 +383,19 @@ bool CParameterSchema::ValidateField(const Field& field, const QJsonValue& value
 				SetError(errorPtr, QString("Field '%1' is too long").arg(field.name));
 
 				return false;
+			}
+
+			if (!field.pattern.isEmpty()){
+				QRegularExpressionMatch match = QRegularExpression(field.pattern).match(
+							text,
+							0,
+							QRegularExpression::NormalMatch,
+							QRegularExpression::AnchoredMatchOption);
+				if (!match.hasMatch() || (match.capturedLength() != text.size())){
+					SetError(errorPtr, QString("Field '%1' has an invalid format").arg(field.name));
+
+					return false;
+				}
 			}
 
 			if (field.type == FT_ID){
@@ -478,5 +508,3 @@ bool CParameterSchema::ValidateField(const Field& field, const QJsonValue& value
 
 
 } // namespace imtassist
-
-

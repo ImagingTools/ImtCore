@@ -19,6 +19,7 @@ QtObject {
 	id: root
 
 	property string conversationId: ""
+	property int conversationGeneration: 0
 	// Whether the assistant is enabled for the organization of the session (AssistantGetStatus).
 	property bool available: false
 	property bool busy: false
@@ -72,6 +73,8 @@ QtObject {
 	}
 
 	function newConversation(){
+		root.conversationGeneration++
+
 		if (root.conversationId !== ""){
 			root.sendRequest("AssistantCloseConversation", {"conversationId": root.conversationId})
 		}
@@ -189,6 +192,28 @@ QtObject {
 		root.contextItems = []
 	}
 
+	function isNonEmptyString(value){
+		return typeof value === "string" && value !== ""
+	}
+
+	function isOptionalString(object, key){
+		return object[key] === undefined || typeof object[key] === "string"
+	}
+
+	function isValidRepresentation(representation){
+		return representation !== null &&
+				typeof representation === "object" &&
+				!Array.isArray(representation) &&
+				typeof representation.type === "string" &&
+				representation.type !== "" &&
+				typeof representation.version === "number" &&
+				representation.version > 0 &&
+				representation.version % 1 === 0 &&
+				representation.data !== null &&
+				typeof representation.data === "object" &&
+				!Array.isArray(representation.data)
+	}
+
 	function isValidMessage(message){
 		if (message === null || typeof message !== "object"){
 			return false
@@ -198,7 +223,78 @@ QtObject {
 			return false
 		}
 
-		return root.knownKinds.indexOf(message.kind) >= 0
+		if (root.knownKinds.indexOf(message.kind) < 0){
+			return false
+		}
+
+		if (message.kind === "userText" || message.kind === "assistantText"){
+			return typeof message.text === "string"
+		}
+
+		if (message.kind === "clarification"){
+			if (typeof message.text !== "string" ||
+					(message.options !== undefined && !Array.isArray(message.options))){
+				return false
+			}
+
+			if (message.options !== undefined){
+				for (let i = 0; i < message.options.length; i++){
+					if (typeof message.options[i] !== "string"){
+						return false
+					}
+				}
+			}
+
+			return true
+		}
+
+		if (message.kind === "actionPreview"){
+			if (!root.isNonEmptyString(message.previewId) ||
+					!root.isNonEmptyString(message.actionId) ||
+					typeof message.text !== "string" ||
+					message.data === null ||
+					typeof message.data !== "object" ||
+					Array.isArray(message.data) ||
+					!Array.isArray(message.data.changes) ||
+					typeof message.data.targetLabel !== "string" ||
+					typeof message.data.impact !== "string"){
+				return false
+			}
+
+			for (let i = 0; i < message.data.changes.length; i++){
+				let change = message.data.changes[i]
+				if (change === null || typeof change !== "object" || Array.isArray(change) ||
+						typeof change.field !== "string"){
+					return false
+				}
+			}
+
+			return true
+		}
+
+		if (message.kind === "actionResult"){
+			return root.isNonEmptyString(message.actionId) &&
+					root.isOptionalString(message, "text") &&
+					(message.representation === undefined || root.isValidRepresentation(message.representation))
+		}
+
+		if (message.kind === "actionExecuted"){
+			return root.isNonEmptyString(message.actionId) &&
+					root.isNonEmptyString(message.previewId) &&
+					root.isNonEmptyString(message.code) &&
+					root.isOptionalString(message, "text") &&
+					(message.representation === undefined || root.isValidRepresentation(message.representation))
+		}
+
+		if (message.kind === "status"){
+			return root.isNonEmptyString(message.previewId) && root.isNonEmptyString(message.code)
+		}
+
+		if (message.kind === "error"){
+			return root.isNonEmptyString(message.code) && root.isOptionalString(message, "text")
+		}
+
+		return false
 	}
 
 	function appendMessage(message){
@@ -219,7 +315,18 @@ QtObject {
 	}
 
 	// Called by the transport with the answer of a command.
-	function handleResponse(commandId, conversationId, messagesJson){
+	function handleResponse(commandId, conversationId, messagesJson, requestGeneration){
+		if (commandId !== "AssistantStartConversation" &&
+				((conversationId !== root.conversationId) ||
+					(requestGeneration !== undefined && requestGeneration !== root.conversationGeneration))){
+			return
+		}
+
+		if (commandId === "AssistantStartConversation" &&
+				requestGeneration !== undefined && requestGeneration !== root.conversationGeneration){
+			return
+		}
+
 		let messages = []
 		if (messagesJson !== undefined && messagesJson !== ""){
 			try {
@@ -236,7 +343,6 @@ QtObject {
 
 		if (commandId === "AssistantGetHistory" && Array.isArray(messages)){
 			root.messagesModel.clear()
-			root.previewStates = {}
 		}
 
 		if (!Array.isArray(messages)){
@@ -266,18 +372,30 @@ QtObject {
 	}
 
 	// Called by the transport if a command failed without an answer.
-	function handleError(commandId, message){
+	function handleError(commandId, message, conversationId, requestGeneration){
+		if (commandId !== "AssistantGetStatus" &&
+				((conversationId !== undefined && conversationId !== root.conversationId) ||
+					(requestGeneration !== undefined && requestGeneration !== root.conversationGeneration))){
+			return
+		}
+
 		if (commandId === "AssistantGetStatus"){
 			root.handleStatus(false)
 
 			return
 		}
 
-		if (commandId === "AssistantCancelRequest" || commandId === "AssistantCloseConversation" || commandId === "AssistantGetHistory"){
+		if (commandId === "AssistantCloseConversation"){
 			return
 		}
 
-		if (commandId === "AssistantConfirmPreview"){
+		if (commandId === "AssistantCancelRequest"){
+			root.appendLocalError("CancelFailed")
+		}
+		else if (commandId === "AssistantGetHistory"){
+			root.appendLocalError("HistoryReloadFailed")
+		}
+		else if (commandId === "AssistantConfirmPreview"){
 			// The outcome is unknown; it is not reported as success or failure.
 			root.appendLocalError("ConfirmationStatusUnknown")
 		}

@@ -40,6 +40,17 @@ QJsonValue RemoveUnsupportedKeywords(const QJsonValue& value)
 			continue;
 		}
 
+		if (iter.key() == "properties" && iter.value().isObject()){
+			QJsonObject properties;
+			QJsonObject propertySchemas = iter.value().toObject();
+			for (QJsonObject::const_iterator propertyIter = propertySchemas.constBegin(); propertyIter != propertySchemas.constEnd(); ++propertyIter){
+				properties[propertyIter.key()] = RemoveUnsupportedKeywords(propertyIter.value());
+			}
+
+			retVal[iter.key()] = properties;
+			continue;
+		}
+
 		retVal[iter.key()] = RemoveUnsupportedKeywords(iter.value());
 	}
 
@@ -219,5 +230,4 @@ IAssistantProvider::Reply CGeminiProvider::ParseResponseBody(const QByteArray& b
 
 
 } // namespace imtassist
-
 

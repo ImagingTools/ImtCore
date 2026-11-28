@@ -675,6 +675,26 @@ void CAssistantProviderTest::testGemini_RequestAndSignatureRoundTrip()
 	QVERIFY(!ContainsKeyRecursively(body.value("tools"), "additionalProperties"));
 	QCOMPARE(body.value("contents").toArray().at(1).toObject().value("role").toString(), QString("model"));
 
+	IAssistantProvider::Request propertyNamedAdditionalProperties = CreateConversation();
+	QJsonObject parameters = propertyNamedAdditionalProperties.tools[0].parameterSchema;
+	QJsonObject properties = parameters.value("properties").toObject();
+	QJsonObject additionalPropertiesProperty;
+	additionalPropertiesProperty["type"] = QStringLiteral("string");
+	additionalPropertiesProperty["additionalProperties"] = false;
+	properties["additionalProperties"] = additionalPropertiesProperty;
+	parameters["properties"] = properties;
+	parameters["additionalProperties"] = false;
+	propertyNamedAdditionalProperties.tools[0].parameterSchema = parameters;
+	transport.AddResponse(500, QByteArray());
+	providerPtr->Complete(propertyNamedAdditionalProperties, CCancellationToken());
+
+	QJsonObject declaration = transport.LastBody().value("tools").toArray().at(0).toObject()
+			.value("functionDeclarations").toArray().at(0).toObject();
+	QJsonObject emittedParameters = declaration.value("parameters").toObject();
+	QVERIFY(emittedParameters.value("properties").toObject().contains("additionalProperties"));
+	QVERIFY(!emittedParameters.contains("additionalProperties"));
+	QVERIFY(!emittedParameters.value("properties").toObject().value("additionalProperties").toObject().contains("additionalProperties"));
+
 	// The signature is sent back with the call in the next request.
 	IAssistantProvider::Request request = CreateConversation();
 	request.messages[2].providerState = reply.providerState;
@@ -975,8 +995,16 @@ void CAssistantProviderTest::testSigV4_AwsTestVector()
 				"SignedHeaders=host;x-amz-date, "
 				"Signature=5fa00fa31553b73ebf1942676e86291e8372ff2a2260956d9b8aae1d763fbf31"));
 
-	// Paths are encoded twice, as required for services other than S3.
 	QByteArray signedHeaders;
+	QByteArray duplicateQueryCanonical = CAwsSigV4Signer::CreateCanonicalRequest(
+				"GET",
+				QUrl("https://example.amazonaws.com/?a=2&a=1&b=3"),
+				CAwsSigV4Signer::Headers(),
+				QByteArray(),
+				signedHeaders);
+	QCOMPARE(duplicateQueryCanonical.split('\n').at(2), QByteArray("a=1&a=2&b=3"));
+
+	// Paths are encoded twice, as required for services other than S3.
 	QByteArray canonical = CAwsSigV4Signer::CreateCanonicalRequest(
 				"POST",
 				QUrl("https://bedrock-runtime.eu-central-1.amazonaws.com/model/a.b-v1%3A0/converse"),
@@ -1062,5 +1090,3 @@ void CAssistantProviderTest::testRestTransport_ResponseTimeoutAndCancel()
 
 
 I_ADD_TEST(CAssistantProviderTest);
-
-

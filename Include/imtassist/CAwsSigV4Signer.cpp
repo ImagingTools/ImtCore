@@ -2,8 +2,12 @@
 #include <imtassist/CAwsSigV4Signer.h>
 
 
+// STL includes
+#include <algorithm>
+
 // Qt includes
 #include <QtCore/QCryptographicHash>
+#include <QtCore/QList>
 #include <QtCore/QMap>
 #include <QtCore/QMessageAuthenticationCode>
 #include <QtCore/QUrlQuery>
@@ -103,15 +107,23 @@ QByteArray CAwsSigV4Signer::CreateCanonicalRequest(
 
 	QByteArray canonicalUri = UriEncode(path, false);
 
-	QMap<QByteArray, QByteArray> queryItems;
+	QList<QPair<QByteArray, QByteArray>> queryItems;
 	QUrlQuery query(url);
 	for (const QPair<QString, QString>& item: query.queryItems(QUrl::FullyDecoded)){
-		queryItems.insert(UriEncode(item.first.toUtf8(), true), UriEncode(item.second.toUtf8(), true));
+		queryItems.append(qMakePair(UriEncode(item.first.toUtf8(), true), UriEncode(item.second.toUtf8(), true)));
 	}
 
+	std::sort(queryItems.begin(), queryItems.end(), [](const QPair<QByteArray, QByteArray>& left, const QPair<QByteArray, QByteArray>& right){
+		if (left.first != right.first){
+			return left.first < right.first;
+		}
+
+		return left.second < right.second;
+	});
+
 	QByteArrayList queryParts;
-	for (QMap<QByteArray, QByteArray>::const_iterator iter = queryItems.constBegin(); iter != queryItems.constEnd(); ++iter){
-		queryParts.append(iter.key() + "=" + iter.value());
+	for (const QPair<QByteArray, QByteArray>& item: queryItems){
+		queryParts.append(item.first + "=" + item.second);
 	}
 
 	QMap<QByteArray, QByteArray> canonicalHeaders;
@@ -166,5 +178,3 @@ QByteArray CAwsSigV4Signer::UriEncode(const QByteArray& value, bool encodeSlash)
 
 
 } // namespace imtassist
-
-

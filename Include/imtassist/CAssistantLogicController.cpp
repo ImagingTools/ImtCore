@@ -462,7 +462,9 @@ AssistantMessages CAssistantLogicController::ConfirmPreview(const CAssistantRequ
 
 	if (!context.IsValid()){
 		Log(IAssistantAuditLog::ET_PREVIEW_CONFIRMED, context, "InvalidContext", QByteArray(), previewId);
-		retVal.append(CreateError(context, QByteArray(), "InvalidContext", "The request has no authenticated user."));
+		CAssistantMessage error = CreateError(context, QByteArray(), "InvalidContext", "The request has no authenticated user.");
+		error.SetPreviewId(previewId);
+		retVal.append(error);
 
 		return retVal;
 	}
@@ -475,7 +477,9 @@ AssistantMessages CAssistantLogicController::ConfirmPreview(const CAssistantRequ
 		if (!IsAssistantEnabledForTenant(context.GetTenantId())){
 			lock.unlock();
 			Log(IAssistantAuditLog::ET_PREVIEW_CONFIRMED, context, "AssistantDisabled", QByteArray(), previewId);
-			retVal.append(CreateError(context, QByteArray(), "AssistantDisabled", "The assistant is not enabled."));
+			CAssistantMessage error = CreateError(context, QByteArray(), "AssistantDisabled", "The assistant is not enabled.");
+			error.SetPreviewId(previewId);
+			retVal.append(error);
 
 			return retVal;
 		}
@@ -524,7 +528,11 @@ AssistantMessages CAssistantLogicController::ConfirmPreview(const CAssistantRequ
 
 	if (!errorCode.isEmpty()){
 		Log(IAssistantAuditLog::ET_PREVIEW_CONFIRMED, context, errorCode, preview.actionId, previewId);
-		retVal.append(CreateError(context, preview.conversationId, errorCode, errorText));
+		CAssistantMessage error = CreateError(context, preview.conversationId, errorCode, errorText);
+		if (errorCode != "PreviewInProgress"){
+			error.SetPreviewId(previewId);
+		}
+		retVal.append(error);
 
 		return retVal;
 	}
@@ -1057,5 +1065,3 @@ QByteArray CAssistantLogicController::GetExecutionStatusCode(IAssistantAction::E
 
 
 } // namespace imtassist
-
-

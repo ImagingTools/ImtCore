@@ -976,7 +976,11 @@ void CAssistantTest::testExpiredPreview_NoChange()
 
 	fixture.now = fixture.now.addSecs(61);
 
-	QVERIFY(HasError(fixture.service.ConfirmPreview(context, previewId), "PreviewExpired"));
+	AssistantMessages expiredMessages = fixture.service.ConfirmPreview(context, previewId);
+	QVERIFY(HasError(expiredMessages, "PreviewExpired"));
+	const CAssistantMessage* expiredErrorPtr = FindMessage(expiredMessages, CAssistantMessage::MK_ERROR);
+	QVERIFY(expiredErrorPtr != nullptr);
+	QCOMPARE(expiredErrorPtr->GetPreviewId(), previewId);
 	QVERIFY(HasError(fixture.service.ConfirmPreview(context, previewId), "PreviewRejected"));
 	QCOMPARE(fixture.domain.applyCount, 0);
 
@@ -1405,6 +1409,18 @@ void CAssistantTest::testStandardRepresentations_SelectableList()
 	invalidMode["selectionMode"] = QStringLiteral("all");
 	QVERIFY(!schema.Validate(invalidMode));
 
+	QJsonObject invalidSelectionKind = data;
+	invalidSelectionKind["selectionKind"] = QStringLiteral("selected tasks");
+	QVERIFY(!schema.Validate(invalidSelectionKind));
+	invalidSelectionKind["selectionKind"] = QString::fromUtf8("sélection");
+	QVERIFY(!schema.Validate(invalidSelectionKind));
+	invalidSelectionKind["selectionKind"] = QStringLiteral("selection\n");
+	QVERIFY(!schema.Validate(invalidSelectionKind));
+
+	QJsonObject validSelectionKind = data;
+	validSelectionKind["selectionKind"] = QStringLiteral("task.selection-1");
+	QVERIFY(schema.Validate(validSelectionKind));
+
 	QJsonObject withoutItems = data;
 	withoutItems.remove("items");
 	QVERIFY(!schema.Validate(withoutItems));
@@ -1522,5 +1538,3 @@ void CAssistantTest::testEndToEnd_FakeProviderRules()
 
 
 I_ADD_TEST(CAssistantTest);
-
-

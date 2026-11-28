@@ -136,6 +136,31 @@ TestCase {
 		verify(findVisible(panel, "AssistantRepresentationError") !== null)
 	}
 
+	function test_invalidSelectionKindIsRejected(){
+		let panel = createPanel()
+		let result = listResult("imtassist.selectableList")
+		result.representation.data.selectionKind = "selected tasks"
+		deliver(panel, [result])
+
+		compare(findVisible(panel, "AssistantSelectableList"), null)
+		verify(findVisible(panel, "AssistantRepresentationError") !== null)
+	}
+
+	function test_listSelectionSupportsKeyboard(){
+		let panel = createPanel()
+		deliver(panel, [listResult("imtassist.selectableList")])
+
+		let list = findVisible(panel, "AssistantSelectableList")
+		let rows = findAll(list, "AssistantListItem", [])
+		verify(rows.length > 0)
+		rows[0].forceActiveFocus()
+		tryVerify(function(){ return rows[0].activeFocus })
+		keyClick(Qt.Key_Space)
+
+		compare(list.selectedIds.length, 1)
+		compare(list.selectedIds[0], "task-1")
+	}
+
 	function test_contextCanBeRemoved(){
 		let panel = createPanel()
 		panel.addContext("selection", "Prepare release notes", {"id": "task-1"})
@@ -185,6 +210,16 @@ TestCase {
 		verify(busyRow !== null)
 		findVisible(busyRow, "AssistantCancel").clicked()
 		compare(panel.controller.lastRequest().commandId, "AssistantCancelRequest")
+	}
+
+	function test_historyCanBeReloadedFromThePanel(){
+		let panel = createPanel()
+		let reloadButton = findVisible(panel, "AssistantReloadHistory")
+		verify(reloadButton !== null)
+		reloadButton.clicked()
+
+		compare(panel.controller.lastRequest().commandId, "AssistantGetHistory")
+		compare(panel.controller.lastRequest().input.conversationId, "c-1")
 	}
 
 	function test_errorsAreShownByCode(){

@@ -155,7 +155,12 @@ TestCase {
 	function test_confirmationIsSentOnce(){
 		let controller = startedController()
 
-		let preview = message("actionPreview", {"previewId": "p-1", "text": "Change status"})
+		let preview = message("actionPreview", {
+			"previewId": "p-1",
+			"actionId": "tasks.setStatus",
+			"text": "Change status",
+			"data": {"targetLabel": "", "changes": [], "impact": ""}
+		})
 		controller.handleResponse("AssistantSendMessage", "c-1", messagesJson([preview]))
 		compare(controller.getPreviewState("p-1"), "")
 
@@ -167,9 +172,35 @@ TestCase {
 		compare(controller.lastRequest().input.previewId, "p-1")
 		compare(controller.getPreviewState("p-1"), "confirming")
 
-		let executed = message("actionExecuted", {"previewId": "p-1", "code": "succeeded"})
+		let executed = message("actionExecuted", {"previewId": "p-1", "actionId": "tasks.setStatus", "code": "succeeded"})
 		controller.handleResponse("AssistantConfirmPreview", "c-1", messagesJson([executed]))
 		compare(controller.getPreviewState("p-1"), "decided")
+	}
+
+	function test_malformedActionMessagesAreRejected(){
+		let controller = startedController()
+		let missingPreviewId = message("actionPreview", {
+			"actionId": "tasks.setStatus",
+			"text": "Change status",
+			"data": {"targetLabel": "", "changes": [], "impact": ""}
+		})
+		let nullChange = message("actionPreview", {
+			"previewId": "p-2",
+			"actionId": "tasks.setStatus",
+			"text": "Change status",
+			"data": {"targetLabel": "", "changes": [null], "impact": ""}
+		})
+		let invalidRepresentation = message("actionResult", {
+			"actionId": "tasks.search",
+			"representation": {"type": "list", "version": 1, "data": [null]}
+		})
+
+		controller.handleResponse("AssistantSendMessage", "c-1", messagesJson([missingPreviewId, nullChange, invalidRepresentation]))
+
+		compare(controller.messagesModel.count, 3)
+		compare(messageAt(controller, 0).code, "InvalidMessage")
+		compare(messageAt(controller, 1).code, "InvalidMessage")
+		compare(messageAt(controller, 2).code, "InvalidMessage")
 	}
 
 	function test_rejectionIsSentOnce(){
@@ -231,12 +262,55 @@ TestCase {
 		controller.refreshHistory()
 		compare(controller.lastRequest().commandId, "AssistantGetHistory")
 
-		let preview = message("actionPreview", {"previewId": "p-1"})
-		let executed = message("actionExecuted", {"previewId": "p-1", "code": "stale"})
+		let preview = message("actionPreview", {
+			"previewId": "p-1",
+			"actionId": "tasks.setStatus",
+			"text": "Change status",
+			"data": {"targetLabel": "", "changes": [], "impact": ""}
+		})
+		let executed = message("actionExecuted", {"previewId": "p-1", "actionId": "tasks.setStatus", "code": "stale"})
 		controller.handleResponse("AssistantGetHistory", "c-1", messagesJson([preview, executed]))
 
 		compare(controller.messagesModel.count, 2)
 		compare(controller.getPreviewState("p-1"), "decided")
+	}
+
+	function test_historyRefreshPreservesPendingDecision(){
+		let controller = startedController()
+		controller.confirmPreview("p-1")
+
+		controller.refreshHistory()
+		let preview = message("actionPreview", {
+			"previewId": "p-1",
+			"actionId": "tasks.setStatus",
+			"text": "Change status",
+			"data": {"changes": []}
+		})
+		controller.handleResponse("AssistantGetHistory", "c-1", messagesJson([preview]))
+
+		compare(controller.getPreviewState("p-1"), "confirming")
+	}
+
+	function test_staleResponsesAndErrorsAreIgnored(){
+		let controller = startedController()
+		controller.refreshHistory()
+		let oldGeneration = controller.conversationGeneration
+
+		controller.newConversation()
+		controller.handleResponse("AssistantGetHistory", "c-1", messagesJson([message("assistantText", {"text": "Old"})]), oldGeneration)
+		controller.handleError("AssistantGetHistory", "Network error", "c-1", oldGeneration)
+
+		compare(controller.conversationId, "")
+		compare(controller.messagesModel.count, 0)
+	}
+
+	function test_cancelAndHistoryErrorsAreVisible(){
+		let controller = startedController()
+		controller.handleError("AssistantCancelRequest", "Network error", "c-1", controller.conversationGeneration)
+		controller.handleError("AssistantGetHistory", "Network error", "c-1", controller.conversationGeneration)
+
+		compare(messageAt(controller, 0).code, "CancelFailed")
+		compare(messageAt(controller, 1).code, "HistoryReloadFailed")
 	}
 
 	function test_newConversationClearsState(){

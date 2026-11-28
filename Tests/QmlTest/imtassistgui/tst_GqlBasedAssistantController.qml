@@ -137,4 +137,35 @@ TestCase {
 		compare(message.kind, "error")
 		compare(message.code, "ConfirmationStatusUnknown")
 	}
+
+	function test_historyResponseFromAnotherConversationIsIgnored(){
+		let controller = startedController()
+		let original = [{"formatVersion": 1, "kind": "assistantText", "text": "Current conversation"}]
+		controller.handleResponse("AssistantSendMessage", "c-1", JSON.stringify(original))
+
+		GqlTestTransport.queueResponse("AssistantGetHistory", response("AssistantGetHistory", {
+			"conversationId": "c-old",
+			"messagesJson": JSON.stringify([{"formatVersion": 1, "kind": "assistantText", "text": "Old conversation"}])
+		}))
+		controller.refreshHistory()
+		waitForCommand("AssistantGetHistory")
+		wait(100)
+		tryCompare(controller.messagesModel, "count", 1, 5000)
+		compare(JSON.parse(controller.messagesModel.get(0).messageJson).text, "Current conversation")
+	}
+
+	function test_staleHistoryFailureIsIgnoredAfterNewConversation(){
+		let controller = startedController()
+		GqlTestTransport.queueDelay("AssistantGetHistory", 200)
+		GqlTestTransport.queueStatus("AssistantGetHistory", 500)
+		GqlTestTransport.queueResponse("AssistantGetHistory", failure("AssistantGetHistory"))
+
+		controller.refreshHistory()
+		waitForCommand("AssistantGetHistory")
+		GqlTestTransport.queueResponse("AssistantCloseConversation", response("AssistantCloseConversation", {"closed": true}))
+		controller.newConversation()
+		tryCompare(controller, "conversationId", "", 5000)
+		wait(300)
+		compare(controller.messagesModel.count, 0)
+	}
 }

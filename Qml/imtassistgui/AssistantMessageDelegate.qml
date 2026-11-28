@@ -94,6 +94,12 @@ Item {
 		if (code === "ConfirmationStatusUnknown"){
 			return qsTr("The answer to the confirmation was lost. Reload the conversation to see whether the change was executed.")
 		}
+		if (code === "CancelFailed"){
+			return qsTr("The request could not be canceled.")
+		}
+		if (code === "HistoryReloadFailed"){
+			return qsTr("The conversation could not be reloaded.")
+		}
 
 		return qsTr("An error occurred.")
 	}
@@ -190,6 +196,7 @@ Item {
 				anchors.top: parent.top
 				anchors.margins: Style.marginS
 				text: messageDelegate.displayText()
+				textFormat: Text.PlainText
 				wrapMode: Text.WordWrap
 				color: messageDelegate.isOwn ? Style.highlightedTextColor : (messageDelegate.isProblem ? Style.errorTextColor : Style.textColor)
 			}

@@ -64,6 +64,7 @@ public:
 		FieldType type = FT_STRING;
 		bool isRequired = false;
 		QString description;
+		QString pattern;
 		int maxLength = DEFAULT_MAX_STRING_LENGTH;
 		int maxItems = DEFAULT_MAX_ITEMS;
 		qint64 minValue = std::numeric_limits<qint32>::min();
@@ -91,6 +92,7 @@ public:
 		Convenience functions for the common field types.
 	*/
 	CParameterSchema& AddString(const QString& name, bool isRequired, int maxLength = DEFAULT_MAX_STRING_LENGTH);
+	CParameterSchema& AddStringPattern(const QString& name, bool isRequired, int maxLength, const QString& pattern);
 	CParameterSchema& AddInteger(const QString& name, bool isRequired, qint64 minValue, qint64 maxValue);
 	CParameterSchema& AddBoolean(const QString& name, bool isRequired);
 	CParameterSchema& AddId(const QString& name, bool isRequired);
@@ -134,5 +136,4 @@ private:
 
 
 } // namespace imtassist
-
 

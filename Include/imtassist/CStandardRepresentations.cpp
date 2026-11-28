@@ -19,7 +19,7 @@ CParameterSchema CStandardRepresentations::CreateSelectableListSchema()
 	CParameterSchema retVal(s_selectableListType, SELECTABLE_LIST_VERSION);
 	retVal.AddString("title", false, 200);
 	retVal.AddEnum("selectionMode", false, QStringList() << "single" << "multiple");
-	retVal.AddId("selectionKind", false);
+	retVal.AddStringPattern("selectionKind", false, 64, QStringLiteral("^[A-Za-z0-9._-]{1,64}$"));
 	retVal.AddObjectList("items", true, itemSchemaPtr, SELECTABLE_LIST_MAX_ITEMS);
 
 	return retVal;
@@ -53,5 +53,4 @@ QJsonObject CStandardRepresentations::CreateSelectableListData(const QJsonArray&
 
 
 } // namespace imtassist
-
 

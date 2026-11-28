@@ -2,6 +2,9 @@
 #include <imtrest/CHttpClientRequestSender.h>
 
 
+// STL includes
+#include <limits>
+
 // Qt includes
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QEventLoop>
@@ -64,6 +67,11 @@ CHttpClientRequestSender::SendResult CHttpClientRequestSender::Send(
 		request.SetState(IHttpClientRequest::RS_FINISHED | IHttpClientRequest::RS_ERROR);
 
 		return SR_INVALID_REQUEST;
+	}
+
+	if (maxReplySize >= 0){
+		qint64 readBufferSize = (maxReplySize < std::numeric_limits<qint64>::max()) ? maxReplySize + 1 : maxReplySize;
+		replyPtr->setReadBufferSize(readBufferSize);
 	}
 
 	request.SetReply(replyPtr);
@@ -135,5 +143,3 @@ CHttpClientRequestSender::SendResult CHttpClientRequestSender::Send(
 
 
 } // namespace imtrest
-
-

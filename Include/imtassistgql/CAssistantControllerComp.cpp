@@ -36,6 +36,14 @@ bool IsValidContextKind(const QString& kind)
 }
 
 
+bool IsValidPreviewId(const QByteArray& previewId)
+{
+	QUuid uuid = QUuid::fromString(QString::fromUtf8(previewId));
+
+	return !uuid.isNull() && (uuid.toString(QUuid::WithoutBraces).toLatin1() == previewId);
+}
+
+
 } // namespace
 
 
@@ -218,10 +226,26 @@ QJsonObject CAssistantControllerComp::CreateInternalResponse(const imtgql::CGqlR
 	}
 
 	if (commandId == s_confirmPreviewCommandId){
+		if (!IsValidPreviewId(previewId)){
+			imtassist::CAssistantMessage error(imtassist::CAssistantMessage::MK_ERROR, conversationId, context.GetCorrelationId());
+			error.SetCode("PreviewNotFound");
+			error.SetText(QStringLiteral("The proposed change does not exist."));
+
+			return CreateMessagesResponse(conversationId, imtassist::AssistantMessages() << error);
+		}
+
 		return CreateMessagesResponse(conversationId, servicePtr->ConfirmPreview(context, previewId));
 	}
 
 	if (commandId == s_rejectPreviewCommandId){
+		if (!IsValidPreviewId(previewId)){
+			imtassist::CAssistantMessage error(imtassist::CAssistantMessage::MK_ERROR, conversationId, context.GetCorrelationId());
+			error.SetCode("PreviewNotFound");
+			error.SetText(QStringLiteral("The proposed change does not exist."));
+
+			return CreateMessagesResponse(conversationId, imtassist::AssistantMessages() << error);
+		}
+
 		return CreateMessagesResponse(conversationId, servicePtr->RejectPreview(context, previewId));
 	}
 
@@ -265,5 +289,3 @@ void CAssistantControllerComp::OnComponentCreated()
 
 
 } // namespace imtassistgql
-
-
