@@ -8,6 +8,7 @@
 const fs = require('fs')
 const os = require('os')
 const path = require('path')
+const vm = require('vm')
 const { execFileSync } = require('child_process')
 const { compileQml, load } = require('../bench/lib')
 
@@ -83,10 +84,17 @@ async function v5Lines(file){
         if(fail && process.env.DIFF_VERBOSE) lines.push('  ' + text(a))
     }
     let consoleOf = { log: (...a) => lines.push(text(a)), info(){}, debug(){}, warn(){}, error }
-    let app = compileQml(caseDocuments(file), { allowWarnings: true })
+    let documents = caseDocuments(file)
+    let app = compileQml(documents, { allowWarnings: true })
     // the platform Qt runs on (offscreen): its navigator for the focus policies of macOS, no hover effects (no mouse)
     let globals = { navigator: { platform: process.platform === 'darwin' ? 'MacIntel' : process.platform === 'win32' ? 'Win32' : 'Linux x86_64', language: 'en-US' } }
-    let beforeMount = (JQ) => { JQ.Qt.styleHints.useHoverEffects = false }
+    let beforeMount = (JQ, context) => {
+        JQ.Qt.styleHints.useHoverEffects = false
+        if(Object.values(documents).some(source => source.includes('createQmlObject'))){
+            let compiler = path.resolve(__dirname, '../../dist/qmlcompiler.js')
+            vm.runInContext(fs.readFileSync(compiler, 'utf8'), context, { filename: compiler })
+        }
+    }
     let { context, JQ, root, dispose } = load(app, { console: consoleOf, globals, beforeMount })
     let tests = []
     // QQuickView::ResizeViewToRootObject (qml, qmltestrunner): the window is the size of the root; its content item (the

@@ -1,5 +1,6 @@
 const { GroupObject } = require('../Core/QtObject')
 const { defineType } = require('../Core/type')
+const engine = require('../Core/engine')
 
 // the text of the font is laid out again: its owner's, and of the texts that show it (`font: control.font` gives a Text the
 // font of the control itself)
@@ -10,6 +11,7 @@ const ownerText = (group) => {
 }
 
 const POINTS_PER_PIXEL = 72 / 96
+const notifyAlias = (font) => engine.emit(font, Font.SIGNAL_valueChanged)
 
 // QQuickFontValueType: pixelSize and pointSize both read as a size, from whichever was set last
 class Font extends GroupObject {
@@ -34,6 +36,25 @@ class Font extends GroupObject {
     }
 
     $write(id, value){
+        if(!this.$valueAliasObserved || this.$writingAliasValue){
+            this.$writeFontField(id, value)
+            return
+        }
+        const old = this.$v[id]
+        const unit = this.$sizeUnit
+        this.$writingAliasValue = true
+        try {
+            this.$writeFontField(id, value)
+        } finally {
+            this.$writingAliasValue = false
+        }
+        if(old !== this.$v[id] || unit !== this.$sizeUnit){
+            if(this.$effects) this.$effects.add(notifyAlias)
+            else notifyAlias(this)
+        }
+    }
+
+    $writeFontField(id, value){
         if(id === Font.PIXELSIZE && value > 0) this.$sizeUnit = 'px'
         else if(id === Font.POINTSIZE && value > 0) this.$sizeUnit = 'pt'
         if(value > 0){
@@ -51,6 +72,7 @@ class Font extends GroupObject {
     }
 }
 defineType(Font, {
+    signals: ['valueChanged'],
     props: {
         pixelSize: { kind: 'int', initial: 12, effect: ownerText },
         pointSize: { kind: 'real', initial: 9, effect: ownerText },

@@ -4,6 +4,7 @@ project(imtrestTest)
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 include(${ACFDIR}/Config/CMake/DeployQt.cmake)
+include(${IACFDIR}/Config/CMake/zlib.cmake)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	imtrest

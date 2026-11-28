@@ -639,6 +639,19 @@ function track(obj, signal){
     subscribe(link)
 }
 
+// Only the alias' own notifier is captured. The getter still follows the current object,
+// while Qt may keep listening to the originally declared object or have no notifier.
+function readNestedAlias(target, signal, source, property, field){
+    track(target, signal)
+    const previous = active
+    active = null
+    try {
+        return source?.[property]?.[field]
+    } finally {
+        active = previous
+    }
+}
+
 function evaluate(binding){
     if(binding.flags & EVALUATING){
         console.warn('JQML: ' + binding.target.constructor.name + ': Binding loop detected for property "' + binding.target.constructor.$type.props[binding.prop].name + '"' + (binding.fn.name ? ' (' + binding.fn.name + ')' : ''))
@@ -688,7 +701,7 @@ function sweep(binding){
 function runBinding(binding){
     if(binding.flags & DISPOSED || binding.target.$f & (DESTROYED | DELETING)) return
     if(binding.scope && scopeCleared(binding.scope)){
-        binding.target.$takeBinding(binding.prop)
+        binding.target.$takeBinding(binding.prop, binding)
         disposeBinding(binding)
         return
     }
@@ -885,11 +898,13 @@ function enablePending(binding){
 // QObjectWrapper::getProperty -> QQmlData::flushPendingBinding: reading a property whose binding is still
 // pending enables that binding first. Anchors are bindings of anchors.*, not of x/width, so they stay pending
 function flushPending(obj, prop){
-    for(let binding = obj.$bindings; binding; binding = binding.next){
+    for(let binding = obj.$bindings; binding;){
+        const next = binding.next
         if(binding.prop === prop && binding.flags & PENDING && !(binding.flags & SETTER)){
             enablePending(binding)
-            return
+            if(binding.field === undefined) return
         }
+        binding = next
     }
 }
 
@@ -905,7 +920,7 @@ module.exports = {
     clearScope, scopeCleared, nextScope, parentScope, make, inContext, buildIn,
     Link, Binding, stats,
     connect, disconnect, connectHandler, subscribe, unsubscribe, hasSubscribers, dropSubscribers, dropConnections,
-    emit, emitArgs, track, evaluate, runBinding, disposeBinding, isUpdating, flushPending,
+    emit, emitArgs, track, readNestedAlias, evaluate, runBinding, disposeBinding, isUpdating, flushPending,
     beginUpdate, endUpdate, batch, markDirty, onSceneChanged, queuePolish, queueCall, queueDelete, queueFrame, flushFrame, stop, isStopped,
     timerScheduled, timerDone,
     beginCreate, endCreate, creatingRoot, scheduleComponentComplete, scheduleFinalize, scheduleBinding, scheduleCompleted,

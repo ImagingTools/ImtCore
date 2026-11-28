@@ -1,6 +1,7 @@
 const engine = require('../Core/engine')
 const { QtObject } = require('../Core/QtObject')
 const { defineType } = require('../Core/type')
+const { aliasValue, withAliasField, resolveAliasTarget } = require('./AliasValue')
 
 // "When the binding becomes inactive again, any direct bindings that were previously set on the property will be restored."
 const RestoreNone = 0, RestoreBinding = 1, RestoreValue = 2, RestoreBindingOrValue = 3
@@ -8,7 +9,7 @@ const RestoreNone = 0, RestoreBinding = 1, RestoreValue = 2, RestoreBindingOrVal
 class Binding extends QtObject {
     constructor(parent = null){
         super(parent)
-        this.$saved = null      // { target, id, binding: { fn, scope, self } | null, value }
+        this.$saved = null      // { target, id, bindings, value }
         this.$delayedTimer = null
         engine.scheduleComponentComplete(this)
     }
@@ -24,7 +25,11 @@ class Binding extends QtObject {
         let name = this.$v[Binding.PROPERTY]
         if(!target || !name || !target.constructor || !target.constructor.$type) return null
         let prop = target.constructor.$type.propByName.get(name)
-        return prop ? { target, id: prop.id } : null
+        if(prop) return { target, id: prop.id }
+        const alias = resolveAliasTarget(target, name)
+        if(!alias) return null
+        const [owner, id, field, kind] = alias
+        return { target: owner, id, field, kind }
     }
 
     $apply(){
@@ -43,32 +48,45 @@ class Binding extends QtObject {
 
     $applyNow(){
         let active = this.$v[Binding.WHEN] && this.$targetProperty()
-        if(this.$saved && (!active || active.target !== this.$saved.target || active.id !== this.$saved.id)) this.$restore()
+        if(this.$saved && (!active || active.target !== this.$saved.target || active.id !== this.$saved.id || active.field !== this.$saved.field)) this.$restore()
         if(!active) return
         if(!this.$saved){
-            let previous = active.target.$takeBinding(active.id)
+            const value = active.target.$v[active.id]
             this.$saved = {
-                target: active.target,
-                id: active.id,
-                binding: previous ? { fn: previous.fn, scope: previous.scope, self: previous.self } : null,
-                value: active.target.$v[active.id],
+                ...active,
+                bindings: active.target.$bindingSnapshot(active.id, active.field),
+                value: active.field === undefined ? value : aliasValue(value, active.kind)[active.field],
             }
-            if(previous) engine.disposeBinding(previous)
+            active.target.$removeBindings(active.id, active.field)
         }
-        active.target.$write(active.id, this.$v[Binding.VALUE])
+        writeValue(active, this.$v[Binding.VALUE])
     }
 
     $restore(){
         let saved = this.$saved
         this.$saved = null
-        if(saved.target.$f & engine.DESTROYED) return
+        if(saved.target.$f & (engine.DESTROYED | engine.DELETING)) return
         let mode = this.$v[Binding.RESTOREMODE]
-        if(saved.binding && mode & RestoreBinding){
-            saved.target.$bind(saved.id, saved.binding.fn, saved.binding.scope, saved.binding.self)
+        if(saved.bindings && mode & RestoreBinding){
+            saved.target.$restoreBindings(saved.id, saved.bindings)
         } else if(mode & RestoreValue){
-            saved.target.$write(saved.id, saved.value)
+            writeValue(saved, saved.value)
         }
     }
+
+    $disposeNative(){
+        if(this.$delayedTimer){
+            clearTimeout(this.$delayedTimer)
+            this.$delayedTimer = null
+        }
+        if(this.$saved) this.$restore()
+        super.$disposeNative()
+    }
+}
+
+function writeValue({target, id, field, kind}, value){
+    if(field !== undefined) value = withAliasField(aliasValue(target.$v[id], kind), field, value)
+    target.$write(id, value)
 }
 
 const reapply = (binding) => binding.$apply()

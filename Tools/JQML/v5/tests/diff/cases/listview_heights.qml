@@ -17,11 +17,16 @@ Item {
         delegate: Item { width: 300; height: 10 + (index * 37) % 41 }
     }
     Timer {
-        interval: 50; repeat: true; running: true
+        // Let the asynchronous cache refill settle before measuring its estimate.
+        interval: 150; repeat: true; running: true
         onTriggered: {
             root.step++
             if (root.step === 1) { root.report("start"); list.contentY = 5000 }
-            else if (root.step === 2) { root.report("jumped"); list.positionViewAtIndex(250, ListView.Beginning) }
+            else if (root.step === 2) {
+                root.report("jumped")
+                console.log("offscreen current", list.currentIndex, list.currentItem !== null, list.itemAtIndex(0) === null)
+                list.positionViewAtIndex(250, ListView.Beginning)
+            }
             else if (root.step === 3) { root.report("at 250"); list.positionViewAtIndex(120, ListView.Center) }
             else if (root.step === 4) { root.report("at 120 center"); list.positionViewAtBeginning() }
             else if (root.step === 5) { root.report("beginning"); list.positionViewAtEnd() }

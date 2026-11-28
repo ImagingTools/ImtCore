@@ -43,6 +43,11 @@ const LIST_VALUE = new Set(['states', 'transitions', 'targets', 'animations', 'c
 
 // the list properties of an item an alias can name: an object declared in such an alias is appended to the list
 const LIST_ALIAS = new Set(['data', 'children', 'resources'])
+const VALUE_ALIAS_TYPES = new Set(['color', 'point', 'size', 'rect', 'font', 'vector2d', 'vector3d', 'vector4d', 'quaternion', 'matrix4x4'])
+
+function isDefaultParentAlias(alias){
+    return alias && alias.path.length >= 2 && ['data', 'children'].includes(alias.path[alias.path.length - 1])
+}
 
 class TypeRef {
     constructor(name, kind, Class, file, ref){
@@ -330,6 +335,41 @@ class Codegen {
 
     member(el, name){
         return this.ownMember(el, name) || this.typeMember(el.typeRef, name)
+    }
+
+    aliasIntermediate(file, el, alias){
+        let [id, property] = alias.path
+        let target = file.elements.find(candidate => candidate.scope === el.scope && candidate.id === id)
+        let member = target && this.member(target, property)
+        const visited = new Set()
+        while(member?.kind === 'alias' && member.alias?.path.length === 2){
+            if(visited.has(member.alias)) return {}
+            visited.add(member.alias)
+            const [nextId, nextProperty] = member.alias.path
+            target = this.elementById(member.own.scope, nextId)
+            property = nextProperty
+            member = target && this.member(target, property)
+        }
+        return { target, property, member }
+    }
+
+    aliasValueKind(file, el, alias){
+        if(alias.path.length !== 3) return null
+        const {member} = this.aliasIntermediate(file, el, alias)
+        if(member?.prop?.kind === 'color') return 'color'
+        return VALUE_ALIAS_TYPES.has(member?.qmlType) ? member.qmlType : null
+    }
+
+    // Qt resolves a nested QObject alias' notifier through an object declaration.
+    // An expression providing the intermediate object is still read by the getter.
+    aliasHasBoundIntermediate(file, el, alias){
+        if(alias.path.length !== 3 || alias.valueKind) return false
+        const {target, property, member} = this.aliasIntermediate(file, el, alias)
+        if(member?.kind !== 'prop' || !member.own) return false
+        let assignment = target.assigns.find(a => a.name === property)
+            || member.own.assigns.find(a => a.name === property)
+            || member.own.propdefs.find(def => def.name === property)
+        return assignment?.value && !isConstant(assignment.value)
     }
 
     // the attached object of a type of a module (ScrollBar.vertical, ContextMenu.menu, Layout.fillWidth): only with the
@@ -648,23 +688,38 @@ class Codegen {
                 let path = a.path.slice(1)
                 let owner = [target].concat(path.slice(0, -1)).join('.')
                 let last = path[path.length - 1]
-                this.out.push('Object.defineProperty(' + className + '.prototype,' + JSON.stringify(a.name) + ',{get(){return ' + owner + '.' + last + '},set(v){' + owner + '.' + last + '=v},configurable:true});')
+                a.valueKind = this.aliasValueKind(file, el, a)
+                let fieldCode = target + ',' + [path[0], last, a.valueKind].map(value => JSON.stringify(value)).join(',')
+                let getter = a.valueKind ? 'JQ.readAliasField(' + fieldCode + ')' : owner + '.' + last
+                if(!a.valueKind && path.length === 2){
+                    getter = 'JQ.engine.readNestedAlias(this,' + className + '.SIGNAL_' + a.name + 'Changed,' + target + ','
+                        + JSON.stringify(path[0]) + ',' + JSON.stringify(last) + ')'
+                }
+                let setter = a.valueKind
+                    ? 'JQ.writeAliasField(' + fieldCode + ',v)'
+                    : owner + '.' + last + '=v'
+                this.out.push('Object.defineProperty(' + className + '.prototype,' + JSON.stringify(a.name) + ',{get(){return ' + getter + '},set(v){' + setter + '},configurable:true});')
                 if(LIST_ALIAS.has(last)){
                     // an alias of the data / children / resources of an item: an object declared in it is appended
                     listAliases.push(JSON.stringify(a.name) + ':(o)=>[o.$s_' + className + '[' + slot + ']' + path.slice(0, -1).map(p => '.' + p).join('') + ',' + JSON.stringify(last) + ']')
                     continue
                 }
-                aliasTargets.push(JSON.stringify(a.name) + ':(o)=>{let t=o.$s_' + className + '[' + slot + ']' + path.slice(0, -1).map(p => '.' + p).join('') + ';return[t,t.constructor.$type.propByName.get(' + JSON.stringify(last) + ').id]}')
+                let scopeTarget = 'o.$s_' + className + '[' + slot + ']'
+                let resolver = a.valueKind
+                    ? 'list?null:JQ.aliasFieldTarget(' + scopeTarget + ',' + JSON.stringify(path[0]) + ',' + JSON.stringify(last) + ',' + JSON.stringify(a.valueKind) + ')'
+                    : 'JQ.aliasTarget(' + scopeTarget + path.slice(0, -1).map(p => '.' + p).join('') + ',' + JSON.stringify(last) + ',list)'
+                aliasTargets.push(JSON.stringify(a.name) + ':(o,list)=>' + resolver)
             }
         }
         let defaultAlias = el.defaultAlias
-        if(isFileType && defaultAlias && defaultAlias.path.length === 2 && (defaultAlias.path[1] === 'data' || defaultAlias.path[1] === 'children')){
+        if(isFileType && isDefaultParentAlias(defaultAlias)){
             let slot = el.scope.ids.get(defaultAlias.path[0])
-            if(slot !== undefined) this.out.push(className + '.$defaultParent=(o)=>o.$s_' + className + '[' + slot + '];')
+            let path = defaultAlias.path.slice(1, -1).map(p => '.' + p).join('')
+            if(slot !== undefined) this.out.push(className + '.$defaultParent=(o)=>o.$s_' + className + '[' + slot + ']' + path + ';')
         } else if(isFileType && defaultAlias && defaultAlias.path.length >= 2){
             // `default property alias content: pane.contentItem`: a child is assigned to that property
             let slot = el.scope.ids.get(defaultAlias.path[0])
-            if(slot !== undefined) this.out.push(className + '.$defaultAssign=(o,c)=>{o.$s_' + className + '[' + slot + '].' + defaultAlias.path.slice(1).join('.') + '=c};')
+            if(slot !== undefined) this.out.push(className + '.$defaultAssign=(o,c)=>JQ.aliasAssign(o,' + JSON.stringify(defaultAlias.name) + ',c);')
         }
         if(listAliases.length){
             this.out.push(className + '.$listAliases=Object.assign({},' + base + '.$listAliases,{' + listAliases.join(',') + '});')
@@ -771,8 +826,13 @@ class Codegen {
                 continue
             }
             if(assign.elements){
+                let m = this.member(el, assign.name)
+                if(m?.kind === 'alias'){
+                    let vars = assign.elements.map(child => this.emitElement(file, child, 'null', post))
+                    post.push('JQ.aliasAssign(' + v + ',' + JSON.stringify(assign.name) + ',[' + vars.join(',') + '],true);')
+                    continue
+                }
                 unit(named, at, 'named', null, () => {
-                    let m = this.member(el, assign.name)
                     // a list property of a type (states, transitions ...) or one declared list<T>: the objects of a
                     // declared one are the object's (QObject parent), not its visual children
                     let declaredList = m && m.qmlType && /^list\s*</.test(m.qmlType)
@@ -807,12 +867,12 @@ class Codegen {
         for(let handler of el.handlers) this.emitHandler(file, el, v, handler, post)
 
         for(let a of el.aliases){
-            if(a.path.length < 2) continue
+            if(a.path.length < 2 || this.aliasHasBoundIntermediate(file, el, a)) continue
             let slot = el.scope.ids.get(a.path[0])
             if(slot === undefined) continue
-            let owner = '$s[' + slot + ']' + a.path.slice(1, -1).map(p => '.' + p).join('')
-            let last = a.path[a.path.length - 1]
-            post.push('JQ.forward(' + owner + ',' + owner + '.constructor.$type.signalByName.get(' + JSON.stringify(last + 'Changed') + '),' + v + ',' + cls + '.SIGNAL_' + a.name + 'Changed);')
+            let owner = '$s[' + slot + ']' + (a.valueKind ? '' : a.path.slice(1, -1).map(p => '.' + p).join(''))
+            let last = a.valueKind ? a.path[1] : a.path[a.path.length - 1]
+            post.push('JQ.forwardAliasProperty(' + owner + ',' + JSON.stringify(last) + ',' + v + ',' + cls + '.SIGNAL_' + a.name + 'Changed);')
         }
     }
 
@@ -1195,8 +1255,7 @@ class Codegen {
         for(let type = typeRef; type; type = type.kind === 'qml' ? type.file.root.typeRef : null){
             if(type.kind === 'builtin') return false
             let alias = type.file.root.defaultAlias
-            if(alias && alias.path.length > 2) return true
-            if(alias && alias.path.length === 2) return alias.path[1] !== 'data' && alias.path[1] !== 'children'
+            if(alias && alias.path.length >= 2) return !isDefaultParentAlias(alias)
             if(type.file.root.propdefs.some(p => p.defaultProp)) return false
         }
         return false
@@ -1207,7 +1266,7 @@ class Codegen {
         for(let type = typeRef; type; type = type.kind === 'qml' ? type.file.root.typeRef : null){
             if(type.kind === 'builtin') return !!type.Class.$defaultParent
             let alias = type.file.root.defaultAlias
-            if(alias && alias.path.length === 2 && (alias.path[1] === 'data' || alias.path[1] === 'children')) return true
+            if(alias && alias.path.length >= 2) return isDefaultParentAlias(alias)
         }
         return false
     }

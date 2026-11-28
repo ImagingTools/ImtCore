@@ -2,6 +2,7 @@ const engine = require('../Core/engine')
 const { QtObject, writeBypassingInterceptor } = require('../Core/QtObject')
 const { defineType } = require('../Core/type')
 const { Item } = require('./Item')
+const { aliasValue, withAliasField, resolveAliasTarget } = require('../QtQml/AliasValue')
 
 const STOPPED = 0, PAUSED = 1, RUNNING = 2
 
@@ -49,7 +50,7 @@ function unregister(job){
 // ---- property access for animations ---------------------------------------------------------
 
 // "font.pixelSize" -> { obj: font group, id }
-function resolveProperty(target, name){
+function resolveProperty(target, name, allowAliasField = false){
     if(!target || !name) return null
     let parts = String(name).split('.')
     let obj = target
@@ -57,14 +58,30 @@ function resolveProperty(target, name){
         obj = obj[parts[i]]
         if(!obj) return null
     }
-    let type = obj.constructor && obj.constructor.$type
-    let prop = type ? type.propByName.get(parts[parts.length - 1]) : null
+    let last = parts[parts.length - 1]
+    let prop = obj.constructor?.$type?.propByName.get(last)
+    let field, valueKind
+    if(!prop){
+        const alias = resolveAliasTarget(obj, last)
+        if(!alias || (!allowAliasField && alias[2] !== undefined)) return null
+        obj = alias[0]
+        prop = obj.constructor.$type.props[alias[1]]
+        field = alias[2]
+        valueKind = alias[3]
+    }
     if(!prop || prop.kind === 'group') return null
-    return { obj, id: prop.id, kind: prop.kind, name: parts[parts.length - 1], target, path: name }
+    const resolved = { obj, id: prop.id, kind: prop.kind, name: last, target, path: name }
+    if(field !== undefined) Object.assign(resolved, { field, valueKind })
+    return resolved
 }
 
 function readProperty(p){
-    return p.obj.$v[p.id]
+    const value = p.obj.$v[p.id]
+    return p.field === undefined ? value : aliasValue(value, p.valueKind)[p.field]
+}
+
+function propertyWriteValue(p, value){
+    return p.field === undefined ? value : withAliasField(aliasValue(p.obj.$v[p.id], p.valueKind), p.field, value)
 }
 
 // QQmlPropertyPrivate::write(..., BypassInterceptor | DontRemoveBinding)
@@ -73,7 +90,7 @@ function writeProperty(p, value){
         if(p.id === Item.WIDTH) p.obj.$explicit |= 1
         if(p.id === Item.HEIGHT) p.obj.$explicit |= 2
     }
-    writeBypassingInterceptor(p.obj, p.id, value)
+    writeBypassingInterceptor(p.obj, p.id, propertyWriteValue(p, value))
 }
 
 // ---- Animation ------------------------------------------------------------------------------
@@ -349,4 +366,4 @@ class AnimationGroup extends Animation {
 }
 defineType(AnimationGroup)
 
-module.exports = { STOPPED, PAUSED, RUNNING, clock, resolveProperty, readProperty, writeProperty, Animation, AnimationGroup }
+module.exports = { STOPPED, PAUSED, RUNNING, clock, resolveProperty, readProperty, propertyWriteValue, writeProperty, Animation, AnimationGroup }

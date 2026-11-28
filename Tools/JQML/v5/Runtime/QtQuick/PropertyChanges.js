@@ -24,7 +24,7 @@ class PropertyChanges extends QtObject {
         let explicit = this.$v[PropertyChanges.EXPLICIT]
         for(let change of this.$changes){
             let object = change.target || target
-            let p = resolveProperty(object, change.path)
+            let p = resolveProperty(object, change.path, true)
             if(!p){
                 if(object) engine.reportError('Cannot assign to non-existent property "' + change.path + '"', 'PropertyChanges')
                 continue
