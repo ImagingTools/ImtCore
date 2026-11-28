@@ -23,6 +23,8 @@ struct Token
 
 	Kind kind = TK_END;
 	QString text;
+	// A comment behind other text on its line: it describes that line, not the next one
+	bool isTrailing = false;
 };
 
 
@@ -31,9 +33,14 @@ QList<Token> Tokenize(const QString& sdl)
 	QList<Token> retVal;
 
 	int position = 0;
+	bool isLineStart = true;
 	const int length = sdl.size();
 	while (position < length){
 		const QChar character = sdl.at(position);
+		if (character == QLatin1Char('\n')){
+			isLineStart = true;
+		}
+
 		if (character.isSpace() || (character == QLatin1Char(','))){
 			++position;
 
@@ -48,7 +55,14 @@ QList<Token> Tokenize(const QString& sdl)
 			}
 
 			token.kind = Token::TK_COMMENT;
-			token.text = sdl.mid(position + 1, end - position - 1).trimmed();
+			// "##" marks documentation comments; all leading '#' are dropped
+			int textStart = position;
+			while ((textStart < end) && (sdl.at(textStart) == QLatin1Char('#'))){
+				++textStart;
+			}
+
+			token.text = sdl.mid(textStart, end - textStart).trimmed();
+			token.isTrailing = !isLineStart;
 			position = end;
 		}
 		else if (character == QLatin1Char('"')){
@@ -77,6 +91,7 @@ QList<Token> Tokenize(const QString& sdl)
 			++position;
 		}
 
+		isLineStart = false;
 		retVal.append(token);
 	}
 
@@ -106,6 +121,8 @@ public:
 
 		const QString retVal = m_pendingComments.join(QLatin1Char(' ')).trimmed();
 		m_pendingComments.clear();
+		// A trailing comment not taken by a field (e.g. behind "type X {") describes nothing
+		m_trailingComment.clear();
 
 		return retVal;
 	}
@@ -257,6 +274,13 @@ public:
 				return false;
 			}
 
+			// A comment behind the field on its line describes the field
+			SkipComments();
+			if (!m_trailingComment.isEmpty()){
+				field.description = field.description.isEmpty() ? m_trailingComment : (field.description + QLatin1Char(' ') + m_trailingComment);
+				m_trailingComment.clear();
+			}
+
 			fields.append(field);
 		}
 	}
@@ -303,13 +327,21 @@ private:
 	void SkipComments()
 	{
 		while ((m_position < m_tokens.size()) && (m_tokens.at(m_position).kind == Token::TK_COMMENT)){
-			m_pendingComments.append(m_tokens.at(m_position).text);
+			const Token& token = m_tokens.at(m_position);
+			if (token.isTrailing){
+				m_trailingComment = token.text;
+			}
+			else{
+				m_pendingComments.append(token.text);
+			}
+
 			++m_position;
 		}
 	}
 
 	QList<Token> m_tokens;
 	QStringList m_pendingComments;
+	QString m_trailingComment;
 	int m_position = 0;
 };
 

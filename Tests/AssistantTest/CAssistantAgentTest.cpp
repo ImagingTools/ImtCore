@@ -458,6 +458,25 @@ void CAssistantAgentTest::testCatalog_ReadsImtCoreSchemas()
 	QString error;
 	QVERIFY(!catalog.AddSchema(QStringLiteral("broken.sdl"), QStringLiteral("type Broken { name String }"), &error));
 	QVERIFY(error.contains(QStringLiteral("broken.sdl")));
+
+	// "##" marks documentation; a comment behind a field describes that field, not the next one
+	QVERIFY(catalog.AddSchema(
+				QStringLiteral("comments.sdl"),
+				QStringLiteral("type Commented { # not a field\n"
+							   "\t## The serial number.\n"
+							   "\tserialNumber: String\n"
+							   "\tboundCount: Integer  # Number of bound licenses\n"
+							   "\tcount: [Integer]! # Seats\n"
+							   "\t# Plain comment\n"
+							   "\tname: String\n"
+							   "}\n"),
+				&error));
+	const CSdlApiCatalog::TypeInfo* commentedPtr = catalog.FindType(QStringLiteral("Commented"));
+	QVERIFY(commentedPtr != nullptr);
+	QCOMPARE(commentedPtr->FindField(QStringLiteral("serialNumber"))->description, QStringLiteral("The serial number."));
+	QCOMPARE(commentedPtr->FindField(QStringLiteral("boundCount"))->description, QStringLiteral("Number of bound licenses"));
+	QCOMPARE(commentedPtr->FindField(QStringLiteral("count"))->description, QStringLiteral("Seats"));
+	QCOMPARE(commentedPtr->FindField(QStringLiteral("name"))->description, QStringLiteral("Plain comment"));
 }
 
 
