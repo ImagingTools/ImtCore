@@ -537,6 +537,12 @@ authentication, so it enables `AllowDemoPrincipal`. Users in `ReadOnlyUserIds` o
   `tst_AssistantSettingsPage` (loading without key, saving with keep, set and clear of the key, refusal,
   read-only).
 
+## MCP server
+
+An MCP endpoint, so that customers can connect their own AI agents to our servers, is deferred
+until a customer asks for it. The decision, the mapping onto the existing actions, knowledge base
+and API catalog, and the requirements before a release are in [Mcp.md](Mcp.md).
+
 ## Known limitations
 
 - Conversations, previews and their outcomes are kept in memory of the server process; a restart
