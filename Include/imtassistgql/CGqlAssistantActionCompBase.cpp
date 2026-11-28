@@ -7,7 +7,9 @@
 
 // ImtCore includes
 #include <imtauth/imtauth.h>
+#include <imtbase/imtbase.h>
 #include <imtgql/CGqlRequest.h>
+#include <imtgql/imtgql.h>
 #include <imtservergql/imtservergql.h>
 
 
@@ -86,7 +88,8 @@ bool CGqlAssistantActionCompBase::ExecuteGql(
 			const QByteArray& query,
 			const QJsonObject& variables,
 			QJsonObject& data,
-			QString& errorMessage) const
+			QString& errorMessage,
+			const QByteArray& changeSetId) const
 {
 	data = QJsonObject();
 
@@ -118,6 +121,10 @@ bool CGqlAssistantActionCompBase::ExecuteGql(
 	}
 
 	request.SetGqlContext(imtgql::IGqlContextSharedPtr(std::move(requestContextPtr)));
+	if (!changeSetId.isEmpty()){
+		// Only on the copy of the context: the operation context of the handlers takes it over
+		request.SetHeader(imtbase::s_changeSetHeaderId, changeSetId);
+	}
 
 	const QByteArray commandId = request.GetCommandId();
 
@@ -158,6 +165,78 @@ QByteArray CGqlAssistantActionCompBase::GetProductId(const imtassist::CAssistant
 	const imtgql::IGqlContext* gqlContextPtr = GetGqlContext(context);
 
 	return (gqlContextPtr != nullptr) ? gqlContextPtr->GetProductId() : QByteArray();
+}
+
+
+bool CGqlAssistantActionCompBase::BeginChangeSet(
+			const imtassist::CAssistantRequestContext& context,
+			const QString& summary,
+			QByteArray& changeSetId,
+			const QByteArray& origin,
+			const QByteArray& referenceId) const
+{
+	changeSetId.clear();
+
+	if (!m_changeSetJournalCompPtr.IsValid()){
+		return true;
+	}
+
+	changeSetId = m_changeSetJournalCompPtr->BeginChangeSet(GetDataTenantId(context), context.GetUserId(), origin, summary, referenceId);
+	if (changeSetId.isEmpty()){
+		SendErrorMessage(0, QStringLiteral("Assistant action '%1': the change set could not be created").arg(QString::fromUtf8(GetActionId())), "AssistantChangeSets");
+
+		return false;
+	}
+
+	return true;
+}
+
+
+void CGqlAssistantActionCompBase::FinishChangeSet(
+			const imtassist::CAssistantRequestContext& context,
+			const QByteArray& changeSetId,
+			int appliedCount,
+			int totalCount) const
+{
+	if (changeSetId.isEmpty() || !m_changeSetJournalCompPtr.IsValid()){
+		return;
+	}
+
+	imtbase::IChangeSetJournal::ChangeSetState state = imtbase::IChangeSetJournal::CSS_PARTIALLY_APPLIED;
+	if (appliedCount <= 0){
+		state = imtbase::IChangeSetJournal::CSS_FAILED;
+	}
+	else if (appliedCount >= totalCount){
+		state = imtbase::IChangeSetJournal::CSS_APPLIED;
+	}
+
+	if (!m_changeSetJournalCompPtr->SetChangeSetState(GetDataTenantId(context), changeSetId, state)){
+		SendErrorMessage(0, QStringLiteral("Assistant action '%1': the change set could not be finished").arg(QString::fromUtf8(GetActionId())), "AssistantChangeSets");
+	}
+}
+
+
+QByteArray CGqlAssistantActionCompBase::GetDataTenantId(const imtassist::CAssistantRequestContext& context, imtbase::TenantType* tenantTypePtr)
+{
+	imtbase::TenantType tenantType = imtbase::TT_ORGANIZATION;
+	QByteArray tenantId = context.GetTenantId();
+
+	const imtgql::IGqlContext* gqlContextPtr = GetGqlContext(context);
+	if (gqlContextPtr != nullptr){
+		tenantId = imtgql::GetDataTenantId(*gqlContextPtr, tenantType);
+	}
+
+	if (tenantTypePtr != nullptr){
+		*tenantTypePtr = tenantType;
+	}
+
+	return tenantId;
+}
+
+
+imtbase::IChangeSetJournal* CGqlAssistantActionCompBase::GetChangeSetJournal() const
+{
+	return m_changeSetJournalCompPtr.IsValid() ? m_changeSetJournalCompPtr.GetPtr() : nullptr;
 }
 
 

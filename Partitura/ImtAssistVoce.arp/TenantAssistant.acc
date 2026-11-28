@@ -7,7 +7,7 @@
             <Version Id="1023" Number="396033" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
-    <Description>AI assistant of a server: configuration per tenant in the administration, knowledge of the product (KnowledgeDocuments), the public API from the SDL files (ApiSchemaPaths) with the policy AllowedQueries/AllowedMutations/ForbiddenCommands, plans of changes and the shared administration actions. Export: the GraphQL handlers AssistantController and ConfigurationController. Needs ConfigurationCollection, SecretProtector and RequestHandlers (the GraphQL handlers of the application). Call Init::InitAssistantServer().</Description>
+    <Description>AI assistant of a server: configuration per tenant in the administration, knowledge of the product (KnowledgeDocuments), the public API from the SDL files (ApiSchemaPaths) with the policy AllowedQueries/AllowedMutations/ForbiddenCommands, plans of changes, the rollback of confirmed change sets (ChangeSetJournal with RollbackCollections/RollbackDelegates and their permissions) and the shared administration actions. Export: the GraphQL handlers AssistantController and ConfigurationController. Needs ConfigurationCollection, SecretProtector and RequestHandlers (the GraphQL handlers of the application). Call Init::InitAssistantServer().</Description>
     <Keywords>Assistant AI Tenant Administration Server Knowledge API Agent</Keywords>
     <ElementsList>
         <Element Id="ActionRegistry" PackageId="ImtAssistPck" ComponentId="AssistantActionRegistry">
@@ -26,6 +26,8 @@
                                 <Value>SearchGroups</Value>
                                 <Value>SearchRoles</Value>
                                 <Value>AddUserToGroup</Value>
+                                <Value>ChangesList</Value>
+                                <Value>ChangesRollback</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -35,6 +37,9 @@
         <Element Id="AddUserToGroup" PackageId="ImtAssistGqlPck" ComponentId="AdministrationAddUserToGroupAction">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ChangeSetJournal" Type="Reference" ExportId="ChangeSetJournal">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="GroupTypeId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Group"/>
                     </AttributeInfo>
@@ -131,6 +136,9 @@
                     <AttributeInfo Id="ApiCatalog" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApiCatalog"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ChangeSetJournal" Type="Reference" ExportId="ChangeSetJournal">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -226,6 +234,66 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ChangesList" PackageId="ImtAssistGqlPck" ComponentId="AssistantChangeSetAction">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ChangeSetJournal" Type="Reference" ExportId="ChangeSetJournal">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Collections" Type="Reference[]" ExportId="RollbackCollections">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Delegates" Type="Reference[]" ExportId="RollbackDelegates">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EditPermissions" Type="Id[]" ExportId="RollbackEditPermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Kind" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="list"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RemovePermissions" Type="Id[]" ExportId="RollbackRemovePermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestHandlers" Type="Reference[]" ExportId="RequestHandlers">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ChangesRollback" PackageId="ImtAssistGqlPck" ComponentId="AssistantChangeSetAction">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ChangeSetJournal" Type="Reference" ExportId="ChangeSetJournal">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Collections" Type="Reference[]" ExportId="RollbackCollections">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Delegates" Type="Reference[]" ExportId="RollbackDelegates">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EditPermissions" Type="Id[]" ExportId="RollbackEditPermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Kind" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="rollback"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RemovePermissions" Type="Id[]" ExportId="RollbackRemovePermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestHandlers" Type="Reference[]" ExportId="RequestHandlers">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

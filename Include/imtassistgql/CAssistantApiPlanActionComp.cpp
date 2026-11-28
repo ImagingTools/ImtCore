@@ -81,6 +81,7 @@ CAssistantApiPlanActionComp::CAssistantApiPlanActionComp()
 
 	m_resultSchema.AddInteger("appliedSteps", true, 0, MAX_STEPS);
 	m_resultSchema.AddString("resultsJson", true, MAX_RESULTS_LENGTH + 100);
+	m_resultSchema.AddId("changeSetId", false);
 }
 
 
@@ -180,7 +181,9 @@ imtassist::IAssistantAction::ExecutionStatus CAssistantApiPlanActionComp::Prepar
 		preview.changes.append(change);
 	}
 
-	preview.impact = QStringLiteral("The steps run one after another and stop at the first failure. Applied steps are not undone automatically.");
+	preview.impact = (GetChangeSetJournal() != nullptr)
+				? QStringLiteral("The steps run one after another and stop at the first failure. Applied steps are not undone automatically; they can be rolled back afterwards if they only changed documents with revisions.")
+				: QStringLiteral("The steps run one after another and stop at the first failure. Applied steps are not undone automatically.");
 	preview.stateToken = CreateStateToken(parameters);
 
 	return ES_SUCCEEDED;
@@ -203,6 +206,13 @@ imtassist::IAssistantAction::ExecutionStatus CAssistantApiPlanActionComp::ApplyC
 		return ES_FAILED;
 	}
 
+	QByteArray changeSetId;
+	if (!BeginChangeSet(context, parameters.value("summary").toString().trimmed(), changeSetId)){
+		userError = QStringLiteral("The changes could not be recorded for a rollback; nothing was changed.");
+
+		return ES_FAILED;
+	}
+
 	QList<QJsonObject> stepResults;
 	QJsonArray results;
 	for (int i = 0; i < steps.size(); ++i){
@@ -215,7 +225,7 @@ imtassist::IAssistantAction::ExecutionStatus CAssistantApiPlanActionComp::ApplyC
 		bool isApplied =
 					ResolveReferences(steps[i].input, stepResults, input, error) &&
 					CAssistantApiRequestBuilder::BuildRequest(*m_apiCatalogCompPtr, steps[i].command, input, QStringList(), query, variables, error);
-		if (isApplied && !ExecuteGql(context, query, variables, data, error)){
+		if (isApplied && !ExecuteGql(context, query, variables, data, error, changeSetId)){
 			isApplied = false;
 			error = QStringLiteral("refused or failed");
 		}
@@ -223,10 +233,15 @@ imtassist::IAssistantAction::ExecutionStatus CAssistantApiPlanActionComp::ApplyC
 		if (!isApplied){
 			SendWarningMessage(0, QStringLiteral("Assistant plan: step %1 (%2) failed: %3").arg(i + 1).arg(steps[i].command, error), "AssistantApi");
 
+			FinishChangeSet(context, changeSetId, i, steps.size());
+
 			userError = (i == 0)
 						? QStringLiteral("The first change (%1) failed; nothing was changed.").arg(steps[i].command)
 						: QStringLiteral("%1 of %2 changes were applied; change %3 (%4) failed; the remaining changes were not applied.")
 									.arg(i).arg(steps.size()).arg(i + 1).arg(steps[i].command);
+			if ((i > 0) && !changeSetId.isEmpty()){
+				userError += QStringLiteral(" The applied changes are the change set %1 (changes.rollback).").arg(QString::fromUtf8(changeSetId));
+			}
 
 			return ES_FAILED;
 		}
@@ -242,9 +257,15 @@ imtassist::IAssistantAction::ExecutionStatus CAssistantApiPlanActionComp::ApplyC
 		resultsJson = resultsJson.left(MAX_RESULTS_LENGTH) + QStringLiteral("...");
 	}
 
+	FinishChangeSet(context, changeSetId, steps.size(), steps.size());
+
 	result.data["appliedSteps"] = steps.size();
 	result.data["resultsJson"] = resultsJson;
 	result.text = QStringLiteral("%1 changes were applied.").arg(steps.size());
+	if (!changeSetId.isEmpty()){
+		result.data["changeSetId"] = QString::fromUtf8(changeSetId);
+		result.text += QStringLiteral(" Change set %1 (changes.rollback).").arg(QString::fromUtf8(changeSetId));
+	}
 
 	return ES_SUCCEEDED;
 }

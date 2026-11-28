@@ -5,6 +5,7 @@
 // ImtCore includes
 #include <imtbase/imtbase.h>
 #include <imtgql/CGqlRequestContextManager.h>
+#include <imtgql/imtgql.h>
 
 
 namespace imtservergql
@@ -62,7 +63,7 @@ imtgql::IGqlContextUniquePtr CSimpleGqlContextCreatorComp::CreateGqlContext(
 		return nullptr;
 	}
 
-	gqlContextPtr->SetHeaders(headers);
+	gqlContextPtr->SetHeaders(imtgql::RemoveServerHeaders(headers));
 	gqlContextPtr->SetToken(headers.value(imtbase::s_authenticationTokenHeaderId));
 	gqlContextPtr->SetProductId(headers.value(imtbase::s_productIdHeaderId));
 

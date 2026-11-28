@@ -136,5 +136,10 @@ I_EXPORT_COMPONENT(
 			"SQL database transaction manager",
 			"SQL Database Transaction Manager");
 
+I_EXPORT_COMPONENT(
+			ChangeSetJournal,
+			"Journal of the change sets of the tenants, for rolling back confirmed changes of documents with revisions",
+			"Change Set Journal Rollback Revision");
+
 
 } // namespace ImtDatabasePck

@@ -6,6 +6,8 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
+#include <imtbase/IChangeSetJournal.h>
+#include <imtbase/TenantType.h>
 #include <imtassist/IAssistantAction.h>
 #include <imtgql/IGqlContext.h>
 #include <imtgql/IGqlRequestHandler.h>
@@ -41,6 +43,7 @@ public:
 	I_BEGIN_BASE_COMPONENT(CGqlAssistantActionCompBase);
 		I_REGISTER_INTERFACE(imtassist::IAssistantAction);
 		I_ASSIGN_MULTI_0(m_requestHandlersCompPtr, "RequestHandlers", "GraphQL handlers of the application that process the requests of the action", true);
+		I_ASSIGN(m_changeSetJournalCompPtr, "ChangeSetJournal", "Journal of the change sets: with it the confirmed changes can be rolled back (changes.rollback)", false, "ChangeSetJournal");
 	I_END_COMPONENT;
 
 	// reimplemented (imtassist::IAssistantAction)
@@ -78,13 +81,43 @@ protected:
 		User input is passed only in \c variables, never in the query text.
 		\param data			Payload of the command.
 		\param errorMessage	Technical error for the log, without the text of the handler.
+		\param changeSetId	Change set the handlers write into (header imtbase::s_changeSetHeaderId); empty for none.
 	*/
 	bool ExecuteGql(
 				const imtassist::CAssistantRequestContext& context,
 				const QByteArray& query,
 				const QJsonObject& variables,
 				QJsonObject& data,
-				QString& errorMessage) const;
+				QString& errorMessage,
+				const QByteArray& changeSetId = QByteArray()) const;
+
+	/**
+		Begin the change set of a confirmed change. Without a journal the change goes ahead without one (empty ID).
+		
+eturn False if the journal could not create the change set; then nothing may be changed.
+	*/
+	bool BeginChangeSet(
+				const imtassist::CAssistantRequestContext& context,
+				const QString& summary,
+				QByteArray& changeSetId,
+				const QByteArray& origin = QByteArrayLiteral("assistant"),
+				const QByteArray& referenceId = QByteArray()) const;
+
+	/**
+		Finish the change set after \c appliedCount of \c totalCount changes were applied.
+	*/
+	void FinishChangeSet(const imtassist::CAssistantRequestContext& context, const QByteArray& changeSetId, int appliedCount, int totalCount) const;
+
+	/**
+		Tenant of the data of the request, as the operation context of the handlers has it: the organization,
+		or the user for a personal space. The change sets of the journal belong to it.
+	*/
+	static QByteArray GetDataTenantId(const imtassist::CAssistantRequestContext& context, imtbase::TenantType* tenantTypePtr = nullptr);
+
+	/**
+		Journal of the change sets, nullptr if not configured.
+	*/
+	imtbase::IChangeSetJournal* GetChangeSetJournal() const;
 
 	/**
 		Product of the request, for the commands that take a \c productId.
@@ -93,6 +126,7 @@ protected:
 
 private:
 	I_MULTIREF(imtgql::IGqlRequestHandler, m_requestHandlersCompPtr);
+	I_REF(imtbase::IChangeSetJournal, m_changeSetJournalCompPtr);
 };
 
 

@@ -55,6 +55,16 @@ void COperationContext::SetOperationDescription(const QString& operationDescript
 }
 
 
+void COperationContext::SetChangeSetId(const QByteArray& changeSetId)
+{
+	if (m_changeSetId != changeSetId){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_changeSetId = changeSetId;
+	}
+}
+
+
 // reimplemented (imtbase::IOperationContext)
 
 imtbase::IOperationContext::IdentifableObjectInfo COperationContext::GetOperationOwnerId() const
@@ -84,6 +94,14 @@ QString COperationContext::GetOperationDescription() const
 imtbase::IObjectCollection* COperationContext::GetChangesCollection()
 {
 	return &m_changesCollection;
+}
+
+
+// reimplemented (imtbase::IChangeSetContext)
+
+QByteArray COperationContext::GetChangeSetId() const
+{
+	return m_changeSetId;
 }
 
 

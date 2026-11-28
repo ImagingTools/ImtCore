@@ -55,6 +55,11 @@ I_EXPORT_COMPONENT(
 			"Assistant action api.planChanges: a plan of mutations confirmed as a whole",
 			"Assistant AI Action API Plan Changes");
 
+I_EXPORT_COMPONENT(
+			AssistantChangeSetAction,
+			"Assistant actions changes.list and changes.rollback: roll back a confirmed change set of documents with revisions",
+			"Assistant AI Action Change Set Rollback Undo");
+
 
 } // namespace ImtAssistGqlPck
 

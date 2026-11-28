@@ -181,4 +181,20 @@ void SetServerRequestContext(CGqlRequest& gqlRequest, const QByteArray& serverTo
 }
 
 
+IGqlContext::Headers RemoveServerHeaders(const IGqlContext::Headers& headers)
+{
+	IGqlContext::Headers retVal = headers;
+	for (IGqlContext::Headers::iterator iter = retVal.begin(); iter != retVal.end();){
+		if (iter.key().compare(imtbase::s_changeSetHeaderId, Qt::CaseInsensitive) == 0){
+			iter = retVal.erase(iter);
+		}
+		else{
+			++iter;
+		}
+	}
+
+	return retVal;
+}
+
+
 } // namespace imtqml

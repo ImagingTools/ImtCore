@@ -69,6 +69,12 @@ QByteArray GetTranslation(const iqt::ITranslationManager* translationManagerPtr,
 */
 void SetServerRequestContext(CGqlRequest& gqlRequest, const QByteArray& serverToken = QByteArray());
 
+/**
+	Headers of a client request without the headers only the server itself may set (imtbase::s_changeSetHeaderId);
+	the names are compared without case.
+*/
+IGqlContext::Headers RemoveServerHeaders(const IGqlContext::Headers& headers);
+
 
 } // namespace imtqml
 

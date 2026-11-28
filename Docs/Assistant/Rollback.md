@@ -1,8 +1,9 @@
 # Rolling back applied changes: design
 
-Status: **design, not implemented**. This document describes how a confirmed change set (an
-applied `api.planChanges` plan, an administration action, later also a manual bulk operation)
-can be rolled back as a whole.
+Status: **stage 1 implemented** (collections with revisions; Puma: user groups). This document
+describes how a confirmed change set (an applied `api.planChanges` plan, an administration action,
+later also a manual bulk operation) is rolled back as a whole. "Implementation" at the end lists the
+components; the sections before it are the design they follow.
 
 ## Idea
 
@@ -26,7 +27,8 @@ Checked in ImtCore and in the Puma composites (November 2026):
 | Assistant configuration | `CAssistantConfigurationDbDelegateComp` | no | physical `DELETE` |
 
 Only the collections based on `imtdb::CSqlDatabaseDocumentDelegateCompBase` can be rolled back
-with the journal alone. The Puma assistant currently allows the mutations `GroupAdd` and
+with the journal alone. Rolling back user documents is not offered: a user document also holds
+credentials, and its domain logic mirrors the memberships of the groups. The Puma assistant currently allows the mutations `GroupAdd` and
 `GroupUpdate`, which both work on user groups, so the first stage covers everything the
 assistant can change today.
 
@@ -130,3 +132,31 @@ by a journal entry younger than the retention period.
   rollback is needed there. This is a data model change of its own.
 - Partial rollback of selected entries.
 - Rollback of manual bulk operations and imports through the same journal.
+
+## Implementation
+
+| Part | Where |
+| --- | --- |
+| Interfaces | `imtbase::IChangeSetJournal` (journal), `imtbase::IChangeSetContext` (change set of an operation; `imtbase::COperationContext` implements it) |
+| Journal | `imtdb::CChangeSetJournalComp` (`ImtDatabasePck/ChangeSetJournal`), tables from `CreateChangeSetTables.sql` in `imtdb.qrc`, created before the first change set; attribute `RetentionDays` (default 90) |
+| Entries | `imtdb::CChangeSetJournalQueries`; written by `CSqlDatabaseDocumentDelegateCompBase` before the statements of the document (create, update, remove, restore; a selection writes `Unrecorded`) in the same transaction |
+| Writes without revisions | `CSqlDatabaseObjectCollectionComp` adds an `Unrecorded` entry when the statements of a delegate contain no journal entry |
+| Transport | The action puts the ID into the header `x-imt-change-set` of its copy of the GraphQL context; `COperationContextControllerComp` takes it over into the operation context. The context creators remove the header from client requests (`imtgql::RemoveServerHeaders`) |
+| Guard | An entry is written only while the change set of the tenant of the operation is `Applying`: an unknown, foreign or finished ID writes nothing |
+| Assistant | `CGqlAssistantActionCompBase` (`ChangeSetJournal`, `BeginChangeSet`, `FinishChangeSet`), `api.planChanges` and `administration.addUserToGroup` record their change sets; `CAssistantChangeSetActionComp` with `changes.list` and `changes.rollback` |
+| Composite | `TenantAssistant`: exported attributes `ChangeSetJournal`, `RollbackCollections`, `RollbackDelegates` (the same repositories: they export the collection and the document delegate), `RollbackEditPermissions`, `RollbackRemovePermissions` |
+| Permission | `/Administration/Assistant/RollbackAny` (change sets of other users), in the default scope of new organizations |
+
+Differences to the design above, found while implementing:
+
+- Writes the domain logic of a delegate makes to other documents (the memberships of a group in the user
+  documents, parent group references) use their own operation context and are not recorded. A rollback
+  writes the former revision through the collection, so the same logic adjusts them again.
+- Removals are not rolled back at all in stage 1: removing a document also deletes its tenant bindings
+  and shares and clears references in other documents, which restoring the document does not bring back.
+- The rollback writes the collections directly, not through the GraphQL handlers, so the action checks
+  the configured edit or remove permission of every collection itself.
+- A change set that only partly applied (`PartiallyApplied`) can be rolled back like a complete one.
+
+Tests: `Include/imtdb/Test/CChangeSetJournalTest.cpp` (journal and entries on SQLite) and
+`Tests/AssistantTest/CAssistantChangeSetTest.cpp` (change sets of the actions, list, rollback and its checks).

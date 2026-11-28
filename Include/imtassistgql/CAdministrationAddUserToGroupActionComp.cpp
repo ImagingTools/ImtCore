@@ -58,6 +58,7 @@ CAdministrationAddUserToGroupActionComp::CAdministrationAddUserToGroupActionComp
 
 	m_resultSchema.AddId("groupId", true);
 	m_resultSchema.AddId("userId", true);
+	m_resultSchema.AddId("changeSetId", false);
 }
 
 
@@ -194,17 +195,31 @@ imtassist::IAssistantAction::ExecutionStatus CAdministrationAddUserToGroupAction
 	QJsonObject variables;
 	variables["input"] = input;
 
+	QByteArray changeSetId;
+	if (!BeginChangeSet(context, QStringLiteral("Add a user to the group '%1'").arg(group.name), changeSetId)){
+		userError = QStringLiteral("The change could not be recorded for a rollback; nothing was changed.");
+
+		return ES_FAILED;
+	}
+
 	QJsonObject data;
-	if (!ExecuteGql(context, "mutation AssistantAddUserToGroup($input: GroupDataInput) { GroupUpdate(input: $input) { id } }", variables, data, error)){
+	if (!ExecuteGql(context, "mutation AssistantAddUserToGroup($input: GroupDataInput) { GroupUpdate(input: $input) { id } }", variables, data, error, changeSetId)){
+		FinishChangeSet(context, changeSetId, 0, 1);
 		SendWarningMessage(0, QStringLiteral("Assistant action '%1' failed: %2").arg(QString::fromUtf8(GetActionId()), error), "AssistantAdministration");
 		userError = QStringLiteral("The group could not be changed.");
 
 		return ES_FAILED;
 	}
 
+	FinishChangeSet(context, changeSetId, 1, 1);
+
 	result.data["groupId"] = QString::fromUtf8(group.id);
 	result.data["userId"] = QString::fromUtf8(userId);
 	result.text = QStringLiteral("The user was added to the group '%1'.").arg(group.name);
+	if (!changeSetId.isEmpty()){
+		result.data["changeSetId"] = QString::fromUtf8(changeSetId);
+		result.text += QStringLiteral(" Change set %1 (changes.rollback).").arg(QString::fromUtf8(changeSetId));
+	}
 
 	return ES_SUCCEEDED;
 }

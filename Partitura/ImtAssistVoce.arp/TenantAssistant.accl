@@ -19,15 +19,17 @@
         <Element ComponentName="AssistantController" X="100" Y="500" Note=""/>
         <Element ComponentName="AssistantService" X="350" Y="500" Note=""/>
         <Element ComponentName="AuditLog" X="600" Y="500" Note=""/>
-        <Element ComponentName="ConfigurationController" X="850" Y="500" Note=""/>
-        <Element ComponentName="ConfigurationStore" X="100" Y="700" Note=""/>
-        <Element ComponentName="KnowledgeBase" X="350" Y="700" Note=""/>
-        <Element ComponentName="KnowledgeRead" X="600" Y="700" Note=""/>
-        <Element ComponentName="KnowledgeSearch" X="850" Y="700" Note=""/>
-        <Element ComponentName="Provider" X="100" Y="900" Note=""/>
-        <Element ComponentName="RepresentationRegistry" X="350" Y="900" Note=""/>
-        <Element ComponentName="SearchGroups" X="600" Y="900" Note=""/>
-        <Element ComponentName="SearchRoles" X="850" Y="900" Note=""/>
-        <Element ComponentName="SearchUsers" X="100" Y="1100" Note=""/>
+        <Element ComponentName="ChangesList" X="850" Y="500" Note=""/>
+        <Element ComponentName="ChangesRollback" X="100" Y="700" Note=""/>
+        <Element ComponentName="ConfigurationController" X="350" Y="700" Note=""/>
+        <Element ComponentName="ConfigurationStore" X="600" Y="700" Note=""/>
+        <Element ComponentName="KnowledgeBase" X="850" Y="700" Note=""/>
+        <Element ComponentName="KnowledgeRead" X="100" Y="900" Note=""/>
+        <Element ComponentName="KnowledgeSearch" X="350" Y="900" Note=""/>
+        <Element ComponentName="Provider" X="600" Y="900" Note=""/>
+        <Element ComponentName="RepresentationRegistry" X="850" Y="900" Note=""/>
+        <Element ComponentName="SearchGroups" X="100" Y="1100" Note=""/>
+        <Element ComponentName="SearchRoles" X="350" Y="1100" Note=""/>
+        <Element ComponentName="SearchUsers" X="600" Y="1100" Note=""/>
     </PositionMap>
 </Acf>

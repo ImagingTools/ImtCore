@@ -143,6 +143,12 @@ protected:
 	
 private:
 	void AddOperationContextToChangeSet(const imtbase::IOperationContext& operationContext, istd::IChangeable::ChangeSet& changeSet) const;
+	/**
+		A write of an operation with a change set whose statements (\c query, created by the delegate) add no entry to the
+		change set journal, e.g. of a table without revisions: the change set gets an entry of the kind EO_UNRECORDED, so it
+		is not rolled back incompletely. Written before the write; if the write fails the change set only stays not reversible.
+	*/
+	void MarkUnrecordedWrite(const imtbase::IOperationContext* operationContextPtr, const QByteArray& query) const;
 
 protected:
 	I_REF(IDatabaseEngine, m_dbEngineCompPtr);

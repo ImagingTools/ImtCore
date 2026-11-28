@@ -18,6 +18,7 @@
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtbase/IRevisionController.h>
 #include <imtbase/CParamsSetJoiner.h>
+#include <imtdb/CChangeSetJournalQueries.h>
 #include <imtdb/CSqlDatabaseObjectCollectionIterator.h>
 #include <imtdb/imtdb.h>
 
@@ -140,6 +141,7 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 				description,
 				defaultValuePtr,
 				operationContextPtr);
+	MarkUnrecordedWrite(operationContextPtr, objectQuery.query);
 	if (objectQuery.query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 
@@ -206,6 +208,7 @@ bool CSqlDatabaseObjectCollectionComp::RemoveElements(const Ids& elementIds, con
 	}
 
 	QByteArray query = m_objectDelegateCompPtr->CreateDeleteObjectsQuery(*this, elementIds, operationContextPtr);
+	MarkUnrecordedWrite(operationContextPtr, query);
 	if (query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 
@@ -243,6 +246,7 @@ bool CSqlDatabaseObjectCollectionComp::RemoveElementSet(
 	}
 
 	QByteArray query = m_objectDelegateCompPtr->CreateDeleteObjectSetQuery(*this, selectionParamsPtr, operationContextPtr);
+	MarkUnrecordedWrite(operationContextPtr, query);
 	if (query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 
@@ -280,6 +284,7 @@ bool CSqlDatabaseObjectCollectionComp::RestoreObjects(
 	}
 
 	QByteArray query = m_objectDelegateCompPtr->CreateRestoreObjectsQuery(*this, objectIds, operationContextPtr);
+	MarkUnrecordedWrite(operationContextPtr, query);
 	if (query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 
@@ -317,6 +322,7 @@ bool CSqlDatabaseObjectCollectionComp::RestoreObjectSet(
 	}
 
 	QByteArray query = m_objectDelegateCompPtr->CreateRestoreObjectSetQuery(*this, selectionParamsPtr, operationContextPtr);
+	MarkUnrecordedWrite(operationContextPtr, query);
 	if (query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 
@@ -402,6 +408,7 @@ bool CSqlDatabaseObjectCollectionComp::SetObjectData(
 	}
 
 	auto objectQuery = m_objectDelegateCompPtr->CreateUpdateObjectQueryWithParameters(*this, objectId, object, operationContextPtr);
+	MarkUnrecordedWrite(operationContextPtr, objectQuery.query);
 	if (objectQuery.query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 
@@ -1087,6 +1094,30 @@ void CSqlDatabaseObjectCollectionComp::OnComponentDestroyed()
 
 
 // private methods
+
+void CSqlDatabaseObjectCollectionComp::MarkUnrecordedWrite(const imtbase::IOperationContext* operationContextPtr, const QByteArray& query) const
+{
+	if (query.isEmpty() || CChangeSetJournalQueries::GetChangeSetId(operationContextPtr).isEmpty() || !m_dbEngineCompPtr.IsValid() || !m_objectDelegateCompPtr.IsValid()){
+		return;
+	}
+
+	// A delegate that records the documents it writes adds the entries to its statements
+	if (CChangeSetJournalQueries::ContainsEntryQuery(query)){
+		return;
+	}
+
+	const QString markerQuery = CChangeSetJournalQueries::CreateUnrecordedEntryQuery(
+				operationContextPtr,
+				m_objectDelegateCompPtr->GetTableScheme(),
+				m_objectDelegateCompPtr->GetTableName());
+
+	QSqlError sqlError;
+	m_dbEngineCompPtr->ExecSqlQuery(markerQuery.toUtf8(), &sqlError);
+	if (sqlError.type() != QSqlError::NoError){
+		SendWarningMessage(0, QStringLiteral("The change set journal could not mark a write that cannot be rolled back"), "Database collection");
+	}
+}
+
 
 void CSqlDatabaseObjectCollectionComp::AddOperationContextToChangeSet(const imtbase::IOperationContext& operationContext, istd::IChangeable::ChangeSet& changeSet) const
 {
