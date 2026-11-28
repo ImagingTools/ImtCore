@@ -8,6 +8,7 @@
 #include <iprm/TParamsPtr.h>
 
 // ImtCore includes
+#include <imtrest/CHttpResponse.h>
 #include <imtrest/CWebSocketRequest.h>
 #include <imtrest/CWebSocketThread.h>
 
@@ -56,7 +57,9 @@ void CWebSocketServerComp::RegisterSender(const QByteArray& clientId, QWebSocket
 {
 	QWriteLocker locker(&m_sendersLock);
 
-	QSharedPointer<CWebSocketSender> socketSender(new CWebSocketSender(webSocketPtr));
+	// The sender lives in the main thread, but it can be released in another one (SendResponse of a worker): it is deleted in its thread,
+	// after the data it has queued for sending
+	QSharedPointer<CWebSocketSender> socketSender(new CWebSocketSender(webSocketPtr), &QObject::deleteLater);
 	QThread* mainThread = QCoreApplication::instance()->thread();
 	if (mainThread == nullptr){
 		Q_ASSERT(false);
@@ -115,16 +118,47 @@ void CWebSocketServerComp::SendVerboseMessage(const QString& message, const QStr
 
 bool CWebSocketServerComp::SendResponse(const QByteArray& requestId, ConstResponsePtr& response) const
 {
-	QReadLocker locker(&m_sendersLock);
-
-	CWebSocketSender* sender = m_senders.value(requestId).data();
-	if (sender != nullptr){
-		QByteArray data = response->GetData();
-
-		return sender->SendData(data);
+	if (!response.IsValid()){
+		return false;
 	}
 
-	return false;
+	// A GraphQL query that a client sends over its socket ("type": "query") is processed by a worker as an HTTP request
+	// (CWebSocketThread::ProcessTextMessage), whose ID is not the ID of the query: the socket is registered by the ID of the query,
+	// which the response carries in its header "id". The client waits for the answer as "query_data" with this ID.
+	QByteArray queryId;
+	if (dynamic_cast<const CHttpResponse*>(response.GetPtr()) != nullptr){
+		queryId = response->GetHeaders().value(QByteArrayLiteral("id"));
+	}
+
+	if (queryId.isEmpty()){
+		QReadLocker locker(&m_sendersLock);
+
+		CWebSocketSender* sender = m_senders.value(requestId).data();
+		if (sender != nullptr){
+			QByteArray data = response->GetData();
+
+			return sender->SendData(data);
+		}
+
+		return false;
+	}
+
+	const QByteArray payload = response->GetData();
+	const QByteArray data = QByteArrayLiteral("{\"type\":\"query_data\",\"id\":\"")
+				+ queryId
+				+ QByteArrayLiteral("\",\"payload\":")
+				+ (payload.isEmpty() ? QByteArrayLiteral("{}") : payload)
+				+ QByteArrayLiteral("}");
+
+	// A query is answered once: its sender is not kept until the connection is closed
+	QSharedPointer<CWebSocketSender> senderPtr;
+	{
+		QWriteLocker locker(&m_sendersLock);
+
+		senderPtr = m_senders.take(queryId);
+	}
+
+	return !senderPtr.isNull() && senderPtr->SendData(data);
 }
 
 
