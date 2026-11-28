@@ -17,7 +17,7 @@
 #include <imtassist/CAnthropicMessagesProvider.h>
 #include <imtassist/CAssistantActionRegistry.h>
 #include <imtassist/CAssistantProviderPresets.h>
-#include <imtassist/CAssistantService.h>
+#include <imtassist/CAssistantLogicController.h>
 #include <imtassist/CAwsSigV4Signer.h>
 #include <imtassist/CBedrockConverseProvider.h>
 #include <imtassist/CGeminiProvider.h>
@@ -389,7 +389,7 @@ void CAssistantProviderTest::testNotConfigured_NoRequest()
 
 	// The service does not call an unconfigured provider at all.
 	CAssistantActionRegistry registry;
-	CAssistantService service;
+	CAssistantLogicController service;
 	service.SetEnabled(true);
 	service.SetProvider(providerPtr.get());
 	service.SetActionRegistry(&registry);
@@ -907,7 +907,7 @@ void CAssistantProviderTest::testService_ToolResultLinkedToCall()
 	CAssistantActionRegistry registry;
 	QVERIFY(registry.RegisterAction(&action));
 
-	CAssistantService service;
+	CAssistantLogicController service;
 	service.SetEnabled(true);
 	service.SetProvider(providerPtr.get());
 	service.SetActionRegistry(&registry);

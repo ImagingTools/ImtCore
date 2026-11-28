@@ -6,7 +6,7 @@
 #include <QtCore/QMutex>
 
 // ImtCore includes
-#include <imtassist/IAssistantController.h>
+#include <imtassist/IAssistantLogicController.h>
 #include <imtassist/IAssistantProvider.h>
 #include <imtassist/IAssistantTenantPolicy.h>
 #include <imtassist/IAssistantActionRegistry.h>
@@ -37,7 +37,7 @@ namespace imtassist
 
 	\ingroup imtassist
 */
-class CAssistantService: virtual public IAssistantController
+class CAssistantLogicController: virtual public IAssistantLogicController
 {
 public:
 	enum
@@ -50,7 +50,7 @@ public:
 		MAX_CONVERSATIONS_PER_PRINCIPAL = 20
 	};
 
-	CAssistantService();
+	CAssistantLogicController();
 
 	void SetEnabled(bool isEnabled);
 	bool IsEnabled() const;
@@ -67,7 +67,7 @@ public:
 
 	CActionPreviewStore& GetPreviewStore();
 
-	// reimplemented (imtassist::IAssistantController)
+	// reimplemented (imtassist::IAssistantLogicController)
 	virtual bool IsAvailable(const CAssistantRequestContext& context) const override;
 	virtual QByteArray StartConversation(const CAssistantRequestContext& context) override;
 	virtual AssistantMessages SendUserMessage(

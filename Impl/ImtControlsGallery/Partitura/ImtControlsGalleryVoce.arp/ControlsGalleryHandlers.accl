@@ -14,7 +14,7 @@
         <Element ComponentName="AssistantController" X="1200" Y="175" Note=""/>
         <Element ComponentName="AssistantProvider" X="1450" Y="375" Note=""/>
         <Element ComponentName="AssistantRepresentations" X="1700" Y="375" Note=""/>
-        <Element ComponentName="AssistantService" X="1450" Y="175" Note=""/>
+        <Element ComponentName="AssistantLogicController" X="1450" Y="175" Note=""/>
         <Element ComponentName="ContactInfoController" X="825" Y="375" Note=""/>
         <Element ComponentName="DemoSearchTasksAction" X="1100" Y="575" Note=""/>
         <Element ComponentName="DemoSetTaskStatusAction" X="1300" Y="575" Note=""/>

@@ -125,8 +125,8 @@
                     <AttributeInfo Id="AllowDemoPrincipal" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="AssistantService" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="AssistantService"/>
+                    <AttributeInfo Id="AssistantLogicController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="AssistantLogicController"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
@@ -256,7 +256,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="AssistantService" PackageId="ImtAssistPck" ComponentId="AssistantService">
+        <Element Id="AssistantLogicController" PackageId="ImtAssistPck" ComponentId="AssistantLogicController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ActionRegistry" Type="Reference" ExportId="">

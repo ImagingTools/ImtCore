@@ -17,7 +17,7 @@
         <Element ComponentName="ApiQuery" X="600" Y="300" Note=""/>
         <Element ComponentName="AssistantConfiguration" X="850" Y="300" Note=""/>
         <Element ComponentName="AssistantController" X="100" Y="500" Note=""/>
-        <Element ComponentName="AssistantService" X="350" Y="500" Note=""/>
+        <Element ComponentName="AssistantLogicController" X="350" Y="500" Note=""/>
         <Element ComponentName="AuditLog" X="600" Y="500" Note=""/>
         <Element ComponentName="ChangesList" X="850" Y="500" Note=""/>
         <Element ComponentName="ChangesRollback" X="100" Y="700" Note=""/>

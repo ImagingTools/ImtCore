@@ -15,7 +15,7 @@
 #include <imtassist/CAssistantActionRegistry.h>
 #include <imtassist/CAssistantConfigurationComp.h>
 #include <imtassist/CAssistantConfigurationStoreComp.h>
-#include <imtassist/CAssistantService.h>
+#include <imtassist/CAssistantLogicController.h>
 #include <imtassist/CFakeAssistantProvider.h>
 #include <imtassist/CTenantAssistantProviderComp.h>
 #include <imtcrypt/ISecretProtector.h>
@@ -357,7 +357,7 @@ void CAssistantConfigurationTest::testService_EnabledPerTenant()
 	provider.SetDefaultReply(CFakeAssistantProvider::CreateTextReply(QStringLiteral("Hello")));
 	CAssistantActionRegistry registry;
 
-	CAssistantService service;
+	CAssistantLogicController service;
 	service.SetEnabled(true);
 	service.SetProvider(&provider);
 	service.SetActionRegistry(&registry);
@@ -428,7 +428,7 @@ void CAssistantConfigurationTest::testTenantProvider_NotConfiguredTenant()
 
 	// In the service the tenant gets a clear error.
 	CAssistantActionRegistry registry;
-	CAssistantService service;
+	CAssistantLogicController service;
 	service.SetEnabled(true);
 	service.SetProvider(&provider);
 	service.SetActionRegistry(&registry);

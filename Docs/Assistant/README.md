@@ -23,7 +23,7 @@ workflows; it never bypasses permissions or business logic.
 
 | Class | Purpose |
 |---|---|
-| `IAssistantController` / `CAssistantService` | Conversation turns, confirmation and rejection of previews, cancellation. Disabled by default. |
+| `IAssistantLogicController` / `CAssistantLogicController` | Conversation turns, confirmation and rejection of previews, cancellation. Disabled by default. |
 | `IAssistantAction` | Domain function registered by the application: stable ID, description, versioned parameter and result schema, reading or changing. |
 | `CAssistantActionRegistry` | Registry of actions. Only registered actions can be called. |
 | `CParameterSchema` | Strict, versioned schema of a JSON object (parameters, results, UI data). |
@@ -48,14 +48,14 @@ and `imtchatgui` is unchanged.
 
 | Component | Attributes |
 |---|---|
-| `ImtAssistPck/AssistantService` | `Enabled` (default `false`), `EnabledParam` (server setting), `TenantPolicy` (e.g. `AssistantConfigurationStore`), `Provider`, `ActionRegistry`, `RepresentationRegistry`, `AuditLog`, `ProviderTimeout`, `MaxStepsPerTurn`, `PreviewTimeToLive` |
+| `ImtAssistPck/AssistantLogicController` | `Enabled` (default `false`), `EnabledParam` (server setting), `TenantPolicy` (e.g. `AssistantConfigurationStore`), `Provider`, `ActionRegistry`, `RepresentationRegistry`, `AuditLog`, `ProviderTimeout`, `MaxStepsPerTurn`, `PreviewTimeToLive` |
 | `ImtAssistPck/AssistantActionRegistry` | `Actions`: the action components of the application |
 | `ImtAssistPck/UiRepresentationRegistry` | `RegisterStandardRepresentations` (default `true`), `SchemaProviders` (`IUiRepresentationSchemaProvider`) |
 | `ImtAssistPck/HttpAssistantProvider` | `Preset`, `Model`, `Endpoint`, `Region`, `Project`, `Resource`, `ApiKeyVariable`, `AwsAccessKeyIdVariable`, `AwsSecretAccessKeyVariable`, `AwsSessionTokenVariable`, `MaxOutputTokens`, `AdditionalInstructions` (see [Model providers](#model-providers)); the `...Param` references to settings of the server |
 | `ImtAssistPck/AssistantProviderList` | – (the presets as options for the provider selection) |
 | `ImtAssistPck/FakeAssistantProvider` | rules: `RuleKeywords`, `RuleActionIds`, `RuleParameters` (JSON), `RuleReplies`, `RuleQuestions`; `DefaultReply`, `ToolResultReply` |
 | `ImtAssistPck/AssistantAuditLog` | writes events to the ACF log of the component |
-| `ImtAssistGqlPck/AssistantController` | `AssistantService`, `CommandIds` (the `Assistant*` commands), `CommandPermissions`, `PermissionChecker`; `AllowDemoPrincipal`, `DemoUserId`, `DemoTenantId` (demo only, see below) |
+| `ImtAssistGqlPck/AssistantController` | `AssistantLogicController`, `CommandIds` (the `Assistant*` commands), `CommandPermissions`, `PermissionChecker`; `AllowDemoPrincipal`, `DemoUserId`, `DemoTenantId` (demo only, see below) |
 | `ImtAssistPck/AssistantConfiguration`, `AssistantConfigurationStore`, `TenantAssistantProvider`, `ImtAssistGqlPck/AssistantConfigurationController`, `AssistantConfigurationDatabaseDelegate` | see [Configuration per organization](#configuration-per-organization-administration) |
 | `ImtAssistGqlPck/AdministrationSearchAction` (`Kind`: `users`, `groups`, `roles`), `AdministrationAddUserToGroupAction` | `RequestHandlers`, see [Administration actions](#administration-actions) |
 
@@ -140,7 +140,7 @@ Applications that use the panel call `DefaultImtCoreQmlInitializer::InitAssistan
 3. **Configure and enable** the service explicitly:
 
    ```cpp
-   imtassist::CAssistantService service;
+   imtassist::CAssistantLogicController service;
    service.SetActionRegistry(&actions);
    service.SetRepresentationRegistry(&representations);
    service.SetProvider(&providerAdapter);   // credentials stay inside the adapter
@@ -261,8 +261,8 @@ own provider, model and API key and enables the assistant for its members.
   the host name of the provider and must not contain dots.
 - The policy is checked again at every request: a configuration that the server no longer allows is
   not used.
-- The assistant answers an organization only if it is enabled server-wide (`AssistantService/Enabled`)
-  **and** in the configuration of the organization (`AssistantService/TenantPolicy`).
+- The assistant answers an organization only if it is enabled server-wide (`AssistantLogicController/Enabled`)
+  **and** in the configuration of the organization (`AssistantLogicController/TenantPolicy`).
 
 | Command | Input | Output |
 |---|---|---|
@@ -485,7 +485,7 @@ Every message has `formatVersion` (currently `1`), `id`, `kind`, `conversationId
 | `actionPreview` | Prepared change: `previewId`, summary in `text`, `data.targetId`, `data.targetLabel`, `data.changes`, `data.impact`, `data.expiresAt` |
 | `actionExecuted` | Outcome of a confirmed change; `code` is `succeeded`, `failed`, `accessDenied` or `stale` |
 | `status` | For example `previewRejected`, `alreadyProcessed` |
-| `error` | `code` as listed in `IAssistantController` |
+| `error` | `code` as listed in `IAssistantLogicController` |
 
 The UI localizes texts by `code`; the `text` of errors is a technical fallback.
 
@@ -493,9 +493,9 @@ The UI localizes texts by `code`; the `text` of errors is a technical fallback.
 
 | Setting | Default |
 |---|---|
-| `CAssistantService::SetEnabled` | `false` |
-| `CAssistantService::SetProviderTimeout` | 30000 ms |
-| `CAssistantService::SetMaxStepsPerTurn` | 5 |
+| `CAssistantLogicController::SetEnabled` | `false` |
+| `CAssistantLogicController::SetProviderTimeout` | 30000 ms |
+| `CAssistantLogicController::SetMaxStepsPerTurn` | 5 |
 | `CActionPreviewStore::SetTimeToLive` | 300 s |
 | Max. pending previews per user and tenant | 20 (the oldest is rejected) |
 | Max. conversations per user and tenant | 20 |
@@ -512,7 +512,7 @@ The page **Assistant** of the ControlsGallery shows the MVP flow end to end:
 4. **Confirm** executes the change; **Reject** changes nothing.
 
 Server configuration: `Partitura/ImtControlsGalleryVoce.arp/ControlsGalleryHandlers.acc`
-(`AssistantController`, `AssistantService` with `Enabled`, `AssistantProvider` with rules,
+(`AssistantController`, `AssistantLogicController` with `Enabled`, `AssistantProvider` with rules,
 `DemoTaskStore`, `DemoSearchTasksAction`, `DemoSetTaskStatusAction`). The gallery has no
 authentication, so it enables `AllowDemoPrincipal`. Users in `ReadOnlyUserIds` of
 `DemoSetTaskStatusAction` are refused, to try a denied change.

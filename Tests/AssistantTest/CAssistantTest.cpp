@@ -14,7 +14,7 @@
 
 // ImtCore includes
 #include <imtassist/CAssistantActionRegistry.h>
-#include <imtassist/CAssistantService.h>
+#include <imtassist/CAssistantLogicController.h>
 #include <imtassist/CFakeAssistantProvider.h>
 #include <imtassist/CStandardRepresentations.h>
 #include <imtassist/CUiRepresentationRegistry.h>
@@ -396,7 +396,7 @@ struct CFixture
 	CUiRepresentationRegistry representationRegistry;
 	CFakeAssistantProvider provider;
 	CRecordingAuditLog auditLog;
-	CAssistantService service;
+	CAssistantLogicController service;
 	QDateTime now;
 
 	CFixture()
@@ -697,7 +697,7 @@ void CAssistantTest::testDisabled_NoProviderCall()
 
 	// A service that was never enabled does not call a provider either.
 	CFakeAssistantProvider provider;
-	CAssistantService defaultService;
+	CAssistantLogicController defaultService;
 	QVERIFY(!defaultService.IsEnabled());
 	defaultService.SetProvider(&provider);
 	QVERIFY(HasError(defaultService.SendUserMessage(context, "any", "Show open tasks"), "AssistantDisabled"));
@@ -1264,7 +1264,7 @@ void CAssistantTest::testInvalidProviderResponse_Visible()
 	fixture.provider.AddScriptedReply(CFakeAssistantProvider::CreateErrorReply(IAssistantProvider::RS_INVALID_RESPONSE));
 	QVERIFY(HasError(fixture.service.SendUserMessage(context, conversationId, "Hello"), "InvalidResponse"));
 
-	fixture.provider.AddScriptedReply(CFakeAssistantProvider::CreateTextReply(QString(CAssistantService::MAX_REPLY_TEXT_LENGTH + 1, 'x')));
+	fixture.provider.AddScriptedReply(CFakeAssistantProvider::CreateTextReply(QString(CAssistantLogicController::MAX_REPLY_TEXT_LENGTH + 1, 'x')));
 	QVERIFY(HasError(fixture.service.SendUserMessage(context, conversationId, "Hello"), "InvalidResponse"));
 }
 

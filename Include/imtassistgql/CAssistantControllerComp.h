@@ -2,7 +2,7 @@
 #pragma once
 
 // ImtCore includes
-#include <imtassist/IAssistantController.h>
+#include <imtassist/IAssistantLogicController.h>
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
 
 
@@ -36,7 +36,7 @@ public:
 	typedef imtservergql::CPermissibleGqlRequestHandlerComp BaseClass;
 
 	I_BEGIN_COMPONENT(CAssistantControllerComp);
-		I_ASSIGN(m_assistantServiceCompPtr, "AssistantService", "Assistant service", true, "AssistantService");
+		I_ASSIGN(m_assistantLogicControllerCompPtr, "AssistantLogicController", "Assistant logic controller", true, "AssistantLogicController");
 		I_ASSIGN(m_allowDemoPrincipalAttrPtr, "AllowDemoPrincipal", "Process requests without an authenticated user as DemoUserId/DemoTenantId. Only for demo applications without authentication; never enable in production", true, false);
 		I_ASSIGN(m_demoUserIdAttrPtr, "DemoUserId", "User ID used for requests without an authenticated user if AllowDemoPrincipal is set", false, "demo-user");
 		I_ASSIGN(m_demoTenantIdAttrPtr, "DemoTenantId", "Tenant ID used for requests without an authenticated user if AllowDemoPrincipal is set", false, "demo-tenant");
@@ -83,7 +83,7 @@ protected:
 	virtual void OnComponentCreated() override;
 
 private:
-	I_REF(imtassist::IAssistantController, m_assistantServiceCompPtr);
+	I_REF(imtassist::IAssistantLogicController, m_assistantLogicControllerCompPtr);
 	I_ATTR(bool, m_allowDemoPrincipalAttrPtr);
 	I_ATTR(QByteArray, m_demoUserIdAttrPtr);
 	I_ATTR(QByteArray, m_demoTenantIdAttrPtr);

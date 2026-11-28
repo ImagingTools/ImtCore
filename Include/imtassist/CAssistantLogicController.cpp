@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtassist/CAssistantService.h>
+#include <imtassist/CAssistantLogicController.h>
 
 
 // Qt includes
@@ -21,7 +21,7 @@ const int s_maxClarificationOptionLength = 200;
 
 bool IsValidReplyText(const QString& text)
 {
-	return !text.trimmed().isEmpty() && (text.size() <= CAssistantService::MAX_REPLY_TEXT_LENGTH);
+	return !text.trimmed().isEmpty() && (text.size() <= CAssistantLogicController::MAX_REPLY_TEXT_LENGTH);
 }
 
 
@@ -40,12 +40,12 @@ bool AreValidChanges(const QJsonArray& changes)
 } // namespace
 
 
-CAssistantService::CAssistantService()
+CAssistantLogicController::CAssistantLogicController()
 {
 }
 
 
-void CAssistantService::SetEnabled(bool isEnabled)
+void CAssistantLogicController::SetEnabled(bool isEnabled)
 {
 	QMutexLocker lock(&m_mutex);
 
@@ -53,7 +53,7 @@ void CAssistantService::SetEnabled(bool isEnabled)
 }
 
 
-bool CAssistantService::IsEnabled() const
+bool CAssistantLogicController::IsEnabled() const
 {
 	QMutexLocker lock(&m_mutex);
 
@@ -61,7 +61,7 @@ bool CAssistantService::IsEnabled() const
 }
 
 
-void CAssistantService::SetProvider(IAssistantProvider* providerPtr)
+void CAssistantLogicController::SetProvider(IAssistantProvider* providerPtr)
 {
 	QMutexLocker lock(&m_mutex);
 
@@ -69,7 +69,7 @@ void CAssistantService::SetProvider(IAssistantProvider* providerPtr)
 }
 
 
-void CAssistantService::SetTenantPolicy(const IAssistantTenantPolicy* policyPtr)
+void CAssistantLogicController::SetTenantPolicy(const IAssistantTenantPolicy* policyPtr)
 {
 	QMutexLocker lock(&m_mutex);
 
@@ -77,7 +77,7 @@ void CAssistantService::SetTenantPolicy(const IAssistantTenantPolicy* policyPtr)
 }
 
 
-void CAssistantService::SetActionRegistry(const IAssistantActionRegistry* registryPtr)
+void CAssistantLogicController::SetActionRegistry(const IAssistantActionRegistry* registryPtr)
 {
 	QMutexLocker lock(&m_mutex);
 
@@ -85,7 +85,7 @@ void CAssistantService::SetActionRegistry(const IAssistantActionRegistry* regist
 }
 
 
-void CAssistantService::SetRepresentationRegistry(const IUiRepresentationRegistry* registryPtr)
+void CAssistantLogicController::SetRepresentationRegistry(const IUiRepresentationRegistry* registryPtr)
 {
 	QMutexLocker lock(&m_mutex);
 
@@ -93,7 +93,7 @@ void CAssistantService::SetRepresentationRegistry(const IUiRepresentationRegistr
 }
 
 
-void CAssistantService::SetAuditLog(IAssistantAuditLog* auditLogPtr)
+void CAssistantLogicController::SetAuditLog(IAssistantAuditLog* auditLogPtr)
 {
 	QMutexLocker lock(&m_mutex);
 
@@ -101,7 +101,7 @@ void CAssistantService::SetAuditLog(IAssistantAuditLog* auditLogPtr)
 }
 
 
-void CAssistantService::SetProviderTimeout(int timeoutMs)
+void CAssistantLogicController::SetProviderTimeout(int timeoutMs)
 {
 	QMutexLocker lock(&m_mutex);
 
@@ -109,7 +109,7 @@ void CAssistantService::SetProviderTimeout(int timeoutMs)
 }
 
 
-void CAssistantService::SetMaxStepsPerTurn(int maxSteps)
+void CAssistantLogicController::SetMaxStepsPerTurn(int maxSteps)
 {
 	QMutexLocker lock(&m_mutex);
 
@@ -117,7 +117,7 @@ void CAssistantService::SetMaxStepsPerTurn(int maxSteps)
 }
 
 
-int CAssistantService::GetMaxStepsPerTurn() const
+int CAssistantLogicController::GetMaxStepsPerTurn() const
 {
 	QMutexLocker lock(&m_mutex);
 
@@ -125,15 +125,15 @@ int CAssistantService::GetMaxStepsPerTurn() const
 }
 
 
-CActionPreviewStore& CAssistantService::GetPreviewStore()
+CActionPreviewStore& CAssistantLogicController::GetPreviewStore()
 {
 	return m_previewStore;
 }
 
 
-// reimplemented (imtassist::IAssistantController)
+// reimplemented (imtassist::IAssistantLogicController)
 
-bool CAssistantService::IsAvailable(const CAssistantRequestContext& context) const
+bool CAssistantLogicController::IsAvailable(const CAssistantRequestContext& context) const
 {
 	if (!context.IsValid()){
 		return false;
@@ -145,7 +145,7 @@ bool CAssistantService::IsAvailable(const CAssistantRequestContext& context) con
 }
 
 
-QByteArray CAssistantService::StartConversation(const CAssistantRequestContext& context)
+QByteArray CAssistantLogicController::StartConversation(const CAssistantRequestContext& context)
 {
 	if (!context.IsValid()){
 		Log(IAssistantAuditLog::ET_REQUEST_REJECTED, context, "InvalidContext");
@@ -194,7 +194,7 @@ QByteArray CAssistantService::StartConversation(const CAssistantRequestContext& 
 }
 
 
-AssistantMessages CAssistantService::SendUserMessage(
+AssistantMessages CAssistantLogicController::SendUserMessage(
 			const CAssistantRequestContext& context,
 			const QByteArray& conversationId,
 			const QString& text)
@@ -438,7 +438,7 @@ AssistantMessages CAssistantService::SendUserMessage(
 }
 
 
-bool CAssistantService::CancelRequest(const CAssistantRequestContext& context, const QByteArray& conversationId)
+bool CAssistantLogicController::CancelRequest(const CAssistantRequestContext& context, const QByteArray& conversationId)
 {
 	QMutexLocker lock(&m_mutex);
 
@@ -456,7 +456,7 @@ bool CAssistantService::CancelRequest(const CAssistantRequestContext& context, c
 }
 
 
-AssistantMessages CAssistantService::ConfirmPreview(const CAssistantRequestContext& context, const QByteArray& previewId)
+AssistantMessages CAssistantLogicController::ConfirmPreview(const CAssistantRequestContext& context, const QByteArray& previewId)
 {
 	AssistantMessages retVal;
 
@@ -599,7 +599,7 @@ AssistantMessages CAssistantService::ConfirmPreview(const CAssistantRequestConte
 }
 
 
-AssistantMessages CAssistantService::RejectPreview(const CAssistantRequestContext& context, const QByteArray& previewId)
+AssistantMessages CAssistantLogicController::RejectPreview(const CAssistantRequestContext& context, const QByteArray& previewId)
 {
 	AssistantMessages retVal;
 
@@ -651,7 +651,7 @@ AssistantMessages CAssistantService::RejectPreview(const CAssistantRequestContex
 }
 
 
-AssistantMessages CAssistantService::GetHistory(const CAssistantRequestContext& context, const QByteArray& conversationId) const
+AssistantMessages CAssistantLogicController::GetHistory(const CAssistantRequestContext& context, const QByteArray& conversationId) const
 {
 	QMutexLocker lock(&m_mutex);
 
@@ -664,7 +664,7 @@ AssistantMessages CAssistantService::GetHistory(const CAssistantRequestContext& 
 }
 
 
-bool CAssistantService::CloseConversation(const CAssistantRequestContext& context, const QByteArray& conversationId)
+bool CAssistantLogicController::CloseConversation(const CAssistantRequestContext& context, const QByteArray& conversationId)
 {
 	QMutexLocker lock(&m_mutex);
 
@@ -682,13 +682,13 @@ bool CAssistantService::CloseConversation(const CAssistantRequestContext& contex
 
 // protected methods
 
-bool CAssistantService::IsAssistantEnabled() const
+bool CAssistantLogicController::IsAssistantEnabled() const
 {
 	return m_isEnabled;
 }
 
 
-bool CAssistantService::IsAssistantEnabledForTenant(const QByteArray& tenantId) const
+bool CAssistantLogicController::IsAssistantEnabledForTenant(const QByteArray& tenantId) const
 {
 	if (!IsAssistantEnabled()){
 		return false;
@@ -700,13 +700,13 @@ bool CAssistantService::IsAssistantEnabledForTenant(const QByteArray& tenantId) 
 
 // private methods
 
-bool CAssistantService::IsConversationOf(const Conversation& conversation, const CAssistantRequestContext& context) const
+bool CAssistantLogicController::IsConversationOf(const Conversation& conversation, const CAssistantRequestContext& context) const
 {
 	return context.IsValid() && (conversation.userId == context.GetUserId()) && (conversation.tenantId == context.GetTenantId());
 }
 
 
-CAssistantService::StepResult CAssistantService::ProcessActionCall(
+CAssistantLogicController::StepResult CAssistantLogicController::ProcessActionCall(
 			const CAssistantRequestContext& context,
 			const QByteArray& conversationId,
 			const IAssistantProvider::Reply& reply,
@@ -891,7 +891,7 @@ CAssistantService::StepResult CAssistantService::ProcessActionCall(
 }
 
 
-void CAssistantService::AppendFailedToolResult(
+void CAssistantLogicController::AppendFailedToolResult(
 			IAssistantProvider::Messages& providerMessages,
 			const QByteArray& actionId,
 			const QByteArray& callId,
@@ -907,7 +907,7 @@ void CAssistantService::AppendFailedToolResult(
 }
 
 
-IAssistantProvider::ToolDescriptions CAssistantService::CreateToolDescriptions() const
+IAssistantProvider::ToolDescriptions CAssistantLogicController::CreateToolDescriptions() const
 {
 	const IAssistantActionRegistry* registryPtr = nullptr;
 	{
@@ -939,7 +939,7 @@ IAssistantProvider::ToolDescriptions CAssistantService::CreateToolDescriptions()
 }
 
 
-CAssistantMessage CAssistantService::CreateError(
+CAssistantMessage CAssistantLogicController::CreateError(
 			const CAssistantRequestContext& context,
 			const QByteArray& conversationId,
 			const QByteArray& code,
@@ -953,7 +953,7 @@ CAssistantMessage CAssistantService::CreateError(
 }
 
 
-CAssistantMessage CAssistantService::CreateExecutedMessage(
+CAssistantMessage CAssistantLogicController::CreateExecutedMessage(
 			const CAssistantRequestContext& context,
 			const CActionPreviewStore::Preview& preview) const
 {
@@ -981,7 +981,7 @@ CAssistantMessage CAssistantService::CreateExecutedMessage(
 }
 
 
-void CAssistantService::AppendToConversation(
+void CAssistantLogicController::AppendToConversation(
 			const CAssistantRequestContext& context,
 			const QByteArray& conversationId,
 			const AssistantMessages& messages,
@@ -1010,7 +1010,7 @@ void CAssistantService::AppendToConversation(
 }
 
 
-void CAssistantService::Log(
+void CAssistantLogicController::Log(
 			IAssistantAuditLog::EventType type,
 			const CAssistantRequestContext& context,
 			const QByteArray& outcome,
@@ -1041,7 +1041,7 @@ void CAssistantService::Log(
 }
 
 
-QByteArray CAssistantService::GetExecutionStatusCode(IAssistantAction::ExecutionStatus status)
+QByteArray CAssistantLogicController::GetExecutionStatusCode(IAssistantAction::ExecutionStatus status)
 {
 	switch (status){
 	case IAssistantAction::ES_SUCCEEDED:

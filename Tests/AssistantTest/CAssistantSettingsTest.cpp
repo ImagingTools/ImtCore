@@ -18,7 +18,7 @@
 // ImtCore includes
 #include <imtassist/CAssistantActionRegistry.h>
 #include <imtassist/CAssistantProviderPresetListComp.h>
-#include <imtassist/CAssistantServiceComp.h>
+#include <imtassist/CAssistantLogicControllerComp.h>
 #include <imtassist/CHttpAssistantProviderComp.h>
 #include <imtcrypt/CProtectedTextParamComp.h>
 
@@ -77,7 +77,7 @@ typedef icomp::TSimSharedComponentPtr<iprm::CEnableableParamComp> EnableablePara
 typedef icomp::TSimSharedComponentPtr<CAssistantProviderPresetListComp> ProviderList;
 typedef icomp::TSimSharedComponentPtr<CTestSecretProtectorComp> TestProtector;
 typedef icomp::TSimComponentWrap<CHttpAssistantProviderComp> HttpProvider;
-typedef icomp::TSimComponentWrap<CAssistantServiceComp> AssistantService;
+typedef icomp::TSimComponentWrap<CAssistantLogicControllerComp> AssistantLogicController;
 typedef icomp::TSimComponentWrap<imtcrypt::CProtectedTextParamComp> ProtectedTextParam;
 
 
@@ -273,7 +273,7 @@ void CAssistantSettingsTest::testService_EnabledBySetting()
 	enabledParam->InitComponent();
 	QVERIFY(!enabledParam->IsEnabled());
 
-	AssistantService service;
+	AssistantLogicController service;
 	service.SetBoolAttr("Enabled", true);
 	service.SetRef("EnabledParam", enabledParam);
 	service.InitComponent();
@@ -289,7 +289,7 @@ void CAssistantSettingsTest::testService_EnabledBySetting()
 	QVERIFY(!service.StartConversation(context).isEmpty());
 
 	// Without the setting the attribute decides; it is off by default.
-	AssistantService defaultService;
+	AssistantLogicController defaultService;
 	defaultService.InitComponent();
 	QVERIFY(!defaultService.IsEnabled());
 }

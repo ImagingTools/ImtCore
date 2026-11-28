@@ -6,7 +6,7 @@
 #include <iprm/IEnableableParam.h>
 
 // ImtCore includes
-#include <imtassist/CAssistantService.h>
+#include <imtassist/CAssistantLogicController.h>
 
 
 namespace imtassist
@@ -19,15 +19,15 @@ namespace imtassist
 
 	\ingroup imtassist
 */
-class CAssistantServiceComp:
+class CAssistantLogicControllerComp:
 			public ilog::CLoggerComponentBase,
-			public CAssistantService
+			public CAssistantLogicController
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CAssistantServiceComp);
-		I_REGISTER_INTERFACE(IAssistantController);
+	I_BEGIN_COMPONENT(CAssistantLogicControllerComp);
+		I_REGISTER_INTERFACE(IAssistantLogicController);
 		I_ASSIGN(m_isEnabledAttrPtr, "Enabled", "Enable the assistant. While disabled, no request is sent to a provider; overridden by EnabledParam", true, false);
 		I_ASSIGN(m_enabledParamCompPtr, "EnabledParam", "Setting of the server that enables the assistant; Enabled when unset", false, "EnabledParam");
 		I_ASSIGN(m_tenantPolicyCompPtr, "TenantPolicy", "Decision per tenant, e.g. the assistant configuration of the tenant; all tenants when unset", false, "TenantPolicy");
@@ -35,13 +35,13 @@ public:
 		I_ASSIGN(m_actionRegistryCompPtr, "ActionRegistry", "Registry of the actions available to the assistant", true, "ActionRegistry");
 		I_ASSIGN(m_representationRegistryCompPtr, "RepresentationRegistry", "Registry of the known UI representation types", false, "RepresentationRegistry");
 		I_ASSIGN(m_auditLogCompPtr, "AuditLog", "Receiver of technical events and action decisions", false, "AuditLog");
-		I_ASSIGN(m_providerTimeoutAttrPtr, "ProviderTimeout", "Timeout of one provider call in milliseconds", true, CAssistantService::DEFAULT_PROVIDER_TIMEOUT_MS);
-		I_ASSIGN(m_maxStepsPerTurnAttrPtr, "MaxStepsPerTurn", "Maximum number of provider calls in one turn", true, CAssistantService::DEFAULT_MAX_STEPS_PER_TURN);
+		I_ASSIGN(m_providerTimeoutAttrPtr, "ProviderTimeout", "Timeout of one provider call in milliseconds", true, CAssistantLogicController::DEFAULT_PROVIDER_TIMEOUT_MS);
+		I_ASSIGN(m_maxStepsPerTurnAttrPtr, "MaxStepsPerTurn", "Maximum number of provider calls in one turn", true, CAssistantLogicController::DEFAULT_MAX_STEPS_PER_TURN);
 		I_ASSIGN(m_previewTimeToLiveAttrPtr, "PreviewTimeToLive", "Time to live of a prepared change in seconds", true, CActionPreviewStore::DEFAULT_TIME_TO_LIVE_SEC);
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtassist::CAssistantService)
+	// reimplemented (imtassist::CAssistantLogicController)
 	virtual bool IsAssistantEnabled() const override;
 
 	// reimplemented (icomp::CComponentBase)

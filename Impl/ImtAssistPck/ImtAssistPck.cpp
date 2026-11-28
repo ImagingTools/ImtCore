@@ -16,7 +16,7 @@ I_EXPORT_PACKAGE(
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
-			AssistantService,
+			AssistantLogicController,
 			"Provider-independent assistant service, disabled by default",
 			"Assistant AI Service");
 

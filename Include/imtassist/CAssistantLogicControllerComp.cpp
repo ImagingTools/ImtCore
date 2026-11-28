@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtassist/CAssistantServiceComp.h>
+#include <imtassist/CAssistantLogicControllerComp.h>
 
 
 namespace imtassist
@@ -8,21 +8,21 @@ namespace imtassist
 
 // protected methods
 
-// reimplemented (imtassist::CAssistantService)
+// reimplemented (imtassist::CAssistantLogicController)
 
-bool CAssistantServiceComp::IsAssistantEnabled() const
+bool CAssistantLogicControllerComp::IsAssistantEnabled() const
 {
 	if (m_enabledParamCompPtr.IsValid()){
 		return m_enabledParamCompPtr->IsEnabled();
 	}
 
-	return CAssistantService::IsAssistantEnabled();
+	return CAssistantLogicController::IsAssistantEnabled();
 }
 
 
 // reimplemented (icomp::CComponentBase)
 
-void CAssistantServiceComp::OnComponentCreated()
+void CAssistantLogicControllerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
@@ -48,12 +48,12 @@ void CAssistantServiceComp::OnComponentCreated()
 	SetEnabled(isEnabled);
 
 	if (IsEnabled() && !m_providerCompPtr.IsValid()){
-		SendWarningMessage(0, QStringLiteral("The assistant is enabled, but no provider is configured; requests are rejected."), "AssistantService");
+		SendWarningMessage(0, QStringLiteral("The assistant is enabled, but no provider is configured; requests are rejected."), "AssistantLogicController");
 	}
 }
 
 
-void CAssistantServiceComp::OnComponentDestroyed()
+void CAssistantLogicControllerComp::OnComponentDestroyed()
 {
 	SetEnabled(false);
 	SetProvider(nullptr);

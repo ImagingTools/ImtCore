@@ -3,7 +3,7 @@
 
 
 // ImtCore includes
-#include <imtassist/CAssistantServiceComp.h>
+#include <imtassist/CAssistantLogicControllerComp.h>
 #include <imtassist/CAssistantActionRegistryComp.h>
 #include <imtassist/CUiRepresentationRegistryComp.h>
 #include <imtassist/CFakeAssistantProviderComp.h>
@@ -24,7 +24,7 @@ namespace ImtAssistPck
 {
 
 
-typedef imtassist::CAssistantServiceComp AssistantService;
+typedef imtassist::CAssistantLogicControllerComp AssistantLogicController;
 typedef imtassist::CAssistantActionRegistryComp AssistantActionRegistry;
 typedef imtassist::CUiRepresentationRegistryComp UiRepresentationRegistry;
 typedef imtassist::CFakeAssistantProviderComp FakeAssistantProvider;
