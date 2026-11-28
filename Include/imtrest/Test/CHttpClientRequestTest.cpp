@@ -2,6 +2,9 @@
 #include "CHttpClientRequestTest.h"
 
 
+// STL includes
+#include <limits>
+
 // Qt includes
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QTimer>
@@ -227,6 +230,17 @@ void CHttpClientRequestTest::TooLargeReplyTest()
 }
 
 
+void CHttpClientRequestTest::InvalidMaxReplySizeTest()
+{
+	imtrest::CHttpClientRequest request;
+	request.SetRequest(QNetworkRequest(QUrl("http://127.0.0.1/invalid-size")));
+
+	QCOMPARE(imtrest::CHttpClientRequestSender::Send(request, 5000, imtrest::CHttpClientRequestSender::CancellationCheck(), -1), imtrest::CHttpClientRequestSender::SR_INVALID_REQUEST);
+	QCOMPARE(imtrest::CHttpClientRequestSender::Send(request, 5000, imtrest::CHttpClientRequestSender::CancellationCheck(), std::numeric_limits<qint64>::max()), imtrest::CHttpClientRequestSender::SR_INVALID_REQUEST);
+	QVERIFY(m_receivedRequest.isEmpty());
+}
+
+
 void CHttpClientRequestTest::InvalidUrlTest()
 {
 	imtrest::CHttpClientRequest request;
@@ -280,5 +294,4 @@ QUrl CHttpClientRequestTest::GetServerUrl(const QString& path) const
 
 
 I_ADD_TEST(CHttpClientRequestTest);
-
 

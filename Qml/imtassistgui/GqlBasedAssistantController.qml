@@ -19,29 +19,30 @@ AssistantController {
 
 	// reimplemented (AssistantController)
 	function sendRequest(commandId, input){
+		let requestParams = Object.assign({}, input, {"requestGeneration": root.requestGeneration})
 		if (commandId === "AssistantGetStatus"){
-			statusSender.send(input)
+			statusSender.send(requestParams)
 		}
 		else if (commandId === "AssistantStartConversation"){
-			startSender.send(input)
+			startSender.send(requestParams)
 		}
 		else if (commandId === "AssistantSendMessage"){
-			sendMessageSender.send(input)
+			sendMessageSender.send(requestParams)
 		}
 		else if (commandId === "AssistantConfirmPreview"){
-			confirmSender.send(input)
+			confirmSender.send(requestParams)
 		}
 		else if (commandId === "AssistantRejectPreview"){
-			rejectSender.send(input)
+			rejectSender.send(requestParams)
 		}
 		else if (commandId === "AssistantCancelRequest"){
-			cancelSender.send(input)
+			cancelSender.send(requestParams)
 		}
 		else if (commandId === "AssistantGetHistory"){
-			historySender.send(input)
+			historySender.send(requestParams)
 		}
 		else if (commandId === "AssistantCloseConversation"){
-			closeSender.send(input)
+			closeSender.send(requestParams)
 		}
 		else{
 			console.warn("GqlBasedAssistantController: unsupported command", commandId)
@@ -101,12 +102,12 @@ AssistantController {
 			query.AddField(Gql.GqlObject("available"))
 		}
 
-		function onResult(data){
-			root.handleStatus(data && data.containsKey("available") && data.getData("available") === true)
+		function onResult(data, params){
+			root.handleStatus(data && data.containsKey("available") && data.getData("available") === true, params.requestGeneration)
 		}
 
-		function onError(message, type){
-			root.handleError("AssistantGetStatus", message)
+		function onError(message, type, params){
+			root.handleError("AssistantGetStatus", message, params.requestGeneration)
 		}
 	}
 
@@ -120,12 +121,12 @@ AssistantController {
 			root.addMessageFields(query)
 		}
 
-		function onResult(data){
-			root.handleResponse("AssistantStartConversation", root.readString(data, "conversationId"), root.readString(data, "messagesJson"))
+		function onResult(data, params){
+			root.handleResponse("AssistantStartConversation", root.readString(data, "conversationId"), root.readString(data, "messagesJson"), params.requestGeneration)
 		}
 
-		function onError(message, type){
-			root.handleError("AssistantStartConversation", message)
+		function onError(message, type, params){
+			root.handleError("AssistantStartConversation", message, params.requestGeneration)
 		}
 	}
 
@@ -139,12 +140,12 @@ AssistantController {
 			root.addMessageFields(query)
 		}
 
-		function onResult(data){
-			root.handleResponse("AssistantSendMessage", root.conversationId, root.readString(data, "messagesJson"))
+		function onResult(data, params){
+			root.handleResponse("AssistantSendMessage", root.readString(data, "conversationId"), root.readString(data, "messagesJson"), params.requestGeneration)
 		}
 
-		function onError(message, type){
-			root.handleError("AssistantSendMessage", message)
+		function onError(message, type, params){
+			root.handleError("AssistantSendMessage", message, params.requestGeneration)
 		}
 	}
 
@@ -158,12 +159,12 @@ AssistantController {
 			root.addMessageFields(query)
 		}
 
-		function onResult(data){
-			root.handleResponse("AssistantConfirmPreview", root.conversationId, root.readString(data, "messagesJson"))
+		function onResult(data, params){
+			root.handleResponse("AssistantConfirmPreview", root.readString(data, "conversationId"), root.readString(data, "messagesJson"), params.requestGeneration)
 		}
 
-		function onError(message, type){
-			root.handleError("AssistantConfirmPreview", message)
+		function onError(message, type, params){
+			root.handleError("AssistantConfirmPreview", message, params.requestGeneration)
 		}
 	}
 
@@ -177,12 +178,12 @@ AssistantController {
 			root.addMessageFields(query)
 		}
 
-		function onResult(data){
-			root.handleResponse("AssistantRejectPreview", root.conversationId, root.readString(data, "messagesJson"))
+		function onResult(data, params){
+			root.handleResponse("AssistantRejectPreview", root.readString(data, "conversationId"), root.readString(data, "messagesJson"), params.requestGeneration)
 		}
 
-		function onError(message, type){
-			root.handleError("AssistantRejectPreview", message)
+		function onError(message, type, params){
+			root.handleError("AssistantRejectPreview", message, params.requestGeneration)
 		}
 	}
 
@@ -199,8 +200,8 @@ AssistantController {
 		function onResult(data){
 		}
 
-		function onError(message, type){
-			root.handleError("AssistantCancelRequest", message)
+		function onError(message, type, params){
+			root.handleError("AssistantCancelRequest", message, params.requestGeneration)
 		}
 	}
 
@@ -214,12 +215,12 @@ AssistantController {
 			root.addMessageFields(query)
 		}
 
-		function onResult(data){
-			root.handleResponse("AssistantGetHistory", root.conversationId, root.readString(data, "messagesJson"))
+		function onResult(data, params){
+			root.handleResponse("AssistantGetHistory", root.readString(data, "conversationId"), root.readString(data, "messagesJson"), params.requestGeneration)
 		}
 
-		function onError(message, type){
-			root.handleError("AssistantGetHistory", message)
+		function onError(message, type, params){
+			root.handleError("AssistantGetHistory", message, params.requestGeneration)
 		}
 	}
 
@@ -236,8 +237,8 @@ AssistantController {
 		function onResult(data){
 		}
 
-		function onError(message, type){
-			root.handleError("AssistantCloseConversation", message)
+		function onError(message, type, params){
+			root.handleError("AssistantCloseConversation", message, params.requestGeneration)
 		}
 	}
 }

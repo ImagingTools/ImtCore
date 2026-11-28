@@ -71,6 +71,21 @@ TestCase {
 		return ids
 	}
 
+	function findItem(item, objectName){
+		if (item.objectName === objectName){
+			return item
+		}
+
+		for (let i = 0; i < item.children.length; ++i){
+			let found = findItem(item.children[i], objectName)
+			if (found){
+				return found
+			}
+		}
+
+		return null
+	}
+
 	function verifyCurrentPage(view, pageId){
 		let index = view.multiPageView.getIndexById(pageId)
 		verify(index >= 0, "the sub-page '" + pageId + "' is present")
@@ -142,5 +157,45 @@ TestCase {
 		NavigationController.navigate("Administration/Tools")
 
 		verifyCurrentPage(view, "Tools")
+	}
+
+	function test_assistantStateAddsPageWithoutRebuildingOthers(){
+		AuthorizationController.userTokenProvider.permissions = ["/Administration/Assistant/ViewPage"]
+		let view = createView()
+		view.multiPageView.removePage("Assistant")
+		view.assistantSupported = false
+		view.multiPageView.activatePage(view.multiPageView.getIndexById("Tools"))
+		let toolsPage = view.multiPageView.getPageById("Tools")
+		let existingIds = pageIds(view)
+
+		view.onAssistantStateChanged({"active": false})
+
+		compare(pageIds(view), existingIds.concat(["Assistant"]))
+		compare(view.multiPageView.getPageById("Tools"), toolsPage)
+		verifyCurrentPage(view, "Tools")
+		let adminNavigation = null
+		for (let i = 0; i < NavigationController.navigableItems.length; ++i){
+			let item = NavigationController.navigableItems[i]
+			if (item.parentSegment === "Administration"){
+				adminNavigation = item
+			}
+		}
+
+		verify(adminNavigation !== null)
+		verify(adminNavigation.paths.indexOf("Assistant") >= 0)
+	}
+
+	function test_assistantButtonFitsCompactSidebar(){
+		AuthorizationController.userTokenProvider.permissions = ["/Administration/Assistant/ViewPage"]
+		let view = createView()
+		view.multiPageView.removePage("Assistant")
+		view.assistantSupported = false
+		view.onAssistantStateChanged({"active": true})
+		view.parent.width = view.multiPageView.panelWidth + 100
+
+		let button = findItem(view, "AdministrationAssistantButton")
+		verify(button)
+		tryVerify(function(){ return view.multiPageView.compact }, 2000)
+		compare(button.width, Style.iconSizeS)
 	}
 }

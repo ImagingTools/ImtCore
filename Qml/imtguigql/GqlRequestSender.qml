@@ -95,7 +95,7 @@ GqlModel {
 		if (headers && root.permissionPath && root.permissionPath != "")
 			headers["permissionPath"] = root.permissionPath
 
-		root.setGqlQuery(query.GetQuery(), headers)
+		root.setGqlQuery(query.GetQuery(), headers, params)
     }
 
     function createQueryParams(query, params){}
@@ -108,7 +108,7 @@ GqlModel {
             return;
         }
         else if (state === "Error"){
-            root.onError("Network error", "Critical");
+            root.onError("Network error", "Critical", root.responseContext);
         }
         else if (state === "Ready"){
             if (root.containsKey("errors")){
@@ -135,7 +135,7 @@ GqlModel {
                     }
                 }
 
-                root.onError(message, type);
+                root.onError(message, type, root.responseContext);
             }
 
             else if (root.containsKey("data")){
@@ -143,7 +143,7 @@ GqlModel {
                 if (dataModelLocal.containsKey(root.gqlCommandId)){
                     let data = dataModelLocal.getData(root.gqlCommandId)
 
-                    root.onResult(data);
+                    root.onResult(data, root.responseContext);
                 }
             }
         }

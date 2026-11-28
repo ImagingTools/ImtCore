@@ -19,6 +19,7 @@ QtObject {
 	id: root
 
 	property string conversationId: ""
+	property int requestGeneration: 0
 	// Whether the assistant is enabled for the organization of the session (AssistantGetStatus).
 	property bool available: false
 	property bool busy: false
@@ -60,7 +61,11 @@ QtObject {
 		root.sendRequest("AssistantGetStatus", {})
 	}
 
-	function handleStatus(isAvailable){
+	function handleStatus(isAvailable, requestGeneration){
+		if (requestGeneration !== undefined && requestGeneration !== root.requestGeneration){
+			return
+		}
+
 		root.available = isAvailable === true
 		root.availabilityChecked(root.available)
 	}
@@ -72,6 +77,8 @@ QtObject {
 	}
 
 	function newConversation(){
+		root.requestGeneration++
+
 		if (root.conversationId !== ""){
 			root.sendRequest("AssistantCloseConversation", {"conversationId": root.conversationId})
 		}
@@ -80,6 +87,7 @@ QtObject {
 		root.messagesModel.clear()
 		root.previewStates = {}
 		root.clearContextItems()
+		root.__pendingText = ""
 		root.busy = false
 		root.busyCommand = ""
 	}
@@ -219,7 +227,11 @@ QtObject {
 	}
 
 	// Called by the transport with the answer of a command.
-	function handleResponse(commandId, conversationId, messagesJson){
+	function handleResponse(commandId, conversationId, messagesJson, requestGeneration){
+		if (requestGeneration !== undefined && requestGeneration !== root.requestGeneration){
+			return
+		}
+
 		let messages = []
 		if (messagesJson !== undefined && messagesJson !== ""){
 			try {
@@ -266,7 +278,11 @@ QtObject {
 	}
 
 	// Called by the transport if a command failed without an answer.
-	function handleError(commandId, message){
+	function handleError(commandId, message, requestGeneration){
+		if (requestGeneration !== undefined && requestGeneration !== root.requestGeneration){
+			return
+		}
+
 		if (commandId === "AssistantGetStatus"){
 			root.handleStatus(false)
 

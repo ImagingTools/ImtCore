@@ -108,6 +108,10 @@ QtObject {
 		target: root.controller
 
 		function onAvailabilityChecked(available){
+			if (root.active === available){
+				root.__publishState()
+			}
+
 			root.active = available
 		}
 	}

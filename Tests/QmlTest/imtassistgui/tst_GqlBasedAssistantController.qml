@@ -73,6 +73,21 @@ TestCase {
 		compare(controller.messagesModel.count, 0)
 	}
 
+	function test_staleAvailabilityErrorIsIgnored(){
+		GqlTestTransport.queueDelay("AssistantGetStatus", 300)
+		GqlTestTransport.queueResponse("AssistantGetStatus", failure("AssistantGetStatus"))
+
+		let controller = createTemporaryObject(controllerComp, testCase)
+		controller.handleStatus(true)
+		controller.checkAvailability()
+		waitForCommand("AssistantGetStatus")
+		controller.newConversation()
+
+		wait(500)
+		verify(controller.available)
+		compare(controller.messagesModel.count, 0)
+	}
+
 	function test_messageWithContextIsSentAndAnswered(){
 		let controller = startedController()
 
@@ -94,6 +109,25 @@ TestCase {
 		tryCompare(controller.messagesModel, "count", 1, 5000)
 		compare(controller.busy, false)
 		compare(JSON.parse(controller.messagesModel.get(0).messageJson).text, "Two open tasks")
+	}
+
+	function test_newConversationInvalidatesPendingStart(){
+		GqlTestTransport.queueDelay("AssistantStartConversation", 300)
+		GqlTestTransport.queueResponse("AssistantStartConversation", response("AssistantStartConversation", {"conversationId": "c-old", "messagesJson": "[]"}))
+
+		let controller = createTemporaryObject(controllerComp, testCase)
+		controller.sendMessage("Do not send this after stopping")
+		waitForCommand("AssistantStartConversation")
+		verify(controller.__pendingText !== "")
+
+		controller.newConversation()
+		verify(controller.__pendingText === "")
+		wait(500)
+
+		compare(controller.conversationId, "")
+		verify(!controller.busy)
+		compare(controller.messagesModel.count, 0)
+		verify(GqlTestTransport.requestedCommands().indexOf("AssistantSendMessage") < 0)
 	}
 
 	function test_confirmationSendsThePreviewId(){
