@@ -1045,7 +1045,8 @@ void CAssistantProviderTest::testRestTransport_ResponseTimeoutAndCancel()
 	quint16 port = server.serverPort();
 	server.close();
 	request.url = QUrl(QStringLiteral("http://127.0.0.1:%1/").arg(port));
-	request.timeoutMs = 3000;
+	// Windows retries a refused connection to the local machine for some seconds.
+	request.timeoutMs = 20000;
 	response = transport.Post(request, CCancellationToken());
 	QCOMPARE(response.status, IAssistantHttpTransport::TS_NETWORK_ERROR);
 }

@@ -213,7 +213,8 @@ void CAssistantSettingsTest::testProvider_SettingsOverrideAttributes()
 	IAssistantProvider::Reply reply = provider.Complete(CreateRequest(), CCancellationToken());
 	QCOMPARE(reply.status, IAssistantProvider::RS_OK);
 	QCOMPARE(reply.text, QString("Hello"));
-	QVERIFY(modelServer.request.contains("Authorization: Bearer key-from-settings"));
+	// Newer Qt versions send the header names in lower case.
+	QVERIFY(modelServer.request.toLower().contains("authorization: bearer key-from-settings"));
 	QVERIFY(modelServer.request.contains("\"model\":\"model-from-settings\""));
 	QVERIFY(!modelServer.request.contains("model-from-attribute"));
 }

@@ -37,6 +37,14 @@ TestCase {
 		return request
 	}
 
+	// CGqlModel reads the body of every answer except 401/403, so a failed request needs an error body.
+	function failure(commandId){
+		let errors = {}
+		errors[commandId] = {"message": "Internal error"}
+
+		return JSON.stringify({"errors": errors})
+	}
+
 	function startedController(){
 		GqlTestTransport.queueResponse("AssistantStartConversation", response("AssistantStartConversation", {"conversationId": "c-1", "messagesJson": "[]"}))
 
@@ -59,6 +67,7 @@ TestCase {
 		tryCompare(controller, "available", true, 5000)
 
 		GqlTestTransport.queueStatus("AssistantGetStatus", 500)
+		GqlTestTransport.queueResponse("AssistantGetStatus", failure("AssistantGetStatus"))
 		controller.checkAvailability()
 		tryCompare(controller, "available", false, 5000)
 		compare(controller.messagesModel.count, 0)
@@ -120,6 +129,7 @@ TestCase {
 		let controller = startedController()
 
 		GqlTestTransport.queueStatus("AssistantConfirmPreview", 500)
+		GqlTestTransport.queueResponse("AssistantConfirmPreview", failure("AssistantConfirmPreview"))
 		controller.confirmPreview("p-1")
 
 		tryCompare(controller.messagesModel, "count", 1, 5000)

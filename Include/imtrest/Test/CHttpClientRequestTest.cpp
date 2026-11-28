@@ -244,7 +244,8 @@ void CHttpClientRequestTest::ConnectionRefusedTest()
 	imtrest::CHttpClientRequest request;
 	request.SetRequest(QNetworkRequest(QUrl(QStringLiteral("http://127.0.0.1:%1/").arg(port))));
 
-	QCOMPARE(imtrest::CHttpClientRequestSender::Send(request, 3000), imtrest::CHttpClientRequestSender::SR_FINISHED);
+	// Windows retries a refused connection to the local machine for some seconds.
+	QCOMPARE(imtrest::CHttpClientRequestSender::Send(request, 20000), imtrest::CHttpClientRequestSender::SR_FINISHED);
 	QVERIFY(!request.GetAttribute(QNetworkRequest::HttpStatusCodeAttribute).isValid());
 	QCOMPARE(request.GetErrorType(), QNetworkReply::ConnectionRefusedError);
 }
