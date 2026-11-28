@@ -1,7 +1,7 @@
 // The runtime, exposed as window.JQ: the QML types by name and what generated code calls.
 const engine = require('./Core/engine')
 const { defineType } = require('./Core/type')
-const { QtObject, GroupObject } = require('./Core/QtObject')
+const { QtObject, GroupObject, QtBinding } = require('./Core/QtObject')
 const { setRootProvider } = require('./Core/Resources')
 const { Qt } = require('./Qt/Qt')
 const { files, load } = require('./QtQml/files')
@@ -9,6 +9,7 @@ const { Component } = require('./QtQml/Component')
 const { Timer } = require('./QtQml/Timer')
 const { Connections } = require('./QtQml/Connections')
 const { Binding } = require('./QtQml/Binding')
+const { aliasValue, withAliasField, bindAliasField } = require('./QtQml/AliasValue')
 const { ListModel } = require('./QtQml/Models/ListModel')
 const { Instantiator } = require('./QtQml/Models/Instantiator')
 const { ItemSelectionModel } = require('./QtQml/Models/ItemSelectionModel')
@@ -133,10 +134,47 @@ function forward(source, sourceSignal, target, targetSignal){
     engine.connect(source, sourceSignal, (a, b) => engine.emit(target, targetSignal, a, b))
 }
 
+function forwardAliasProperty(source, name, target, targetSignal){
+    if(!source?.constructor?.$type) return
+    // In Qt a font subproperty shares the notifier of the enclosing QFont.
+    const font = source instanceof Font
+    if(font) source.$valueAliasObserved = true
+    const signal = font ? Font.SIGNAL_valueChanged : source.constructor.$type.signalByName.get(name + 'Changed')
+    if(signal !== undefined) forward(source, signal, target, targetSignal)
+}
+
+function aliasTarget(target, name, forList = false){
+    let prop = target.constructor.$type.propByName.get(name)
+    if(forList){
+        if(prop?.kind === 'list') return [target, name, true]
+        return target.constructor.$listAliases?.[name]?.(target) || target.constructor.$aliases?.[name]?.(target, true)
+    }
+    return prop ? [target, prop.id] : target.constructor.$aliases[name](target)
+}
+
+function aliasFieldTarget(target, name, field, kind){
+    return [...aliasTarget(target, name), field, kind]
+}
+
+function readAliasField(target, name, field, kind){
+    return aliasValue(target[name], kind)[field]
+}
+
+function writeAliasField(target, name, field, kind, next){
+    const [owner, id] = aliasTarget(target, name)
+    if(next instanceof QtBinding){
+        bindAliasField(owner, id, field, kind, next.fn, null, target)
+        return
+    }
+    owner.$removeBindings(id, field, true)
+    owner.$write(id, withAliasField(aliasValue(owner.$v[id], kind), field, next))
+}
+
 // Binding written on an alias goes to the aliased property, evaluated with the alias owner as self
 function bindAlias(owner, name, fn, scope){
-    let [target, id] = owner.constructor.$aliases[name](owner)
-    return target.$bind(id, fn, scope, owner)
+    let [target, id, field, kind] = owner.constructor.$aliases[name](owner)
+    if(field === undefined) return target.$bind(id, fn, scope, owner)
+    return bindAliasField(target, id, field, kind, fn, scope, owner)
 }
 
 // QML methods are bound to their object, also when read as a value: obj.ping.connect(handler).
@@ -165,14 +203,21 @@ function defaultParent(Class, obj){
 // a child of a type whose default property is an alias of an object property (pane.contentItem): assigned to it
 // an object declared in an alias (media: Item {}): appended to the list of an alias of data / children / resources
 // (QQmlObjectCreator appends to a list property), else the value of the alias
-function aliasAssign(obj, name, child){
-    let list = obj.constructor.$listAliases && obj.constructor.$listAliases[name]
+function aliasAssign(obj, name, child, array = false){
+    let list = aliasTarget(obj, name, true)
     if(!list){
-        obj[name] = child
+        obj[name] = array ? child.map(item => ownValue(obj, item)) : child
         return
     }
-    let [owner, prop] = list(obj)
-    if(child && child.$setParent && (prop !== 'children' || child.$isItem)) child.$setParent(owner)
+    let [owner, prop, typed] = list
+    let items = array ? child : [child]
+    if(typed){
+        owner[prop].push(...items.map(item => ownValue(owner, item)))
+        return
+    }
+    for(const item of items){
+        if(item?.$setParent && (prop !== 'children' || item.$isItem)) item.$setParent(owner)
+    }
 }
 
 // an object made as the value of a property (`property QtObject helper: QtObject {}`, `model: ListModel {}`): its
@@ -421,7 +466,7 @@ function csetm(obj, key, name, v){
 }
 
 const JQ = {
-    cset, csetm, qsTrIn, forward, bindAlias, handleGroup, callCreateQmlObject, files, scripts, script, si, sis, moduleScripts, make: engine.make, inContext: engine.inContext, callCreateComponent, sctx, sctxValue, sset, singleton, defineMethod, defaultParent, defaultAssign, aliasAssign, ownValue, ctx, ctxValue, mctx, mrole, as, ns, qmlModule, subAssign, rootContext,
+    cset, csetm, qsTrIn, forward, forwardAliasProperty, bindAlias, aliasTarget, aliasFieldTarget, readAliasField, writeAliasField, handleGroup, callCreateQmlObject, files, scripts, script, si, sis, moduleScripts, make: engine.make, inContext: engine.inContext, callCreateComponent, sctx, sctxValue, sset, singleton, defineMethod, defaultParent, defaultAssign, aliasAssign, ownValue, ctx, ctxValue, mctx, mrole, as, ns, qmlModule, subAssign, rootContext,
     engine, defineType, create,
     batch: engine.batch,
     stats: engine.stats,

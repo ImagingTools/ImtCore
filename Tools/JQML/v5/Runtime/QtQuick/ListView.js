@@ -97,6 +97,7 @@ class ListView extends Item {
         this.$visible = []            // QQuickItemViewPrivate::visibleItems: the entries built in a row, each at its position
         this.$visibleIndex = 0        // the index of the first of them (visibleIndex)
         this.$visiblePos = 0          // its position (visiblePos)
+        this.$bufferBefore = null    // before the first move, fill both sides
         this.$currentEntry = null     // the entry of the current item
         this.$moveReason = MOVE_OTHER
         this.$internalMove = 0        // the view moves itself (setPosition): not a move of the user
@@ -400,17 +401,17 @@ class ListView extends Item {
     // ---- the API ----
 
     itemAtIndex(index){
-        let entry = this.$entries.get(index)
+        let entry = this.$visibleEntry(index)
         return entry ? entry.item : null
     }
 
     // "the visible item containing the point x, y in content coordinates"
     $entryAt(x, y){
-        for(let [index, entry] of this.$entries){
+        for(let entry of this.$visible){
             let item = entry.item
             if(!item || !item.$v[Item.VISIBLE]) continue
             let ix = item.$v[Item.X], iy = item.$v[Item.Y]
-            if(x >= ix && y >= iy && x < ix + item.$v[Item.WIDTH] && y < iy + item.$v[Item.HEIGHT]) return [index, item]
+            if(x >= ix && y >= iy && x < ix + item.$v[Item.WIDTH] && y < iy + item.$v[Item.HEIGHT]) return [entry.index, item]
         }
         return null
     }
@@ -465,8 +466,9 @@ class ListView extends Item {
         // the extent of the view before it moves (calculatedMaxExtent, taken first)
         let maxExtent = this.$flowBounds().max
         if(!entry){
-            let itemPos = this.$positionAt(idx)
-            this.$visiblePos = itemPos
+            let atStart = idx === 0 && mode === ListView.Beginning
+            let itemPos = atStart ? -this.$headerSize() - this.$startMargin() : this.$positionAt(idx)
+            this.$visiblePos = atStart ? 0 : itemPos
             this.$visibleIndex = idx
             // the entries built stay while the view fills, so a row built again keeps its item
             let old = this.$visible
@@ -509,6 +511,7 @@ class ListView extends Item {
             this.$resetHighlightPosition()
             this.$updateHighlight()
         }
+        fixup(this, this.$vertical() ? 'y' : 'x', true)
     }
 
     // QQuickItemView::forceLayout: layout() now (the visible items one after the other, refill), not at the next polish
@@ -931,6 +934,7 @@ class ListView extends Item {
         this.$visible = []
         this.$visibleIndex = 0
         this.$visiblePos = 0
+        this.$bufferBefore = null
         this.$currentEntry = null
         let count = modelRows(this.$model).count
         this.$write(ListView.COUNT, count)
@@ -1124,7 +1128,11 @@ class ListView extends Item {
             let added = this.$addVisible(rows, from, to, bufferFrom, bufferTo, false)
             if(buffer > 0){
                 if(added) this.$scheduleBuffer()
-                else added = this.$addVisible(rows, bufferFrom, bufferTo, bufferFrom, bufferTo, true)
+                else {
+                    const fillFrom = this.$bufferBefore === false ? from : bufferFrom
+                    const fillTo = this.$bufferBefore === true ? to : bufferTo
+                    added = this.$addVisible(rows, fillFrom, fillTo, bufferFrom, bufferTo, true)
+                }
             }
             let removed = this.$removeNonVisible(bufferFrom, bufferTo)
             if(added || removed) this.$visibleItemsChanged()
@@ -1632,6 +1640,9 @@ const refill = (view) => view.$forceLayoutPolish()
 const scrolled = (view) => {
     view.$content.$write(Item.X, -view.$v[ListView.CONTENTX])
     view.$content.$write(Item.Y, -view.$v[ListView.CONTENTY])
+    const axis = view.$vertical() ? 'y' : 'x'
+    const velocity = view.$fs?.[axis].smoothVelocity || 0
+    view.$bufferBefore = view.$reversed() ? velocity >= 0 : velocity < 0
     view.$updateBeginningEnd()
     engine.queuePolish(view)
     view.$strictViewportMoved()

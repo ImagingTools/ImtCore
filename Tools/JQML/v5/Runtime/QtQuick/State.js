@@ -5,12 +5,7 @@ const { readProperty } = require('./Animation')
 const { takeBinding } = require('./StateBindings')
 const { TransitionManager } = require('./TransitionManager')
 
-const same = (a, b) => a.obj === b.obj && a.id === b.id
-
-function currentBinding(p){
-    let binding = p.obj.$findBinding(p.id)
-    return binding ? { fn: binding.fn, scope: binding.scope, self: binding.self } : null
-}
+const same = (a, b) => a.obj === b.obj && a.id === b.id && a.field === b.field
 
 // ---- State ----------------------------------------------------------------------------------
 
@@ -74,7 +69,7 @@ class State extends QtObject {
         let additionalReverts = []
         for(let action of applyList){
             if(action.event) continue
-            action.fromBinding = currentBinding(action.p)
+            action.fromBinding = action.p.obj.$bindingSnapshot(action.p.id, action.p.field)
             let found = this.$revertList.some(r => same(r.p, action.p))
             if(!found && action.restore){
                 additionalReverts.push({ p: action.p, value: action.from, binding: action.fromBinding, specifiedObject: action.specifiedObject, specifiedProperty: action.specifiedProperty })

@@ -39,11 +39,7 @@ class QtObject {
             this.$bind(id, (self) => fn.call(self))
             return
         }
-        let binding = this.$findBinding(id)
-        if(binding && !engine.isUpdating(binding)){
-            this.$takeBinding(id)
-            engine.disposeBinding(binding)
-        }
+        this.$removeBindings(id, undefined, true)
         this.$write(id, value)
     }
 
@@ -102,13 +98,36 @@ class QtObject {
     }
 
     $bind(id, fn, scope, self = this){
-        let previous = this.$takeBinding(id)
-        if(previous) engine.disposeBinding(previous)
+        return this.$bindProperty(id, fn, scope, self)
+    }
+
+    $bindProperty(id, fn, scope, self, field){
+        this.$removeBindings(id, field)
         let binding = new engine.Binding(this, id, fn, scope, self)
+        if(field !== undefined) binding.field = field
         binding.next = this.$bindings
         this.$bindings = binding
         engine.scheduleBinding(binding)
         return binding
+    }
+
+    // A whole-property assignment replaces every field binding. A field assignment
+    // replaces its own binding or the binding of the whole value.
+    $removeBindings(id, field, keepUpdating = false){
+        let previous = null
+        let binding = this.$bindings
+        while(binding){
+            const next = binding.next
+            if(binding.prop === id && (field === undefined || binding.field === undefined || field === binding.field)
+                && !(keepUpdating && engine.isUpdating(binding))){
+                if(previous) previous.next = next
+                else this.$bindings = next
+                binding.next = null
+                engine.disposeBinding(binding)
+                if(binding.field === undefined) return
+            } else previous = binding
+            binding = next
+        }
     }
 
     $findBinding(id){
@@ -118,10 +137,27 @@ class QtObject {
         return null
     }
 
-    $takeBinding(id){
+    $bindingSnapshot(id, field){
+        const bindings = []
+        for(let binding = this.$bindings; binding; binding = binding.next){
+            if(binding.prop === id && (field === undefined || binding.field === undefined || field === binding.field)){
+                bindings.push({ fn: binding.fn, scope: binding.scope, self: binding.self, field: binding.field })
+            }
+        }
+        return bindings.length ? bindings.reverse() : null
+    }
+
+    $restoreBindings(id, bindings){
+        for(const binding of bindings){
+            if(binding.field === undefined) this.$bind(id, binding.fn, binding.scope, binding.self)
+            else this.$bindProperty(id, binding.fn, binding.scope, binding.self, binding.field)
+        }
+    }
+
+    $takeBinding(id, exact){
         let previous = null
         for(let binding = this.$bindings; binding; binding = binding.next){
-            if(binding.prop === id){
+            if(binding.prop === id && (!exact || binding === exact)){
                 if(previous) previous.next = binding.next
                 else this.$bindings = binding.next
                 binding.next = null

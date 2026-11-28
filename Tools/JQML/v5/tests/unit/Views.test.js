@@ -195,7 +195,8 @@ function cases(name, runtime){
         engine.batch(() => {
             view.model = 3
             assert.equal(view.contentHeight, 3 * 20 + 2 * 2)
-            assert.ok(view.itemAtIndex(0))
+            assert.ok(view.currentItem)
+            assert.equal(view.itemAtIndex(0), null)
             assert.equal(view.itemAtIndex(1), null)
             view.width = 100
             view.height = 100
