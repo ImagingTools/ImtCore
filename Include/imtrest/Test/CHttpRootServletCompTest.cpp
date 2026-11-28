@@ -5,6 +5,9 @@
 // Qt includes
 #include <QtCore/QtEndian>
 
+// 3rdParty includes
+#include <zlib.h>
+
 // ImtCore includes
 #include <imtrest/CHttpResponse.h>
 #include <imtrest/CHttpRootServletComp.h>
@@ -123,16 +126,32 @@ void CHttpRootServletCompTest::DeflateRoundTripTest()
 }
 
 
-void CHttpRootServletCompTest::GzipHeaderTest()
+void CHttpRootServletCompTest::GzipRoundTripTest()
 {
-	imtrest::CHttpResponse response(200, CreateBody('a'), "text/javascript", s_engine);
+	const QByteArray body = CreateBody('a');
+	imtrest::CHttpResponse response(200, body, "text/javascript", s_engine);
 
 	CServlet servlet;
-	const QByteArray gzipped = servlet.Gzip("Views/html/index.js", response);
+	QByteArray gzipped = servlet.Gzip("Views/html/index.js", response);
 
-	QVERIFY(gzipped.size() > 10);
-	QCOMPARE(quint8(gzipped[0]), quint8(0x1f));
-	QCOMPARE(quint8(gzipped[1]), quint8(0x8b));
+	QVERIFY(gzipped.size() < body.size());
+
+	QByteArray decoded(body.size() + 1, '\0');
+	z_stream stream{};
+	stream.next_in = reinterpret_cast<Bytef*>(gzipped.data());
+	stream.avail_in = uInt(gzipped.size());
+	stream.next_out = reinterpret_cast<Bytef*>(decoded.data());
+	stream.avail_out = uInt(decoded.size());
+	QCOMPARE(inflateInit2(&stream, MAX_WBITS + 16), Z_OK);
+	const int result = inflate(&stream, Z_FINISH);
+	const qsizetype decodedSize = qsizetype(stream.total_out);
+	const uInt remaining = stream.avail_in;
+	inflateEnd(&stream);
+
+	QCOMPARE(result, Z_STREAM_END);
+	QCOMPARE(remaining, uInt(0));
+	decoded.resize(decodedSize);
+	QCOMPARE(decoded, body);
 }
 
 

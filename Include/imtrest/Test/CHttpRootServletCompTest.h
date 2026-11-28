@@ -15,7 +15,7 @@ class CHttpRootServletCompTest: public QObject
 	Q_OBJECT
 private slots:
 	void DeflateRoundTripTest();
-	void GzipHeaderTest();
+	void GzipRoundTripTest();
 	void SameTagIsCompressedOnceTest();
 	void TagHeaderNameIgnoresCaseTest();
 	void NewTagIsCompressedAgainTest();

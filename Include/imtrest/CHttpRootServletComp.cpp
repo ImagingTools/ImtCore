@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtrest/CHttpRootServletComp.h>
 
+// STL includes
+#include <limits>
 
 // Qt includes
-#include <QtCore/QDataStream>
 #include <QtCore/QRegularExpression>
+#include <QtCore/QtEndian>
 
 // 3rdParty includes
 #include "zlib.h"
@@ -198,22 +200,25 @@ QByteArray CHttpRootServletComp::Compress(const QByteArray& data, EncodingType e
 
 	QByteArray qData = qCompress(data, 8);
 	qData.remove(0, 6);
-	qData.remove(qData.length() - 4, 4);
-	int crc = (int)crc32(0, (unsigned char *)qData.data(), qData.length());
-	const char gzipheader[] = {
-			 0x1f, static_cast<char>(0x8b)      // gzip magic number
-			 , 8             // compress method "defalte"
-			 , 1             // text data
-			 , 0, 0, 0, 0    // timestamp is not set
-			 , 2             // maximum compression flag
-			 , static_cast<char>(255)           // unknown OS
-		 };
-	QByteArray outData;
-	QDataStream datastream(&outData, QIODevice::WriteOnly);
-	datastream.device()->write(gzipheader,10);
-	datastream.device()->write(qData);
-	datastream << crc;
-	datastream << qData.length();
+	qData.chop(4);
+
+	const char gzipHeader[] = {
+		0x1f, static_cast<char>(0x8b), 8, 1, 0, 0, 0, 0, 2, static_cast<char>(255)
+	};
+	uLong crc = 0;
+	for (qsizetype offset = 0; offset < data.size();){
+		const auto chunkSize = uInt(qMin<quint64>(data.size() - offset, std::numeric_limits<uInt>::max()));
+		crc = crc32(crc, reinterpret_cast<const Bytef*>(data.constData() + offset), chunkSize);
+		offset += chunkSize;
+	}
+	char trailer[2 * sizeof(quint32)];
+	qToLittleEndian<quint32>(quint32(crc), trailer);
+	qToLittleEndian<quint32>(quint32(data.size()), trailer + sizeof(quint32));
+
+	QByteArray outData(gzipHeader, sizeof(gzipHeader));
+	outData.reserve(sizeof(gzipHeader) + qData.size() + sizeof(trailer));
+	outData.append(qData);
+	outData.append(trailer, sizeof(trailer));
 
 	return outData;
 }
