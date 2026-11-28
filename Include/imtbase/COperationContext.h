@@ -3,6 +3,7 @@
 
 
 // ImtCore includes
+#include <imtbase/IDocumentActionContext.h>
 #include <imtbase/IOperationContext.h>
 #include <imtbase/CObjectCollection.h>
 
@@ -11,7 +12,9 @@ namespace imtbase
 {
 
 
-class COperationContext: virtual public imtbase::IOperationContext
+class COperationContext:
+			virtual public imtbase::IOperationContext,
+			virtual public imtbase::IDocumentActionContext
 {
 public:
 	COperationContext();
@@ -19,6 +22,7 @@ public:
 	void SetOperationOwnerId(const imtbase::IOperationContext::IdentifableObjectInfo& operationOwnerId);
 	void SetTenantId(const QByteArray& tenantId, TenantType tenantType = TT_ORGANIZATION);
 	void SetOperationDescription(const QString& operationDescription);
+	void SetDocumentActionId(const QByteArray& documentActionId);
 
 	// reimplemented (imtbase::IOperationContext)
 	virtual IdentifableObjectInfo GetOperationOwnerId() const override;
@@ -27,11 +31,15 @@ public:
 	virtual QString GetOperationDescription() const override;
 	virtual imtbase::IObjectCollection* GetChangesCollection() override;
 
+	// reimplemented (imtbase::IDocumentActionContext)
+	virtual QByteArray GetDocumentActionId() const override;
+
 private:
 	IdentifableObjectInfo m_operationOwnerId;
 	QByteArray m_tenantId;
 	TenantType m_tenantType;
 	QString m_operationDescription;
+	QByteArray m_documentActionId;
 	imtbase::CObjectCollection m_changesCollection;
 };
 

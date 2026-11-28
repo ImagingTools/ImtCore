@@ -44,8 +44,11 @@ Rectangle {
 		Events.subscribeEvent("StartLoading", thumbnailDecoratorContainer.startLoading);
 		Events.subscribeEvent("StopLoading", thumbnailDecoratorContainer.stopLoading);
 		Events.subscribeEvent("ShowPreferencePage", thumbnailDecoratorContainer.showPreferencePage);
+		Events.subscribeEvent("AssistantStateChanged", thumbnailDecoratorContainer.onAssistantStateChanged);
 		
 		PopupManager.popupContainer = popupContainer;
+
+		Events.sendEvent("AssistantStateRequested");
 	}
 	
 	Component.onDestruction: {
@@ -53,6 +56,13 @@ Rectangle {
 		Events.unSubscribeEvent("StopLoading", thumbnailDecoratorContainer.stopLoading);
 		
 		Events.unSubscribeEvent("ShowPreferencePage", thumbnailDecoratorContainer.showPreferencePage);
+		Events.unSubscribeEvent("AssistantStateChanged", thumbnailDecoratorContainer.onAssistantStateChanged);
+	}
+
+	// State of the assistant of the application (imtassistgui AssistantCenter)
+	function onAssistantStateChanged(state){
+		assistantDrawerLoader.active = state.active;
+		assistantDrawerLoader.panelVisible = state.panelVisible;
 	}
 	
 	function updateModels(){
@@ -166,7 +176,7 @@ Rectangle {
 		id: pagesManager;
 		
 		anchors.left: menuPanel.visible ? menuPanel.right : parent.left;
-		anchors.right: thumbnailDecoratorContainer.right;
+		anchors.right: assistantDrawerLoader.visible ? assistantDrawerLoader.left : thumbnailDecoratorContainer.right;
 		anchors.top: topPanelLoader_.bottom;
 		anchors.bottom: thumbnailDecoratorContainer.bottom;
 		
@@ -176,6 +186,23 @@ Rectangle {
 		anchors.rightMargin: thumbnailDecoratorContainer.pageMargin;
 		
 		activePageIndex: menuPanel.activePageIndex;
+	}
+	
+	// The assistant beside the pages, loaded by URL only while it is enabled: applications without it do not need imtassistgui
+	Loader {
+		id: assistantDrawerLoader;
+
+		property bool panelVisible: false;
+
+		anchors.right: parent.right;
+		anchors.top: topPanelLoader_.bottom;
+		anchors.bottom: parent.bottom;
+
+		width: Math.min(Math.round(parent.width * 0.4), Style.sizeHintXXL * 0.6);
+		visible: active && panelVisible;
+
+		active: false;
+		source: "qrc:/qml/imtassistgui/AssistantDrawer.qml";
 	}
 	
 	DrawingContainer{

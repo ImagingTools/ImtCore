@@ -338,7 +338,7 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContext(
 	gqlContextPtr->SetUserId(resolvedUserId);
 	gqlContextPtr->SetTenantId(tenantId);
 	gqlContextPtr->SetToken(token);
-	gqlContextPtr->SetHeaders(headers);
+	gqlContextPtr->SetHeaders(imtgql::RemoveServerHeaders(headers));
 	gqlContextPtr->SetProductId(productId);
 	gqlContextPtr->SetServerProductId(serverProductId);
 	gqlContextPtr->SetProductInfo(m_productInfoCompPtr.IsValid() ? m_productInfoCompPtr.GetPtr() : m_permissionTreeCompPtr.GetPtr());

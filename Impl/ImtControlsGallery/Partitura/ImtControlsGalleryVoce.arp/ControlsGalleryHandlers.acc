@@ -55,6 +55,7 @@
                                 <Value>Pages/GridViewPage</Value>
                                 <Value>Pages/TestPage</Value>
                                 <Value>Pages/SdlTestPage</Value>
+                                <Value>Pages/AssistantPage</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -70,6 +71,7 @@
                                 <Value>SlaveControllers</Value>
                                 <Value>ContactInfoController</Value>
                                 <Value>ParamsSetTestController</Value>
+                                <Value>AssistantController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -81,6 +83,211 @@
                     </AttributeInfo>
                     <AttributeInfo Id="WebCommandId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="ControlsGallery/Views/*"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="AssistantActions" PackageId="ImtAssistPck" ComponentId="AssistantActionRegistry">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Actions" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>DemoSearchTasksAction</Value>
+                                <Value>DemoSetTaskStatusAction</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="AssistantAuditLog" PackageId="ImtAssistPck" ComponentId="AssistantAuditLog">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="AssistantController" PackageId="ImtAssistGqlPck" ComponentId="AssistantController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AllowDemoPrincipal" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AssistantLogicController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="AssistantLogicController"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>AssistantGetStatus</Value>
+                                <Value>AssistantStartConversation</Value>
+                                <Value>AssistantSendMessage</Value>
+                                <Value>AssistantConfirmPreview</Value>
+                                <Value>AssistantRejectPreview</Value>
+                                <Value>AssistantCancelRequest</Value>
+                                <Value>AssistantGetHistory</Value>
+                                <Value>AssistantCloseConversation</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DemoTenantId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="demo-tenant"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DemoUserId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="demo-user"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="AssistantProvider" PackageId="ImtAssistPck" ComponentId="FakeAssistantProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Configured" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultReply" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="I can show tasks and change their status. Try &quot;Show open tasks&quot;."/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RuleActionIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>tasks.setStatus</Value>
+                                <Value>tasks.search</Value>
+                                <Value>tasks.search</Value>
+                                <Value>tasks.setStatus</Value>
+                                <Value>tasks.setStatus</Value>
+                                <Value></Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RuleKeywords" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>reopen</Value>
+                                <Value>open tasks</Value>
+                                <Value>show</Value>
+                                <Value>done</Value>
+                                <Value>progress</Value>
+                                <Value>help</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RuleParameters" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>{"taskId": "$context.selection.id", "status": "open"}</Value>
+                                <Value>{"status": "open"}</Value>
+                                <Value>{}</Value>
+                                <Value>{"taskId": "$context.selection.id", "status": "done"}</Value>
+                                <Value>{"taskId": "$context.selection.id", "status": "inProgress"}</Value>
+                                <Value></Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RuleQuestions" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Which task do you mean? Select it in the list and hand it over.</Value>
+                                <Value></Value>
+                                <Value></Value>
+                                <Value>Which task do you mean? Select it in the list and hand it over.</Value>
+                                <Value>Which task do you mean? Select it in the list and hand it over.</Value>
+                                <Value></Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RuleReplies" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value></Value>
+                                <Value></Value>
+                                <Value></Value>
+                                <Value></Value>
+                                <Value></Value>
+                                <Value>Ask me to "Show open tasks", select a task, hand it over and say "Mark it as done".</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ToolResultReply" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Select a task in the list, hand it over and tell me what to do, e.g. &quot;Mark it as done&quot;."/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="AssistantRepresentations" PackageId="ImtAssistPck" ComponentId="UiRepresentationRegistry">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RegisterStandardRepresentations" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="AssistantLogicController" PackageId="ImtAssistPck" ComponentId="AssistantLogicController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ActionRegistry" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="AssistantActions"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AuditLog" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="AssistantAuditLog"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Enabled" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MaxStepsPerTurn" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="5"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PreviewTimeToLive" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="300"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Provider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="AssistantProvider"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProviderTimeout" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="30000"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RepresentationRegistry" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="AssistantRepresentations"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -104,6 +311,29 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="DemoSearchTasksAction" PackageId="ControlsGalleryGqlPck" ComponentId="DemoSearchTasksAction">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="TaskStore" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DemoTaskStore"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="DemoSetTaskStatusAction" PackageId="ControlsGalleryGqlPck" ComponentId="DemoSetTaskStatusAction">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="TaskStore" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DemoTaskStore"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="DemoTaskStore" PackageId="ControlsGalleryGqlPck" ComponentId="DemoTaskStore">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="Pages" PackageId="ImtControlsGalleryVoce" ComponentId="Pages">

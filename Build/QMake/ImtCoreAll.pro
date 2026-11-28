@@ -169,6 +169,14 @@ SUBDIRS += imtauthgql
 imtauthgql.file = ../../Include/imtauthgql/QMake/imtauthgql.pro
 imtauthgql.depends = imtauthsdl 
 
+SUBDIRS += imtassist
+imtassist.file = ../../Include/imtassist/QMake/imtassist.pro
+imtassist.depends = imtrest
+
+SUBDIRS += imtassistdb
+imtassistdb.file = ../../Include/imtassistdb/QMake/imtassistdb.pro
+imtassistdb.depends = imtassist imtauthdb
+
 SUBDIRS += imtcrypt
 imtcrypt.file = ../../Include/imtcrypt/QMake/imtcrypt.pro
 
@@ -265,6 +273,10 @@ imtchat.file = ../../Include/imtchat/QMake/imtchat.pro
 SUBDIRS += imtdesk
 imtdesk.file = ../../Include/imtdesk/QMake/imtdesk.pro
 
+SUBDIRS += imtassistgql
+imtassistgql.file = ../../Include/imtassistgql/QMake/imtassistgql.pro
+imtassistgql.depends = imtassist
+
 SUBDIRS += imtchatgql
 imtchatgql.file = ../../Include/imtchatgql/QMake/imtchatgql.pro
 imtchatgql.depends = imtchatsdl
@@ -341,6 +353,9 @@ imtlicguiqml.depends = imtlicsdl
 SUBDIRS += imtdeskguiqml
 imtdeskguiqml.file = ../../Qml/imtdeskgui/QMake/imtdeskguiqml.pro
 imtdeskguiqml.depends = imtdesksdl
+
+SUBDIRS += imtassistguiqml
+imtassistguiqml.file = ../../Qml/imtassistgui/QMake/imtassistguiqml.pro
 
 SUBDIRS += imtchatguiqml
 imtchatguiqml.file = ../../Qml/imtchatgui/QMake/imtchatguiqml.pro
@@ -525,6 +540,14 @@ ImtHypeDbPck.depends = imthypedb imtbase imtdb imthype
 SUBDIRS += ImtHypeGuiPck
 ImtHypeGuiPck.file = ../../Impl/ImtHypeGuiPck/QMake/ImtHypeGuiPck.pro
 ImtHypeGuiPck.depends = imthypegui imthype imtwidgets imtgui
+
+SUBDIRS += ImtAssistPck
+ImtAssistPck.file = ../../Impl/ImtAssistPck/QMake/ImtAssistPck.pro
+ImtAssistPck.depends = imtassist imtrest imtcom
+
+SUBDIRS += ImtAssistGqlPck
+ImtAssistGqlPck.file = ../../Impl/ImtAssistGqlPck/QMake/ImtAssistGqlPck.pro
+ImtAssistGqlPck.depends = imtassist imtassistdb imtassistgql imtservergql imtserverapp
 
 SUBDIRS += ImtChatPck
 ImtChatPck.file = ../../Impl/ImtChatPck/QMake/ImtChatPck.pro

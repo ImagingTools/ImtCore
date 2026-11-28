@@ -246,6 +246,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 	if(USE_QTDB)
 		add_subdirectory("${INCLUDE_DIR}/imtauthdb/CMake"	"${AUX_INCLUDE_DIR}/imtauthdb")
+		add_subdirectory("${INCLUDE_DIR}/imtassistdb/CMake"	"${AUX_INCLUDE_DIR}/imtassistdb")
 		add_subdirectory("${INCLUDE_DIR}/imtchat/CMake"		"${AUX_INCLUDE_DIR}/imtchat")
 		add_subdirectory("${INCLUDE_DIR}/imtchatdb/CMake"	"${AUX_INCLUDE_DIR}/imtchatdb")
 		add_subdirectory("${INCLUDE_DIR}/imtcom/CMake"		"${AUX_INCLUDE_DIR}/imtcom")
@@ -259,6 +260,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_subdirectory("${INCLUDE_DIR}/imthypedb/CMake"	"${AUX_INCLUDE_DIR}/imthypedb")
 		add_subdirectory("${INCLUDE_DIR}/imtlicdb/CMake"	"${AUX_INCLUDE_DIR}/imtlicdb")
 		add_subdirectory("${INCLUDE_DIR}/imtrest/CMake"		"${AUX_INCLUDE_DIR}/imtrest")
+		add_subdirectory("${INCLUDE_DIR}/imtassist/CMake"		"${AUX_INCLUDE_DIR}/imtassist")
 
 		add_subdirectory("${INCLUDE_DIR}/imtauthgql/CMake" "${AUX_INCLUDE_DIR}/imtauthgql")
 		add_dependencies(imtauthgql imtauthsdl)
@@ -319,6 +321,11 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_dependencies(imtchatgql imtchatsdl)
 
 		if(USE_QTDB)
+			add_subdirectory("${INCLUDE_DIR}/imtassistgql/CMake" "${AUX_INCLUDE_DIR}/imtassistgql")
+			add_dependencies(imtassistgql imtassist imtbasesdl)
+		endif()
+
+		if(USE_QTDB)
 			add_subdirectory("${INCLUDE_DIR}/imtdeskgql/CMake" "${AUX_INCLUDE_DIR}/imtdeskgql")
 			add_dependencies(imtdeskgql imtdesksdl)
 
@@ -334,6 +341,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		# QML libraries
 		add_subdirectory("${QML_DIR}/imtauthgui/CMake"		"${AUX_INCLUDE_DIR}/imtauthguiqml")
 		add_subdirectory("${QML_DIR}/imtchatgui/CMake"		"${AUX_INCLUDE_DIR}/imtchatguiqml")
+		add_subdirectory("${QML_DIR}/imtassistgui/CMake"	"${AUX_INCLUDE_DIR}/imtassistguiqml")
 		add_subdirectory("${QML_DIR}/imtcolgui/CMake"		"${AUX_INCLUDE_DIR}/imtcolguiqml")
 		add_subdirectory("${QML_DIR}/imtcontrols/CMake"		"${AUX_INCLUDE_DIR}/imtcontrolsqml")
 		add_subdirectory("${QML_DIR}/imtdeskgui/CMake"		"${AUX_INCLUDE_DIR}/imtdeskguiqml")
@@ -440,6 +448,9 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 			add_subdirectory("${IMPL_DIR}/ImtChatPck/CMake" "${AUX_INCLUDE_DIR}/ImtChatPck")
 			add_dependencies(ImtChatPck imtbase imtchat)
+
+			add_subdirectory("${IMPL_DIR}/ImtAssistPck/CMake" "${AUX_INCLUDE_DIR}/ImtAssistPck")
+			add_dependencies(ImtAssistPck imtassist imtrest)
 
 			add_subdirectory("${IMPL_DIR}/ImtDatabasePck/CMake" "${AUX_INCLUDE_DIR}/ImtDatabasePck")
 			add_dependencies(ImtDatabasePck imtbase imtauth imtaccount imtcol imtdb)
@@ -556,6 +567,9 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 			add_subdirectory("${IMPL_DIR}/ImtChatGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtChatGqlPck")
 			add_dependencies(ImtChatGqlPck imtchat imtchatsdl imtchatgql)
 
+			add_subdirectory("${IMPL_DIR}/ImtAssistGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtAssistGqlPck")
+			add_dependencies(ImtAssistGqlPck imtassist imtassistdb imtassistgql)
+
 			add_subdirectory("${IMPL_DIR}/ImtDeskGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtDeskGqlPck")
 			add_dependencies(ImtDeskGqlPck imtdb imtdesk imtdesksdl imtservergql imtdoc imtdeskgql)
 
@@ -653,6 +667,11 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_subdirectory("${TESTS_DIR}/PasswordPolicyTest/CMake" "${AUX_INCLUDE_DIR}/PasswordPolicyTest")
 		add_dependencies(PasswordPolicyTest imtbase imtauth)
 
+		if(USE_QTDB AND USE_QTQML)
+			add_subdirectory("${TESTS_DIR}/AssistantTest/CMake" "${AUX_INCLUDE_DIR}/AssistantTest")
+			add_dependencies(AssistantTest imtassist imtassistgql imtrest imtcrypt)
+		endif()
+
 		add_subdirectory("${TESTS_DIR}/UserAccountStateTest/CMake" "${AUX_INCLUDE_DIR}/UserAccountStateTest")
 		add_dependencies(UserAccountStateTest imtbase imtauth)
 
@@ -678,7 +697,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 			add_subdirectory("${TESTS_DIR}/QmlTest/CMake" "${AUX_INCLUDE_DIR}/QmlTest")
 			add_dependencies(ImtCoreQmlTest
 				imtbasesdl imtappsdl imtauthsdl imtcolorsdl imt2dsdl imtnotifysdl
-				imtstylecontrolsqml imtcontrolsqml imtguiqml imtguigqlqml imtcolguiqml imtdocguiqml imtauthguiqml imtlicguiqml imtnotifyguiqml
+				imtstylecontrolsqml imtcontrolsqml imtguiqml imtguigqlqml imtcolguiqml imtdocguiqml imtauthguiqml imtlicguiqml imtnotifyguiqml imtassistguiqml
 				imtstyle imtqml imtgql
 			)
 			imt_chain_windeploy_target(ImtCoreQmlTest)

@@ -29,6 +29,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	imtdocguiqml
 	imtauthguiqml
 	imtlicguiqml
+	imtassistguiqml
 	imtstyle
 	imtqml
 	imtgql

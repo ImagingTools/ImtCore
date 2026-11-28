@@ -55,6 +55,16 @@ void COperationContext::SetOperationDescription(const QString& operationDescript
 }
 
 
+void COperationContext::SetDocumentActionId(const QByteArray& documentActionId)
+{
+	if (m_documentActionId != documentActionId){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_documentActionId = documentActionId;
+	}
+}
+
+
 // reimplemented (imtbase::IOperationContext)
 
 imtbase::IOperationContext::IdentifableObjectInfo COperationContext::GetOperationOwnerId() const
@@ -84,6 +94,14 @@ QString COperationContext::GetOperationDescription() const
 imtbase::IObjectCollection* COperationContext::GetChangesCollection()
 {
 	return &m_changesCollection;
+}
+
+
+// reimplemented (imtbase::IDocumentActionContext)
+
+QByteArray COperationContext::GetDocumentActionId() const
+{
+	return m_documentActionId;
 }
 
 

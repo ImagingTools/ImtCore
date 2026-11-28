@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/qml">
+		<file alias="imtassistgui/qmldir">qmldir</file>
+		<file alias="imtassistgui/AssistantController.qml">AssistantController.qml</file>
+		<file alias="imtassistgui/AssistantMessageDelegate.qml">AssistantMessageDelegate.qml</file>
+		<file alias="imtassistgui/AssistantPanel.qml">AssistantPanel.qml</file>
+		<file alias="imtassistgui/AssistantPreviewCard.qml">AssistantPreviewCard.qml</file>
+		<file alias="imtassistgui/AssistantRepresentationRegistry.qml">AssistantRepresentationRegistry.qml</file>
+		<file alias="imtassistgui/AssistantSelectableList.qml">AssistantSelectableList.qml</file>
+		<file alias="imtassistgui/AssistantButton.qml">AssistantButton.qml</file>
+		<file alias="imtassistgui/AssistantCenter.qml">AssistantCenter.qml</file>
+		<file alias="imtassistgui/AssistantDrawer.qml">AssistantDrawer.qml</file>
+		<file alias="imtassistgui/AssistantSettingsPage.qml">AssistantSettingsPage.qml</file>
+		<file alias="imtassistgui/GqlBasedAssistantController.qml">GqlBasedAssistantController.qml</file>
+    </qresource>
+</RCC>

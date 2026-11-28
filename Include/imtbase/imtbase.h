@@ -59,6 +59,9 @@ static const inline QByteArray s_permissionPathHeaderId = QByteArrayLiteral("per
 static const inline QByteArray s_languageIdHeaderId = QByteArrayLiteral("languageid");
 // Unique ID of a client request; e.g. a DocumentChanged notification names the request that made the change
 static const inline QByteArray s_requestIdHeaderId = QByteArrayLiteral("X-Request-ID");
+// ID of the document action a server-side request writes into (see imtdb::IDocumentActionJournal); set only by the server itself,
+// the context creators remove it from the requests of clients
+static const inline QByteArray s_documentActionHeaderId = QByteArrayLiteral("x-imt-document-action");
 
 
 /**

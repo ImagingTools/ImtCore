@@ -6,6 +6,9 @@
 // ACF includes
 #include <iprm/ITextParam.h>
 
+// ImtCore includes
+#include <imtcrypt/ISecretTextParam.h>
+
 
 namespace imtserverapp
 {
@@ -26,7 +29,8 @@ bool CTextParamRepresentationControllerComp::IsModelSupported(const istd::IChang
 {
 	const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(&dataModel);
 
-	return textParamPtr != nullptr;
+	// A secret is represented by CSecretTextParamRepresentationControllerComp only, never as plain text.
+	return (textParamPtr != nullptr) && (dynamic_cast<const imtcrypt::ISecretTextParam*>(&dataModel) == nullptr);
 }
 
 

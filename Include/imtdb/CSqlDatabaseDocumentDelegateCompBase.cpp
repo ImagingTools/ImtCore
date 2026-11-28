@@ -24,6 +24,7 @@
 // ImtCore includes
 #include <imtbase/imtbase.h>
 #include <imtbase/ICollectionFilter.h>
+#include <imtdb/CDocumentActionJournalQueries.h>
 #include <imtdb/CComplexCollectionFilterConverter.h>
 #include <imtdb/imtdb.h>
 #include <imtcol/IObjectTypeIdFilter.h>
@@ -262,6 +263,10 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateCompB
 				operationContextPtr,
 				1);
 
+	if (!retVal.query.isEmpty()){
+		retVal.query.prepend(CreateDocumentActionEntryQuery(operationContextPtr, objectId, imtdb::IDocumentActionJournal::EO_CREATED).toUtf8());
+	}
+
 	// Only the creating organization owns the document; a revision saved by an organization it is shared with adds no binding
 	if (!retVal.query.isEmpty() && operationContextPtr != nullptr){
 		retVal.query += CreateTenantBindingInsertQuery(operationContextPtr->GetTenantId(), objectId, operationContextPtr);
@@ -276,10 +281,16 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateCompB
 QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateDeleteObjectsQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const imtbase::ICollectionInfo::Ids& objectIds,
-			const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const imtbase::IOperationContext* operationContextPtr) const
 {
 	if (objectIds.isEmpty()){
 		return QByteArray();
+	}
+
+	// The entries are written before the documents are disabled: they select the active revisions
+	QString entriesQuery;
+	for (const QByteArray& objectId: objectIds){
+		entriesQuery += CreateDocumentActionEntryQuery(operationContextPtr, objectId, imtdb::IDocumentActionJournal::EO_REMOVED);
 	}
 
 	QString schemaPrefix;
@@ -304,14 +315,14 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateDeleteObjectsQuery(
 
 	query += CreateDocumentShareDeleteQuery(quotedIds);
 
-	return query.toUtf8();
+	return (entriesQuery + query).toUtf8();
 }
 
 
 QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateDeleteObjectSetQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const iprm::IParamsSet* paramsPtr,
-			const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const imtbase::IOperationContext* operationContextPtr) const
 {
 	QString schemaPrefix;
 	if (m_tableSchemaAttrPtr.IsValid()){
@@ -357,7 +368,8 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateDeleteObjectSetQuery(
 		documentIdSelection += QStringLiteral(" AND (") + QString::fromUtf8(conditionList.join(QByteArrayLiteral(" AND "))) + ')';
 	}
 
-	QByteArray retVal = CreateDocumentShareDeleteQuery(documentIdSelection) + updateQuery;
+	// The documents of a selection are not recorded one by one: the document action cannot be rolled back
+	QByteArray retVal = CreateUnrecordedDocumentActionEntryQuery(operationContextPtr).toUtf8() + CreateDocumentShareDeleteQuery(documentIdSelection) + updateQuery;
 
 	bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
 	if (useTenantBindings){
@@ -389,7 +401,7 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateDeleteObjectSetQuery(
 QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateRestoreObjectsQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const imtbase::ICollectionInfo::Ids& objectIds,
-			const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const imtbase::IOperationContext* operationContextPtr) const
 {
 	if (objectIds.isEmpty()){
 		return QByteArray();
@@ -402,7 +414,12 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateRestoreObjectsQuery(
 		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
 	}
 
-	return QStringLiteral(R"(
+	QString entriesQuery;
+	for (const QByteArray& objectId: objectIds){
+		entriesQuery += CreateDocumentActionEntryQuery(operationContextPtr, objectId, imtdb::IDocumentActionJournal::EO_RESTORED);
+	}
+
+	return entriesQuery.toUtf8() + QStringLiteral(R"(
 				UPDATE %1 "%2"
 				SET "%3" = 'Active'
 				WHERE "%4" IN (%5)
@@ -420,7 +437,7 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateRestoreObjectsQuery(
 QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateRestoreObjectSetQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const iprm::IParamsSet* paramsPtr,
-			const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const imtbase::IOperationContext* operationContextPtr) const
 {
 	QString schemaPrefix;
 	if (m_tableSchemaAttrPtr.IsValid()){
@@ -429,6 +446,9 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateRestoreObjectSetQuery(
 	QByteArray retVal = 
 				QStringLiteral(R"(UPDATE %1 "%2" as root SET "%3" = 'Active' WHERE "%3" = 'Disabled')")
 							.arg(schemaPrefix, *m_tableNameAttrPtr, s_stateColumn).toUtf8();
+
+	// The documents of a selection are not recorded one by one: the document action cannot be rolled back
+	retVal.prepend(CreateUnrecordedDocumentActionEntryQuery(operationContextPtr).toUtf8());
 
 	if (paramsPtr != nullptr){
 		iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(paramsPtr, QByteArrayLiteral("ComplexFilter"));
@@ -500,6 +520,10 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateUpdateObjectQuery(
 
 	retVal = PrepareInsertNewObjectQuery(
 				typeId, objectId, objectName, objectDescription, object, operationContextPtr, QVariant::fromValue(sqlExpression));
+	if (!retVal.isEmpty()){
+		// Written before the new revision: the entry reads the active revision as the revision before the change
+		retVal.prepend(CreateDocumentActionEntryQuery(operationContextPtr, objectId, imtdb::IDocumentActionJournal::EO_UPDATED).toUtf8());
+	}
 
 	return retVal;
 }
@@ -1192,6 +1216,35 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateJsonBuildObjectQuery(cons
 	revisionInfo += ')';
 
 	return revisionInfo.toUtf8();
+}
+
+
+QString CSqlDatabaseDocumentDelegateCompBase::CreateDocumentActionEntryQuery(
+			const imtbase::IOperationContext* operationContextPtr,
+			const QByteArray& documentId,
+			imtdb::IDocumentActionJournal::EntryOperation operation) const
+{
+	if (CDocumentActionJournalQueries::GetDocumentActionId(operationContextPtr).isEmpty()){
+		return QString();
+	}
+
+	const QByteArray tableSchema = m_tableSchemaAttrPtr.IsValid() ? *m_tableSchemaAttrPtr : QByteArray();
+
+	return CDocumentActionJournalQueries::CreateDocumentEntryQuery(
+				operationContextPtr,
+				tableSchema,
+				*m_tableNameAttrPtr,
+				documentId,
+				operation,
+				CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int));
+}
+
+
+QString CSqlDatabaseDocumentDelegateCompBase::CreateUnrecordedDocumentActionEntryQuery(const imtbase::IOperationContext* operationContextPtr) const
+{
+	const QByteArray tableSchema = m_tableSchemaAttrPtr.IsValid() ? *m_tableSchemaAttrPtr : QByteArray();
+
+	return CDocumentActionJournalQueries::CreateUnrecordedEntryQuery(operationContextPtr, tableSchema, *m_tableNameAttrPtr);
 }
 
 

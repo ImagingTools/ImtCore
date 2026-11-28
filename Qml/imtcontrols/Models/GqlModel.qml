@@ -3,6 +3,8 @@ import QtQuick 2.0
 TreeItemModel {
     id: container;
 
+    property var responseContext: null
+
     // Must stay in sync with imtbase::s_authenticationTokenHeaderId
     readonly property string authenticationTokenHeaderId: "x-authentication-token"
 
@@ -26,7 +28,7 @@ TreeItemModel {
         return XMLHttpRequest.QMLProductId || ""
     }
 
-    function setGqlQuery(gqlData){
+    function setGqlQuery(gqlData, headers, context){
         this.state = "Loading"
         var xhr = new XMLHttpRequest;
         xhr.open("POST", "../../graphql");
@@ -34,6 +36,7 @@ TreeItemModel {
 
         xhr.onreadystatechange = function(){
             if (xhr.readyState === XMLHttpRequest.DONE){
+                this.responseContext = context
                 this.json = xhr.responseText;
                 this.state = "Processing"
                 this.updateJSONModel()

@@ -4,6 +4,7 @@
 
 // ImtCore includes
 #include <imtbase/COperationContext.h>
+#include <imtbase/imtbase.h>
 #include <imtauth/CUserInfo.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/IGqlRequestProvider.h>
@@ -63,6 +64,12 @@ imtbase::IOperationContext* COperationContextControllerComp::CreateOperationCont
 	imtbase::TenantType tenantType = imtbase::TT_ORGANIZATION;
 	const QByteArray tenantId = imtgql::GetDataTenantId(*requestContextPtr, tenantType);
 	operationContextPtr->SetTenantId(tenantId, tenantType);
+
+	// Set only by server-side requests (the assistant); the context creators remove it from the requests of clients
+	const QByteArray documentActionId = requestContextPtr->GetHeaders().value(imtbase::s_documentActionHeaderId);
+	if (!documentActionId.isEmpty()){
+		operationContextPtr->SetDocumentActionId(documentActionId);
+	}
 
 	if (m_documentChangeGeneratorCompPtr.IsValid()){
 		imtbase::CObjectCollection* changeCollectionPtr = dynamic_cast<imtbase::CObjectCollection*>(operationContextPtr->GetChangesCollection());

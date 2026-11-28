@@ -8,6 +8,7 @@
 // ImtCore includes
 #include <imtauth/ITenantFilterParam.h>
 #include <imtbase/IComplexCollectionFilter.h>
+#include <imtdb/IDocumentActionJournal.h>
 #include <imtbase/IRevisionController.h>
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
 #include <imtdb/IJsonBasedMetaInfoDelegate.h>
@@ -217,6 +218,18 @@ protected:
 	bool IsSQLite() const;
 	QString GetDocumentIdTextExpression() const;
 	QByteArray LoadTenantTableScript(const QString& fileName) const;
+	/**
+		Entry of the document action journal for a document written by an operation with a document action (see imtbase::IDocumentActionContext),
+		written before the statements that change the document; empty without a document action.
+	*/
+	QString CreateDocumentActionEntryQuery(
+				const imtbase::IOperationContext* operationContextPtr,
+				const QByteArray& documentId,
+				imtdb::IDocumentActionJournal::EntryOperation operation) const;
+	/**
+		Entry marking a write of a selection of documents, which the journal cannot roll back; empty without a document action.
+	*/
+	QString CreateUnrecordedDocumentActionEntryQuery(const imtbase::IOperationContext* operationContextPtr) const;
 
 protected:
 	I_ATTR(bool, m_useDataMetaInfoAttrPtr);

@@ -27,6 +27,7 @@
 #include <imtserverapp/CIntegerParamRepresentationControllerComp.h>
 #include <imtserverapp/CDoubleParamRepresentationControllerComp.h>
 #include <imtserverapp/CPasswordParamRepresentationControllerComp.h>
+#include <imtserverapp/CSecretTextParamRepresentationControllerComp.h>
 #include <imtserverapp/CServerLogDataProviderComp.h>
 #include <imtserverapp/CGuiElementModelComp.h>
 #include <imtserverapp/CGuiElementContainerComp.h>
@@ -74,6 +75,7 @@ typedef imtserverapp::CSchedulerParamsRepresentationControllerComp SchedulerPara
 typedef imtserverapp::CIntegerParamRepresentationControllerComp IntegerParamRepresentationController;
 typedef imtserverapp::CDoubleParamRepresentationControllerComp DoubleParamRepresentationController;
 typedef imtserverapp::CPasswordParamRepresentationControllerComp PasswordParamRepresentationController;
+typedef imtserverapp::CSecretTextParamRepresentationControllerComp SecretTextParamRepresentationController;
 typedef imtserverapp::CServerLogDataProviderComp ServerLogDataProvider;
 typedef imtserverapp::CEnableableParamRepresentationControllerComp EnableableParamRepresentationController;
 typedef imtserverapp::CServerConnectionParamRepresentationControllerComp ServerConnectionParamRepresentationController;

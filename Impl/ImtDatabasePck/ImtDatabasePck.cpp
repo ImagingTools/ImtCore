@@ -136,5 +136,10 @@ I_EXPORT_COMPONENT(
 			"SQL database transaction manager",
 			"SQL Database Transaction Manager");
 
+I_EXPORT_COMPONENT(
+			DocumentActionJournal,
+			"Journal of the document actions of the tenants, for rolling back confirmed changes of documents with revisions",
+			"Document Action Journal Rollback Revision");
+
 
 } // namespace ImtDatabasePck

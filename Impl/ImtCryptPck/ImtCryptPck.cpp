@@ -40,6 +40,11 @@ I_EXPORT_COMPONENT(
 			"Protection of a secret at rest by the operating system",
 			"Secret Protection DPAPI");
 
+I_EXPORT_COMPONENT(
+			ProtectedTextParam,
+			"Secret text parameter stored protected by a secret protector, e.g. an API key in the server settings",
+			"Secret Text Parameter Protected Password API Key");
+
 
 } // namespace ImtCryptPck
 

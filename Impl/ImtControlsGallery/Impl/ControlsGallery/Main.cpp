@@ -61,6 +61,7 @@ int main(int argc, char *argv[])
 	Q_INIT_RESOURCE(controlsgalleryContactInfosSdl);
 	Q_INIT_RESOURCE(controlsgalleryContactInfoCollectionDocumentServiceSdl);
 	Q_INIT_RESOURCE(imtguivars);
+	DefaultImtCoreQmlInitializer::InitAssistantQml();
 
 #ifdef Q_OS_WIN
 #if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
