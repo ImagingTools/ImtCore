@@ -7,7 +7,7 @@
 #include <QtCore/QString>
 
 // ImtCore includes
-#include <imtbase/IChangeSetJournal.h>
+#include <imtdb/IDocumentActionJournal.h>
 #include <imtbase/IOperationContext.h>
 
 
@@ -16,46 +16,46 @@ namespace imtdb
 
 
 /**
-	SQL of the change set journal (tables "ChangeSets" and "ChangeSetEntries", see CChangeSetJournalComp),
+	SQL of the document action journal (tables "DocumentActions" and "DocumentActionEntries", see CDocumentActionJournalComp),
 	shared by the journal and the document delegates that write the entries.
 
 	An entry statement is written before the statements that change the document, in the same transaction.
-	It adds the entry only while the change set of the tenant is in the state "Applying", so an operation
-	context with an unknown, finished or foreign change set writes nothing into the journal.
+	It adds the entry only while the document action of the tenant is in the state "Applying", so an operation
+	context with an unknown, finished or foreign document action writes nothing into the journal.
 	The statements contain no ';' inside values, so they can be split into single statements.
 */
-class CChangeSetJournalQueries
+class CDocumentActionJournalQueries
 {
 public:
-	static const QString s_changeSetsTable;
+	static const QString s_documentActionsTable;
 	static const QString s_entriesTable;
 
-	static QByteArray GetStateId(imtbase::IChangeSetJournal::ChangeSetState state);
-	static bool GetStateFromId(const QByteArray& stateId, imtbase::IChangeSetJournal::ChangeSetState& state);
-	static QByteArray GetOperationId(imtbase::IChangeSetJournal::EntryOperation operation);
-	static bool GetOperationFromId(const QByteArray& operationId, imtbase::IChangeSetJournal::EntryOperation& operation);
+	static QByteArray GetStateId(imtdb::IDocumentActionJournal::DocumentActionState state);
+	static bool GetStateFromId(const QByteArray& stateId, imtdb::IDocumentActionJournal::DocumentActionState& state);
+	static QByteArray GetOperationId(imtdb::IDocumentActionJournal::EntryOperation operation);
+	static bool GetOperationFromId(const QByteArray& operationId, imtdb::IDocumentActionJournal::EntryOperation& operation);
 
 	/**
-		ID of the change set of an operation; empty without a change set or if the ID is not a UUID.
+		ID of the document action of an operation; empty without a document action or if the ID is not a UUID.
 	*/
-	static QByteArray GetChangeSetId(const imtbase::IOperationContext* operationContextPtr);
+	static QByteArray GetDocumentActionId(const imtbase::IOperationContext* operationContextPtr);
 
 	/**
 		Statement adding an entry for a document of a table with revisions.
 		\param revisionExpression	SQL expression of the revision number of a row of the table.
-		\return Empty without a change set in the operation context.
+		\return Empty without a document action in the operation context.
 	*/
 	static QString CreateDocumentEntryQuery(
 				const imtbase::IOperationContext* operationContextPtr,
 				const QByteArray& tableSchema,
 				const QByteArray& tableName,
 				const QByteArray& documentId,
-				imtbase::IChangeSetJournal::EntryOperation operation,
+				imtdb::IDocumentActionJournal::EntryOperation operation,
 				const QString& revisionExpression);
 
 	/**
 		Statement adding an entry of the kind EO_UNRECORDED: the write cannot be rolled back.
-		\return Empty without a change set in the operation context.
+		\return Empty without a document action in the operation context.
 	*/
 	static QString CreateUnrecordedEntryQuery(
 				const imtbase::IOperationContext* operationContextPtr,
@@ -74,7 +74,7 @@ public:
 
 private:
 	static QString CreateEntryQuery(
-				const QByteArray& changeSetId,
+				const QByteArray& documentActionId,
 				const QByteArray& tenantId,
 				const QByteArray& tableSchema,
 				const QByteArray& tableName,

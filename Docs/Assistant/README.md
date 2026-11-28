@@ -393,7 +393,7 @@ assignments plus the user, and a group changed since the preview is not overwrit
   `AllowCustomEndpoints`, `AllowServerCredentials`, `AdditionalInstructions` (default: how to use knowledge,
   API and plans), `Enabled`, `MaxStepsPerTurn` (12), `KnowledgeDocuments`, `ApiSchemaPaths`,
   `AllowedQueries`, `AllowedMutations` (default: users, groups, roles read; groups changed),
-  `ForbiddenCommands`, `ForbiddenFields`, `ChangeSetJournal`, `RollbackCollections`, `RollbackDelegates`,
+  `ForbiddenCommands`, `ForbiddenFields`, `DocumentActionJournal`, `RollbackCollections`, `RollbackDelegates`,
   `RollbackEditPermissions`, `RollbackRemovePermissions`, `Log`.
 
 Steps for a server (Puma is the template; ProLife, Agentino, Dogma and Claire follow it):
@@ -404,13 +404,13 @@ Steps for a server (Puma is the template; ProLife, Agentino, Dogma and Claire fo
    `TenantAssistant/AssistantController` and `TenantAssistant/ConfigurationController` to the GraphQL
    handlers of the servlet. Call `Init::InitAssistantServer()` (or `Q_INIT_RESOURCE(imtassistdb)` and
    `Q_INIT_RESOURCE(imtassistgql)`).
-2. Rollback (optional): add `ImtDatabasePck/ChangeSetJournal` with the database engine of the document
+2. Rollback (optional): add `ImtDatabasePck/DocumentActionJournal` with the database engine of the document
    tables and the JSON extractor of the database (`PostgresXPathExtractor` or `SqliteXPathExtractor`) and set
-   it as `ChangeSetJournal`. Set `RollbackCollections` and `RollbackDelegates` to the same repositories with
+   it as `DocumentActionJournal`. Set `RollbackCollections` and `RollbackDelegates` to the same repositories with
    revisions (they export the collection and the document delegate; Puma: the user groups) and the edit and
    remove permission of each in `RollbackEditPermissions` and `RollbackRemovePermissions`. The collections must
    create their operation contexts with `COperationContextControllerComp` (as the pages of the user
-   administration do), so the handlers pass the change set on. Add the permission `RollbackAny` to the
+   administration do), so the handlers pass the document action on. Add the permission `RollbackAny` to the
    feature `Assistant`.
 3. Permissions of the product: add the feature `Assistant` below `Administration` with `ViewPage`,
    `View` and `Edit` (`ViewPage` requires `View`, `Edit` requires `View`), and grant them to the
@@ -548,10 +548,10 @@ authentication, so it enables `AllowDemoPrincipal`. Users in `ReadOnlyUserIds` o
 
 ## Rolling back applied changes
 
-A change set journal links each confirmed change set to the revisions it produced, and the actions
-`changes.list` and `changes.rollback` roll a change set back as a whole after the user confirmed the
+A document action journal links each confirmed document action to the revisions it produced, and the actions
+`changes.list` and `changes.rollback` roll a document action back as a whole after the user confirmed the
 preview. Stage 1 covers the collections with revisions that a product configures (Puma: user groups);
-change sets that removed documents or wrote data without revisions are refused. Details, components,
+document actions that removed documents or wrote data without revisions are refused. Details, components,
 conflicts and permissions are in [Rollback.md](Rollback.md).
 
 ## MCP server

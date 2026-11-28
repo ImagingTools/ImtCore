@@ -56,9 +56,9 @@ I_EXPORT_COMPONENT(
 			"Assistant AI Action API Plan Changes");
 
 I_EXPORT_COMPONENT(
-			AssistantChangeSetAction,
-			"Assistant actions changes.list and changes.rollback: roll back a confirmed change set of documents with revisions",
-			"Assistant AI Action Change Set Rollback Undo");
+			AssistantDocumentAction,
+			"Assistant actions changes.list and changes.rollback: roll back a confirmed document action of documents with revisions",
+			"Assistant AI Action Document Action Rollback Undo");
 
 
 } // namespace ImtAssistGqlPck

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include "CAssistantChangeSetTest.h"
+#include "CAssistantDocumentActionTest.h"
 
 
 // Qt includes
@@ -18,8 +18,8 @@
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
 #include <imtbase/CObjectCollection.h>
-#include <imtbase/IChangeSetContext.h>
-#include <imtbase/IChangeSetJournal.h>
+#include <imtbase/IDocumentActionContext.h>
+#include <imtdb/IDocumentActionJournal.h>
 #include <imtbase/IRevisionController.h>
 #include <imtbase/imtbase.h>
 #include <imtdb/ISqlDatabaseObjectDelegate.h>
@@ -29,7 +29,7 @@
 #include <imtassistgql/CAdministrationAddUserToGroupActionComp.h>
 #include <imtassistgql/CAssistantApiCatalogComp.h>
 #include <imtassistgql/CAssistantApiPlanActionComp.h>
-#include <imtassistgql/CAssistantChangeSetActionComp.h>
+#include <imtassistgql/CAssistantDocumentActionComp.h>
 
 
 using namespace imtassist;
@@ -51,7 +51,7 @@ const QByteArray s_rollbackAnyPermission = "/Administration/Assistant/RollbackAn
 
 
 /**
-	GraphQL handler of the test: answers queued payloads and records the change set header of the requests.
+	GraphQL handler of the test: answers queued payloads and records the document action header of the requests.
 */
 class CTestHandlerComp: public icomp::CComponentBase, virtual public imtgql::IGqlRequestHandler
 {
@@ -72,7 +72,7 @@ public:
 	{
 		const QByteArray commandId = gqlRequest.GetCommandId();
 		const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
-		changeSetHeaders.append(qMakePair(commandId, (contextPtr != nullptr) ? contextPtr->GetHeaders().value(imtbase::s_changeSetHeaderId) : QByteArray()));
+		documentActionHeaders.append(qMakePair(commandId, (contextPtr != nullptr) ? contextPtr->GetHeaders().value(imtbase::s_documentActionHeaderId) : QByteArray()));
 
 		if (refusedCommands.contains(commandId)){
 			errorMessage = QStringLiteral("Refused");
@@ -88,24 +88,24 @@ public:
 
 	QMap<QByteArray, QJsonObject> payloads;
 	QSet<QByteArray> refusedCommands;
-	mutable QList<QPair<QByteArray, QByteArray>> changeSetHeaders;
+	mutable QList<QPair<QByteArray, QByteArray>> documentActionHeaders;
 };
 
 
 /**
-	Change set journal of the test, in memory.
+	Document action journal of the test, in memory.
 */
-class CTestJournalComp: public icomp::CComponentBase, virtual public imtbase::IChangeSetJournal
+class CTestJournalComp: public icomp::CComponentBase, virtual public imtdb::IDocumentActionJournal
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CTestJournalComp);
-		I_REGISTER_INTERFACE(imtbase::IChangeSetJournal);
+		I_REGISTER_INTERFACE(imtdb::IDocumentActionJournal);
 	I_END_COMPONENT;
 
-	// reimplemented (imtbase::IChangeSetJournal)
-	virtual QByteArray BeginChangeSet(
+	// reimplemented (imtdb::IDocumentActionJournal)
+	virtual QByteArray BeginDocumentAction(
 				const QByteArray& tenantId,
 				const QByteArray& ownerId,
 				const QByteArray& origin,
@@ -116,50 +116,50 @@ public:
 			return QByteArray();
 		}
 
-		ChangeSetInfo info;
+		DocumentActionInfo info;
 		info.id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 		info.tenantId = tenantId;
 		info.ownerId = ownerId;
 		info.origin = origin;
 		info.summary = summary;
 		info.referenceId = referenceId;
-		info.state = CSS_APPLYING;
+		info.state = DAS_APPLYING;
 		info.createdAt = QDateTime::currentDateTimeUtc();
-		changeSets.insert(info.id, info);
+		documentActions.insert(info.id, info);
 		order.prepend(info.id);
 
 		return info.id;
 	}
 
-	virtual bool SetChangeSetState(const QByteArray& tenantId, const QByteArray& changeSetId, ChangeSetState state) override
+	virtual bool SetDocumentActionState(const QByteArray& tenantId, const QByteArray& documentActionId, DocumentActionState state) override
 	{
-		if (!changeSets.contains(changeSetId) || (changeSets[changeSetId].tenantId != tenantId)){
+		if (!documentActions.contains(documentActionId) || (documentActions[documentActionId].tenantId != tenantId)){
 			return false;
 		}
 
-		changeSets[changeSetId].state = state;
+		documentActions[documentActionId].state = state;
 
 		return true;
 	}
 
-	virtual bool GetChangeSetInfo(const QByteArray& tenantId, const QByteArray& changeSetId, ChangeSetInfo& info) const override
+	virtual bool GetDocumentActionInfo(const QByteArray& tenantId, const QByteArray& documentActionId, DocumentActionInfo& info) const override
 	{
-		if (!changeSets.contains(changeSetId) || (changeSets[changeSetId].tenantId != tenantId)){
+		if (!documentActions.contains(documentActionId) || (documentActions[documentActionId].tenantId != tenantId)){
 			return false;
 		}
 
-		info = changeSets[changeSetId];
-		info.entryCount = entries.value(changeSetId).size();
+		info = documentActions[documentActionId];
+		info.entryCount = entries.value(documentActionId).size();
 
 		return true;
 	}
 
-	virtual QList<ChangeSetInfo> GetChangeSets(const QByteArray& tenantId, const QByteArray& ownerId, int maxCount) const override
+	virtual QList<DocumentActionInfo> GetDocumentActions(const QByteArray& tenantId, const QByteArray& ownerId, int maxCount) const override
 	{
-		QList<ChangeSetInfo> retVal;
+		QList<DocumentActionInfo> retVal;
 		for (const QByteArray& id: order){
-			ChangeSetInfo info;
-			if (GetChangeSetInfo(tenantId, id, info) && (ownerId.isEmpty() || (info.ownerId == ownerId)) && (retVal.size() < maxCount)){
+			DocumentActionInfo info;
+			if (GetDocumentActionInfo(tenantId, id, info) && (ownerId.isEmpty() || (info.ownerId == ownerId)) && (retVal.size() < maxCount)){
 				retVal.append(info);
 			}
 		}
@@ -167,14 +167,14 @@ public:
 		return retVal;
 	}
 
-	virtual bool GetEntries(const QByteArray& tenantId, const QByteArray& changeSetId, QList<Entry>& result) const override
+	virtual bool GetEntries(const QByteArray& tenantId, const QByteArray& documentActionId, QList<Entry>& result) const override
 	{
-		ChangeSetInfo info;
-		if (!GetChangeSetInfo(tenantId, changeSetId, info)){
+		DocumentActionInfo info;
+		if (!GetDocumentActionInfo(tenantId, documentActionId, info)){
 			return false;
 		}
 
-		result = entries.value(changeSetId);
+		result = entries.value(documentActionId);
 
 		return true;
 	}
@@ -190,17 +190,17 @@ public:
 		return true;
 	}
 
-	QByteArray AddChangeSet(const QByteArray& ownerId, ChangeSetState state, const QList<Entry>& changeSetEntries, const QString& summary = QStringLiteral("Change the group"))
+	QByteArray AddDocumentAction(const QByteArray& ownerId, DocumentActionState state, const QList<Entry>& documentActionEntries, const QString& summary = QStringLiteral("Change the group"))
 	{
-		const QByteArray id = BeginChangeSet(s_tenantId, ownerId, "assistant", summary);
-		changeSets[id].state = state;
-		entries.insert(id, changeSetEntries);
+		const QByteArray id = BeginDocumentAction(s_tenantId, ownerId, "assistant", summary);
+		documentActions[id].state = state;
+		entries.insert(id, documentActionEntries);
 
 		return id;
 	}
 
 	bool failBegin = false;
-	QMap<QByteArray, ChangeSetInfo> changeSets;
+	QMap<QByteArray, DocumentActionInfo> documentActions;
 	QByteArrayList order;
 	QMap<QByteArray, QList<Entry>> entries;
 	QMap<QByteArray, DocumentState> documentStates;
@@ -247,7 +247,7 @@ public:
 
 
 /**
-	Collection of the test: records the change set of every write.
+	Collection of the test: records the document action of every write.
 */
 class CTestCollectionComp: public icomp::CComponentBase, public imtbase::CObjectCollection
 {
@@ -299,7 +299,7 @@ public:
 	{
 		QByteArray kind;
 		QByteArray documentId;
-		QByteArray changeSetId;
+		QByteArray documentActionId;
 		QByteArray tenantId;
 		QByteArray ownerId;
 	};
@@ -312,9 +312,9 @@ private:
 		Write write;
 		write.kind = kind;
 		write.documentId = documentId;
-		const imtbase::IChangeSetContext* changeSetContextPtr = dynamic_cast<const imtbase::IChangeSetContext*>(operationContextPtr);
-		if (changeSetContextPtr != nullptr){
-			write.changeSetId = changeSetContextPtr->GetChangeSetId();
+		const imtbase::IDocumentActionContext* documentActionContextPtr = dynamic_cast<const imtbase::IDocumentActionContext*>(operationContextPtr);
+		if (documentActionContextPtr != nullptr){
+			write.documentActionId = documentActionContextPtr->GetDocumentActionId();
 		}
 		if (operationContextPtr != nullptr){
 			write.tenantId = operationContextPtr->GetTenantId();
@@ -408,7 +408,7 @@ typedef icomp::TSimSharedComponentPtr<CTestJournalComp> TestJournal;
 typedef icomp::TSimSharedComponentPtr<CTestCollectionComp> TestCollection;
 typedef icomp::TSimSharedComponentPtr<CTestDelegateComp> TestDelegate;
 typedef icomp::TSimComponentWrap<CAdministrationAddUserToGroupActionComp> AddUserToGroupAction;
-typedef icomp::TSimComponentWrap<CAssistantChangeSetActionComp> ChangeSetAction;
+typedef icomp::TSimComponentWrap<CAssistantDocumentActionComp> DocumentAction;
 typedef icomp::TSimSharedComponentPtr<CAssistantApiCatalogComp> Catalog;
 typedef icomp::TSimComponentWrap<CAssistantApiPlanActionComp> PlanAction;
 
@@ -434,9 +434,9 @@ CAssistantRequestContext CreateContext(const QByteArrayList& permissions, const 
 }
 
 
-imtbase::IChangeSetJournal::Entry CreateEntry(const QByteArray& documentId, imtbase::IChangeSetJournal::EntryOperation operation, qlonglong before, qlonglong after, const QByteArray& tableName = s_tableName)
+imtdb::IDocumentActionJournal::Entry CreateEntry(const QByteArray& documentId, imtdb::IDocumentActionJournal::EntryOperation operation, qlonglong before, qlonglong after, const QByteArray& tableName = s_tableName)
 {
-	imtbase::IChangeSetJournal::Entry entry;
+	imtdb::IDocumentActionJournal::Entry entry;
 	entry.tableName = tableName;
 	entry.documentId = documentId;
 	entry.operation = operation;
@@ -447,9 +447,9 @@ imtbase::IChangeSetJournal::Entry CreateEntry(const QByteArray& documentId, imtb
 }
 
 
-imtbase::IChangeSetJournal::DocumentState CreateState(qlonglong revision, bool isRemoved = false)
+imtdb::IDocumentActionJournal::DocumentState CreateState(qlonglong revision, bool isRemoved = false)
 {
-	imtbase::IChangeSetJournal::DocumentState state;
+	imtdb::IDocumentActionJournal::DocumentState state;
 	state.exists = true;
 	state.revision = revision;
 	state.isRemoved = isRemoved;
@@ -486,7 +486,7 @@ struct AddFixture
 		handler->payloads["GroupUpdate"] = QJsonObject({{"id", "g1"}});
 
 		action.InsertMultiRef("RequestHandlers", handler);
-		action.SetRef("ChangeSetJournal", journal);
+		action.SetRef("DocumentActionJournal", journal);
 		action.InitComponent();
 
 		parameters["userId"] = QStringLiteral("u2");
@@ -515,7 +515,7 @@ struct RollbackFixture
 
 		action.SetIdAttr("Kind", kind);
 		action.InsertMultiRef("RequestHandlers", handler);
-		action.SetRef("ChangeSetJournal", journal);
+		action.SetRef("DocumentActionJournal", journal);
 		action.InsertMultiRef("Collections", collection);
 		action.InsertMultiRef("Delegates", groupDelegate);
 		action.InsertMultiAttr("EditPermissions", s_editPermission);
@@ -525,7 +525,7 @@ struct RollbackFixture
 
 	QByteArray AddUpdate(const QByteArray& ownerId = s_userId)
 	{
-		const QByteArray id = journal->AddChangeSet(ownerId, imtbase::IChangeSetJournal::CSS_APPLIED, {CreateEntry("g1", imtbase::IChangeSetJournal::EO_UPDATED, 1, 2)});
+		const QByteArray id = journal->AddDocumentAction(ownerId, imtdb::IDocumentActionJournal::DAS_APPLIED, {CreateEntry("g1", imtdb::IDocumentActionJournal::EO_UPDATED, 1, 2)});
 
 		return id;
 	}
@@ -535,7 +535,7 @@ struct RollbackFixture
 	TestJournal journal;
 	TestCollection collection;
 	TestDelegate groupDelegate;
-	ChangeSetAction action;
+	DocumentAction action;
 };
 
 
@@ -558,7 +558,7 @@ struct PlanFixture
 
 		plan.SetRef("ApiCatalog", catalog);
 		plan.InsertMultiRef("RequestHandlers", handler);
-		plan.SetRef("ChangeSetJournal", journal);
+		plan.SetRef("DocumentActionJournal", journal);
 		plan.InitComponent();
 
 		parameters["summary"] = QStringLiteral("Create Support and rename it");
@@ -595,10 +595,10 @@ struct PlanFixture
 };
 
 
-QJsonObject CreateRollbackParameters(const QByteArray& changeSetId)
+QJsonObject CreateRollbackParameters(const QByteArray& documentActionId)
 {
 	QJsonObject retVal;
-	retVal["changeSetId"] = QString::fromUtf8(changeSetId);
+	retVal["documentActionId"] = QString::fromUtf8(documentActionId);
 
 	return retVal;
 }
@@ -607,7 +607,7 @@ QJsonObject CreateRollbackParameters(const QByteArray& changeSetId)
 } // anonymous namespace
 
 
-void CAssistantChangeSetTest::testAddUserToGroup_WritesIntoChangeSet()
+void CAssistantDocumentActionTest::testAddUserToGroup_WritesIntoDocumentAction()
 {
 	AddFixture fixture;
 	const CAssistantRequestContext context = CreateContext(s_permissions);
@@ -619,15 +619,15 @@ void CAssistantChangeSetTest::testAddUserToGroup_WritesIntoChangeSet()
 	IAssistantAction::Result result;
 	QCOMPARE(fixture.action.ApplyChange(context, fixture.parameters, preview.stateToken, result, error), IAssistantAction::ES_SUCCEEDED);
 
-	const QByteArray changeSetId = result.data.value("changeSetId").toString().toUtf8();
-	QVERIFY(!changeSetId.isEmpty());
+	const QByteArray documentActionId = result.data.value("documentActionId").toString().toUtf8();
+	QVERIFY(!documentActionId.isEmpty());
 	QVERIFY(fixture.action.GetResultSchema().Validate(result.data));
 
-	// Only the changing request carries the change set
+	// Only the changing request carries the document action
 	bool isUpdateFound = false;
-	for (const QPair<QByteArray, QByteArray>& call: fixture.handler->changeSetHeaders){
+	for (const QPair<QByteArray, QByteArray>& call: fixture.handler->documentActionHeaders){
 		if (call.first == "GroupUpdate"){
-			QCOMPARE(call.second, changeSetId);
+			QCOMPARE(call.second, documentActionId);
 			isUpdateFound = true;
 		}
 		else{
@@ -636,8 +636,8 @@ void CAssistantChangeSetTest::testAddUserToGroup_WritesIntoChangeSet()
 	}
 	QVERIFY(isUpdateFound);
 
-	const imtbase::IChangeSetJournal::ChangeSetInfo info = fixture.journal->changeSets.value(changeSetId);
-	QCOMPARE(info.state, imtbase::IChangeSetJournal::CSS_APPLIED);
+	const imtdb::IDocumentActionJournal::DocumentActionInfo info = fixture.journal->documentActions.value(documentActionId);
+	QCOMPARE(info.state, imtdb::IDocumentActionJournal::DAS_APPLIED);
 	QCOMPARE(info.ownerId, s_userId);
 	QCOMPARE(info.tenantId, s_tenantId);
 	QCOMPARE(info.origin, QByteArray("assistant"));
@@ -645,7 +645,7 @@ void CAssistantChangeSetTest::testAddUserToGroup_WritesIntoChangeSet()
 }
 
 
-void CAssistantChangeSetTest::testAddUserToGroup_FailedChangeSet()
+void CAssistantDocumentActionTest::testAddUserToGroup_FailedDocumentAction()
 {
 	AddFixture fixture;
 	const CAssistantRequestContext context = CreateContext(s_permissions);
@@ -659,12 +659,12 @@ void CAssistantChangeSetTest::testAddUserToGroup_FailedChangeSet()
 	IAssistantAction::Result result;
 	QCOMPARE(fixture.action.ApplyChange(context, fixture.parameters, preview.stateToken, result, error), IAssistantAction::ES_FAILED);
 
-	QCOMPARE(fixture.journal->changeSets.size(), 1);
-	QCOMPARE(fixture.journal->changeSets.first().state, imtbase::IChangeSetJournal::CSS_FAILED);
+	QCOMPARE(fixture.journal->documentActions.size(), 1);
+	QCOMPARE(fixture.journal->documentActions.first().state, imtdb::IDocumentActionJournal::DAS_FAILED);
 }
 
 
-void CAssistantChangeSetTest::testAddUserToGroup_NothingChangedWithoutChangeSet()
+void CAssistantDocumentActionTest::testAddUserToGroup_NothingChangedWithoutDocumentAction()
 {
 	AddFixture fixture;
 	const CAssistantRequestContext context = CreateContext(s_permissions);
@@ -674,19 +674,19 @@ void CAssistantChangeSetTest::testAddUserToGroup_NothingChangedWithoutChangeSet(
 	QCOMPARE(fixture.action.PrepareChange(context, fixture.parameters, preview, error), IAssistantAction::ES_SUCCEEDED);
 
 	fixture.journal->failBegin = true;
-	fixture.handler->changeSetHeaders.clear();
+	fixture.handler->documentActionHeaders.clear();
 
 	IAssistantAction::Result result;
 	QCOMPARE(fixture.action.ApplyChange(context, fixture.parameters, preview.stateToken, result, error), IAssistantAction::ES_FAILED);
 	QVERIFY(error.contains(QStringLiteral("nothing was changed")));
 
-	for (const QPair<QByteArray, QByteArray>& call: fixture.handler->changeSetHeaders){
+	for (const QPair<QByteArray, QByteArray>& call: fixture.handler->documentActionHeaders){
 		QVERIFY(call.first != "GroupUpdate");
 	}
 }
 
 
-void CAssistantChangeSetTest::testPlan_ChangeSetOfAllSteps()
+void CAssistantDocumentActionTest::testPlan_DocumentActionOfAllSteps()
 {
 	PlanFixture fixture;
 	const CAssistantRequestContext context = CreateContext(s_permissions);
@@ -694,25 +694,25 @@ void CAssistantChangeSetTest::testPlan_ChangeSetOfAllSteps()
 	IAssistantAction::ChangePreview preview;
 	QString error;
 	QCOMPARE(fixture.plan.PrepareChange(context, fixture.parameters, preview, error), IAssistantAction::ES_SUCCEEDED);
-	QVERIFY(fixture.journal->changeSets.isEmpty());
+	QVERIFY(fixture.journal->documentActions.isEmpty());
 
 	IAssistantAction::Result result;
 	QCOMPARE(fixture.plan.ApplyChange(context, fixture.parameters, preview.stateToken, result, error), IAssistantAction::ES_SUCCEEDED);
 	QVERIFY(fixture.plan.GetResultSchema().Validate(result.data));
 
-	const QByteArray changeSetId = result.data.value("changeSetId").toString().toUtf8();
-	QVERIFY(!changeSetId.isEmpty());
-	QCOMPARE(fixture.handler->changeSetHeaders.size(), 2);
-	QCOMPARE(fixture.handler->changeSetHeaders.at(0).second, changeSetId);
-	QCOMPARE(fixture.handler->changeSetHeaders.at(1).second, changeSetId);
+	const QByteArray documentActionId = result.data.value("documentActionId").toString().toUtf8();
+	QVERIFY(!documentActionId.isEmpty());
+	QCOMPARE(fixture.handler->documentActionHeaders.size(), 2);
+	QCOMPARE(fixture.handler->documentActionHeaders.at(0).second, documentActionId);
+	QCOMPARE(fixture.handler->documentActionHeaders.at(1).second, documentActionId);
 
-	const imtbase::IChangeSetJournal::ChangeSetInfo info = fixture.journal->changeSets.value(changeSetId);
-	QCOMPARE(info.state, imtbase::IChangeSetJournal::CSS_APPLIED);
+	const imtdb::IDocumentActionJournal::DocumentActionInfo info = fixture.journal->documentActions.value(documentActionId);
+	QCOMPARE(info.state, imtdb::IDocumentActionJournal::DAS_APPLIED);
 	QCOMPARE(info.summary, QStringLiteral("Create Support and rename it"));
 }
 
 
-void CAssistantChangeSetTest::testPlan_PartiallyAppliedChangeSet()
+void CAssistantDocumentActionTest::testPlan_PartiallyAppliedDocumentAction()
 {
 	PlanFixture fixture;
 	fixture.handler->refusedCommands.insert("GroupUpdate");
@@ -725,11 +725,11 @@ void CAssistantChangeSetTest::testPlan_PartiallyAppliedChangeSet()
 	IAssistantAction::Result result;
 	QCOMPARE(fixture.plan.ApplyChange(context, fixture.parameters, preview.stateToken, result, error), IAssistantAction::ES_FAILED);
 
-	QCOMPARE(fixture.journal->changeSets.size(), 1);
-	const imtbase::IChangeSetJournal::ChangeSetInfo info = fixture.journal->changeSets.first();
-	QCOMPARE(info.state, imtbase::IChangeSetJournal::CSS_PARTIALLY_APPLIED);
+	QCOMPARE(fixture.journal->documentActions.size(), 1);
+	const imtdb::IDocumentActionJournal::DocumentActionInfo info = fixture.journal->documentActions.first();
+	QCOMPARE(info.state, imtdb::IDocumentActionJournal::DAS_PARTIALLY_APPLIED);
 
-	// The user learns which change set holds the applied step
+	// The user learns which document action holds the applied step
 	QVERIFY(error.contains(QString::fromUtf8(info.id)));
 
 	// The first step failing: nothing applied
@@ -737,16 +737,16 @@ void CAssistantChangeSetTest::testPlan_PartiallyAppliedChangeSet()
 	failing.handler->refusedCommands.insert("GroupAdd");
 	QCOMPARE(failing.plan.PrepareChange(context, failing.parameters, preview, error), IAssistantAction::ES_SUCCEEDED);
 	QCOMPARE(failing.plan.ApplyChange(context, failing.parameters, preview.stateToken, result, error), IAssistantAction::ES_FAILED);
-	QCOMPARE(failing.journal->changeSets.first().state, imtbase::IChangeSetJournal::CSS_FAILED);
+	QCOMPARE(failing.journal->documentActions.first().state, imtdb::IDocumentActionJournal::DAS_FAILED);
 }
 
 
-void CAssistantChangeSetTest::testServerHeadersAreRemovedFromClientRequests()
+void CAssistantDocumentActionTest::testServerHeadersAreRemovedFromClientRequests()
 {
 	imtgql::IGqlContext::Headers headers;
 	headers.insert("x-authentication-token", "token");
-	headers.insert(imtbase::s_changeSetHeaderId, "11111111-1111-1111-1111-111111111111");
-	headers.insert("X-IMT-Change-Set", "22222222-2222-2222-2222-222222222222");
+	headers.insert(imtbase::s_documentActionHeaderId, "11111111-1111-1111-1111-111111111111");
+	headers.insert("X-IMT-Document-Action", "22222222-2222-2222-2222-222222222222");
 
 	const imtgql::IGqlContext::Headers filtered = imtgql::RemoveServerHeaders(headers);
 	QCOMPARE(filtered.size(), 1);
@@ -754,11 +754,11 @@ void CAssistantChangeSetTest::testServerHeadersAreRemovedFromClientRequests()
 }
 
 
-void CAssistantChangeSetTest::testList_OwnChangeSetsAndReversibility()
+void CAssistantDocumentActionTest::testList_OwnDocumentActionsAndReversibility()
 {
 	RollbackFixture fixture("list");
 	const QByteArray reversibleId = fixture.AddUpdate();
-	const QByteArray foreignTableId = fixture.journal->AddChangeSet(s_userId, imtbase::IChangeSetJournal::CSS_APPLIED, {CreateEntry("u1", imtbase::IChangeSetJournal::EO_UPDATED, 3, 4, "Users")});
+	const QByteArray foreignTableId = fixture.journal->AddDocumentAction(s_userId, imtdb::IDocumentActionJournal::DAS_APPLIED, {CreateEntry("u1", imtdb::IDocumentActionJournal::EO_UPDATED, 3, 4, "Users")});
 	const QByteArray otherUserId = fixture.AddUpdate(s_otherUserId);
 
 	IAssistantAction::Result result;
@@ -766,12 +766,12 @@ void CAssistantChangeSetTest::testList_OwnChangeSetsAndReversibility()
 	QCOMPARE(fixture.action.Execute(CreateContext(s_permissions), QJsonObject(), result, error), IAssistantAction::ES_SUCCEEDED);
 	QVERIFY(fixture.action.GetResultSchema().Validate(result.data));
 
-	const QJsonArray items = result.data.value("changeSets").toArray();
+	const QJsonArray items = result.data.value("documentActions").toArray();
 	QCOMPARE(items.size(), 2);
 
 	QMap<QString, QJsonObject> byId;
 	for (const QJsonValue& value: items){
-		byId.insert(value.toObject().value("changeSetId").toString(), value.toObject());
+		byId.insert(value.toObject().value("documentActionId").toString(), value.toObject());
 	}
 
 	QVERIFY(byId.value(QString::fromUtf8(reversibleId)).value("reversible").toBool());
@@ -781,7 +781,7 @@ void CAssistantChangeSetTest::testList_OwnChangeSetsAndReversibility()
 }
 
 
-void CAssistantChangeSetTest::testList_AllUsersNeedsPermission()
+void CAssistantDocumentActionTest::testList_AllUsersNeedsPermission()
 {
 	RollbackFixture fixture("list");
 	fixture.AddUpdate();
@@ -798,16 +798,16 @@ void CAssistantChangeSetTest::testList_AllUsersNeedsPermission()
 	IAssistantAction::Result result;
 	QString error;
 	QCOMPARE(fixture.action.Execute(context, parameters, result, error), IAssistantAction::ES_SUCCEEDED);
-	QCOMPARE(result.data.value("changeSets").toArray().size(), 2);
+	QCOMPARE(result.data.value("documentActions").toArray().size(), 2);
 }
 
 
-void CAssistantChangeSetTest::testRollback_RestoresFormerRevision()
+void CAssistantDocumentActionTest::testRollback_RestoresFormerRevision()
 {
 	RollbackFixture fixture;
-	const QByteArray changeSetId = fixture.AddUpdate();
+	const QByteArray documentActionId = fixture.AddUpdate();
 	const CAssistantRequestContext context = CreateContext(s_permissions);
-	const QJsonObject parameters = CreateRollbackParameters(changeSetId);
+	const QJsonObject parameters = CreateRollbackParameters(documentActionId);
 
 	QVERIFY(fixture.action.CheckAccess(context, parameters));
 
@@ -825,32 +825,32 @@ void CAssistantChangeSetTest::testRollback_RestoresFormerRevision()
 
 	QCOMPARE(fixture.collection->GetText("g1"), QStringLiteral("old"));
 
-	// The rollback is a change set of its own, written with the context of the user
-	const QByteArray rollbackId = result.data.value("changeSetId").toString().toUtf8();
+	// The rollback is a document action of its own, written with the context of the user
+	const QByteArray rollbackId = result.data.value("documentActionId").toString().toUtf8();
 	QCOMPARE(fixture.collection->writes.size(), 1);
 	QCOMPARE(fixture.collection->writes.at(0).kind, QByteArray("set"));
-	QCOMPARE(fixture.collection->writes.at(0).changeSetId, rollbackId);
+	QCOMPARE(fixture.collection->writes.at(0).documentActionId, rollbackId);
 	QCOMPARE(fixture.collection->writes.at(0).tenantId, s_tenantId);
 	QCOMPARE(fixture.collection->writes.at(0).ownerId, s_userId);
 
-	const imtbase::IChangeSetJournal::ChangeSetInfo rollbackInfo = fixture.journal->changeSets.value(rollbackId);
+	const imtdb::IDocumentActionJournal::DocumentActionInfo rollbackInfo = fixture.journal->documentActions.value(rollbackId);
 	QCOMPARE(rollbackInfo.origin, QByteArray("rollback"));
-	QCOMPARE(rollbackInfo.referenceId, changeSetId);
-	QCOMPARE(rollbackInfo.state, imtbase::IChangeSetJournal::CSS_APPLIED);
-	QCOMPARE(fixture.journal->changeSets.value(changeSetId).state, imtbase::IChangeSetJournal::CSS_ROLLED_BACK);
+	QCOMPARE(rollbackInfo.referenceId, documentActionId);
+	QCOMPARE(rollbackInfo.state, imtdb::IDocumentActionJournal::DAS_APPLIED);
+	QCOMPARE(fixture.journal->documentActions.value(documentActionId).state, imtdb::IDocumentActionJournal::DAS_ROLLED_BACK);
 }
 
 
-void CAssistantChangeSetTest::testRollback_RemovesCreatedDocument()
+void CAssistantDocumentActionTest::testRollback_RemovesCreatedDocument()
 {
 	RollbackFixture fixture;
-	// Created and then changed in the same change set: the rollback removes it
-	const QByteArray changeSetId = fixture.journal->AddChangeSet(
+	// Created and then changed in the same document action: the rollback removes it
+	const QByteArray documentActionId = fixture.journal->AddDocumentAction(
 				s_userId,
-				imtbase::IChangeSetJournal::CSS_APPLIED,
-				{CreateEntry("g1", imtbase::IChangeSetJournal::EO_CREATED, -1, 1), CreateEntry("g1", imtbase::IChangeSetJournal::EO_UPDATED, 1, 2)});
+				imtdb::IDocumentActionJournal::DAS_APPLIED,
+				{CreateEntry("g1", imtdb::IDocumentActionJournal::EO_CREATED, -1, 1), CreateEntry("g1", imtdb::IDocumentActionJournal::EO_UPDATED, 1, 2)});
 	const CAssistantRequestContext context = CreateContext(s_permissions);
-	const QJsonObject parameters = CreateRollbackParameters(changeSetId);
+	const QJsonObject parameters = CreateRollbackParameters(documentActionId);
 
 	IAssistantAction::ChangePreview preview;
 	QString error;
@@ -867,60 +867,60 @@ void CAssistantChangeSetTest::testRollback_RemovesCreatedDocument()
 }
 
 
-void CAssistantChangeSetTest::testRollback_RefusedIfDocumentChangedLater()
+void CAssistantDocumentActionTest::testRollback_RefusedIfDocumentChangedLater()
 {
 	RollbackFixture fixture;
-	const QByteArray changeSetId = fixture.AddUpdate();
+	const QByteArray documentActionId = fixture.AddUpdate();
 	fixture.journal->documentStates.insert(s_tableName + "/g1", CreateState(3));
 
 	IAssistantAction::ChangePreview preview;
 	QString error;
-	QCOMPARE(fixture.action.PrepareChange(CreateContext(s_permissions), CreateRollbackParameters(changeSetId), preview, error), IAssistantAction::ES_FAILED);
+	QCOMPARE(fixture.action.PrepareChange(CreateContext(s_permissions), CreateRollbackParameters(documentActionId), preview, error), IAssistantAction::ES_FAILED);
 	QVERIFY(error.contains(QStringLiteral("Support")));
 
 	// Removed later counts as changed
 	fixture.journal->documentStates.insert(s_tableName + "/g1", CreateState(2, true));
-	QCOMPARE(fixture.action.PrepareChange(CreateContext(s_permissions), CreateRollbackParameters(changeSetId), preview, error), IAssistantAction::ES_FAILED);
+	QCOMPARE(fixture.action.PrepareChange(CreateContext(s_permissions), CreateRollbackParameters(documentActionId), preview, error), IAssistantAction::ES_FAILED);
 	QVERIFY(fixture.collection->writes.isEmpty());
 }
 
 
-void CAssistantChangeSetTest::testRollback_ChangeSetOfOtherUser()
+void CAssistantDocumentActionTest::testRollback_DocumentActionOfOtherUser()
 {
 	RollbackFixture fixture;
-	const QByteArray changeSetId = fixture.AddUpdate(s_otherUserId);
+	const QByteArray documentActionId = fixture.AddUpdate(s_otherUserId);
 
 	IAssistantAction::ChangePreview preview;
 	QString error;
-	QCOMPARE(fixture.action.PrepareChange(CreateContext(s_permissions), CreateRollbackParameters(changeSetId), preview, error), IAssistantAction::ES_FAILED);
-	QCOMPARE(error, QStringLiteral("The change set was not found."));
+	QCOMPARE(fixture.action.PrepareChange(CreateContext(s_permissions), CreateRollbackParameters(documentActionId), preview, error), IAssistantAction::ES_FAILED);
+	QCOMPARE(error, QStringLiteral("The document action was not found."));
 
-	QCOMPARE(fixture.action.PrepareChange(CreateContext(QByteArrayList(s_permissions) << s_rollbackAnyPermission), CreateRollbackParameters(changeSetId), preview, error), IAssistantAction::ES_SUCCEEDED);
+	QCOMPARE(fixture.action.PrepareChange(CreateContext(QByteArrayList(s_permissions) << s_rollbackAnyPermission), CreateRollbackParameters(documentActionId), preview, error), IAssistantAction::ES_SUCCEEDED);
 }
 
 
-void CAssistantChangeSetTest::testRollback_NeedsPermissionOfCollection()
+void CAssistantDocumentActionTest::testRollback_NeedsPermissionOfCollection()
 {
 	RollbackFixture fixture;
-	const QByteArray changeSetId = fixture.AddUpdate();
+	const QByteArray documentActionId = fixture.AddUpdate();
 
 	IAssistantAction::ChangePreview preview;
 	QString error;
-	QCOMPARE(fixture.action.PrepareChange(CreateContext({"/Administration/Groups/View", s_removePermission}), CreateRollbackParameters(changeSetId), preview, error), IAssistantAction::ES_ACCESS_DENIED);
+	QCOMPARE(fixture.action.PrepareChange(CreateContext({"/Administration/Groups/View", s_removePermission}), CreateRollbackParameters(documentActionId), preview, error), IAssistantAction::ES_ACCESS_DENIED);
 
 	// A created document needs the remove permission
-	const QByteArray createdId = fixture.journal->AddChangeSet(s_userId, imtbase::IChangeSetJournal::CSS_APPLIED, {CreateEntry("g1", imtbase::IChangeSetJournal::EO_CREATED, -1, 2)});
+	const QByteArray createdId = fixture.journal->AddDocumentAction(s_userId, imtdb::IDocumentActionJournal::DAS_APPLIED, {CreateEntry("g1", imtdb::IDocumentActionJournal::EO_CREATED, -1, 2)});
 	QCOMPARE(fixture.action.PrepareChange(CreateContext({"/Administration/Groups/View", s_editPermission}), CreateRollbackParameters(createdId), preview, error), IAssistantAction::ES_ACCESS_DENIED);
 	QVERIFY(fixture.collection->writes.isEmpty());
 }
 
 
-void CAssistantChangeSetTest::testRollback_StaleAfterPreview()
+void CAssistantDocumentActionTest::testRollback_StaleAfterPreview()
 {
 	RollbackFixture fixture;
-	const QByteArray changeSetId = fixture.AddUpdate();
+	const QByteArray documentActionId = fixture.AddUpdate();
 	const CAssistantRequestContext context = CreateContext(s_permissions);
-	const QJsonObject parameters = CreateRollbackParameters(changeSetId);
+	const QJsonObject parameters = CreateRollbackParameters(documentActionId);
 
 	IAssistantAction::ChangePreview preview;
 	QString error;
@@ -936,23 +936,23 @@ void CAssistantChangeSetTest::testRollback_StaleAfterPreview()
 	fixture.journal->documentStates.insert(s_tableName + "/g1", CreateState(2));
 	QCOMPARE(fixture.action.ApplyChange(context, parameters, "other", result, error), IAssistantAction::ES_STALE);
 	QVERIFY(fixture.collection->writes.isEmpty());
-	QCOMPARE(fixture.journal->changeSets.value(changeSetId).state, imtbase::IChangeSetJournal::CSS_APPLIED);
+	QCOMPARE(fixture.journal->documentActions.value(documentActionId).state, imtdb::IDocumentActionJournal::DAS_APPLIED);
 }
 
 
-void CAssistantChangeSetTest::testRollback_RefusedForRemovalsAndUnrecordedWrites()
+void CAssistantDocumentActionTest::testRollback_RefusedForRemovalsAndUnrecordedWrites()
 {
 	RollbackFixture fixture;
 	const CAssistantRequestContext context = CreateContext(s_permissions);
 
-	const QByteArray removedId = fixture.journal->AddChangeSet(
+	const QByteArray removedId = fixture.journal->AddDocumentAction(
 				s_userId,
-				imtbase::IChangeSetJournal::CSS_APPLIED,
-				{CreateEntry("g1", imtbase::IChangeSetJournal::EO_UPDATED, 1, 2), CreateEntry("g2", imtbase::IChangeSetJournal::EO_REMOVED, 4, 4)});
-	const QByteArray unrecordedId = fixture.journal->AddChangeSet(
+				imtdb::IDocumentActionJournal::DAS_APPLIED,
+				{CreateEntry("g1", imtdb::IDocumentActionJournal::EO_UPDATED, 1, 2), CreateEntry("g2", imtdb::IDocumentActionJournal::EO_REMOVED, 4, 4)});
+	const QByteArray unrecordedId = fixture.journal->AddDocumentAction(
 				s_userId,
-				imtbase::IChangeSetJournal::CSS_APPLIED,
-				{CreateEntry("g1", imtbase::IChangeSetJournal::EO_UPDATED, 1, 2), CreateEntry(QByteArray(), imtbase::IChangeSetJournal::EO_UNRECORDED, -1, -1, "Tenants")});
+				imtdb::IDocumentActionJournal::DAS_APPLIED,
+				{CreateEntry("g1", imtdb::IDocumentActionJournal::EO_UPDATED, 1, 2), CreateEntry(QByteArray(), imtdb::IDocumentActionJournal::EO_UNRECORDED, -1, -1, "Tenants")});
 
 	IAssistantAction::ChangePreview preview;
 	QString error;
@@ -965,12 +965,12 @@ void CAssistantChangeSetTest::testRollback_RefusedForRemovalsAndUnrecordedWrites
 }
 
 
-void CAssistantChangeSetTest::testRollback_RefusedTwice()
+void CAssistantDocumentActionTest::testRollback_RefusedTwice()
 {
 	RollbackFixture fixture;
-	const QByteArray changeSetId = fixture.AddUpdate();
+	const QByteArray documentActionId = fixture.AddUpdate();
 	const CAssistantRequestContext context = CreateContext(s_permissions);
-	const QJsonObject parameters = CreateRollbackParameters(changeSetId);
+	const QJsonObject parameters = CreateRollbackParameters(documentActionId);
 
 	IAssistantAction::ChangePreview preview;
 	QString error;
@@ -980,10 +980,10 @@ void CAssistantChangeSetTest::testRollback_RefusedTwice()
 	QCOMPARE(fixture.action.ApplyChange(context, parameters, preview.stateToken, result, error), IAssistantAction::ES_SUCCEEDED);
 
 	QCOMPARE(fixture.action.PrepareChange(context, parameters, preview, error), IAssistantAction::ES_FAILED);
-	QCOMPARE(error, QStringLiteral("The change set was rolled back already."));
+	QCOMPARE(error, QStringLiteral("The document action was rolled back already."));
 }
 
 
-I_ADD_TEST(CAssistantChangeSetTest);
+I_ADD_TEST(CAssistantDocumentActionTest);
 
 

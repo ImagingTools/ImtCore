@@ -3,7 +3,7 @@
 
 
 // ImtCore includes
-#include <imtbase/IChangeSetJournal.h>
+#include <imtdb/IDocumentActionJournal.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtdb/ISqlDatabaseObjectDelegate.h>
 #include <imtassistgql/CGqlAssistantActionCompBase.h>
@@ -14,19 +14,19 @@ namespace imtassistgql
 
 
 /**
-	Assistant actions on the change sets of the confirmed changes (attribute \c Kind):
-	- \c list: \c changes.list, the latest change sets of the user in the organization and whether they can be rolled back;
-	- \c rollback: \c changes.rollback, rolls a change set back as a whole after the user confirmed the preview.
+	Assistant actions on the document actions of the confirmed changes (attribute \c Kind):
+	- \c list: \c changes.list, the latest document actions of the user in the organization and whether they can be rolled back;
+	- \c rollback: \c changes.rollback, rolls a document action back as a whole after the user confirmed the preview.
 
 	A rollback writes the former revisions of the documents again as new revisions and removes the documents the
-	change set created; it is itself a change set (origin "rollback"). Only documents of the configured collections
+	document action created; it is itself a document action (origin "rollback"). Only documents of the configured collections
 	are rolled back: the collections with revisions whose delegate records the documents in the journal.
-	Change sets that removed or restored documents are not rolled back: removing a document also changed references
+	Document actions that removed or restored documents are not rolled back: removing a document also changed references
 	in other documents and its bindings, which restoring the document does not bring back.
 
 	The checks before a rollback:
-	- the change set belongs to the organization of the request and to the user (or the user holds RollbackAnyPermission);
-	- every document is in the state the change set left it in (else it was changed later and the rollback is refused);
+	- the document action belongs to the organization of the request and to the user (or the user holds RollbackAnyPermission);
+	- every document is in the state the document action left it in (else it was changed later and the rollback is refused);
 	- the user holds the configured edit permission (restore a revision) or remove permission (remove a created document)
 	  of the collection of every document; the collections are written directly, not through the GraphQL handlers.
 
@@ -35,7 +35,7 @@ namespace imtassistgql
 
 	\ingroup imtassistgql
 */
-class CAssistantChangeSetActionComp: public CGqlAssistantActionCompBase
+class CAssistantDocumentActionComp: public CGqlAssistantActionCompBase
 {
 public:
 	typedef CGqlAssistantActionCompBase BaseClass;
@@ -46,16 +46,16 @@ public:
 		MAX_DOCUMENTS = 200
 	};
 
-	I_BEGIN_COMPONENT(CAssistantChangeSetActionComp);
+	I_BEGIN_COMPONENT(CAssistantDocumentActionComp);
 		I_ASSIGN(m_kindAttrPtr, "Kind", "list or rollback", true, "list");
 		I_ASSIGN_MULTI_0(m_collectionsCompPtr, "Collections", "Collections whose documents can be rolled back, in the order of Delegates", false);
 		I_ASSIGN_MULTI_0(m_delegatesCompPtr, "Delegates", "Document delegates of the collections: table and revisions", false);
 		I_ASSIGN_MULTI_0(m_editPermissionsAttrPtr, "EditPermissions", "Permission per collection needed to restore a former revision", false);
-		I_ASSIGN_MULTI_0(m_removePermissionsAttrPtr, "RemovePermissions", "Permission per collection needed to remove a document the change set created", false);
-		I_ASSIGN(m_rollbackAnyPermissionAttrPtr, "RollbackAnyPermission", "Permission needed to list and roll back the change sets of other users", true, "/Administration/Assistant/RollbackAny");
+		I_ASSIGN_MULTI_0(m_removePermissionsAttrPtr, "RemovePermissions", "Permission per collection needed to remove a document the document action created", false);
+		I_ASSIGN(m_rollbackAnyPermissionAttrPtr, "RollbackAnyPermission", "Permission needed to list and roll back the document actions of other users", true, "/Administration/Assistant/RollbackAny");
 	I_END_COMPONENT;
 
-	CAssistantChangeSetActionComp();
+	CAssistantDocumentActionComp();
 
 	// reimplemented (imtassist::IAssistantAction)
 	virtual QByteArray GetActionId() const override;
@@ -83,32 +83,32 @@ public:
 
 protected:
 	/**
-		What a rollback does with one document: the state before the first and after the last entry of the change set.
+		What a rollback does with one document: the state before the first and after the last entry of the document action.
 	*/
 	struct DocumentPlan
 	{
 		int collectionIndex = -1;
 		QByteArray documentId;
-		imtbase::IChangeSetJournal::EntryOperation firstOperation = imtbase::IChangeSetJournal::EO_UNRECORDED;
+		imtdb::IDocumentActionJournal::EntryOperation firstOperation = imtdb::IDocumentActionJournal::EO_UNRECORDED;
 		qlonglong revisionBefore = -1;
 		qlonglong revisionAfter = -1;
-		imtbase::IChangeSetJournal::DocumentState currentState;
+		imtdb::IDocumentActionJournal::DocumentState currentState;
 		QString name;
 	};
 
 	/**
-		Group the entries by document and check that the change set can be rolled back at all.
+		Group the entries by document and check that the document action can be rolled back at all.
 		\param reason	Why not, for the user.
 	*/
-	bool CreatePlan(const QList<imtbase::IChangeSetJournal::Entry>& entries, QList<DocumentPlan>& plan, QString& reason) const;
+	bool CreatePlan(const QList<imtdb::IDocumentActionJournal::Entry>& entries, QList<DocumentPlan>& plan, QString& reason) const;
 
 	/**
-		Everything checked before a rollback: change set, owner, state, entries, current documents and permissions.
+		Everything checked before a rollback: document action, owner, state, entries, current documents and permissions.
 	*/
 	ExecutionStatus PrepareRollback(
 				const imtassist::CAssistantRequestContext& context,
-				const QByteArray& changeSetId,
-				imtbase::IChangeSetJournal::ChangeSetInfo& info,
+				const QByteArray& documentActionId,
+				imtdb::IDocumentActionJournal::DocumentActionInfo& info,
 				QList<DocumentPlan>& plan,
 				QString& userError) const;
 
@@ -118,8 +118,8 @@ protected:
 	bool RollbackDocument(const DocumentPlan& documentPlan, const imtbase::IOperationContext& operationContext, QString& error) const;
 
 	static bool IsChanged(const DocumentPlan& documentPlan);
-	static QByteArray CreateStateToken(const QByteArray& changeSetId, const QList<DocumentPlan>& plan);
-	static QString GetStateName(imtbase::IChangeSetJournal::ChangeSetState state);
+	static QByteArray CreateStateToken(const QByteArray& documentActionId, const QList<DocumentPlan>& plan);
+	static QString GetStateName(imtdb::IDocumentActionJournal::DocumentActionState state);
 
 private:
 	enum Kind

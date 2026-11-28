@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include "CChangeSetJournalTest.h"
+#include "CDocumentActionJournalTest.h"
 
 
 // STL includes
@@ -18,19 +18,19 @@
 
 // ImtCore includes
 #include <imtbase/COperationContext.h>
-#include <imtdb/CChangeSetJournalComp.h>
-#include <imtdb/CChangeSetJournalQueries.h>
+#include <imtdb/CDocumentActionJournalComp.h>
+#include <imtdb/CDocumentActionJournalQueries.h>
 #include <imtdb/CSqliteXPathExtractorComp.h>
 #include <imtdb/IDatabaseEngine.h>
 
 
 // The script of the journal tables is a resource of the static library
-static void InitChangeSetJournalResources()
+static void InitDocumentActionJournalResources()
 {
 	Q_INIT_RESOURCE(imtdb);
 }
 
-static const bool s_isJournalResourcesInitialized = (InitChangeSetJournalResources(), true);
+static const bool s_isJournalResourcesInitialized = (InitDocumentActionJournalResources(), true);
 
 
 namespace
@@ -162,7 +162,7 @@ private:
 
 typedef icomp::TSimSharedComponentPtr<CTestEngineComp> TestEngine;
 typedef icomp::TSimSharedComponentPtr<imtdb::CSqliteXPathExtractorComp> Extractor;
-typedef icomp::TSimSharedComponentPtr<imtdb::CChangeSetJournalComp> Journal;
+typedef icomp::TSimSharedComponentPtr<imtdb::CDocumentActionJournalComp> Journal;
 
 
 struct Fixture
@@ -185,26 +185,26 @@ struct Fixture
 		return extractor->ExtractXPath(QStringLiteral("RevisionInfo"), QStringLiteral("RevisionNumber"), QMetaType::Int);
 	}
 
-	std::unique_ptr<imtbase::COperationContext> CreateContext(const QByteArray& changeSetId, const QByteArray& tenantId = s_tenantId) const
+	std::unique_ptr<imtbase::COperationContext> CreateContext(const QByteArray& documentActionId, const QByteArray& tenantId = s_tenantId) const
 	{
 		std::unique_ptr<imtbase::COperationContext> retVal(new imtbase::COperationContext);
 		retVal->SetOperationOwnerId(imtbase::IOperationContext::IdentifableObjectInfo(s_ownerId));
 		retVal->SetTenantId(tenantId);
-		retVal->SetChangeSetId(changeSetId);
+		retVal->SetDocumentActionId(documentActionId);
 
 		return retVal;
 	}
 
-	QString Entry(const imtbase::IOperationContext& context, const QByteArray& documentId, imtbase::IChangeSetJournal::EntryOperation operation)
+	QString Entry(const imtbase::IOperationContext& context, const QByteArray& documentId, imtdb::IDocumentActionJournal::EntryOperation operation)
 	{
-		return imtdb::CChangeSetJournalQueries::CreateDocumentEntryQuery(&context, QByteArray(), s_table, documentId, operation, RevisionExpression());
+		return imtdb::CDocumentActionJournalQueries::CreateDocumentEntryQuery(&context, QByteArray(), s_table, documentId, operation, RevisionExpression());
 	}
 
 	// The statements of the document delegate, written after the entry
 	bool Create(const imtbase::IOperationContext& context, const QByteArray& documentId)
 	{
 		return engine->ExecuteTransaction(
-					Entry(context, documentId, imtbase::IChangeSetJournal::EO_CREATED) +
+					Entry(context, documentId, imtdb::IDocumentActionJournal::EO_CREATED) +
 					QStringLiteral(R"(INSERT INTO "Groups" VALUES ('%1', '%2', json_object('RevisionNumber', 1), 'Active');)")
 								.arg(QUuid::createUuid().toString(QUuid::WithoutBraces), QString::fromUtf8(documentId)));
 	}
@@ -214,7 +214,7 @@ struct Fixture
 		const QString nextRevision = QStringLiteral(R"((SELECT MAX(%1) + 1 FROM "Groups" WHERE "DocumentId" = '%2'))").arg(RevisionExpression(), QString::fromUtf8(documentId));
 
 		return engine->ExecuteTransaction(
-					Entry(context, documentId, imtbase::IChangeSetJournal::EO_UPDATED) +
+					Entry(context, documentId, imtdb::IDocumentActionJournal::EO_UPDATED) +
 					QStringLiteral(R"(UPDATE "Groups" SET "State" = 'InActive' WHERE "DocumentId" = '%1';)").arg(QString::fromUtf8(documentId)) +
 					QStringLiteral(R"(INSERT INTO "Groups" VALUES ('%1', '%2', json_object('RevisionNumber', %3), 'Active');)")
 								.arg(QUuid::createUuid().toString(QUuid::WithoutBraces), QString::fromUtf8(documentId), nextRevision));
@@ -223,14 +223,14 @@ struct Fixture
 	bool Remove(const imtbase::IOperationContext& context, const QByteArray& documentId)
 	{
 		return engine->ExecuteTransaction(
-					Entry(context, documentId, imtbase::IChangeSetJournal::EO_REMOVED) +
+					Entry(context, documentId, imtdb::IDocumentActionJournal::EO_REMOVED) +
 					QStringLiteral(R"(UPDATE "Groups" SET "State" = 'Disabled' WHERE "State" = 'Active' AND "DocumentId" = '%1';)").arg(QString::fromUtf8(documentId)));
 	}
 
 	bool Restore(const imtbase::IOperationContext& context, const QByteArray& documentId)
 	{
 		return engine->ExecuteTransaction(
-					Entry(context, documentId, imtbase::IChangeSetJournal::EO_RESTORED) +
+					Entry(context, documentId, imtdb::IDocumentActionJournal::EO_RESTORED) +
 					QStringLiteral(R"(UPDATE "Groups" SET "State" = 'Active' WHERE "State" = 'Disabled' AND "DocumentId" = '%1';)").arg(QString::fromUtf8(documentId)));
 	}
 
@@ -246,65 +246,65 @@ std::unique_ptr<Fixture> s_fixturePtr;
 } // anonymous namespace
 
 
-void CChangeSetJournalTest::init()
+void CDocumentActionJournalTest::init()
 {
 	s_fixturePtr.reset(new Fixture);
 }
 
 
-void CChangeSetJournalTest::cleanup()
+void CDocumentActionJournalTest::cleanup()
 {
 	s_fixturePtr.reset();
 }
 
 
-void CChangeSetJournalTest::ChangeSetsOfTenantTest()
+void CDocumentActionJournalTest::DocumentActionsOfTenantTest()
 {
 	Fixture& fixture = *s_fixturePtr;
 
-	const QByteArray firstId = fixture.journal->BeginChangeSet(s_tenantId, s_ownerId, "assistant", QString(600, QChar('x')));
+	const QByteArray firstId = fixture.journal->BeginDocumentAction(s_tenantId, s_ownerId, "assistant", QString(600, QChar('x')));
 	QVERIFY(!firstId.isEmpty());
 	QTest::qWait(5);
-	const QByteArray secondId = fixture.journal->BeginChangeSet(s_tenantId, "bob", "assistant", QStringLiteral("Second"));
-	const QByteArray otherTenantId = fixture.journal->BeginChangeSet("tenant-b", s_ownerId, "assistant", QStringLiteral("Other"));
-	QVERIFY(fixture.journal->BeginChangeSet(QByteArray(), s_ownerId, "assistant", QString()).isEmpty());
+	const QByteArray secondId = fixture.journal->BeginDocumentAction(s_tenantId, "bob", "assistant", QStringLiteral("Second"));
+	const QByteArray otherTenantId = fixture.journal->BeginDocumentAction("tenant-b", s_ownerId, "assistant", QStringLiteral("Other"));
+	QVERIFY(fixture.journal->BeginDocumentAction(QByteArray(), s_ownerId, "assistant", QString()).isEmpty());
 
-	imtbase::IChangeSetJournal::ChangeSetInfo info;
-	QVERIFY(fixture.journal->GetChangeSetInfo(s_tenantId, firstId, info));
-	QCOMPARE(info.state, imtbase::IChangeSetJournal::CSS_APPLYING);
+	imtdb::IDocumentActionJournal::DocumentActionInfo info;
+	QVERIFY(fixture.journal->GetDocumentActionInfo(s_tenantId, firstId, info));
+	QCOMPARE(info.state, imtdb::IDocumentActionJournal::DAS_APPLYING);
 	QCOMPARE(info.ownerId, s_ownerId);
 	QCOMPARE(info.origin, QByteArray("assistant"));
-	QCOMPARE(info.summary.size(), int(imtdb::CChangeSetJournalComp::MAX_SUMMARY_LENGTH));
+	QCOMPARE(info.summary.size(), int(imtdb::CDocumentActionJournalComp::MAX_SUMMARY_LENGTH));
 	QVERIFY(info.createdAt.isValid());
 
-	// A change set of another tenant is not found
-	QVERIFY(!fixture.journal->GetChangeSetInfo(s_tenantId, otherTenantId, info));
-	QVERIFY(!fixture.journal->SetChangeSetState(s_tenantId, otherTenantId, imtbase::IChangeSetJournal::CSS_APPLIED));
+	// A document action of another tenant is not found
+	QVERIFY(!fixture.journal->GetDocumentActionInfo(s_tenantId, otherTenantId, info));
+	QVERIFY(!fixture.journal->SetDocumentActionState(s_tenantId, otherTenantId, imtdb::IDocumentActionJournal::DAS_APPLIED));
 
-	QVERIFY(fixture.journal->SetChangeSetState(s_tenantId, firstId, imtbase::IChangeSetJournal::CSS_APPLIED));
-	QVERIFY(fixture.journal->GetChangeSetInfo(s_tenantId, firstId, info));
-	QCOMPARE(info.state, imtbase::IChangeSetJournal::CSS_APPLIED);
+	QVERIFY(fixture.journal->SetDocumentActionState(s_tenantId, firstId, imtdb::IDocumentActionJournal::DAS_APPLIED));
+	QVERIFY(fixture.journal->GetDocumentActionInfo(s_tenantId, firstId, info));
+	QCOMPARE(info.state, imtdb::IDocumentActionJournal::DAS_APPLIED);
 
 	// Newest first, of one owner if given
-	const QList<imtbase::IChangeSetJournal::ChangeSetInfo> all = fixture.journal->GetChangeSets(s_tenantId, QByteArray(), 10);
+	const QList<imtdb::IDocumentActionJournal::DocumentActionInfo> all = fixture.journal->GetDocumentActions(s_tenantId, QByteArray(), 10);
 	QCOMPARE(all.size(), 2);
 	QCOMPARE(all.at(0).id, secondId);
 	QCOMPARE(all.at(1).id, firstId);
 
-	const QList<imtbase::IChangeSetJournal::ChangeSetInfo> own = fixture.journal->GetChangeSets(s_tenantId, s_ownerId, 10);
+	const QList<imtdb::IDocumentActionJournal::DocumentActionInfo> own = fixture.journal->GetDocumentActions(s_tenantId, s_ownerId, 10);
 	QCOMPARE(own.size(), 1);
 	QCOMPARE(own.at(0).id, firstId);
 
-	QCOMPARE(fixture.journal->GetChangeSets(s_tenantId, QByteArray(), 1).size(), 1);
+	QCOMPARE(fixture.journal->GetDocumentActions(s_tenantId, QByteArray(), 1).size(), 1);
 }
 
 
-void CChangeSetJournalTest::EntriesOfDocumentWritesTest()
+void CDocumentActionJournalTest::EntriesOfDocumentWritesTest()
 {
 	Fixture& fixture = *s_fixturePtr;
 
-	const QByteArray changeSetId = fixture.journal->BeginChangeSet(s_tenantId, s_ownerId, "assistant", QStringLiteral("Groups"));
-	const std::unique_ptr<imtbase::COperationContext> contextPtr = fixture.CreateContext(changeSetId);
+	const QByteArray documentActionId = fixture.journal->BeginDocumentAction(s_tenantId, s_ownerId, "assistant", QStringLiteral("Groups"));
+	const std::unique_ptr<imtbase::COperationContext> contextPtr = fixture.CreateContext(documentActionId);
 
 	QVERIFY(fixture.Create(*contextPtr, "g1"));
 	QVERIFY(fixture.Update(*contextPtr, "g1"));
@@ -313,71 +313,71 @@ void CChangeSetJournalTest::EntriesOfDocumentWritesTest()
 	QVERIFY(fixture.Remove(*contextPtr, "g2"));
 	QVERIFY(fixture.Restore(*contextPtr, "g2"));
 
-	QList<imtbase::IChangeSetJournal::Entry> entries;
-	QVERIFY(fixture.journal->GetEntries(s_tenantId, changeSetId, entries));
+	QList<imtdb::IDocumentActionJournal::Entry> entries;
+	QVERIFY(fixture.journal->GetEntries(s_tenantId, documentActionId, entries));
 	QCOMPARE(entries.size(), 6);
 
-	QCOMPARE(entries.at(0).operation, imtbase::IChangeSetJournal::EO_CREATED);
+	QCOMPARE(entries.at(0).operation, imtdb::IDocumentActionJournal::EO_CREATED);
 	QCOMPARE(entries.at(0).documentId, QByteArray("g1"));
 	QCOMPARE(entries.at(0).tableName, s_table);
 	QCOMPARE(entries.at(0).revisionBefore, qlonglong(-1));
 	QCOMPARE(entries.at(0).revisionAfter, qlonglong(1));
 
-	QCOMPARE(entries.at(1).operation, imtbase::IChangeSetJournal::EO_UPDATED);
+	QCOMPARE(entries.at(1).operation, imtdb::IDocumentActionJournal::EO_UPDATED);
 	QCOMPARE(entries.at(1).revisionBefore, qlonglong(1));
 	QCOMPARE(entries.at(1).revisionAfter, qlonglong(2));
 
 	QCOMPARE(entries.at(2).revisionBefore, qlonglong(2));
 	QCOMPARE(entries.at(2).revisionAfter, qlonglong(3));
 
-	QCOMPARE(entries.at(4).operation, imtbase::IChangeSetJournal::EO_REMOVED);
+	QCOMPARE(entries.at(4).operation, imtdb::IDocumentActionJournal::EO_REMOVED);
 	QCOMPARE(entries.at(4).documentId, QByteArray("g2"));
 	QCOMPARE(entries.at(4).revisionBefore, qlonglong(1));
 	QCOMPARE(entries.at(4).revisionAfter, qlonglong(1));
 
-	QCOMPARE(entries.at(5).operation, imtbase::IChangeSetJournal::EO_RESTORED);
+	QCOMPARE(entries.at(5).operation, imtdb::IDocumentActionJournal::EO_RESTORED);
 	QCOMPARE(entries.at(5).revisionAfter, qlonglong(1));
 
 	// Removing a document that is not active writes no entry
 	QVERIFY(fixture.Remove(*contextPtr, "unknown"));
-	QVERIFY(fixture.journal->GetEntries(s_tenantId, changeSetId, entries));
+	QVERIFY(fixture.journal->GetEntries(s_tenantId, documentActionId, entries));
 	QCOMPARE(entries.size(), 6);
 
-	imtbase::IChangeSetJournal::ChangeSetInfo info;
-	QVERIFY(fixture.journal->GetChangeSetInfo(s_tenantId, changeSetId, info));
+	imtdb::IDocumentActionJournal::DocumentActionInfo info;
+	QVERIFY(fixture.journal->GetDocumentActionInfo(s_tenantId, documentActionId, info));
 	QCOMPARE(info.entryCount, 6);
 }
 
 
-void CChangeSetJournalTest::EntriesOnlyForOpenChangeSetOfTenantTest()
+void CDocumentActionJournalTest::EntriesOnlyForOpenDocumentActionOfTenantTest()
 {
 	Fixture& fixture = *s_fixturePtr;
 
-	const QByteArray changeSetId = fixture.journal->BeginChangeSet(s_tenantId, s_ownerId, "assistant", QString());
+	const QByteArray documentActionId = fixture.journal->BeginDocumentAction(s_tenantId, s_ownerId, "assistant", QString());
 
-	// Without a change set, with an ID that is not a UUID: no statement at all
-	QVERIFY(fixture.Entry(*fixture.CreateContext(QByteArray()), "g1", imtbase::IChangeSetJournal::EO_CREATED).isEmpty());
-	QVERIFY(fixture.Entry(*fixture.CreateContext("x'); DROP TABLE \"Groups\"; --"), "g1", imtbase::IChangeSetJournal::EO_CREATED).isEmpty());
-	QVERIFY(imtdb::CChangeSetJournalQueries::CreateDocumentEntryQuery(nullptr, QByteArray(), s_table, "g1", imtbase::IChangeSetJournal::EO_CREATED, fixture.RevisionExpression()).isEmpty());
+	// Without a document action, with an ID that is not a UUID: no statement at all
+	QVERIFY(fixture.Entry(*fixture.CreateContext(QByteArray()), "g1", imtdb::IDocumentActionJournal::EO_CREATED).isEmpty());
+	QVERIFY(fixture.Entry(*fixture.CreateContext("x'); DROP TABLE \"Groups\"; --"), "g1", imtdb::IDocumentActionJournal::EO_CREATED).isEmpty());
+	QVERIFY(imtdb::CDocumentActionJournalQueries::CreateDocumentEntryQuery(nullptr, QByteArray(), s_table, "g1", imtdb::IDocumentActionJournal::EO_CREATED, fixture.RevisionExpression()).isEmpty());
 
-	// An unknown change set, a change set of another tenant: the write happens, no entry
+	// An unknown document action, a document action of another tenant: the write happens, no entry
 	QVERIFY(fixture.Create(*fixture.CreateContext(QUuid::createUuid().toByteArray(QUuid::WithoutBraces)), "g1"));
-	QVERIFY(fixture.Update(*fixture.CreateContext(changeSetId, "tenant-b"), "g1"));
-	QCOMPARE(fixture.engine->CountRows(QStringLiteral("ChangeSetEntries")), 0);
+	QVERIFY(fixture.Update(*fixture.CreateContext(documentActionId, "tenant-b"), "g1"));
+	QCOMPARE(fixture.engine->CountRows(QStringLiteral("DocumentActionEntries")), 0);
 	QCOMPARE(fixture.engine->CountRows(QStringLiteral("Groups")), 2);
 
-	// A finished change set takes no more entries
-	QVERIFY(fixture.Update(*fixture.CreateContext(changeSetId), "g1"));
-	QCOMPARE(fixture.engine->CountRows(QStringLiteral("ChangeSetEntries")), 1);
-	QVERIFY(fixture.journal->SetChangeSetState(s_tenantId, changeSetId, imtbase::IChangeSetJournal::CSS_APPLIED));
-	QVERIFY(fixture.Update(*fixture.CreateContext(changeSetId), "g1"));
-	QCOMPARE(fixture.engine->CountRows(QStringLiteral("ChangeSetEntries")), 1);
+	// A finished document action takes no more entries
+	QVERIFY(fixture.Update(*fixture.CreateContext(documentActionId), "g1"));
+	QCOMPARE(fixture.engine->CountRows(QStringLiteral("DocumentActionEntries")), 1);
+	QVERIFY(fixture.journal->SetDocumentActionState(s_tenantId, documentActionId, imtdb::IDocumentActionJournal::DAS_APPLIED));
+	QVERIFY(fixture.Update(*fixture.CreateContext(documentActionId), "g1"));
+	QCOMPARE(fixture.engine->CountRows(QStringLiteral("DocumentActionEntries")), 1);
 
 	// A document ID with quotes and ';' is kept as a value
 	const QByteArray strangeId = "g'; DELETE FROM \"Groups\"; --";
-	const QByteArray secondId = fixture.journal->BeginChangeSet(s_tenantId, s_ownerId, "assistant", QString());
-	QVERIFY(fixture.engine->ExecuteTransaction(fixture.Entry(*fixture.CreateContext(secondId), strangeId, imtbase::IChangeSetJournal::EO_CREATED)));
-	QList<imtbase::IChangeSetJournal::Entry> entries;
+	const QByteArray secondId = fixture.journal->BeginDocumentAction(s_tenantId, s_ownerId, "assistant", QString());
+	QVERIFY(fixture.engine->ExecuteTransaction(fixture.Entry(*fixture.CreateContext(secondId), strangeId, imtdb::IDocumentActionJournal::EO_CREATED)));
+	QList<imtdb::IDocumentActionJournal::Entry> entries;
 	QVERIFY(fixture.journal->GetEntries(s_tenantId, secondId, entries));
 	QCOMPARE(entries.size(), 1);
 	QCOMPARE(entries.at(0).documentId, strangeId);
@@ -385,39 +385,39 @@ void CChangeSetJournalTest::EntriesOnlyForOpenChangeSetOfTenantTest()
 }
 
 
-void CChangeSetJournalTest::UnrecordedWriteTest()
+void CDocumentActionJournalTest::UnrecordedWriteTest()
 {
 	Fixture& fixture = *s_fixturePtr;
 
-	const QByteArray changeSetId = fixture.journal->BeginChangeSet(s_tenantId, s_ownerId, "assistant", QString());
-	const std::unique_ptr<imtbase::COperationContext> contextPtr = fixture.CreateContext(changeSetId);
+	const QByteArray documentActionId = fixture.journal->BeginDocumentAction(s_tenantId, s_ownerId, "assistant", QString());
+	const std::unique_ptr<imtbase::COperationContext> contextPtr = fixture.CreateContext(documentActionId);
 
-	QVERIFY(fixture.engine->ExecuteTransaction(imtdb::CChangeSetJournalQueries::CreateUnrecordedEntryQuery(contextPtr.get(), QByteArray(), "Tenants")));
+	QVERIFY(fixture.engine->ExecuteTransaction(imtdb::CDocumentActionJournalQueries::CreateUnrecordedEntryQuery(contextPtr.get(), QByteArray(), "Tenants")));
 
-	QList<imtbase::IChangeSetJournal::Entry> entries;
-	QVERIFY(fixture.journal->GetEntries(s_tenantId, changeSetId, entries));
+	QList<imtdb::IDocumentActionJournal::Entry> entries;
+	QVERIFY(fixture.journal->GetEntries(s_tenantId, documentActionId, entries));
 	QCOMPARE(entries.size(), 1);
-	QCOMPARE(entries.at(0).operation, imtbase::IChangeSetJournal::EO_UNRECORDED);
+	QCOMPARE(entries.at(0).operation, imtdb::IDocumentActionJournal::EO_UNRECORDED);
 
 	// The collection recognizes the statements of a delegate that records its documents
-	QVERIFY(imtdb::CChangeSetJournalQueries::ContainsEntryQuery(fixture.Entry(*contextPtr, "g1", imtbase::IChangeSetJournal::EO_UPDATED).toUtf8()));
-	QVERIFY(imtdb::CChangeSetJournalQueries::ContainsEntryQuery(imtdb::CChangeSetJournalQueries::CreateUnrecordedEntryQuery(contextPtr.get(), QByteArray(), "Tenants").toUtf8()));
-	QVERIFY(!imtdb::CChangeSetJournalQueries::ContainsEntryQuery(QByteArrayLiteral(R"(UPDATE "Tenants" SET "Name" = 'x';)")));
+	QVERIFY(imtdb::CDocumentActionJournalQueries::ContainsEntryQuery(fixture.Entry(*contextPtr, "g1", imtdb::IDocumentActionJournal::EO_UPDATED).toUtf8()));
+	QVERIFY(imtdb::CDocumentActionJournalQueries::ContainsEntryQuery(imtdb::CDocumentActionJournalQueries::CreateUnrecordedEntryQuery(contextPtr.get(), QByteArray(), "Tenants").toUtf8()));
+	QVERIFY(!imtdb::CDocumentActionJournalQueries::ContainsEntryQuery(QByteArrayLiteral(R"(UPDATE "Tenants" SET "Name" = 'x';)")));
 	QCOMPARE(entries.at(0).tableName, QByteArray("Tenants"));
 	QVERIFY(entries.at(0).documentId.isEmpty());
 }
 
 
-void CChangeSetJournalTest::DocumentStateTest()
+void CDocumentActionJournalTest::DocumentStateTest()
 {
 	Fixture& fixture = *s_fixturePtr;
 
-	const QByteArray changeSetId = fixture.journal->BeginChangeSet(s_tenantId, s_ownerId, "assistant", QString());
-	const std::unique_ptr<imtbase::COperationContext> contextPtr = fixture.CreateContext(changeSetId);
+	const QByteArray documentActionId = fixture.journal->BeginDocumentAction(s_tenantId, s_ownerId, "assistant", QString());
+	const std::unique_ptr<imtbase::COperationContext> contextPtr = fixture.CreateContext(documentActionId);
 	QVERIFY(fixture.Create(*contextPtr, "g1"));
 	QVERIFY(fixture.Update(*contextPtr, "g1"));
 
-	imtbase::IChangeSetJournal::DocumentState state;
+	imtdb::IDocumentActionJournal::DocumentState state;
 	QVERIFY(fixture.journal->GetDocumentState(QByteArray(), s_table, "g1", state));
 	QVERIFY(state.exists);
 	QVERIFY(!state.isRemoved);
@@ -437,6 +437,6 @@ void CChangeSetJournalTest::DocumentStateTest()
 }
 
 
-I_ADD_TEST(CChangeSetJournalTest);
+I_ADD_TEST(CDocumentActionJournalTest);
 
 

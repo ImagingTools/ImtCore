@@ -6,7 +6,7 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtbase/IChangeSetJournal.h>
+#include <imtdb/IDocumentActionJournal.h>
 #include <imtbase/TenantType.h>
 #include <imtassist/IAssistantAction.h>
 #include <imtgql/IGqlContext.h>
@@ -43,7 +43,7 @@ public:
 	I_BEGIN_BASE_COMPONENT(CGqlAssistantActionCompBase);
 		I_REGISTER_INTERFACE(imtassist::IAssistantAction);
 		I_ASSIGN_MULTI_0(m_requestHandlersCompPtr, "RequestHandlers", "GraphQL handlers of the application that process the requests of the action", true);
-		I_ASSIGN(m_changeSetJournalCompPtr, "ChangeSetJournal", "Journal of the change sets: with it the confirmed changes can be rolled back (changes.rollback)", false, "ChangeSetJournal");
+		I_ASSIGN(m_documentActionJournalCompPtr, "DocumentActionJournal", "Journal of the document actions: with it the confirmed changes can be rolled back (changes.rollback)", false, "DocumentActionJournal");
 	I_END_COMPONENT;
 
 	// reimplemented (imtassist::IAssistantAction)
@@ -81,7 +81,7 @@ protected:
 		User input is passed only in \c variables, never in the query text.
 		\param data			Payload of the command.
 		\param errorMessage	Technical error for the log, without the text of the handler.
-		\param changeSetId	Change set the handlers write into (header imtbase::s_changeSetHeaderId); empty for none.
+		\param documentActionId	Document action the handlers write into (header imtbase::s_documentActionHeaderId); empty for none.
 	*/
 	bool ExecuteGql(
 				const imtassist::CAssistantRequestContext& context,
@@ -89,35 +89,35 @@ protected:
 				const QJsonObject& variables,
 				QJsonObject& data,
 				QString& errorMessage,
-				const QByteArray& changeSetId = QByteArray()) const;
+				const QByteArray& documentActionId = QByteArray()) const;
 
 	/**
-		Begin the change set of a confirmed change. Without a journal the change goes ahead without one (empty ID).
+		Begin the document action of a confirmed change. Without a journal the change goes ahead without one (empty ID).
 		
-eturn False if the journal could not create the change set; then nothing may be changed.
+eturn False if the journal could not create the document action; then nothing may be changed.
 	*/
-	bool BeginChangeSet(
+	bool BeginDocumentAction(
 				const imtassist::CAssistantRequestContext& context,
 				const QString& summary,
-				QByteArray& changeSetId,
+				QByteArray& documentActionId,
 				const QByteArray& origin = QByteArrayLiteral("assistant"),
 				const QByteArray& referenceId = QByteArray()) const;
 
 	/**
-		Finish the change set after \c appliedCount of \c totalCount changes were applied.
+		Finish the document action after \c appliedCount of \c totalCount changes were applied.
 	*/
-	void FinishChangeSet(const imtassist::CAssistantRequestContext& context, const QByteArray& changeSetId, int appliedCount, int totalCount) const;
+	void FinishDocumentAction(const imtassist::CAssistantRequestContext& context, const QByteArray& documentActionId, int appliedCount, int totalCount) const;
 
 	/**
 		Tenant of the data of the request, as the operation context of the handlers has it: the organization,
-		or the user for a personal space. The change sets of the journal belong to it.
+		or the user for a personal space. The document actions of the journal belong to it.
 	*/
 	static QByteArray GetDataTenantId(const imtassist::CAssistantRequestContext& context, imtbase::TenantType* tenantTypePtr = nullptr);
 
 	/**
-		Journal of the change sets, nullptr if not configured.
+		Journal of the document actions, nullptr if not configured.
 	*/
-	imtbase::IChangeSetJournal* GetChangeSetJournal() const;
+	imtdb::IDocumentActionJournal* GetDocumentActionJournal() const;
 
 	/**
 		Product of the request, for the commands that take a \c productId.
@@ -126,7 +126,7 @@ eturn False if the journal could not create the change set; then nothing may be 
 
 private:
 	I_MULTIREF(imtgql::IGqlRequestHandler, m_requestHandlersCompPtr);
-	I_REF(imtbase::IChangeSetJournal, m_changeSetJournalCompPtr);
+	I_REF(imtdb::IDocumentActionJournal, m_documentActionJournalCompPtr);
 };
 
 

@@ -11,7 +11,7 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtbase/IChangeSetJournal.h>
+#include <imtdb/IDocumentActionJournal.h>
 #include <imtdb/IDatabaseEngine.h>
 #include <imtdb/ISqlJsonXPathExtractor.h>
 
@@ -21,15 +21,15 @@ namespace imtdb
 
 
 /**
-	Change set journal in the tables "ChangeSets" and "ChangeSetEntries" of PostgreSQL or SQLite
-	(script CreateChangeSetTables.sql, created before the first change set).
+	Document action journal in the tables "DocumentActions" and "DocumentActionEntries" of PostgreSQL or SQLite
+	(script CreateDocumentActionTables.sql, created before the first document action).
 	The tables must be in the database of the document tables: the document delegates write the entries
-	in the transaction of the revision (see CChangeSetJournalQueries).
-	Change sets older than RetentionDays are removed with their entries; the documents keep their revisions.
+	in the transaction of the revision (see CDocumentActionJournalQueries).
+	Document actions older than RetentionDays are removed with their entries; the documents keep their revisions.
 */
-class CChangeSetJournalComp:
+class CDocumentActionJournalComp:
 			public ilog::CLoggerComponentBase,
-			virtual public imtbase::IChangeSetJournal
+			virtual public imtdb::IDocumentActionJournal
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
@@ -40,24 +40,24 @@ public:
 		MAX_CHANGE_SETS = 100
 	};
 
-	I_BEGIN_COMPONENT(CChangeSetJournalComp);
-		I_REGISTER_INTERFACE(imtbase::IChangeSetJournal);
+	I_BEGIN_COMPONENT(CDocumentActionJournalComp);
+		I_REGISTER_INTERFACE(imtdb::IDocumentActionJournal);
 		I_ASSIGN(m_databaseEngineCompPtr, "DatabaseEngine", "Database engine of the document tables", true, "DatabaseEngine");
 		I_ASSIGN(m_jsonXPathExtractorCompPtr, "SqlJsonXPathExtractor", "Extractor of the revision number from the revision info of the document tables", true, "SqlJsonXPathExtractor");
-		I_ASSIGN(m_retentionDaysAttrPtr, "RetentionDays", "Days a change set is kept for a rollback; 0 keeps the change sets", true, 90);
+		I_ASSIGN(m_retentionDaysAttrPtr, "RetentionDays", "Days a document action is kept for a rollback; 0 keeps the document actions", true, 90);
 	I_END_COMPONENT;
 
-	// reimplemented (imtbase::IChangeSetJournal)
-	virtual QByteArray BeginChangeSet(
+	// reimplemented (imtdb::IDocumentActionJournal)
+	virtual QByteArray BeginDocumentAction(
 				const QByteArray& tenantId,
 				const QByteArray& ownerId,
 				const QByteArray& origin,
 				const QString& summary,
 				const QByteArray& referenceId = QByteArray()) override;
-	virtual bool SetChangeSetState(const QByteArray& tenantId, const QByteArray& changeSetId, ChangeSetState state) override;
-	virtual bool GetChangeSetInfo(const QByteArray& tenantId, const QByteArray& changeSetId, ChangeSetInfo& info) const override;
-	virtual QList<ChangeSetInfo> GetChangeSets(const QByteArray& tenantId, const QByteArray& ownerId, int maxCount) const override;
-	virtual bool GetEntries(const QByteArray& tenantId, const QByteArray& changeSetId, QList<Entry>& entries) const override;
+	virtual bool SetDocumentActionState(const QByteArray& tenantId, const QByteArray& documentActionId, DocumentActionState state) override;
+	virtual bool GetDocumentActionInfo(const QByteArray& tenantId, const QByteArray& documentActionId, DocumentActionInfo& info) const override;
+	virtual QList<DocumentActionInfo> GetDocumentActions(const QByteArray& tenantId, const QByteArray& ownerId, int maxCount) const override;
+	virtual bool GetEntries(const QByteArray& tenantId, const QByteArray& documentActionId, QList<Entry>& entries) const override;
 	virtual bool GetDocumentState(
 				const QByteArray& tableSchema,
 				const QByteArray& tableName,
@@ -68,7 +68,7 @@ private:
 	bool EnsureTables();
 	void RemoveExpired();
 	bool ExecQuery(const QString& query, const QVariantMap& bindValues, QSqlQuery& sqlQuery) const;
-	bool ReadChangeSet(const QSqlQuery& sqlQuery, ChangeSetInfo& info) const;
+	bool ReadDocumentAction(const QSqlQuery& sqlQuery, DocumentActionInfo& info) const;
 	static bool IsIdentifier(const QByteArray& name);
 
 private:

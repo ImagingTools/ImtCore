@@ -31,7 +31,7 @@
 #include <imtdb/CPostgresXPathExtractorComp.h>
 #include <imtdb/CSqliteXPathExtractorComp.h>
 #include <imtdb/CSqlDatabaseTransactionManagerComp.h>
-#include <imtdb/CChangeSetJournalComp.h>
+#include <imtdb/CDocumentActionJournalComp.h>
 #include <imtauth/CTenantFilterParam.h>
 
 
@@ -65,7 +65,7 @@ typedef imtdb::CDependentTableMetaInfoControllerComp DependentTableMetaInfoContr
 typedef imtdb::CSqlDatabaseDocumentDelegateComp SQLiteDatabaseDocumentDelegate;
 typedef imtdb::CPostgresXPathExtractorComp PostgresXPathExtractor;
 typedef imtdb::CSqliteXPathExtractorComp SqliteXPathExtractor;
-typedef imtdb::CChangeSetJournalComp ChangeSetJournal;
+typedef imtdb::CDocumentActionJournalComp DocumentActionJournal;
 typedef imtdb::CSqlDatabaseTransactionManagerComp SqlDatabaseTransactionManager;
 
 

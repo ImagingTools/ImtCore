@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtassistgql/CAssistantChangeSetActionComp.h>
+#include <imtassistgql/CAssistantDocumentActionComp.h>
 
 
 // Qt includes
@@ -20,16 +20,16 @@ namespace
 {
 
 
-QString GetOperationName(imtbase::IChangeSetJournal::EntryOperation operation)
+QString GetOperationName(imtdb::IDocumentActionJournal::EntryOperation operation)
 {
 	switch (operation){
-	case imtbase::IChangeSetJournal::EO_CREATED:
+	case imtdb::IDocumentActionJournal::EO_CREATED:
 		return QStringLiteral("created");
-	case imtbase::IChangeSetJournal::EO_UPDATED:
+	case imtdb::IDocumentActionJournal::EO_UPDATED:
 		return QStringLiteral("changed");
-	case imtbase::IChangeSetJournal::EO_REMOVED:
+	case imtdb::IDocumentActionJournal::EO_REMOVED:
 		return QStringLiteral("removed");
-	case imtbase::IChangeSetJournal::EO_RESTORED:
+	case imtdb::IDocumentActionJournal::EO_RESTORED:
 		return QStringLiteral("restored");
 	default:
 		return QStringLiteral("not recorded");
@@ -40,7 +40,7 @@ QString GetOperationName(imtbase::IChangeSetJournal::EntryOperation operation)
 } // anonymous namespace
 
 
-CAssistantChangeSetActionComp::CAssistantChangeSetActionComp()
+CAssistantDocumentActionComp::CAssistantDocumentActionComp()
 	:m_listParameterSchema("changes.list.parameters", 1),
 	m_listResultSchema("changes.list.result", 1),
 	m_rollbackParameterSchema("changes.rollback.parameters", 1),
@@ -49,66 +49,66 @@ CAssistantChangeSetActionComp::CAssistantChangeSetActionComp()
 	m_listParameterSchema.AddInteger("maxCount", false, 1, MAX_CHANGE_SETS);
 	m_listParameterSchema.AddBoolean("allUsers", false);
 
-	std::shared_ptr<imtassist::CParameterSchema> changeSetSchemaPtr = std::make_shared<imtassist::CParameterSchema>("changes.list.changeSet", 1);
-	changeSetSchemaPtr->AddId("changeSetId", true);
-	changeSetSchemaPtr->AddString("createdAt", true, 40);
-	changeSetSchemaPtr->AddString("summary", false, 600);
-	changeSetSchemaPtr->AddString("origin", false, 40);
-	changeSetSchemaPtr->AddEnum("state", true, QStringList() << "applying" << "applied" << "partiallyApplied" << "failed" << "rolledBack");
-	changeSetSchemaPtr->AddInteger("documentCount", true, 0, std::numeric_limits<qint32>::max());
-	changeSetSchemaPtr->AddBoolean("reversible", true);
-	changeSetSchemaPtr->AddString("reason", false, 300);
-	m_listResultSchema.AddObjectList("changeSets", true, changeSetSchemaPtr, MAX_CHANGE_SETS);
+	std::shared_ptr<imtassist::CParameterSchema> documentActionSchemaPtr = std::make_shared<imtassist::CParameterSchema>("changes.list.documentAction", 1);
+	documentActionSchemaPtr->AddId("documentActionId", true);
+	documentActionSchemaPtr->AddString("createdAt", true, 40);
+	documentActionSchemaPtr->AddString("summary", false, 600);
+	documentActionSchemaPtr->AddString("origin", false, 40);
+	documentActionSchemaPtr->AddEnum("state", true, QStringList() << "applying" << "applied" << "partiallyApplied" << "failed" << "rolledBack");
+	documentActionSchemaPtr->AddInteger("documentCount", true, 0, std::numeric_limits<qint32>::max());
+	documentActionSchemaPtr->AddBoolean("reversible", true);
+	documentActionSchemaPtr->AddString("reason", false, 300);
+	m_listResultSchema.AddObjectList("documentActions", true, documentActionSchemaPtr, MAX_CHANGE_SETS);
 
-	m_rollbackParameterSchema.AddId("changeSetId", true);
+	m_rollbackParameterSchema.AddId("documentActionId", true);
 
 	m_rollbackResultSchema.AddInteger("restoredDocuments", true, 0, MAX_DOCUMENTS);
-	m_rollbackResultSchema.AddId("changeSetId", false);
+	m_rollbackResultSchema.AddId("documentActionId", false);
 }
 
 
 // reimplemented (imtassist::IAssistantAction)
 
-QByteArray CAssistantChangeSetActionComp::GetActionId() const
+QByteArray CAssistantDocumentActionComp::GetActionId() const
 {
 	return (GetKind() == K_ROLLBACK) ? "changes.rollback" : "changes.list";
 }
 
 
-QString CAssistantChangeSetActionComp::GetDescription() const
+QString CAssistantDocumentActionComp::GetDescription() const
 {
 	if (GetKind() == K_ROLLBACK){
-		return "Roll back a change set as a whole: the documents get their former state again, created documents are removed. "
-			   "Takes a change set ID from changes.list or from the result of an applied change. The user confirms the rollback; "
-			   "it is refused if a document was changed after the change set.";
+		return "Roll back a document action as a whole: the documents get their former state again, created documents are removed. "
+			   "Takes a document action ID from changes.list or from the result of an applied change. The user confirms the rollback; "
+			   "it is refused if a document was changed after the document action.";
 	}
 
-	return "List the latest confirmed change sets of the user in the current organization (newest first), with whether each can be rolled back. "
+	return "List the latest confirmed document actions of the user in the current organization (newest first), with whether each can be rolled back. "
 		   "Use it when the user wants to undo a change.";
 }
 
 
-imtassist::IAssistantAction::ActionKind CAssistantChangeSetActionComp::GetActionKind() const
+imtassist::IAssistantAction::ActionKind CAssistantDocumentActionComp::GetActionKind() const
 {
 	return (GetKind() == K_ROLLBACK) ? AK_CHANGE : AK_READ;
 }
 
 
-const imtassist::CParameterSchema& CAssistantChangeSetActionComp::GetParameterSchema() const
+const imtassist::CParameterSchema& CAssistantDocumentActionComp::GetParameterSchema() const
 {
 	return (GetKind() == K_ROLLBACK) ? m_rollbackParameterSchema : m_listParameterSchema;
 }
 
 
-const imtassist::CParameterSchema& CAssistantChangeSetActionComp::GetResultSchema() const
+const imtassist::CParameterSchema& CAssistantDocumentActionComp::GetResultSchema() const
 {
 	return (GetKind() == K_ROLLBACK) ? m_rollbackResultSchema : m_listResultSchema;
 }
 
 
-bool CAssistantChangeSetActionComp::CheckAccess(const imtassist::CAssistantRequestContext& context, const QJsonObject& parameters) const
+bool CAssistantDocumentActionComp::CheckAccess(const imtassist::CAssistantRequestContext& context, const QJsonObject& parameters) const
 {
-	if ((GetChangeSetJournal() == nullptr) || (GetGqlContext(context) == nullptr)){
+	if ((GetDocumentActionJournal() == nullptr) || (GetGqlContext(context) == nullptr)){
 		return false;
 	}
 
@@ -120,13 +120,13 @@ bool CAssistantChangeSetActionComp::CheckAccess(const imtassist::CAssistantReque
 }
 
 
-imtassist::IAssistantAction::ExecutionStatus CAssistantChangeSetActionComp::Execute(
+imtassist::IAssistantAction::ExecutionStatus CAssistantDocumentActionComp::Execute(
 			const imtassist::CAssistantRequestContext& context,
 			const QJsonObject& parameters,
 			Result& result,
 			QString& userError)
 {
-	imtbase::IChangeSetJournal* journalPtr = GetChangeSetJournal();
+	imtdb::IDocumentActionJournal* journalPtr = GetDocumentActionJournal();
 	if ((GetKind() != K_LIST) || (journalPtr == nullptr)){
 		return ES_FAILED;
 	}
@@ -134,31 +134,31 @@ imtassist::IAssistantAction::ExecutionStatus CAssistantChangeSetActionComp::Exec
 	const QByteArray ownerId = parameters.value("allUsers").toBool() ? QByteArray() : context.GetUserId();
 	const int maxCount = parameters.contains("maxCount") ? parameters.value("maxCount").toInt() : 10;
 
-	const QList<imtbase::IChangeSetJournal::ChangeSetInfo> changeSets = journalPtr->GetChangeSets(GetDataTenantId(context), ownerId, qBound(1, maxCount, int(MAX_CHANGE_SETS)));
+	const QList<imtdb::IDocumentActionJournal::DocumentActionInfo> documentActions = journalPtr->GetDocumentActions(GetDataTenantId(context), ownerId, qBound(1, maxCount, int(MAX_CHANGE_SETS)));
 
 	QJsonArray items;
-	for (const imtbase::IChangeSetJournal::ChangeSetInfo& info: changeSets){
+	for (const imtdb::IDocumentActionJournal::DocumentActionInfo& info: documentActions){
 		QString reason;
 		bool isReversible = false;
-		if ((info.state == imtbase::IChangeSetJournal::CSS_APPLIED) || (info.state == imtbase::IChangeSetJournal::CSS_PARTIALLY_APPLIED)){
-			QList<imtbase::IChangeSetJournal::Entry> entries;
+		if ((info.state == imtdb::IDocumentActionJournal::DAS_APPLIED) || (info.state == imtdb::IDocumentActionJournal::DAS_PARTIALLY_APPLIED)){
+			QList<imtdb::IDocumentActionJournal::Entry> entries;
 			QList<DocumentPlan> plan;
 			if (!journalPtr->GetEntries(info.tenantId, info.id, entries)){
-				reason = QStringLiteral("The change set could not be read.");
+				reason = QStringLiteral("The document action could not be read.");
 			}
 			else{
 				isReversible = CreatePlan(entries, plan, reason);
 			}
 		}
-		else if (info.state == imtbase::IChangeSetJournal::CSS_ROLLED_BACK){
-			reason = QStringLiteral("The change set was rolled back already.");
+		else if (info.state == imtdb::IDocumentActionJournal::DAS_ROLLED_BACK){
+			reason = QStringLiteral("The document action was rolled back already.");
 		}
 		else{
 			reason = QStringLiteral("Nothing to roll back.");
 		}
 
 		QJsonObject item;
-		item["changeSetId"] = QString::fromUtf8(info.id);
+		item["documentActionId"] = QString::fromUtf8(info.id);
 		item["createdAt"] = info.createdAt.toString(Qt::ISODate);
 		item["summary"] = info.summary;
 		item["origin"] = QString::fromUtf8(info.origin);
@@ -172,9 +172,9 @@ imtassist::IAssistantAction::ExecutionStatus CAssistantChangeSetActionComp::Exec
 		items.append(item);
 	}
 
-	result.data["changeSets"] = items;
+	result.data["documentActions"] = items;
 	if (items.isEmpty()){
-		result.text = QStringLiteral("There are no change sets.");
+		result.text = QStringLiteral("There are no document actions.");
 	}
 
 	userError.clear();
@@ -183,7 +183,7 @@ imtassist::IAssistantAction::ExecutionStatus CAssistantChangeSetActionComp::Exec
 }
 
 
-imtassist::IAssistantAction::ExecutionStatus CAssistantChangeSetActionComp::PrepareChange(
+imtassist::IAssistantAction::ExecutionStatus CAssistantDocumentActionComp::PrepareChange(
 			const imtassist::CAssistantRequestContext& context,
 			const QJsonObject& parameters,
 			ChangePreview& preview,
@@ -193,11 +193,11 @@ imtassist::IAssistantAction::ExecutionStatus CAssistantChangeSetActionComp::Prep
 		return ES_FAILED;
 	}
 
-	const QByteArray changeSetId = parameters.value("changeSetId").toString().toUtf8();
+	const QByteArray documentActionId = parameters.value("documentActionId").toString().toUtf8();
 
-	imtbase::IChangeSetJournal::ChangeSetInfo info;
+	imtdb::IDocumentActionJournal::DocumentActionInfo info;
 	QList<DocumentPlan> plan;
-	const ExecutionStatus status = PrepareRollback(context, changeSetId, info, plan, userError);
+	const ExecutionStatus status = PrepareRollback(context, documentActionId, info, plan, userError);
 	if (status != ES_SUCCEEDED){
 		return status;
 	}
@@ -206,7 +206,7 @@ imtassist::IAssistantAction::ExecutionStatus CAssistantChangeSetActionComp::Prep
 		QJsonObject change;
 		change["field"] = documentPlan.name.isEmpty() ? QString::fromUtf8(documentPlan.documentId) : documentPlan.name;
 		change["oldValue"] = QStringLiteral("%1 (revision %2)").arg(GetOperationName(documentPlan.firstOperation)).arg(documentPlan.currentState.revision);
-		change["newValue"] = (documentPlan.firstOperation == imtbase::IChangeSetJournal::EO_CREATED)
+		change["newValue"] = (documentPlan.firstOperation == imtdb::IDocumentActionJournal::EO_CREATED)
 					? QStringLiteral("removed")
 					: QStringLiteral("state of revision %1").arg(documentPlan.revisionBefore);
 		preview.changes.append(change);
@@ -215,7 +215,7 @@ imtassist::IAssistantAction::ExecutionStatus CAssistantChangeSetActionComp::Prep
 	preview.summary = QStringLiteral("Roll back: %1").arg(info.summary.isEmpty() ? QString::fromUtf8(info.id) : info.summary);
 	preview.targetLabel = QStringLiteral("%1 documents").arg(plan.size());
 	preview.targetId = info.id;
-	preview.impact = QStringLiteral("The documents get the state they had before the change set; documents the change set created are removed. "
+	preview.impact = QStringLiteral("The documents get the state they had before the document action; documents the document action created are removed. "
 									"Other documents that follow them (for example the memberships of the users of a group) are adjusted as when the document is edited.");
 	preview.stateToken = CreateStateToken(info.id, plan);
 
@@ -223,23 +223,23 @@ imtassist::IAssistantAction::ExecutionStatus CAssistantChangeSetActionComp::Prep
 }
 
 
-imtassist::IAssistantAction::ExecutionStatus CAssistantChangeSetActionComp::ApplyChange(
+imtassist::IAssistantAction::ExecutionStatus CAssistantDocumentActionComp::ApplyChange(
 			const imtassist::CAssistantRequestContext& context,
 			const QJsonObject& parameters,
 			const QByteArray& stateToken,
 			Result& result,
 			QString& userError)
 {
-	imtbase::IChangeSetJournal* journalPtr = GetChangeSetJournal();
+	imtdb::IDocumentActionJournal* journalPtr = GetDocumentActionJournal();
 	if ((GetKind() != K_ROLLBACK) || (journalPtr == nullptr)){
 		return ES_FAILED;
 	}
 
-	const QByteArray changeSetId = parameters.value("changeSetId").toString().toUtf8();
+	const QByteArray documentActionId = parameters.value("documentActionId").toString().toUtf8();
 
-	imtbase::IChangeSetJournal::ChangeSetInfo info;
+	imtdb::IDocumentActionJournal::DocumentActionInfo info;
 	QList<DocumentPlan> plan;
-	const ExecutionStatus status = PrepareRollback(context, changeSetId, info, plan, userError);
+	const ExecutionStatus status = PrepareRollback(context, documentActionId, info, plan, userError);
 	if (status != ES_SUCCEEDED){
 		return status;
 	}
@@ -249,7 +249,7 @@ imtassist::IAssistantAction::ExecutionStatus CAssistantChangeSetActionComp::Appl
 	}
 
 	QByteArray rollbackId;
-	if (!BeginChangeSet(context, QStringLiteral("Rollback: %1").arg(info.summary), rollbackId, QByteArrayLiteral("rollback"), info.id)){
+	if (!BeginDocumentAction(context, QStringLiteral("Rollback: %1").arg(info.summary), rollbackId, QByteArrayLiteral("rollback"), info.id)){
 		userError = QStringLiteral("The rollback could not be recorded; nothing was changed.");
 
 		return ES_FAILED;
@@ -267,17 +267,17 @@ imtassist::IAssistantAction::ExecutionStatus CAssistantChangeSetActionComp::Appl
 	imtbase::COperationContext operationContext;
 	operationContext.SetOperationOwnerId(ownerInfo);
 	operationContext.SetTenantId(tenantId, tenantType);
-	operationContext.SetChangeSetId(rollbackId);
-	operationContext.SetOperationDescription(QStringLiteral("Rollback of a change set"));
+	operationContext.SetDocumentActionId(rollbackId);
+	operationContext.SetOperationDescription(QStringLiteral("Rollback of a document action"));
 
 	// The documents in the reverse order of their first change
 	int restoredCount = 0;
 	for (int i = plan.size() - 1; i >= 0; --i){
 		QString error;
 		if (!RollbackDocument(plan[i], operationContext, error)){
-			SendWarningMessage(0, QStringLiteral("Assistant rollback: a document could not be rolled back: %1").arg(error), "AssistantChangeSets");
+			SendWarningMessage(0, QStringLiteral("Assistant rollback: a document could not be rolled back: %1").arg(error), "AssistantDocumentActions");
 
-			FinishChangeSet(context, rollbackId, restoredCount, plan.size());
+			FinishDocumentAction(context, rollbackId, restoredCount, plan.size());
 			userError = (restoredCount == 0)
 						? QStringLiteral("The rollback failed; nothing was changed.")
 						: QStringLiteral("%1 of %2 documents were rolled back; then the rollback failed.").arg(restoredCount).arg(plan.size());
@@ -288,16 +288,16 @@ imtassist::IAssistantAction::ExecutionStatus CAssistantChangeSetActionComp::Appl
 		++restoredCount;
 	}
 
-	FinishChangeSet(context, rollbackId, restoredCount, plan.size());
+	FinishDocumentAction(context, rollbackId, restoredCount, plan.size());
 
-	if (!journalPtr->SetChangeSetState(tenantId, info.id, imtbase::IChangeSetJournal::CSS_ROLLED_BACK)){
-		SendErrorMessage(0, QStringLiteral("Assistant rollback: the change set could not be marked as rolled back"), "AssistantChangeSets");
+	if (!journalPtr->SetDocumentActionState(tenantId, info.id, imtdb::IDocumentActionJournal::DAS_ROLLED_BACK)){
+		SendErrorMessage(0, QStringLiteral("Assistant rollback: the document action could not be marked as rolled back"), "AssistantDocumentActions");
 	}
 
 	result.data["restoredDocuments"] = restoredCount;
 	result.text = QStringLiteral("%1 documents were rolled back.").arg(restoredCount);
 	if (!rollbackId.isEmpty()){
-		result.data["changeSetId"] = QString::fromUtf8(rollbackId);
+		result.data["documentActionId"] = QString::fromUtf8(rollbackId);
 	}
 
 	return ES_SUCCEEDED;
@@ -306,32 +306,32 @@ imtassist::IAssistantAction::ExecutionStatus CAssistantChangeSetActionComp::Appl
 
 // protected methods
 
-bool CAssistantChangeSetActionComp::CreatePlan(const QList<imtbase::IChangeSetJournal::Entry>& entries, QList<DocumentPlan>& plan, QString& reason) const
+bool CAssistantDocumentActionComp::CreatePlan(const QList<imtdb::IDocumentActionJournal::Entry>& entries, QList<DocumentPlan>& plan, QString& reason) const
 {
 	plan.clear();
 
 	if (entries.isEmpty()){
-		reason = QStringLiteral("The change set changed no documents.");
+		reason = QStringLiteral("The document action changed no documents.");
 
 		return false;
 	}
 
 	QMap<QByteArray, int> documentIndices;
-	for (const imtbase::IChangeSetJournal::Entry& entry: entries){
+	for (const imtdb::IDocumentActionJournal::Entry& entry: entries){
 		switch (entry.operation){
-		case imtbase::IChangeSetJournal::EO_CREATED:
-		case imtbase::IChangeSetJournal::EO_UPDATED:
+		case imtdb::IDocumentActionJournal::EO_CREATED:
+		case imtdb::IDocumentActionJournal::EO_UPDATED:
 			break;
 
-		case imtbase::IChangeSetJournal::EO_REMOVED:
-		case imtbase::IChangeSetJournal::EO_RESTORED:
-			reason = QStringLiteral("The change set removed or restored documents; such change sets cannot be rolled back.");
+		case imtdb::IDocumentActionJournal::EO_REMOVED:
+		case imtdb::IDocumentActionJournal::EO_RESTORED:
+			reason = QStringLiteral("The document action removed or restored documents; such document actions cannot be rolled back.");
 			plan.clear();
 
 			return false;
 
 		default:
-			reason = QStringLiteral("The change set also changed data without revisions; it cannot be rolled back.");
+			reason = QStringLiteral("The document action also changed data without revisions; it cannot be rolled back.");
 			plan.clear();
 
 			return false;
@@ -339,13 +339,13 @@ bool CAssistantChangeSetActionComp::CreatePlan(const QList<imtbase::IChangeSetJo
 
 		const int collectionIndex = FindCollection(entry.tableSchema, entry.tableName);
 		if (collectionIndex < 0){
-			reason = QStringLiteral("The change set changed documents that the assistant cannot roll back.");
+			reason = QStringLiteral("The document action changed documents that the assistant cannot roll back.");
 			plan.clear();
 
 			return false;
 		}
 
-		if ((entry.operation == imtbase::IChangeSetJournal::EO_UPDATED) && (entry.revisionBefore <= 0)){
+		if ((entry.operation == imtdb::IDocumentActionJournal::EO_UPDATED) && (entry.revisionBefore <= 0)){
 			reason = QStringLiteral("The former state of a document is not known.");
 			plan.clear();
 
@@ -371,7 +371,7 @@ bool CAssistantChangeSetActionComp::CreatePlan(const QList<imtbase::IChangeSetJo
 	}
 
 	if (plan.size() > MAX_DOCUMENTS){
-		reason = QStringLiteral("The change set changed too many documents to roll it back here.");
+		reason = QStringLiteral("The document action changed too many documents to roll it back here.");
 		plan.clear();
 
 		return false;
@@ -381,50 +381,50 @@ bool CAssistantChangeSetActionComp::CreatePlan(const QList<imtbase::IChangeSetJo
 }
 
 
-imtassist::IAssistantAction::ExecutionStatus CAssistantChangeSetActionComp::PrepareRollback(
+imtassist::IAssistantAction::ExecutionStatus CAssistantDocumentActionComp::PrepareRollback(
 			const imtassist::CAssistantRequestContext& context,
-			const QByteArray& changeSetId,
-			imtbase::IChangeSetJournal::ChangeSetInfo& info,
+			const QByteArray& documentActionId,
+			imtdb::IDocumentActionJournal::DocumentActionInfo& info,
 			QList<DocumentPlan>& plan,
 			QString& userError) const
 {
-	imtbase::IChangeSetJournal* journalPtr = GetChangeSetJournal();
+	imtdb::IDocumentActionJournal* journalPtr = GetDocumentActionJournal();
 	if ((journalPtr == nullptr) || (GetGqlContext(context) == nullptr)){
 		return ES_ACCESS_DENIED;
 	}
 
 	const QByteArray tenantId = GetDataTenantId(context);
-	if (changeSetId.isEmpty() || !journalPtr->GetChangeSetInfo(tenantId, changeSetId, info)){
-		userError = QStringLiteral("The change set was not found.");
+	if (documentActionId.isEmpty() || !journalPtr->GetDocumentActionInfo(tenantId, documentActionId, info)){
+		userError = QStringLiteral("The document action was not found.");
 
 		return ES_FAILED;
 	}
 
 	if ((info.ownerId != context.GetUserId()) && !HasPermission(context, *m_rollbackAnyPermissionAttrPtr)){
-		// The same answer as for an unknown change set: the change sets of others are not disclosed
-		userError = QStringLiteral("The change set was not found.");
+		// The same answer as for an unknown document action: the document actions of others are not disclosed
+		userError = QStringLiteral("The document action was not found.");
 
 		return ES_FAILED;
 	}
 
 	switch (info.state){
-	case imtbase::IChangeSetJournal::CSS_APPLIED:
-	case imtbase::IChangeSetJournal::CSS_PARTIALLY_APPLIED:
+	case imtdb::IDocumentActionJournal::DAS_APPLIED:
+	case imtdb::IDocumentActionJournal::DAS_PARTIALLY_APPLIED:
 		break;
-	case imtbase::IChangeSetJournal::CSS_ROLLED_BACK:
-		userError = QStringLiteral("The change set was rolled back already.");
+	case imtdb::IDocumentActionJournal::DAS_ROLLED_BACK:
+		userError = QStringLiteral("The document action was rolled back already.");
 		return ES_FAILED;
-	case imtbase::IChangeSetJournal::CSS_APPLYING:
-		userError = QStringLiteral("The change set is still being applied.");
+	case imtdb::IDocumentActionJournal::DAS_APPLYING:
+		userError = QStringLiteral("The document action is still being applied.");
 		return ES_FAILED;
 	default:
-		userError = QStringLiteral("The change set changed nothing.");
+		userError = QStringLiteral("The document action changed nothing.");
 		return ES_FAILED;
 	}
 
-	QList<imtbase::IChangeSetJournal::Entry> entries;
-	if (!journalPtr->GetEntries(tenantId, changeSetId, entries)){
-		userError = QStringLiteral("The change set could not be read.");
+	QList<imtdb::IDocumentActionJournal::Entry> entries;
+	if (!journalPtr->GetEntries(tenantId, documentActionId, entries)){
+		userError = QStringLiteral("The document action could not be read.");
 
 		return ES_FAILED;
 	}
@@ -438,11 +438,11 @@ imtassist::IAssistantAction::ExecutionStatus CAssistantChangeSetActionComp::Prep
 		const imtdb::ISqlDatabaseObjectDelegate* delegatePtr = m_delegatesCompPtr[documentPlan.collectionIndex];
 		const imtbase::IObjectCollection* collectionPtr = m_collectionsCompPtr[documentPlan.collectionIndex];
 
-		const QByteArray permission = (documentPlan.firstOperation == imtbase::IChangeSetJournal::EO_CREATED)
+		const QByteArray permission = (documentPlan.firstOperation == imtdb::IDocumentActionJournal::EO_CREATED)
 					? GetRemovePermission(documentPlan.collectionIndex)
 					: GetEditPermission(documentPlan.collectionIndex);
 		if (permission.isEmpty() || !HasPermission(context, permission)){
-			userError = QStringLiteral("You are not allowed to roll back all documents of this change set.");
+			userError = QStringLiteral("You are not allowed to roll back all documents of this document action.");
 
 			return ES_ACCESS_DENIED;
 		}
@@ -461,7 +461,7 @@ imtassist::IAssistantAction::ExecutionStatus CAssistantChangeSetActionComp::Prep
 	}
 
 	if (!changedNames.isEmpty()){
-		userError = QStringLiteral("The change set cannot be rolled back: these documents were changed or removed after it: %1.").arg(changedNames.join(QStringLiteral(", ")));
+		userError = QStringLiteral("The document action cannot be rolled back: these documents were changed or removed after it: %1.").arg(changedNames.join(QStringLiteral(", ")));
 
 		return ES_FAILED;
 	}
@@ -470,7 +470,7 @@ imtassist::IAssistantAction::ExecutionStatus CAssistantChangeSetActionComp::Prep
 }
 
 
-bool CAssistantChangeSetActionComp::RollbackDocument(const DocumentPlan& documentPlan, const imtbase::IOperationContext& operationContext, QString& error) const
+bool CAssistantDocumentActionComp::RollbackDocument(const DocumentPlan& documentPlan, const imtbase::IOperationContext& operationContext, QString& error) const
 {
 	imtbase::IObjectCollection* collectionPtr = m_collectionsCompPtr[documentPlan.collectionIndex];
 	if (collectionPtr == nullptr){
@@ -479,7 +479,7 @@ bool CAssistantChangeSetActionComp::RollbackDocument(const DocumentPlan& documen
 		return false;
 	}
 
-	if (documentPlan.firstOperation == imtbase::IChangeSetJournal::EO_CREATED){
+	if (documentPlan.firstOperation == imtdb::IDocumentActionJournal::EO_CREATED){
 		if (!collectionPtr->RemoveElements(imtbase::ICollectionInfo::Ids() << documentPlan.documentId, &operationContext)){
 			error = QStringLiteral("the created document could not be removed");
 
@@ -514,7 +514,7 @@ bool CAssistantChangeSetActionComp::RollbackDocument(const DocumentPlan& documen
 }
 
 
-bool CAssistantChangeSetActionComp::IsChanged(const DocumentPlan& documentPlan)
+bool CAssistantDocumentActionComp::IsChanged(const DocumentPlan& documentPlan)
 {
 	return !documentPlan.currentState.exists ||
 				documentPlan.currentState.isRemoved ||
@@ -522,10 +522,10 @@ bool CAssistantChangeSetActionComp::IsChanged(const DocumentPlan& documentPlan)
 }
 
 
-QByteArray CAssistantChangeSetActionComp::CreateStateToken(const QByteArray& changeSetId, const QList<DocumentPlan>& plan)
+QByteArray CAssistantDocumentActionComp::CreateStateToken(const QByteArray& documentActionId, const QList<DocumentPlan>& plan)
 {
 	QCryptographicHash hash(QCryptographicHash::Sha256);
-	hash.addData(changeSetId);
+	hash.addData(documentActionId);
 	for (const DocumentPlan& documentPlan: plan){
 		hash.addData(QByteArrayLiteral("|"));
 		hash.addData(documentPlan.documentId);
@@ -537,16 +537,16 @@ QByteArray CAssistantChangeSetActionComp::CreateStateToken(const QByteArray& cha
 }
 
 
-QString CAssistantChangeSetActionComp::GetStateName(imtbase::IChangeSetJournal::ChangeSetState state)
+QString CAssistantDocumentActionComp::GetStateName(imtdb::IDocumentActionJournal::DocumentActionState state)
 {
 	switch (state){
-	case imtbase::IChangeSetJournal::CSS_APPLIED:
+	case imtdb::IDocumentActionJournal::DAS_APPLIED:
 		return QStringLiteral("applied");
-	case imtbase::IChangeSetJournal::CSS_PARTIALLY_APPLIED:
+	case imtdb::IDocumentActionJournal::DAS_PARTIALLY_APPLIED:
 		return QStringLiteral("partiallyApplied");
-	case imtbase::IChangeSetJournal::CSS_FAILED:
+	case imtdb::IDocumentActionJournal::DAS_FAILED:
 		return QStringLiteral("failed");
-	case imtbase::IChangeSetJournal::CSS_ROLLED_BACK:
+	case imtdb::IDocumentActionJournal::DAS_ROLLED_BACK:
 		return QStringLiteral("rolledBack");
 	default:
 		return QStringLiteral("applying");
@@ -556,7 +556,7 @@ QString CAssistantChangeSetActionComp::GetStateName(imtbase::IChangeSetJournal::
 
 // private methods
 
-CAssistantChangeSetActionComp::Kind CAssistantChangeSetActionComp::GetKind() const
+CAssistantDocumentActionComp::Kind CAssistantDocumentActionComp::GetKind() const
 {
 	const QByteArray kind = m_kindAttrPtr.IsValid() ? *m_kindAttrPtr : QByteArray();
 
@@ -564,7 +564,7 @@ CAssistantChangeSetActionComp::Kind CAssistantChangeSetActionComp::GetKind() con
 }
 
 
-int CAssistantChangeSetActionComp::FindCollection(const QByteArray& tableSchema, const QByteArray& tableName) const
+int CAssistantDocumentActionComp::FindCollection(const QByteArray& tableSchema, const QByteArray& tableName) const
 {
 	const int count = qMin(m_collectionsCompPtr.GetCount(), m_delegatesCompPtr.GetCount());
 	for (int i = 0; i < count; ++i){
@@ -582,13 +582,13 @@ int CAssistantChangeSetActionComp::FindCollection(const QByteArray& tableSchema,
 }
 
 
-QByteArray CAssistantChangeSetActionComp::GetEditPermission(int collectionIndex) const
+QByteArray CAssistantDocumentActionComp::GetEditPermission(int collectionIndex) const
 {
 	return (collectionIndex >= 0) && (collectionIndex < m_editPermissionsAttrPtr.GetCount()) ? m_editPermissionsAttrPtr[collectionIndex] : QByteArray();
 }
 
 
-QByteArray CAssistantChangeSetActionComp::GetRemovePermission(int collectionIndex) const
+QByteArray CAssistantDocumentActionComp::GetRemovePermission(int collectionIndex) const
 {
 	return (collectionIndex >= 0) && (collectionIndex < m_removePermissionsAttrPtr.GetCount()) ? m_removePermissionsAttrPtr[collectionIndex] : QByteArray();
 }

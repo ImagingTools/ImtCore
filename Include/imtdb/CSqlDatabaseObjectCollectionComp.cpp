@@ -18,7 +18,7 @@
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtbase/IRevisionController.h>
 #include <imtbase/CParamsSetJoiner.h>
-#include <imtdb/CChangeSetJournalQueries.h>
+#include <imtdb/CDocumentActionJournalQueries.h>
 #include <imtdb/CSqlDatabaseObjectCollectionIterator.h>
 #include <imtdb/imtdb.h>
 
@@ -1097,16 +1097,16 @@ void CSqlDatabaseObjectCollectionComp::OnComponentDestroyed()
 
 void CSqlDatabaseObjectCollectionComp::MarkUnrecordedWrite(const imtbase::IOperationContext* operationContextPtr, const QByteArray& query) const
 {
-	if (query.isEmpty() || CChangeSetJournalQueries::GetChangeSetId(operationContextPtr).isEmpty() || !m_dbEngineCompPtr.IsValid() || !m_objectDelegateCompPtr.IsValid()){
+	if (query.isEmpty() || CDocumentActionJournalQueries::GetDocumentActionId(operationContextPtr).isEmpty() || !m_dbEngineCompPtr.IsValid() || !m_objectDelegateCompPtr.IsValid()){
 		return;
 	}
 
 	// A delegate that records the documents it writes adds the entries to its statements
-	if (CChangeSetJournalQueries::ContainsEntryQuery(query)){
+	if (CDocumentActionJournalQueries::ContainsEntryQuery(query)){
 		return;
 	}
 
-	const QString markerQuery = CChangeSetJournalQueries::CreateUnrecordedEntryQuery(
+	const QString markerQuery = CDocumentActionJournalQueries::CreateUnrecordedEntryQuery(
 				operationContextPtr,
 				m_objectDelegateCompPtr->GetTableScheme(),
 				m_objectDelegateCompPtr->GetTableName());
@@ -1114,7 +1114,7 @@ void CSqlDatabaseObjectCollectionComp::MarkUnrecordedWrite(const imtbase::IOpera
 	QSqlError sqlError;
 	m_dbEngineCompPtr->ExecSqlQuery(markerQuery.toUtf8(), &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
-		SendWarningMessage(0, QStringLiteral("The change set journal could not mark a write that cannot be rolled back"), "Database collection");
+		SendWarningMessage(0, QStringLiteral("The document action journal could not mark a write that cannot be rolled back"), "Database collection");
 	}
 }
 

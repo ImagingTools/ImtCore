@@ -8,20 +8,20 @@
 
 
 /**
-	Tests of the change set journal (CChangeSetJournalComp) and of the journal entries the document delegates write
-	(CChangeSetJournalQueries) in a SQLite database: the statements of a delegate are run as the collection runs them,
+	Tests of the document action journal (CDocumentActionJournalComp) and of the journal entries the document delegates write
+	(CDocumentActionJournalQueries) in a SQLite database: the statements of a delegate are run as the collection runs them,
 	split into single statements in one transaction.
 */
-class CChangeSetJournalTest: public QObject
+class CDocumentActionJournalTest: public QObject
 {
 	Q_OBJECT
 private slots:
 	void init();
 	void cleanup();
 
-	void ChangeSetsOfTenantTest();
+	void DocumentActionsOfTenantTest();
 	void EntriesOfDocumentWritesTest();
-	void EntriesOnlyForOpenChangeSetOfTenantTest();
+	void EntriesOnlyForOpenDocumentActionOfTenantTest();
 	void UnrecordedWriteTest();
 	void DocumentStateTest();
 };

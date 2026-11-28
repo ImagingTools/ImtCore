@@ -89,7 +89,7 @@ bool CGqlAssistantActionCompBase::ExecuteGql(
 			const QJsonObject& variables,
 			QJsonObject& data,
 			QString& errorMessage,
-			const QByteArray& changeSetId) const
+			const QByteArray& documentActionId) const
 {
 	data = QJsonObject();
 
@@ -121,9 +121,9 @@ bool CGqlAssistantActionCompBase::ExecuteGql(
 	}
 
 	request.SetGqlContext(imtgql::IGqlContextSharedPtr(std::move(requestContextPtr)));
-	if (!changeSetId.isEmpty()){
+	if (!documentActionId.isEmpty()){
 		// Only on the copy of the context: the operation context of the handlers takes it over
-		request.SetHeader(imtbase::s_changeSetHeaderId, changeSetId);
+		request.SetHeader(imtbase::s_documentActionHeaderId, documentActionId);
 	}
 
 	const QByteArray commandId = request.GetCommandId();
@@ -168,22 +168,22 @@ QByteArray CGqlAssistantActionCompBase::GetProductId(const imtassist::CAssistant
 }
 
 
-bool CGqlAssistantActionCompBase::BeginChangeSet(
+bool CGqlAssistantActionCompBase::BeginDocumentAction(
 			const imtassist::CAssistantRequestContext& context,
 			const QString& summary,
-			QByteArray& changeSetId,
+			QByteArray& documentActionId,
 			const QByteArray& origin,
 			const QByteArray& referenceId) const
 {
-	changeSetId.clear();
+	documentActionId.clear();
 
-	if (!m_changeSetJournalCompPtr.IsValid()){
+	if (!m_documentActionJournalCompPtr.IsValid()){
 		return true;
 	}
 
-	changeSetId = m_changeSetJournalCompPtr->BeginChangeSet(GetDataTenantId(context), context.GetUserId(), origin, summary, referenceId);
-	if (changeSetId.isEmpty()){
-		SendErrorMessage(0, QStringLiteral("Assistant action '%1': the change set could not be created").arg(QString::fromUtf8(GetActionId())), "AssistantChangeSets");
+	documentActionId = m_documentActionJournalCompPtr->BeginDocumentAction(GetDataTenantId(context), context.GetUserId(), origin, summary, referenceId);
+	if (documentActionId.isEmpty()){
+		SendErrorMessage(0, QStringLiteral("Assistant action '%1': the document action could not be created").arg(QString::fromUtf8(GetActionId())), "AssistantDocumentActions");
 
 		return false;
 	}
@@ -192,26 +192,26 @@ bool CGqlAssistantActionCompBase::BeginChangeSet(
 }
 
 
-void CGqlAssistantActionCompBase::FinishChangeSet(
+void CGqlAssistantActionCompBase::FinishDocumentAction(
 			const imtassist::CAssistantRequestContext& context,
-			const QByteArray& changeSetId,
+			const QByteArray& documentActionId,
 			int appliedCount,
 			int totalCount) const
 {
-	if (changeSetId.isEmpty() || !m_changeSetJournalCompPtr.IsValid()){
+	if (documentActionId.isEmpty() || !m_documentActionJournalCompPtr.IsValid()){
 		return;
 	}
 
-	imtbase::IChangeSetJournal::ChangeSetState state = imtbase::IChangeSetJournal::CSS_PARTIALLY_APPLIED;
+	imtdb::IDocumentActionJournal::DocumentActionState state = imtdb::IDocumentActionJournal::DAS_PARTIALLY_APPLIED;
 	if (appliedCount <= 0){
-		state = imtbase::IChangeSetJournal::CSS_FAILED;
+		state = imtdb::IDocumentActionJournal::DAS_FAILED;
 	}
 	else if (appliedCount >= totalCount){
-		state = imtbase::IChangeSetJournal::CSS_APPLIED;
+		state = imtdb::IDocumentActionJournal::DAS_APPLIED;
 	}
 
-	if (!m_changeSetJournalCompPtr->SetChangeSetState(GetDataTenantId(context), changeSetId, state)){
-		SendErrorMessage(0, QStringLiteral("Assistant action '%1': the change set could not be finished").arg(QString::fromUtf8(GetActionId())), "AssistantChangeSets");
+	if (!m_documentActionJournalCompPtr->SetDocumentActionState(GetDataTenantId(context), documentActionId, state)){
+		SendErrorMessage(0, QStringLiteral("Assistant action '%1': the document action could not be finished").arg(QString::fromUtf8(GetActionId())), "AssistantDocumentActions");
 	}
 }
 
@@ -234,9 +234,9 @@ QByteArray CGqlAssistantActionCompBase::GetDataTenantId(const imtassist::CAssist
 }
 
 
-imtbase::IChangeSetJournal* CGqlAssistantActionCompBase::GetChangeSetJournal() const
+imtdb::IDocumentActionJournal* CGqlAssistantActionCompBase::GetDocumentActionJournal() const
 {
-	return m_changeSetJournalCompPtr.IsValid() ? m_changeSetJournalCompPtr.GetPtr() : nullptr;
+	return m_documentActionJournalCompPtr.IsValid() ? m_documentActionJournalCompPtr.GetPtr() : nullptr;
 }
 
 

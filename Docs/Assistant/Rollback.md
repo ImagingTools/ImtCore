@@ -1,7 +1,7 @@
 # Rolling back applied changes: design
 
 Status: **stage 1 implemented** (collections with revisions; Puma: user groups). This document
-describes how a confirmed change set (an applied `api.planChanges` plan, an administration action,
+describes how a confirmed document action (an applied `api.planChanges` plan, an administration action,
 later also a manual bulk operation) is rolled back as a whole. "Implementation" at the end lists the
 components; the sections before it are the design they follow.
 
@@ -9,7 +9,7 @@ components; the sections before it are the design they follow.
 
 Documents are stored with revisions, and a removed document is only marked as disabled. The
 data of every former state therefore stays in the database. What is missing is the link between
-one confirmed change set and the revisions it produced. A small **change set journal** provides
+one confirmed document action and the revisions it produced. A small **document action journal** provides
 this link. It is an index to the existing revisions, not a copy of the data, and not a log of all
 transactions.
 
@@ -35,16 +35,16 @@ assistant can change today.
 A command that writes to a collection without revisions, or that has effects outside the
 database (e-mail, LDAP, external systems), is **irreversible**: see "Irreversible commands".
 
-## Change set journal
+## Document action journal
 
-One record per confirmed change set:
+One record per confirmed document action:
 
-- `ChangeSetId`, `TenantId`, owner (user id), time, summary text of the plan, origin
+- `DocumentActionId`, `TenantId`, owner (user id), time, summary text of the plan, origin
   (`assistant`, later `manual`, `import`), state (`applied`, `rolledBack`, `partiallyApplied`).
 
 One entry per written document:
 
-- `ChangeSetId`, collection (table name), `DocumentId`, operation (`created`, `updated`,
+- `DocumentActionId`, collection (table name), `DocumentId`, operation (`created`, `updated`,
   `removed`), revision before, revision after.
 
 The journal holds no document data, no parameter values and no message texts. It lives in the
@@ -55,20 +55,20 @@ database of the tenant, next to the documents it refers to.
 The assistant applies changes through the GraphQL handlers and does not see revision numbers.
 Reading them before and after from outside would be open to races. Instead:
 
-1. The action that applies a change set creates the journal record and puts the `ChangeSetId`
+1. The action that applies a document action creates the journal record and puts the `DocumentActionId`
    into the `imtbase::IOperationContext` passed down to the collections.
 2. `CSqlDatabaseDocumentDelegateCompBase` adds the journal entry in the **same query** that
    writes the revision (`PrepareInsertNewObjectQuery`, the revision number expression is
    already part of that query) and in the queries that mark documents as disabled or active.
    The entry is therefore committed or rolled back together with the revision.
-3. Without a `ChangeSetId` in the operation context nothing is written; existing behaviour is
+3. Without a `DocumentActionId` in the operation context nothing is written; existing behaviour is
    unchanged.
 
-This makes the mechanism generic: other write paths only have to pass a `ChangeSetId`.
+This makes the mechanism generic: other write paths only have to pass a `DocumentActionId`.
 
 ## Rollback
 
-A rollback never rewrites history. It is a new change set in the opposite direction:
+A rollback never rewrites history. It is a new document action in the opposite direction:
 
 | Original operation | Rollback |
 | --- | --- |
@@ -77,7 +77,7 @@ A rollback never rewrites history. It is a new change set in the opposite direct
 | `removed` | mark the document as active again (`CreateRestoreObjectsQuery`) |
 
 Entries are processed in reverse order. The rollback itself gets a journal record with origin
-`rollback` and a reference to the original change set, so a rollback can be traced and, if
+`rollback` and a reference to the original document action, so a rollback can be traced and, if
 needed, rolled back again.
 
 ### Conflicts
@@ -98,7 +98,7 @@ A rollback is a change like any other: the user sees a preview (documents, opera
 and restored state) and confirms it. The preview is bound to user, tenant and a state token
 built from the current revisions, as for all assistant changes. The user needs the edit
 permissions of every affected collection, checked through the same handlers. Rolling back a
-change set of another user additionally requires a dedicated permission
+document action of another user additionally requires a dedicated permission
 (`/Administration/Assistant/RollbackAny`).
 
 ## Irreversible commands
@@ -119,12 +119,12 @@ by a journal entry younger than the retention period.
 ## Assistant integration
 
 - `api.planChanges` and the administration actions create the journal record when the change
-  is applied; the result tells the model the `ChangeSetId`.
-- New read action `changes.list`: the user's recent change sets in the current tenant (summary,
+  is applied; the result tells the model the `DocumentActionId`.
+- New read action `changes.list`: the user's recent document actions in the current tenant (summary,
   time, state).
 - New change action `changes.rollback`: preview and apply as described above.
 - Possible entry point in the user interface: "Undo" next to the result of an applied plan in
-  the assistant panel, and a list of change sets in the administration area.
+  the assistant panel, and a list of document actions in the administration area.
 
 ## Later
 
@@ -137,15 +137,15 @@ by a journal entry younger than the retention period.
 
 | Part | Where |
 | --- | --- |
-| Interfaces | `imtbase::IChangeSetJournal` (journal), `imtbase::IChangeSetContext` (change set of an operation; `imtbase::COperationContext` implements it) |
-| Journal | `imtdb::CChangeSetJournalComp` (`ImtDatabasePck/ChangeSetJournal`), tables from `CreateChangeSetTables.sql` in `imtdb.qrc`, created before the first change set; attribute `RetentionDays` (default 90) |
-| Entries | `imtdb::CChangeSetJournalQueries`; written by `CSqlDatabaseDocumentDelegateCompBase` before the statements of the document (create, update, remove, restore; a selection writes `Unrecorded`) in the same transaction |
+| Interfaces | `imtdb::IDocumentActionJournal` (journal), `imtbase::IDocumentActionContext` (document action of an operation; `imtbase::COperationContext` implements it) |
+| Journal | `imtdb::CDocumentActionJournalComp` (`ImtDatabasePck/DocumentActionJournal`), tables from `CreateDocumentActionTables.sql` in `imtdb.qrc`, created before the first document action; attribute `RetentionDays` (default 90) |
+| Entries | `imtdb::CDocumentActionJournalQueries`; written by `CSqlDatabaseDocumentDelegateCompBase` before the statements of the document (create, update, remove, restore; a selection writes `Unrecorded`) in the same transaction |
 | Writes without revisions | `CSqlDatabaseObjectCollectionComp` adds an `Unrecorded` entry when the statements of a delegate contain no journal entry |
-| Transport | The action puts the ID into the header `x-imt-change-set` of its copy of the GraphQL context; `COperationContextControllerComp` takes it over into the operation context. The context creators remove the header from client requests (`imtgql::RemoveServerHeaders`) |
-| Guard | An entry is written only while the change set of the tenant of the operation is `Applying`: an unknown, foreign or finished ID writes nothing |
-| Assistant | `CGqlAssistantActionCompBase` (`ChangeSetJournal`, `BeginChangeSet`, `FinishChangeSet`), `api.planChanges` and `administration.addUserToGroup` record their change sets; `CAssistantChangeSetActionComp` with `changes.list` and `changes.rollback` |
-| Composite | `TenantAssistant`: exported attributes `ChangeSetJournal`, `RollbackCollections`, `RollbackDelegates` (the same repositories: they export the collection and the document delegate), `RollbackEditPermissions`, `RollbackRemovePermissions` |
-| Permission | `/Administration/Assistant/RollbackAny` (change sets of other users), in the default scope of new organizations |
+| Transport | The action puts the ID into the header `x-imt-document-action` of its copy of the GraphQL context; `COperationContextControllerComp` takes it over into the operation context. The context creators remove the header from client requests (`imtgql::RemoveServerHeaders`) |
+| Guard | An entry is written only while the document action of the tenant of the operation is `Applying`: an unknown, foreign or finished ID writes nothing |
+| Assistant | `CGqlAssistantActionCompBase` (`DocumentActionJournal`, `BeginDocumentAction`, `FinishDocumentAction`), `api.planChanges` and `administration.addUserToGroup` record their document actions; `CAssistantDocumentActionComp` with `changes.list` and `changes.rollback` |
+| Composite | `TenantAssistant`: exported attributes `DocumentActionJournal`, `RollbackCollections`, `RollbackDelegates` (the same repositories: they export the collection and the document delegate), `RollbackEditPermissions`, `RollbackRemovePermissions` |
+| Permission | `/Administration/Assistant/RollbackAny` (document actions of other users), in the default scope of new organizations |
 
 Differences to the design above, found while implementing:
 
@@ -156,7 +156,7 @@ Differences to the design above, found while implementing:
   and shares and clears references in other documents, which restoring the document does not bring back.
 - The rollback writes the collections directly, not through the GraphQL handlers, so the action checks
   the configured edit or remove permission of every collection itself.
-- A change set that only partly applied (`PartiallyApplied`) can be rolled back like a complete one.
+- A document action that only partly applied (`PartiallyApplied`) can be rolled back like a complete one.
 
-Tests: `Include/imtdb/Test/CChangeSetJournalTest.cpp` (journal and entries on SQLite) and
-`Tests/AssistantTest/CAssistantChangeSetTest.cpp` (change sets of the actions, list, rollback and its checks).
+Tests: `Include/imtdb/Test/CDocumentActionJournalTest.cpp` (journal and entries on SQLite) and
+`Tests/AssistantTest/CAssistantDocumentActionTest.cpp` (document actions of the actions, list, rollback and its checks).

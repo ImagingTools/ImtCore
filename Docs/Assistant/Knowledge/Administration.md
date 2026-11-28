@@ -80,17 +80,17 @@ The `productId` of the session is the product of the server; take it from the it
 
 ## Undoing a confirmed change
 
-Every confirmed change of the assistant is a change set: the result of the change names its ID
-("Change set ...").
+Every confirmed change of the assistant is a document action: the result of the change names its ID
+("Document action ...").
 
-- `changes.list` lists the latest change sets of the user, newest first, with `reversible` and, if not,
-  the `reason`. Use it when the user wants to undo something and does not name the change set.
-- `changes.rollback` with the `changeSetId` rolls the change set back as a whole after the user confirmed
-  the preview: changed documents get their state before the change set, documents it created are removed.
-  The rollback is a change set of its own.
+- `changes.list` lists the latest document actions of the user, newest first, with `reversible` and, if not,
+  the `reason`. Use it when the user wants to undo something and does not name the document action.
+- `changes.rollback` with the `documentActionId` rolls the document action back as a whole after the user confirmed
+  the preview: changed documents get their state before the document action, documents it created are removed.
+  The rollback is a document action of its own.
 
 What can be rolled back: changes of user groups (create, members, roles, parent groups, name) in Puma.
-Not rolled back: change sets that removed documents, that changed data without revisions (e.g. the
-organization or its members), or documents that were changed again after the change set — then tell the
-user which documents are in the way; a newer change set may have to be rolled back first.
+Not rolled back: document actions that removed documents, that changed data without revisions (e.g. the
+organization or its members), or documents that were changed again after the document action — then tell the
+user which documents are in the way; a newer document action may have to be rolled back first.
 Memberships mirrored in the user documents follow the group, as when the group is edited.

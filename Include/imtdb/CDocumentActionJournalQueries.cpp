@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtdb/CChangeSetJournalQueries.h>
+#include <imtdb/CDocumentActionJournalQueries.h>
 
 
 // Qt includes
 #include <QtCore/QUuid>
 
 // ImtCore includes
-#include <imtbase/IChangeSetContext.h>
+#include <imtbase/IDocumentActionContext.h>
 #include <imtbase/imtbase.h>
 #include <imtdb/imtdb.h>
 
@@ -15,8 +15,8 @@ namespace imtdb
 {
 
 
-const QString CChangeSetJournalQueries::s_changeSetsTable = QStringLiteral("ChangeSets");
-const QString CChangeSetJournalQueries::s_entriesTable = QStringLiteral("ChangeSetEntries");
+const QString CDocumentActionJournalQueries::s_documentActionsTable = QStringLiteral("DocumentActions");
+const QString CDocumentActionJournalQueries::s_entriesTable = QStringLiteral("DocumentActionEntries");
 
 
 namespace
@@ -25,40 +25,40 @@ namespace
 
 struct StateName
 {
-	imtbase::IChangeSetJournal::ChangeSetState state;
+	imtdb::IDocumentActionJournal::DocumentActionState state;
 	const char* id;
 };
 
 
 const StateName s_stateNames[] = {
-	{imtbase::IChangeSetJournal::CSS_APPLYING, "Applying"},
-	{imtbase::IChangeSetJournal::CSS_APPLIED, "Applied"},
-	{imtbase::IChangeSetJournal::CSS_PARTIALLY_APPLIED, "PartiallyApplied"},
-	{imtbase::IChangeSetJournal::CSS_FAILED, "Failed"},
-	{imtbase::IChangeSetJournal::CSS_ROLLED_BACK, "RolledBack"}
+	{imtdb::IDocumentActionJournal::DAS_APPLYING, "Applying"},
+	{imtdb::IDocumentActionJournal::DAS_APPLIED, "Applied"},
+	{imtdb::IDocumentActionJournal::DAS_PARTIALLY_APPLIED, "PartiallyApplied"},
+	{imtdb::IDocumentActionJournal::DAS_FAILED, "Failed"},
+	{imtdb::IDocumentActionJournal::DAS_ROLLED_BACK, "RolledBack"}
 };
 
 
 struct OperationName
 {
-	imtbase::IChangeSetJournal::EntryOperation operation;
+	imtdb::IDocumentActionJournal::EntryOperation operation;
 	const char* id;
 };
 
 
 const OperationName s_operationNames[] = {
-	{imtbase::IChangeSetJournal::EO_CREATED, "Created"},
-	{imtbase::IChangeSetJournal::EO_UPDATED, "Updated"},
-	{imtbase::IChangeSetJournal::EO_REMOVED, "Removed"},
-	{imtbase::IChangeSetJournal::EO_RESTORED, "Restored"},
-	{imtbase::IChangeSetJournal::EO_UNRECORDED, "Unrecorded"}
+	{imtdb::IDocumentActionJournal::EO_CREATED, "Created"},
+	{imtdb::IDocumentActionJournal::EO_UPDATED, "Updated"},
+	{imtdb::IDocumentActionJournal::EO_REMOVED, "Removed"},
+	{imtdb::IDocumentActionJournal::EO_RESTORED, "Restored"},
+	{imtdb::IDocumentActionJournal::EO_UNRECORDED, "Unrecorded"}
 };
 
 
 } // namespace
 
 
-QByteArray CChangeSetJournalQueries::GetStateId(imtbase::IChangeSetJournal::ChangeSetState state)
+QByteArray CDocumentActionJournalQueries::GetStateId(imtdb::IDocumentActionJournal::DocumentActionState state)
 {
 	for (const StateName& stateName: s_stateNames){
 		if (stateName.state == state){
@@ -70,7 +70,7 @@ QByteArray CChangeSetJournalQueries::GetStateId(imtbase::IChangeSetJournal::Chan
 }
 
 
-bool CChangeSetJournalQueries::GetStateFromId(const QByteArray& stateId, imtbase::IChangeSetJournal::ChangeSetState& state)
+bool CDocumentActionJournalQueries::GetStateFromId(const QByteArray& stateId, imtdb::IDocumentActionJournal::DocumentActionState& state)
 {
 	for (const StateName& stateName: s_stateNames){
 		if (stateId == stateName.id){
@@ -84,7 +84,7 @@ bool CChangeSetJournalQueries::GetStateFromId(const QByteArray& stateId, imtbase
 }
 
 
-QByteArray CChangeSetJournalQueries::GetOperationId(imtbase::IChangeSetJournal::EntryOperation operation)
+QByteArray CDocumentActionJournalQueries::GetOperationId(imtdb::IDocumentActionJournal::EntryOperation operation)
 {
 	for (const OperationName& operationName: s_operationNames){
 		if (operationName.operation == operation){
@@ -96,7 +96,7 @@ QByteArray CChangeSetJournalQueries::GetOperationId(imtbase::IChangeSetJournal::
 }
 
 
-bool CChangeSetJournalQueries::GetOperationFromId(const QByteArray& operationId, imtbase::IChangeSetJournal::EntryOperation& operation)
+bool CDocumentActionJournalQueries::GetOperationFromId(const QByteArray& operationId, imtdb::IDocumentActionJournal::EntryOperation& operation)
 {
 	for (const OperationName& operationName: s_operationNames){
 		if (operationId == operationName.id){
@@ -110,32 +110,32 @@ bool CChangeSetJournalQueries::GetOperationFromId(const QByteArray& operationId,
 }
 
 
-QByteArray CChangeSetJournalQueries::GetChangeSetId(const imtbase::IOperationContext* operationContextPtr)
+QByteArray CDocumentActionJournalQueries::GetDocumentActionId(const imtbase::IOperationContext* operationContextPtr)
 {
-	const imtbase::IChangeSetContext* changeSetContextPtr = dynamic_cast<const imtbase::IChangeSetContext*>(operationContextPtr);
-	if (changeSetContextPtr == nullptr){
+	const imtbase::IDocumentActionContext* documentActionContextPtr = dynamic_cast<const imtbase::IDocumentActionContext*>(operationContextPtr);
+	if (documentActionContextPtr == nullptr){
 		return QByteArray();
 	}
 
-	const QByteArray changeSetId = changeSetContextPtr->GetChangeSetId();
-	if (changeSetId.isEmpty() || QUuid::fromString(QString::fromLatin1(changeSetId)).isNull()){
+	const QByteArray documentActionId = documentActionContextPtr->GetDocumentActionId();
+	if (documentActionId.isEmpty() || QUuid::fromString(QString::fromLatin1(documentActionId)).isNull()){
 		return QByteArray();
 	}
 
-	return changeSetId;
+	return documentActionId;
 }
 
 
-QString CChangeSetJournalQueries::CreateDocumentEntryQuery(
+QString CDocumentActionJournalQueries::CreateDocumentEntryQuery(
 			const imtbase::IOperationContext* operationContextPtr,
 			const QByteArray& tableSchema,
 			const QByteArray& tableName,
 			const QByteArray& documentId,
-			imtbase::IChangeSetJournal::EntryOperation operation,
+			imtdb::IDocumentActionJournal::EntryOperation operation,
 			const QString& revisionExpression)
 {
-	const QByteArray changeSetId = GetChangeSetId(operationContextPtr);
-	if (changeSetId.isEmpty() || revisionExpression.isEmpty()){
+	const QByteArray documentActionId = GetDocumentActionId(operationContextPtr);
+	if (documentActionId.isEmpty() || revisionExpression.isEmpty()){
 		return QString();
 	}
 
@@ -149,37 +149,37 @@ QString CChangeSetJournalQueries::CreateDocumentEntryQuery(
 	QString condition;
 
 	switch (operation){
-	case imtbase::IChangeSetJournal::EO_CREATED:
+	case imtdb::IDocumentActionJournal::EO_CREATED:
 		// A new document starts with the revision 1
 		revisionBefore = NULL_DATA_LITERAL;
 		revisionAfter = QStringLiteral("1");
 		break;
 
-	case imtbase::IChangeSetJournal::EO_UPDATED:
+	case imtdb::IDocumentActionJournal::EO_UPDATED:
 		// The same expression as the revision of the new row
 		revisionBefore = activeRevision;
 		revisionAfter = QStringLiteral(R"((SELECT MAX(%1) + 1 FROM %2 WHERE %3))").arg(revisionExpression, table, documentCondition);
 		break;
 
-	case imtbase::IChangeSetJournal::EO_REMOVED:
+	case imtdb::IDocumentActionJournal::EO_REMOVED:
 		revisionBefore = activeRevision;
 		revisionAfter = activeRevision;
 		condition = QStringLiteral(R"(EXISTS (SELECT 1 FROM %1 WHERE %2 AND %1."State" = 'Active'))").arg(table, documentCondition);
 		break;
 
-	case imtbase::IChangeSetJournal::EO_RESTORED:
+	case imtdb::IDocumentActionJournal::EO_RESTORED:
 		revisionBefore = QStringLiteral(R"((SELECT MAX(%1) FROM %2 WHERE %3 AND %2."State" = 'Disabled'))")
 					.arg(revisionExpression, table, documentCondition);
 		revisionAfter = revisionBefore;
 		condition = QStringLiteral(R"(EXISTS (SELECT 1 FROM %1 WHERE %2 AND %1."State" = 'Disabled'))").arg(table, documentCondition);
 		break;
 
-	case imtbase::IChangeSetJournal::EO_UNRECORDED:
+	case imtdb::IDocumentActionJournal::EO_UNRECORDED:
 		return CreateUnrecordedEntryQuery(operationContextPtr, tableSchema, tableName);
 	}
 
 	return CreateEntryQuery(
-				changeSetId,
+				documentActionId,
 				operationContextPtr->GetTenantId(),
 				tableSchema,
 				tableName,
@@ -191,30 +191,30 @@ QString CChangeSetJournalQueries::CreateDocumentEntryQuery(
 }
 
 
-QString CChangeSetJournalQueries::CreateUnrecordedEntryQuery(
+QString CDocumentActionJournalQueries::CreateUnrecordedEntryQuery(
 			const imtbase::IOperationContext* operationContextPtr,
 			const QByteArray& tableSchema,
 			const QByteArray& tableName)
 {
-	const QByteArray changeSetId = GetChangeSetId(operationContextPtr);
-	if (changeSetId.isEmpty()){
+	const QByteArray documentActionId = GetDocumentActionId(operationContextPtr);
+	if (documentActionId.isEmpty()){
 		return QString();
 	}
 
 	return CreateEntryQuery(
-				changeSetId,
+				documentActionId,
 				operationContextPtr->GetTenantId(),
 				tableSchema,
 				tableName,
 				QByteArray(),
-				GetOperationId(imtbase::IChangeSetJournal::EO_UNRECORDED),
+				GetOperationId(imtdb::IDocumentActionJournal::EO_UNRECORDED),
 				NULL_DATA_LITERAL,
 				NULL_DATA_LITERAL,
 				QString());
 }
 
 
-bool CChangeSetJournalQueries::ContainsEntryQuery(const QByteArray& query)
+bool CDocumentActionJournalQueries::ContainsEntryQuery(const QByteArray& query)
 {
 	static const QByteArray entryStatement = QStringLiteral("INSERT INTO %1 ").arg(QuoteIdentifier(s_entriesTable)).toUtf8();
 
@@ -222,7 +222,7 @@ bool CChangeSetJournalQueries::ContainsEntryQuery(const QByteArray& query)
 }
 
 
-QString CChangeSetJournalQueries::GetQualifiedTableName(const QByteArray& tableSchema, const QByteArray& tableName)
+QString CDocumentActionJournalQueries::GetQualifiedTableName(const QByteArray& tableSchema, const QByteArray& tableName)
 {
 	const QString quotedTable = QuoteIdentifier(QString::fromUtf8(tableName));
 	if (tableSchema.isEmpty()){
@@ -236,8 +236,8 @@ QString CChangeSetJournalQueries::GetQualifiedTableName(const QByteArray& tableS
 
 // private static methods
 
-QString CChangeSetJournalQueries::CreateEntryQuery(
-			const QByteArray& changeSetId,
+QString CDocumentActionJournalQueries::CreateEntryQuery(
+			const QByteArray& documentActionId,
 			const QByteArray& tenantId,
 			const QByteArray& tableSchema,
 			const QByteArray& tableName,
@@ -247,18 +247,18 @@ QString CChangeSetJournalQueries::CreateEntryQuery(
 			const QString& revisionAfter,
 			const QString& condition)
 {
-	const QString changeSets = QuoteIdentifier(s_changeSetsTable);
+	const QString documentActions = QuoteIdentifier(s_documentActionsTable);
 	const QString entries = QuoteIdentifier(s_entriesTable);
 
 	QString query = QStringLiteral(
-				R"(INSERT INTO %1 ("Id", "ChangeSetId", "Position", "TableSchema", "TableName", "DocumentId", "Operation", "RevisionBefore", "RevisionAfter") )"
-				R"(SELECT %2, %3."Id", (SELECT COUNT(*) FROM %1 WHERE %1."ChangeSetId" = %4), %5, %6, %7, %8, %9, %10 )"
+				R"(INSERT INTO %1 ("Id", "DocumentActionId", "Position", "TableSchema", "TableName", "DocumentId", "Operation", "RevisionBefore", "RevisionAfter") )"
+				R"(SELECT %2, %3."Id", (SELECT COUNT(*) FROM %1 WHERE %1."DocumentActionId" = %4), %5, %6, %7, %8, %9, %10 )"
 				R"(FROM %3 WHERE %3."Id" = %4 AND %3."TenantId" = %11 AND %3."State" = 'Applying')")
 				.arg(
 							/*1*/ entries,
 							/*2*/ Text(QUuid::createUuid().toByteArray(QUuid::WithoutBraces)),
-							/*3*/ changeSets,
-							/*4*/ Text(changeSetId),
+							/*3*/ documentActions,
+							/*4*/ Text(documentActionId),
 							/*5*/ Text(tableSchema),
 							/*6*/ Text(tableName),
 							/*7*/ documentId.isEmpty() ? NULL_DATA_LITERAL : Text(documentId),
@@ -275,7 +275,7 @@ QString CChangeSetJournalQueries::CreateEntryQuery(
 }
 
 
-QString CChangeSetJournalQueries::Text(const QByteArray& value)
+QString CDocumentActionJournalQueries::Text(const QByteArray& value)
 {
 	return SqlEncode(QString::fromUtf8(value)).prepend('\'').append('\'');
 }

@@ -7,27 +7,27 @@
 
 
 /**
-	Tests of the change sets of the assistant: a confirmed change writes into a change set (the handlers get its ID
-	in the header of the request), and changes.list / changes.rollback list and roll back a change set as a whole,
+	Tests of the document actions of the assistant: a confirmed change writes into a document action (the handlers get its ID
+	in the header of the request), and changes.list / changes.rollback list and roll back a document action as a whole,
 	only after the checks of the owner, the state, the current documents and the permissions.
 */
-class CAssistantChangeSetTest: public QObject
+class CAssistantDocumentActionTest: public QObject
 {
 	Q_OBJECT
 
 private slots:
-	void testAddUserToGroup_WritesIntoChangeSet();
-	void testAddUserToGroup_FailedChangeSet();
-	void testAddUserToGroup_NothingChangedWithoutChangeSet();
-	void testPlan_ChangeSetOfAllSteps();
-	void testPlan_PartiallyAppliedChangeSet();
+	void testAddUserToGroup_WritesIntoDocumentAction();
+	void testAddUserToGroup_FailedDocumentAction();
+	void testAddUserToGroup_NothingChangedWithoutDocumentAction();
+	void testPlan_DocumentActionOfAllSteps();
+	void testPlan_PartiallyAppliedDocumentAction();
 	void testServerHeadersAreRemovedFromClientRequests();
-	void testList_OwnChangeSetsAndReversibility();
+	void testList_OwnDocumentActionsAndReversibility();
 	void testList_AllUsersNeedsPermission();
 	void testRollback_RestoresFormerRevision();
 	void testRollback_RemovesCreatedDocument();
 	void testRollback_RefusedIfDocumentChangedLater();
-	void testRollback_ChangeSetOfOtherUser();
+	void testRollback_DocumentActionOfOtherUser();
 	void testRollback_NeedsPermissionOfCollection();
 	void testRollback_StaleAfterPreview();
 	void testRollback_RefusedForRemovalsAndUnrecordedWrites();

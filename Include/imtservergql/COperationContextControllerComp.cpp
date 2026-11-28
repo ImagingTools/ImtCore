@@ -66,9 +66,9 @@ imtbase::IOperationContext* COperationContextControllerComp::CreateOperationCont
 	operationContextPtr->SetTenantId(tenantId, tenantType);
 
 	// Set only by server-side requests (the assistant); the context creators remove it from the requests of clients
-	const QByteArray changeSetId = requestContextPtr->GetHeaders().value(imtbase::s_changeSetHeaderId);
-	if (!changeSetId.isEmpty()){
-		operationContextPtr->SetChangeSetId(changeSetId);
+	const QByteArray documentActionId = requestContextPtr->GetHeaders().value(imtbase::s_documentActionHeaderId);
+	if (!documentActionId.isEmpty()){
+		operationContextPtr->SetDocumentActionId(documentActionId);
 	}
 
 	if (m_documentChangeGeneratorCompPtr.IsValid()){

@@ -8,7 +8,7 @@
 // ImtCore includes
 #include <imtauth/ITenantFilterParam.h>
 #include <imtbase/IComplexCollectionFilter.h>
-#include <imtbase/IChangeSetJournal.h>
+#include <imtdb/IDocumentActionJournal.h>
 #include <imtbase/IRevisionController.h>
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
 #include <imtdb/IJsonBasedMetaInfoDelegate.h>
@@ -219,17 +219,17 @@ protected:
 	QString GetDocumentIdTextExpression() const;
 	QByteArray LoadTenantTableScript(const QString& fileName) const;
 	/**
-		Entry of the change set journal for a document written by an operation with a change set (see imtbase::IChangeSetContext),
-		written before the statements that change the document; empty without a change set.
+		Entry of the document action journal for a document written by an operation with a document action (see imtbase::IDocumentActionContext),
+		written before the statements that change the document; empty without a document action.
 	*/
-	QString CreateChangeSetEntryQuery(
+	QString CreateDocumentActionEntryQuery(
 				const imtbase::IOperationContext* operationContextPtr,
 				const QByteArray& documentId,
-				imtbase::IChangeSetJournal::EntryOperation operation) const;
+				imtdb::IDocumentActionJournal::EntryOperation operation) const;
 	/**
-		Entry marking a write of a selection of documents, which the journal cannot roll back; empty without a change set.
+		Entry marking a write of a selection of documents, which the journal cannot roll back; empty without a document action.
 	*/
-	QString CreateUnrecordedChangeSetEntryQuery(const imtbase::IOperationContext* operationContextPtr) const;
+	QString CreateUnrecordedDocumentActionEntryQuery(const imtbase::IOperationContext* operationContextPtr) const;
 
 protected:
 	I_ATTR(bool, m_useDataMetaInfoAttrPtr);

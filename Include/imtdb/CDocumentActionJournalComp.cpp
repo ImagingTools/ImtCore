@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtdb/CChangeSetJournalComp.h>
+#include <imtdb/CDocumentActionJournalComp.h>
 
 
 // Qt includes
@@ -11,7 +11,7 @@
 #include <QtSql/QSqlRecord>
 
 // ImtCore includes
-#include <imtdb/CChangeSetJournalQueries.h>
+#include <imtdb/CDocumentActionJournalQueries.h>
 #include <imtdb/imtdb.h>
 
 
@@ -38,9 +38,9 @@ QString Text(const QByteArray& value)
 } // namespace
 
 
-// reimplemented (imtbase::IChangeSetJournal)
+// reimplemented (imtdb::IDocumentActionJournal)
 
-QByteArray CChangeSetJournalComp::BeginChangeSet(
+QByteArray CDocumentActionJournalComp::BeginDocumentAction(
 			const QByteArray& tenantId,
 			const QByteArray& ownerId,
 			const QByteArray& origin,
@@ -53,43 +53,43 @@ QByteArray CChangeSetJournalComp::BeginChangeSet(
 
 	RemoveExpired();
 
-	const QByteArray changeSetId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+	const QByteArray documentActionId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	QVariantMap bindValues;
-	bindValues.insert(QStringLiteral(":Id"), Text(changeSetId));
+	bindValues.insert(QStringLiteral(":Id"), Text(documentActionId));
 	bindValues.insert(QStringLiteral(":TenantId"), Text(tenantId));
 	bindValues.insert(QStringLiteral(":OwnerId"), Text(ownerId));
 	bindValues.insert(QStringLiteral(":Origin"), Text(origin));
 	bindValues.insert(QStringLiteral(":Summary"), summary.left(MAX_SUMMARY_LENGTH));
 	bindValues.insert(QStringLiteral(":ReferenceId"), Text(referenceId));
-	bindValues.insert(QStringLiteral(":State"), Text(CChangeSetJournalQueries::GetStateId(CSS_APPLYING)));
+	bindValues.insert(QStringLiteral(":State"), Text(CDocumentActionJournalQueries::GetStateId(DAS_APPLYING)));
 	bindValues.insert(QStringLiteral(":CreatedAt"), TimeToText(QDateTime::currentDateTimeUtc()));
 
 	QSqlQuery sqlQuery;
 	const QString query = QStringLiteral(
-				R"(INSERT INTO "ChangeSets" ("Id", "TenantId", "OwnerId", "Origin", "Summary", "ReferenceId", "State", "CreatedAt") )"
+				R"(INSERT INTO "DocumentActions" ("Id", "TenantId", "OwnerId", "Origin", "Summary", "ReferenceId", "State", "CreatedAt") )"
 				R"(VALUES (:Id, :TenantId, :OwnerId, :Origin, :Summary, :ReferenceId, :State, :CreatedAt))");
 	if (!ExecQuery(query, bindValues, sqlQuery)){
 		return QByteArray();
 	}
 
-	return changeSetId;
+	return documentActionId;
 }
 
 
-bool CChangeSetJournalComp::SetChangeSetState(const QByteArray& tenantId, const QByteArray& changeSetId, ChangeSetState state)
+bool CDocumentActionJournalComp::SetDocumentActionState(const QByteArray& tenantId, const QByteArray& documentActionId, DocumentActionState state)
 {
-	if (tenantId.isEmpty() || changeSetId.isEmpty() || !EnsureTables()){
+	if (tenantId.isEmpty() || documentActionId.isEmpty() || !EnsureTables()){
 		return false;
 	}
 
 	QVariantMap bindValues;
-	bindValues.insert(QStringLiteral(":Id"), Text(changeSetId));
+	bindValues.insert(QStringLiteral(":Id"), Text(documentActionId));
 	bindValues.insert(QStringLiteral(":TenantId"), Text(tenantId));
-	bindValues.insert(QStringLiteral(":State"), Text(CChangeSetJournalQueries::GetStateId(state)));
+	bindValues.insert(QStringLiteral(":State"), Text(CDocumentActionJournalQueries::GetStateId(state)));
 
 	QSqlQuery sqlQuery;
-	if (!ExecQuery(QStringLiteral(R"(UPDATE "ChangeSets" SET "State" = :State WHERE "Id" = :Id AND "TenantId" = :TenantId)"), bindValues, sqlQuery)){
+	if (!ExecQuery(QStringLiteral(R"(UPDATE "DocumentActions" SET "State" = :State WHERE "Id" = :Id AND "TenantId" = :TenantId)"), bindValues, sqlQuery)){
 		return false;
 	}
 
@@ -97,35 +97,35 @@ bool CChangeSetJournalComp::SetChangeSetState(const QByteArray& tenantId, const 
 }
 
 
-bool CChangeSetJournalComp::GetChangeSetInfo(const QByteArray& tenantId, const QByteArray& changeSetId, ChangeSetInfo& info) const
+bool CDocumentActionJournalComp::GetDocumentActionInfo(const QByteArray& tenantId, const QByteArray& documentActionId, DocumentActionInfo& info) const
 {
-	info = ChangeSetInfo();
+	info = DocumentActionInfo();
 
-	if (tenantId.isEmpty() || changeSetId.isEmpty() || !const_cast<CChangeSetJournalComp*>(this)->EnsureTables()){
+	if (tenantId.isEmpty() || documentActionId.isEmpty() || !const_cast<CDocumentActionJournalComp*>(this)->EnsureTables()){
 		return false;
 	}
 
 	QVariantMap bindValues;
-	bindValues.insert(QStringLiteral(":Id"), Text(changeSetId));
+	bindValues.insert(QStringLiteral(":Id"), Text(documentActionId));
 	bindValues.insert(QStringLiteral(":TenantId"), Text(tenantId));
 
 	QSqlQuery sqlQuery;
 	const QString query = QStringLiteral(
-				R"(SELECT cs.*, (SELECT COUNT(*) FROM "ChangeSetEntries" e WHERE e."ChangeSetId" = cs."Id") AS "EntryCount" )"
-				R"(FROM "ChangeSets" cs WHERE cs."Id" = :Id AND cs."TenantId" = :TenantId)");
+				R"(SELECT cs.*, (SELECT COUNT(*) FROM "DocumentActionEntries" e WHERE e."DocumentActionId" = cs."Id") AS "EntryCount" )"
+				R"(FROM "DocumentActions" cs WHERE cs."Id" = :Id AND cs."TenantId" = :TenantId)");
 	if (!ExecQuery(query, bindValues, sqlQuery) || !sqlQuery.next()){
 		return false;
 	}
 
-	return ReadChangeSet(sqlQuery, info);
+	return ReadDocumentAction(sqlQuery, info);
 }
 
 
-QList<imtbase::IChangeSetJournal::ChangeSetInfo> CChangeSetJournalComp::GetChangeSets(const QByteArray& tenantId, const QByteArray& ownerId, int maxCount) const
+QList<imtdb::IDocumentActionJournal::DocumentActionInfo> CDocumentActionJournalComp::GetDocumentActions(const QByteArray& tenantId, const QByteArray& ownerId, int maxCount) const
 {
-	QList<ChangeSetInfo> retVal;
+	QList<DocumentActionInfo> retVal;
 
-	if (tenantId.isEmpty() || !const_cast<CChangeSetJournalComp*>(this)->EnsureTables()){
+	if (tenantId.isEmpty() || !const_cast<CDocumentActionJournalComp*>(this)->EnsureTables()){
 		return retVal;
 	}
 
@@ -142,15 +142,15 @@ QList<imtbase::IChangeSetJournal::ChangeSetInfo> CChangeSetJournalComp::GetChang
 
 	QSqlQuery sqlQuery;
 	const QString query = QStringLiteral(
-				R"(SELECT cs.*, (SELECT COUNT(*) FROM "ChangeSetEntries" e WHERE e."ChangeSetId" = cs."Id") AS "EntryCount" )"
-				R"(FROM "ChangeSets" cs WHERE %1 ORDER BY cs."CreatedAt" DESC LIMIT %2)").arg(condition).arg(count);
+				R"(SELECT cs.*, (SELECT COUNT(*) FROM "DocumentActionEntries" e WHERE e."DocumentActionId" = cs."Id") AS "EntryCount" )"
+				R"(FROM "DocumentActions" cs WHERE %1 ORDER BY cs."CreatedAt" DESC LIMIT %2)").arg(condition).arg(count);
 	if (!ExecQuery(query, bindValues, sqlQuery)){
 		return retVal;
 	}
 
 	while (sqlQuery.next()){
-		ChangeSetInfo info;
-		if (ReadChangeSet(sqlQuery, info)){
+		DocumentActionInfo info;
+		if (ReadDocumentAction(sqlQuery, info)){
 			retVal.append(info);
 		}
 	}
@@ -159,22 +159,22 @@ QList<imtbase::IChangeSetJournal::ChangeSetInfo> CChangeSetJournalComp::GetChang
 }
 
 
-bool CChangeSetJournalComp::GetEntries(const QByteArray& tenantId, const QByteArray& changeSetId, QList<Entry>& entries) const
+bool CDocumentActionJournalComp::GetEntries(const QByteArray& tenantId, const QByteArray& documentActionId, QList<Entry>& entries) const
 {
 	entries.clear();
 
-	ChangeSetInfo info;
-	if (!GetChangeSetInfo(tenantId, changeSetId, info)){
+	DocumentActionInfo info;
+	if (!GetDocumentActionInfo(tenantId, documentActionId, info)){
 		return false;
 	}
 
 	QVariantMap bindValues;
-	bindValues.insert(QStringLiteral(":ChangeSetId"), Text(changeSetId));
+	bindValues.insert(QStringLiteral(":DocumentActionId"), Text(documentActionId));
 
 	QSqlQuery sqlQuery;
 	const QString query = QStringLiteral(
 				R"(SELECT "TableSchema", "TableName", "DocumentId", "Operation", "RevisionBefore", "RevisionAfter" )"
-				R"(FROM "ChangeSetEntries" WHERE "ChangeSetId" = :ChangeSetId ORDER BY "Position")");
+				R"(FROM "DocumentActionEntries" WHERE "DocumentActionId" = :DocumentActionId ORDER BY "Position")");
 	if (!ExecQuery(query, bindValues, sqlQuery)){
 		return false;
 	}
@@ -184,7 +184,7 @@ bool CChangeSetJournalComp::GetEntries(const QByteArray& tenantId, const QByteAr
 		entry.tableSchema = sqlQuery.value(0).toString().toUtf8();
 		entry.tableName = sqlQuery.value(1).toString().toUtf8();
 		entry.documentId = sqlQuery.value(2).toString().toUtf8();
-		if (!CChangeSetJournalQueries::GetOperationFromId(sqlQuery.value(3).toString().toUtf8(), entry.operation)){
+		if (!CDocumentActionJournalQueries::GetOperationFromId(sqlQuery.value(3).toString().toUtf8(), entry.operation)){
 			entry.operation = EO_UNRECORDED;
 		}
 		entry.revisionBefore = sqlQuery.value(4).isNull() ? -1 : sqlQuery.value(4).toLongLong();
@@ -197,7 +197,7 @@ bool CChangeSetJournalComp::GetEntries(const QByteArray& tenantId, const QByteAr
 }
 
 
-bool CChangeSetJournalComp::GetDocumentState(
+bool CDocumentActionJournalComp::GetDocumentState(
 			const QByteArray& tableSchema,
 			const QByteArray& tableName,
 			const QByteArray& documentId,
@@ -218,7 +218,7 @@ bool CChangeSetJournalComp::GetDocumentState(
 	const QString query = QStringLiteral(
 				R"(SELECT %1 AS "Revision", "State" FROM %2 WHERE "DocumentId" = :DocumentId AND "State" IN ('Active', 'Disabled') )"
 				R"(ORDER BY "Revision" DESC LIMIT 1)")
-				.arg(revisionExpression, CChangeSetJournalQueries::GetQualifiedTableName(tableSchema, tableName));
+				.arg(revisionExpression, CDocumentActionJournalQueries::GetQualifiedTableName(tableSchema, tableName));
 	if (!ExecQuery(query, bindValues, sqlQuery)){
 		return false;
 	}
@@ -235,7 +235,7 @@ bool CChangeSetJournalComp::GetDocumentState(
 
 // private methods
 
-bool CChangeSetJournalComp::EnsureTables()
+bool CDocumentActionJournalComp::EnsureTables()
 {
 	QMutexLocker locker(&m_tablesMutex);
 
@@ -244,14 +244,14 @@ bool CChangeSetJournalComp::EnsureTables()
 	}
 
 	if (!m_databaseEngineCompPtr.IsValid()){
-		SendCriticalMessage(0, QStringLiteral("Invalid component configuration: Database engine missing"), "ChangeSetJournal");
+		SendCriticalMessage(0, QStringLiteral("Invalid component configuration: Database engine missing"), "DocumentActionJournal");
 
 		return false;
 	}
 
-	QFile scriptFile(GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateChangeSetTables.sql")));
+	QFile scriptFile(GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateDocumentActionTables.sql")));
 	if (!scriptFile.open(QFile::ReadOnly)){
-		SendErrorMessage(0, QStringLiteral("The script '%1' could not be loaded").arg(scriptFile.fileName()), "ChangeSetJournal");
+		SendErrorMessage(0, QStringLiteral("The script '%1' could not be loaded").arg(scriptFile.fileName()), "DocumentActionJournal");
 
 		return false;
 	}
@@ -266,7 +266,7 @@ bool CChangeSetJournalComp::EnsureTables()
 		QSqlError sqlError;
 		m_databaseEngineCompPtr->ExecSqlQuery(trimmed, &sqlError);
 		if (sqlError.type() != QSqlError::NoError){
-			SendErrorMessage(0, QStringLiteral("The tables of the change set journal could not be created (error %1)").arg(sqlError.nativeErrorCode()), "ChangeSetJournal");
+			SendErrorMessage(0, QStringLiteral("The tables of the document action journal could not be created (error %1)").arg(sqlError.nativeErrorCode()), "DocumentActionJournal");
 
 			return false;
 		}
@@ -278,7 +278,7 @@ bool CChangeSetJournalComp::EnsureTables()
 }
 
 
-void CChangeSetJournalComp::RemoveExpired()
+void CDocumentActionJournalComp::RemoveExpired()
 {
 	const int retentionDays = *m_retentionDaysAttrPtr;
 	if (retentionDays <= 0){
@@ -301,14 +301,14 @@ void CChangeSetJournalComp::RemoveExpired()
 
 	QSqlQuery sqlQuery;
 	ExecQuery(
-				QStringLiteral(R"(DELETE FROM "ChangeSetEntries" WHERE "ChangeSetId" IN (SELECT "Id" FROM "ChangeSets" WHERE "CreatedAt" < :CreatedBefore))"),
+				QStringLiteral(R"(DELETE FROM "DocumentActionEntries" WHERE "DocumentActionId" IN (SELECT "Id" FROM "DocumentActions" WHERE "CreatedAt" < :CreatedBefore))"),
 				bindValues,
 				sqlQuery);
-	ExecQuery(QStringLiteral(R"(DELETE FROM "ChangeSets" WHERE "CreatedAt" < :CreatedBefore)"), bindValues, sqlQuery);
+	ExecQuery(QStringLiteral(R"(DELETE FROM "DocumentActions" WHERE "CreatedAt" < :CreatedBefore)"), bindValues, sqlQuery);
 }
 
 
-bool CChangeSetJournalComp::ExecQuery(const QString& query, const QVariantMap& bindValues, QSqlQuery& sqlQuery) const
+bool CDocumentActionJournalComp::ExecQuery(const QString& query, const QVariantMap& bindValues, QSqlQuery& sqlQuery) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return false;
@@ -318,7 +318,7 @@ bool CChangeSetJournalComp::ExecQuery(const QString& query, const QVariantMap& b
 	sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query.toUtf8(), bindValues, &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
 		// Only the code of the error: the text of the database may contain values
-		SendErrorMessage(0, QStringLiteral("A statement of the change set journal failed (error %1)").arg(sqlError.nativeErrorCode()), "ChangeSetJournal");
+		SendErrorMessage(0, QStringLiteral("A statement of the document action journal failed (error %1)").arg(sqlError.nativeErrorCode()), "DocumentActionJournal");
 
 		return false;
 	}
@@ -327,7 +327,7 @@ bool CChangeSetJournalComp::ExecQuery(const QString& query, const QVariantMap& b
 }
 
 
-bool CChangeSetJournalComp::ReadChangeSet(const QSqlQuery& sqlQuery, ChangeSetInfo& info) const
+bool CDocumentActionJournalComp::ReadDocumentAction(const QSqlQuery& sqlQuery, DocumentActionInfo& info) const
 {
 	const QSqlRecord record = sqlQuery.record();
 
@@ -340,11 +340,11 @@ bool CChangeSetJournalComp::ReadChangeSet(const QSqlQuery& sqlQuery, ChangeSetIn
 	info.createdAt = QDateTime::fromString(record.value(QStringLiteral("CreatedAt")).toString(), Qt::ISODateWithMs);
 	info.entryCount = record.value(QStringLiteral("EntryCount")).toInt();
 
-	return CChangeSetJournalQueries::GetStateFromId(record.value(QStringLiteral("State")).toString().toUtf8(), info.state);
+	return CDocumentActionJournalQueries::GetStateFromId(record.value(QStringLiteral("State")).toString().toUtf8(), info.state);
 }
 
 
-bool CChangeSetJournalComp::IsIdentifier(const QByteArray& name)
+bool CDocumentActionJournalComp::IsIdentifier(const QByteArray& name)
 {
 	static const QRegularExpression identifierExpression(QStringLiteral("^[A-Za-z_][A-Za-z0-9_]{0,62}$"));
 

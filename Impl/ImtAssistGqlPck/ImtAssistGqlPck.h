@@ -11,7 +11,7 @@
 #include <imtassistgql/CAssistantApiCatalogComp.h>
 #include <imtassistgql/CAssistantApiActionComp.h>
 #include <imtassistgql/CAssistantApiPlanActionComp.h>
-#include <imtassistgql/CAssistantChangeSetActionComp.h>
+#include <imtassistgql/CAssistantDocumentActionComp.h>
 
 
 /**
@@ -29,7 +29,7 @@ typedef imtassistdb::CAssistantConfigurationDbDelegateComp AssistantConfiguratio
 typedef imtassistgql::CAssistantApiCatalogComp AssistantApiCatalog;
 typedef imtassistgql::CAssistantApiActionComp AssistantApiAction;
 typedef imtassistgql::CAssistantApiPlanActionComp AssistantApiPlanAction;
-typedef imtassistgql::CAssistantChangeSetActionComp AssistantChangeSetAction;
+typedef imtassistgql::CAssistantDocumentActionComp AssistantDocumentAction;
 
 
 } // namespace ImtAssistGqlPck
