@@ -553,12 +553,14 @@ struct PlanFixture
 
 		handler->InitComponent();
 		journal->InitComponent();
+		groupDelegate->InitComponent();
 		handler->payloads["GroupAdd"] = QJsonObject({{"id", "g-created"}});
 		handler->payloads["GroupUpdate"] = QJsonObject({{"id", "g-created"}});
 
 		plan.SetRef("ApiCatalog", catalog);
 		plan.InsertMultiRef("RequestHandlers", handler);
 		plan.SetRef("DocumentActionJournal", journal);
+		plan.InsertMultiRef("Delegates", groupDelegate);
 		plan.InitComponent();
 
 		parameters["summary"] = QStringLiteral("Create Support and rename it");
@@ -590,6 +592,7 @@ struct PlanFixture
 	Catalog catalog;
 	TestHandler handler;
 	TestJournal journal;
+	TestDelegate groupDelegate;
 	PlanAction plan;
 	QJsonObject parameters;
 };
@@ -738,6 +741,68 @@ void CAssistantDocumentActionTest::testPlan_PartiallyAppliedDocumentAction()
 	QCOMPARE(failing.plan.PrepareChange(context, failing.parameters, preview, error), IAssistantAction::ES_SUCCEEDED);
 	QCOMPARE(failing.plan.ApplyChange(context, failing.parameters, preview.stateToken, result, error), IAssistantAction::ES_FAILED);
 	QCOMPARE(failing.journal->documentActions.first().state, imtdb::IDocumentActionJournal::DAS_FAILED);
+}
+
+
+void CAssistantDocumentActionTest::testPlan_StaleIfObjectChangedAfterPreview()
+{
+	PlanFixture fixture;
+	fixture.journal->documentStates.insert(s_tableName + "/g1", CreateState(2));
+	fixture.parameters["steps"] = QJsonArray({PlanFixture::CreateStep("GroupUpdate", "g1", "Customer Support")});
+	const CAssistantRequestContext context = CreateContext(s_permissions);
+
+	IAssistantAction::ChangePreview preview;
+	QString error;
+	QCOMPARE(fixture.plan.PrepareChange(context, fixture.parameters, preview, error), IAssistantAction::ES_SUCCEEDED);
+
+	// The group got a new revision after the preview, e.g. a member was added: the plan would overwrite it.
+	fixture.journal->documentStates.insert(s_tableName + "/g1", CreateState(3));
+
+	IAssistantAction::Result result;
+	QCOMPARE(fixture.plan.ApplyChange(context, fixture.parameters, preview.stateToken, result, error), IAssistantAction::ES_STALE);
+	QVERIFY(fixture.handler->documentActionHeaders.isEmpty());
+	QVERIFY(fixture.journal->documentActions.isEmpty());
+
+	// A new preview of the current revision is applied.
+	QCOMPARE(fixture.plan.PrepareChange(context, fixture.parameters, preview, error), IAssistantAction::ES_SUCCEEDED);
+	QCOMPARE(fixture.plan.ApplyChange(context, fixture.parameters, preview.stateToken, result, error), IAssistantAction::ES_SUCCEEDED);
+	QCOMPARE(fixture.handler->documentActionHeaders.size(), 1);
+
+	// An object created by someone else after the preview is not overwritten either.
+	PlanFixture created;
+	created.parameters["steps"] = QJsonArray({PlanFixture::CreateStep("GroupAdd", "g2", "Support")});
+	QCOMPARE(created.plan.PrepareChange(context, created.parameters, preview, error), IAssistantAction::ES_SUCCEEDED);
+	created.journal->documentStates.insert(s_tableName + "/g2", CreateState(1));
+	QCOMPARE(created.plan.ApplyChange(context, created.parameters, preview.stateToken, result, error), IAssistantAction::ES_STALE);
+	QVERIFY(created.handler->documentActionHeaders.isEmpty());
+}
+
+
+void CAssistantDocumentActionTest::testPlan_RefusedIfChangesCannotBeDetected()
+{
+	PlanFixture fixture;
+	const CAssistantRequestContext context = CreateContext(s_permissions);
+
+	// Without the tables with revisions the state of an existing object is unknown.
+	PlanAction plan;
+	plan.SetRef("ApiCatalog", fixture.catalog);
+	plan.InsertMultiRef("RequestHandlers", fixture.handler);
+	plan.SetRef("DocumentActionJournal", fixture.journal);
+	plan.InitComponent();
+
+	IAssistantAction::ChangePreview preview;
+	QString error;
+	QCOMPARE(plan.PrepareChange(context, fixture.parameters, preview, error), IAssistantAction::ES_FAILED);
+	QVERIFY(error.contains(QStringLiteral("new")));
+
+	// A step without the ID of its object cannot be checked.
+	QJsonObject step = PlanFixture::CreateStep("GroupUpdate", "g1", "Customer Support");
+	QJsonObject input = QJsonDocument::fromJson(step.value("inputJson").toString().toUtf8()).object();
+	input.remove("id");
+	step["inputJson"] = QString::fromUtf8(QJsonDocument(input).toJson(QJsonDocument::Compact));
+	fixture.parameters["steps"] = QJsonArray({step});
+	QCOMPARE(fixture.plan.PrepareChange(context, fixture.parameters, preview, error), IAssistantAction::ES_FAILED);
+	QVERIFY(fixture.handler->documentActionHeaders.isEmpty());
 }
 
 

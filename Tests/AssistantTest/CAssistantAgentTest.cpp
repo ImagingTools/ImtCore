@@ -7,6 +7,7 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
+#include <QtCore/QUuid>
 
 // ACF includes
 #include <icomp/TSimComponentWrap.h>
@@ -14,6 +15,8 @@
 
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
+#include <imtdb/IDocumentActionJournal.h>
+#include <imtdb/ISqlDatabaseObjectDelegate.h>
 #include <imtgql/CGqlContext.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtassist/CAssistantKnowledgeActionComp.h>
@@ -108,7 +111,95 @@ public:
 };
 
 
+/**
+	Document action journal of the test: the current state of the documents, no history.
+*/
+class CTestJournalComp: public icomp::CComponentBase, virtual public imtdb::IDocumentActionJournal
+{
+public:
+	typedef icomp::CComponentBase BaseClass;
+
+	I_BEGIN_COMPONENT(CTestJournalComp);
+		I_REGISTER_INTERFACE(imtdb::IDocumentActionJournal);
+	I_END_COMPONENT;
+
+	// reimplemented (imtdb::IDocumentActionJournal)
+	virtual QByteArray BeginDocumentAction(
+				const QByteArray& /*tenantId*/,
+				const QByteArray& /*ownerId*/,
+				const QByteArray& /*origin*/,
+				const QString& /*summary*/,
+				const QByteArray& /*referenceId*/ = QByteArray()) override
+	{
+		return QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+	}
+
+	virtual bool SetDocumentActionState(const QByteArray& /*tenantId*/, const QByteArray& /*documentActionId*/, DocumentActionState /*state*/) override { return true; }
+	virtual bool GetDocumentActionInfo(const QByteArray& /*tenantId*/, const QByteArray& /*documentActionId*/, DocumentActionInfo& /*info*/) const override { return false; }
+	virtual QList<DocumentActionInfo> GetDocumentActions(const QByteArray& /*tenantId*/, const QByteArray& /*ownerId*/, int /*maxCount*/) const override { return QList<DocumentActionInfo>(); }
+	virtual bool GetEntries(const QByteArray& /*tenantId*/, const QByteArray& /*documentActionId*/, QList<Entry>& /*result*/) const override { return false; }
+
+	virtual bool GetDocumentState(
+				const QByteArray& /*tableSchema*/,
+				const QByteArray& /*tableName*/,
+				const QByteArray& documentId,
+				DocumentState& state) const override
+	{
+		state = documentStates.value(documentId);
+
+		return true;
+	}
+
+	QMap<QByteArray, DocumentState> documentStates;
+};
+
+
+/**
+	Document delegate of the test: only the table of the groups.
+*/
+class CTestDelegateComp: public icomp::CComponentBase, virtual public imtdb::ISqlDatabaseObjectDelegate
+{
+public:
+	typedef icomp::CComponentBase BaseClass;
+
+	I_BEGIN_COMPONENT(CTestDelegateComp);
+		I_REGISTER_INTERFACE(imtdb::ISqlDatabaseObjectDelegate);
+	I_END_COMPONENT;
+
+	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
+	virtual QByteArray GetTableName() const override { return QByteArrayLiteral("UserGroups"); }
+	virtual QByteArray GetTableScheme() const override { return QByteArray(); }
+	virtual QByteArray GetObjectIdFromRecord(const QSqlRecord& /*record*/) const override { return QByteArray(); }
+	virtual QByteArray GetObjectTypeIdFromRecord(const QSqlRecord& /*record*/) const override { return QByteArray(); }
+	virtual bool CreateObjectInfoFromRecord(const QSqlRecord& /*record*/, idoc::MetaInfoPtr& /*objectMetaInfoPtr*/, idoc::MetaInfoPtr& /*collectionItemMetaInfoPtr*/) const override { return false; }
+	virtual istd::IChangeableUniquePtr CreateObjectFromRecord(const QSqlRecord& /*record*/, const iprm::IParamsSet* /*paramsPtr*/ = nullptr) const override { return nullptr; }
+	virtual QVariant GetElementInfoFromRecord(const QSqlRecord& /*record*/, const QByteArray& /*infoId*/) const override { return QVariant(); }
+	virtual QByteArray CreateUpdateMetaInfoQuery(const QSqlRecord& /*record*/) const override { return QByteArray(); }
+
+	// reimplemented (imtdb::IDatabaseObjectDelegate)
+	virtual const iprm::IOptionsList* GetObjectTypeInfos() const override { return nullptr; }
+	virtual QByteArray GetObjectTypeId(const QByteArray& /*objectId*/) const override { return QByteArray(); }
+	virtual QByteArray GetCountQuery(const iprm::IParamsSet* /*paramsPtr*/ = nullptr) const override { return QByteArray(); }
+	virtual QByteArray GetSelectionQuery(const QByteArray& /*objectId*/ = QByteArray(), int /*offset*/ = 0, int /*count*/ = -1, const iprm::IParamsSet* /*paramsPtr*/ = nullptr) const override { return QByteArray(); }
+	virtual NewObjectQuery CreateNewObjectQuery(const QByteArray& /*typeId*/, const QByteArray& /*proposedObjectId*/, const QString& /*objectName*/, const QString& /*objectDescription*/, const istd::IChangeable* /*valuePtr*/, const imtbase::IOperationContext* /*operationContextPtr*/) const override { return NewObjectQuery(); }
+	virtual QByteArray CreateDeleteObjectsQuery(const imtbase::IObjectCollection& /*collection*/, const imtbase::ICollectionInfo::Ids& /*objectIds*/, const imtbase::IOperationContext* /*operationContextPtr*/) const override { return QByteArray(); }
+	virtual QByteArray CreateDeleteObjectSetQuery(const imtbase::IObjectCollection& /*collection*/, const iprm::IParamsSet* /*paramsPtr*/ = nullptr, const imtbase::IOperationContext* /*operationContextPtr*/ = nullptr) const override { return QByteArray(); }
+	virtual QByteArray CreateRestoreObjectsQuery(const imtbase::IObjectCollection& /*collection*/, const imtbase::ICollectionInfo::Ids& /*objectIds*/, const imtbase::IOperationContext* /*operationContextPtr*/ = nullptr) const override { return QByteArray(); }
+	virtual QByteArray CreateRestoreObjectSetQuery(const imtbase::IObjectCollection& /*collection*/, const iprm::IParamsSet* /*paramsPtr*/ = nullptr, const imtbase::IOperationContext* /*operationContextPtr*/ = nullptr) const override { return QByteArray(); }
+	virtual QByteArray CreateUpdateObjectQuery(const imtbase::IObjectCollection& /*collection*/, const QByteArray& /*objectId*/, const istd::IChangeable& /*object*/, const imtbase::IOperationContext* /*operationContextPtr*/, bool /*useExternDelegate*/ = true) const override { return QByteArray(); }
+	virtual NewObjectQuery CreateUpdateObjectQueryWithParameters(const imtbase::IObjectCollection& /*collection*/, const QByteArray& /*objectId*/, const istd::IChangeable& /*object*/, const imtbase::IOperationContext* /*operationContextPtr*/, bool /*useExternDelegate*/ = true) const override { return NewObjectQuery(); }
+	virtual QByteArray CreateRenameObjectQuery(const imtbase::IObjectCollection& /*collection*/, const QByteArray& /*objectId*/, const QString& /*newObjectName*/, const imtbase::IOperationContext* /*operationContextPtr*/) const override { return QByteArray(); }
+	virtual QByteArray CreateDescriptionObjectQuery(const imtbase::IObjectCollection& /*collection*/, const QByteArray& /*objectId*/, const QString& /*description*/, const imtbase::IOperationContext* /*operationContextPtr*/) const override { return QByteArray(); }
+	virtual QByteArray CreateResetQuery(const imtbase::IObjectCollection& /*collection*/) const override { return QByteArray(); }
+	virtual QByteArray CreateDataMetaInfoQuery(const imtbase::IObjectCollection& /*collection*/, const QByteArray& /*objectId*/, const idoc::IDocumentMetaInfo* /*dataMetaInfoPtr*/) const override { return QByteArray(); }
+	virtual QByteArray CreateCollectionItemMetaInfoQuery(const imtbase::IObjectCollection& /*collection*/, const QByteArray& /*objectId*/, const idoc::IDocumentMetaInfo* /*collectionItemMetaInfoPtr*/) const override { return QByteArray(); }
+	virtual QByteArray GetSelectionByMetaInfoQuery(const QByteArray& /*metaInfoId*/, const QVariant& /*metaInfoValue*/) const override { return QByteArray(); }
+};
+
+
 typedef icomp::TSimSharedComponentPtr<CTestHandlerComp> TestHandler;
+typedef icomp::TSimSharedComponentPtr<CTestJournalComp> TestJournal;
+typedef icomp::TSimSharedComponentPtr<CTestDelegateComp> TestDelegate;
 typedef icomp::TSimSharedComponentPtr<CAssistantApiCatalogComp> Catalog;
 typedef icomp::TSimSharedComponentPtr<CMarkdownKnowledgeBaseComp> KnowledgeBase;
 typedef icomp::TSimComponentWrap<CAssistantApiActionComp> ApiAction;
@@ -158,6 +249,8 @@ struct ApiFixture
 	{
 		InitCatalog(catalog);
 		handler->InitComponent();
+		journal->InitComponent();
+		groupDelegate->InitComponent();
 
 		InitAction(list, "list");
 		InitAction(describe, "describe");
@@ -165,6 +258,8 @@ struct ApiFixture
 
 		plan.SetRef("ApiCatalog", catalog);
 		plan.InsertMultiRef("RequestHandlers", handler);
+		plan.SetRef("DocumentActionJournal", journal);
+		plan.InsertMultiRef("Delegates", groupDelegate);
 		plan.InitComponent();
 	}
 
@@ -178,6 +273,8 @@ struct ApiFixture
 
 	Catalog catalog;
 	TestHandler handler;
+	TestJournal journal;
+	TestDelegate groupDelegate;
 	ApiAction list;
 	ApiAction describe;
 	ApiAction query;

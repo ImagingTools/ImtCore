@@ -144,7 +144,7 @@ by a journal entry younger than the retention period.
 | Transport | The action puts the ID into the header `x-imt-document-action` of its copy of the GraphQL context; `COperationContextControllerComp` takes it over into the operation context. The context creators remove the header from client requests (`imtgql::RemoveServerHeaders`) |
 | Guard | An entry is written only while the document action of the tenant of the operation is `Applying`: an unknown, foreign or finished ID writes nothing |
 | Assistant | `CGqlAssistantActionCompBase` (`DocumentActionJournal`, `BeginDocumentAction`, `FinishDocumentAction`), `api.planChanges` and `administration.addUserToGroup` record their document actions; `CAssistantDocumentActionComp` with `changes.list` and `changes.rollback` |
-| Composite | `TenantAssistant`: exported attributes `DocumentActionJournal`, `RollbackCollections`, `RollbackDelegates` (the same repositories: they export the collection and the document delegate), `RollbackEditPermissions`, `RollbackRemovePermissions` |
+| Composite | `TenantAssistant`: exported attributes `DocumentActionJournal`, `RollbackCollections`, `RollbackDelegates` (the same repositories: they export the collection and the document delegate; `api.planChanges` also uses the delegates to check the objects of a plan for changes after the preview), `RollbackEditPermissions`, `RollbackRemovePermissions` |
 | Permission | `/Administration/Assistant/RollbackAny` (document actions of other users), in the default scope of new organizations |
 
 Differences to the design above, found while implementing:

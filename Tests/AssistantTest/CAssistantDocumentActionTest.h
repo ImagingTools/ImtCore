@@ -21,6 +21,8 @@ private slots:
 	void testAddUserToGroup_NothingChangedWithoutDocumentAction();
 	void testPlan_DocumentActionOfAllSteps();
 	void testPlan_PartiallyAppliedDocumentAction();
+	void testPlan_StaleIfObjectChangedAfterPreview();
+	void testPlan_RefusedIfChangesCannotBeDetected();
 	void testServerHeadersAreRemovedFromClientRequests();
 	void testList_OwnDocumentActionsAndReversibility();
 	void testList_AllUsersNeedsPermission();

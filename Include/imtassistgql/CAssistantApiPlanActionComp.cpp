@@ -99,7 +99,8 @@ QString CAssistantApiPlanActionComp::GetDescription() const
 				"Propose changes as a plan of mutations of the public API (one or more steps). The user sees every step "
 				"and confirms or rejects the whole plan; nothing changes before. Read the current data with api.query first; "
 				"update commands usually replace the whole object, so send all its values. After the confirmation the steps run "
-				"in order and stop at the first failure.";
+				"in order and stop at the first failure. Every step needs the \"id\" of its object in the input; the confirmation is "
+				"refused if one of these objects was changed after the preview.";
 }
 
 
@@ -164,6 +165,11 @@ imtassist::IAssistantAction::ExecutionStatus CAssistantApiPlanActionComp::Prepar
 		}
 	}
 
+	QByteArray targetStates;
+	if (!ReadTargetStates(steps, targetStates, userError)){
+		return ES_FAILED;
+	}
+
 	preview.summary = parameters.value("summary").toString().trimmed();
 	preview.targetLabel = QStringLiteral("%1 changes").arg(steps.size());
 	preview.targetId = "api.planChanges";
@@ -179,7 +185,7 @@ imtassist::IAssistantAction::ExecutionStatus CAssistantApiPlanActionComp::Prepar
 	preview.impact = (GetDocumentActionJournal() != nullptr)
 				? QStringLiteral("The steps run one after another and stop at the first failure. Applied steps are not undone automatically; they can be rolled back afterwards if they only changed documents with revisions.")
 				: QStringLiteral("The steps run one after another and stop at the first failure. Applied steps are not undone automatically.");
-	preview.stateToken = CreateStateToken(parameters);
+	preview.stateToken = CreateStateToken(parameters, targetStates);
 
 	return ES_SUCCEEDED;
 }
@@ -192,13 +198,19 @@ imtassist::IAssistantAction::ExecutionStatus CAssistantApiPlanActionComp::ApplyC
 			Result& result,
 			QString& userError)
 {
-	if (CreateStateToken(parameters) != stateToken){
-		return ES_STALE;
-	}
-
 	QList<Step> steps;
 	if (!ReadSteps(parameters, steps, userError)){
 		return ES_FAILED;
+	}
+
+	// The objects of the steps must be in the state the user saw in the preview.
+	QByteArray targetStates;
+	if (!ReadTargetStates(steps, targetStates, userError)){
+		return ES_FAILED;
+	}
+
+	if (CreateStateToken(parameters, targetStates) != stateToken){
+		return ES_STALE;
 	}
 
 	QByteArray documentActionId;
@@ -380,10 +392,86 @@ bool CAssistantApiPlanActionComp::ReadSteps(const QJsonObject& parameters, QList
 }
 
 
-QByteArray CAssistantApiPlanActionComp::CreateStateToken(const QJsonObject& parameters)
+bool CAssistantApiPlanActionComp::ReadTargetStates(const QList<Step>& steps, QByteArray& targetStates, QString& error) const
 {
-	// The plan carries no state of its targets; the token binds the confirmation to exactly these steps.
-	return QCryptographicHash::hash(QJsonDocument(parameters).toJson(QJsonDocument::Compact), QCryptographicHash::Sha256).toHex();
+	static const QRegularExpression referenceExpression(QStringLiteral("^\\$step(\\d+)\\.(.+)$"));
+
+	targetStates.clear();
+
+	const imtdb::IDocumentActionJournal* journalPtr = GetDocumentActionJournal();
+	const int delegateCount = m_delegatesCompPtr.GetCount();
+
+	for (int i = 0; i < steps.size(); ++i){
+		const QJsonValue idValue = steps[i].input.toObject().value("id");
+		if (!idValue.isString()){
+			error = QStringLiteral("Step %1: the input has no \"id\" of the object; changes of the object after the preview could not be detected.").arg(i + 1);
+
+			return false;
+		}
+
+		// A new object or an object of an earlier step of the plan has no state to check.
+		const QString targetId = idValue.toString();
+		if (targetId.isEmpty() || referenceExpression.match(targetId).hasMatch()){
+			continue;
+		}
+
+		if ((journalPtr == nullptr) || (delegateCount == 0)){
+			error = QStringLiteral("Step %1: changes of the object '%2' after the preview could not be detected; the plan cannot be applied.").arg(i + 1).arg(targetId);
+
+			return false;
+		}
+
+		const QByteArray documentId = targetId.toUtf8();
+		targetStates += documentId;
+		targetStates += ':';
+
+		bool isFound = false;
+		for (int delegateIndex = 0; delegateIndex < delegateCount; ++delegateIndex){
+			const imtdb::ISqlDatabaseObjectDelegate* delegatePtr = m_delegatesCompPtr[delegateIndex];
+			if (delegatePtr == nullptr){
+				continue;
+			}
+
+			imtdb::IDocumentActionJournal::DocumentState state;
+			if (!journalPtr->GetDocumentState(delegatePtr->GetTableScheme(), delegatePtr->GetTableName(), documentId, state)){
+				error = QStringLiteral("Step %1: the current state of the object '%2' could not be read.").arg(i + 1).arg(targetId);
+
+				return false;
+			}
+
+			if (state.exists){
+				targetStates += delegatePtr->GetTableScheme();
+				targetStates += '.';
+				targetStates += delegatePtr->GetTableName();
+				targetStates += '/';
+				targetStates += QByteArray::number(state.revision);
+				targetStates += state.isRemoved ? 'R' : 'A';
+				isFound = true;
+
+				break;
+			}
+		}
+
+		if (!isFound){
+			targetStates += QByteArrayLiteral("absent");
+		}
+
+		targetStates += '\n';
+	}
+
+	return true;
+}
+
+
+QByteArray CAssistantApiPlanActionComp::CreateStateToken(const QJsonObject& parameters, const QByteArray& targetStates)
+{
+	// The token binds the confirmation to exactly these steps and to the revisions of their objects.
+	QCryptographicHash hash(QCryptographicHash::Sha256);
+	hash.addData(QJsonDocument(parameters).toJson(QJsonDocument::Compact));
+	hash.addData(QByteArrayLiteral("\n"));
+	hash.addData(targetStates);
+
+	return hash.result().toHex();
 }
 
 

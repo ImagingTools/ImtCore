@@ -331,8 +331,11 @@ GraphQL context of the user. Results are filtered and shortened (100 items per l
 preview shows every step with its command and the data as it will be sent, not only the words of the
 model. After the confirmation the steps run in order and stop at the first failure; the outcome says how
 many steps were applied (no automatic undo). `"$stepN.path"` in an input refers to the result of an earlier
-step, e.g. the ID of a created object. A plan carries no state of its targets: an object changed between the
-preview and the confirmation is written with the data of the plan.
+step, e.g. the ID of a created object. The object of a step is the `id` of its input: the preview records
+its revision (through `DocumentActionJournal` in the tables of `RollbackDelegates`) and the confirmation is
+refused as stale if an object was changed, removed or created after the preview. A step without `id` is
+refused; a step on an existing object needs the journal and the delegates of its table, otherwise the plan is
+refused because later changes could not be detected. New objects and `"$stepN.path"` references are not checked.
 
 **Knowledge of a product.** Put Markdown documents into a resource directory of the product and set
 `KnowledgeDocuments` of `TenantAssistant` to it and to `:/AssistantKnowledge/ImtCore`. Write them for a reader
@@ -404,7 +407,8 @@ Steps for a server (Puma is the template; ProLife, Agentino, Dogma and Claire fo
    `TenantAssistant/AssistantController` and `TenantAssistant/ConfigurationController` to the GraphQL
    handlers of the servlet. Call `Init::InitAssistantServer()` (or `Q_INIT_RESOURCE(imtassistdb)` and
    `Q_INIT_RESOURCE(imtassistgql)`).
-2. Rollback (optional): add `ImtDatabasePck/DocumentActionJournal` with the database engine of the document
+2. Rollback and plans of changes (needed by plans that change existing objects): add
+   `ImtDatabasePck/DocumentActionJournal` with the database engine of the document
    tables and the JSON extractor of the database (`PostgresXPathExtractor` or `SqliteXPathExtractor`) and set
    it as `DocumentActionJournal`. Set `RollbackCollections` and `RollbackDelegates` to the same repositories with
    revisions (they export the collection and the document delegate; Puma: the user groups) and the edit and

@@ -3,6 +3,7 @@
 
 
 // ImtCore includes
+#include <imtdb/ISqlDatabaseObjectDelegate.h>
 #include <imtassistgql/CGqlAssistantActionCompBase.h>
 #include <imtassistgql/IAssistantApiCatalog.h>
 
@@ -17,6 +18,12 @@ namespace imtassistgql
 	will be sent. After the confirmation the steps run one after another with the rights of the
 	user and stop at the first failure; the outcome says which steps were applied. There is no
 	automatic undo.
+
+	The object of a step is the \c id of its input. The preview records the revision of every object
+	in the tables of \c Delegates (read through the document action journal) and the confirmation is
+	refused as stale if one of them was changed, removed or created after the preview. A step without
+	\c id is refused, and so is a step on an existing object if the journal or the delegates are missing:
+	later changes of its object could not be detected.
 
 	A string value \c "$stepN.path" in the input of a step is replaced by the value at \c path in the
 	result of step N, e.g. the ID of an object created by an earlier step.
@@ -37,6 +44,7 @@ public:
 
 	I_BEGIN_COMPONENT(CAssistantApiPlanActionComp);
 		I_ASSIGN(m_apiCatalogCompPtr, "ApiCatalog", "Public API of the application with the policy of the product", true, "ApiCatalog");
+		I_ASSIGN_MULTI_0(m_delegatesCompPtr, "Delegates", "Document delegates of the tables with revisions: the objects of a plan are checked for changes after the preview", false);
 	I_END_COMPONENT;
 
 	CAssistantApiPlanActionComp();
@@ -76,10 +84,17 @@ private:
 	};
 
 	bool ReadSteps(const QJsonObject& parameters, QList<Step>& steps, QString& error) const;
-	static QByteArray CreateStateToken(const QJsonObject& parameters);
+
+	/**
+		Read the current state of the objects of the steps.
+		\return False if a step cannot be checked for later changes of its object.
+	*/
+	bool ReadTargetStates(const QList<Step>& steps, QByteArray& targetStates, QString& error) const;
+	static QByteArray CreateStateToken(const QJsonObject& parameters, const QByteArray& targetStates);
 
 private:
 	I_REF(IAssistantApiCatalog, m_apiCatalogCompPtr);
+	I_MULTIREF(imtdb::ISqlDatabaseObjectDelegate, m_delegatesCompPtr);
 
 	imtassist::CParameterSchema m_parameterSchema;
 	imtassist::CParameterSchema m_resultSchema;
