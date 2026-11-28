@@ -6,6 +6,11 @@
 	drops the test database and the files a previous run left, starts the sims and the server (it creates and migrates
 	the database), and stops them again.
 
+	A suite may list services the server depends on (the "services" list of suite.json, for example the authorization
+	server of the product). They are started in their order before the server, each with its own test database, and
+	stopped in the reverse order after it. A service may have a setup step, a Node script that prepares what the
+	following servers need and passes them environment variables.
+
 	The server's configuration comes from its composition and its own persisted settings; nothing here writes them.
 	To drop the database it uses the same credentials as the server, field by field: the environment variables named
 	in suite.json (TEST_PG_HOST, _PORT, _USER, _PASSWORD with the prefix of the suite), then the server's persisted
@@ -34,6 +39,25 @@ function UnescapeXml(text)
 		.replaceAll('&lt;', '<')
 		.replaceAll('&gt;', '>')
 		.replaceAll('&amp;', '&');
+}
+
+
+/**
+	Replaces ${NAME} by the value of the environment variable. Returns null if a variable is not set, so that a
+	search folder that depends on it (${PUMADIR}/Bin) is skipped on a machine without it.
+*/
+function ExpandEnvironment(text)
+{
+	let isResolved = true;
+	const retVal = text.replace(/\$\{(\w+)\}/g, (match, name) => {
+		if (!process.env[name]){
+			isResolved = false;
+		}
+
+		return process.env[name] ?? '';
+	});
+
+	return isResolved ? retVal : null;
 }
 
 
@@ -67,7 +91,8 @@ export class TestServer
 
 	/**
 		options: bin (the server executable, else the newest one under the suite's bin search folders), resultsDir
-		(where the logs go), keepServer (leave the server and the sims running when the runner ends).
+		(where the logs go), keepServer (leave the servers and the sims running when the runner ends), serviceBins
+		(the executables of the services by their names, else the newest ones under their bin search folders).
 	*/
 	constructor(suite, suiteRoot, options)
 	{
@@ -79,6 +104,13 @@ export class TestServer
 		this.bin = options.bin;
 		this.resultsDir = options.resultsDir;
 		this.keepServer = options.keepServer;
+		this.serviceBins = options.serviceBins ?? {};
+
+		/** The services of the suite in the order of their start: { spec, binary, settingsFolder, databaseSettings, process, starts }. */
+		this.services = [];
+
+		/** The environment variables the setup steps of the services pass to the servers started after them. */
+		this.serverEnvironment = {};
 
 		this.serverProcess = null;
 		this.serverStarts = 0;
@@ -111,16 +143,61 @@ export class TestServer
 			fs.rmSync(path.join(this.resultsDir, name), { force: true });
 		}
 
+		this.services = [];
+		for (const spec of this.suite.services ?? []){
+			this.services.push(this.DescribeService(spec));
+		}
+
 		this.binary = this.FindProgram(this.suite.server.name, this.bin);
-		this.settingsFolder = this.ResolveSettingsFolder();
-		this.databaseSettings = this.ResolveDatabaseSettings();
+		this.settingsFolder = this.ResolveSettingsFolder(this.suite.server);
+		this.databaseSettings = this.ResolveDatabaseSettings(this.suite.server, this.suite.database.name, this.settingsFolder);
 		Log(`Server: ${this.binary}`);
 		Log(`Database: ${this.databaseSettings.name} on ${this.databaseSettings.host}:${this.databaseSettings.port} as ${this.databaseSettings.user}`);
 		Log(`Settings: ${this.settingsFolder}`);
 
 		await this.EnsurePortsAreFree();
+		for (const service of this.services){
+			if (service.databaseSettings !== null){
+				await this.DropDatabase(service.databaseSettings);
+			}
+
+			this.RemoveRunFiles(service.spec, service.settingsFolder);
+		}
+
 		await this.DropDatabase();
-		this.RemoveRunFiles();
+		this.RemoveRunFiles(this.suite.server, this.settingsFolder);
+	}
+
+
+	/**
+		Finds the executable, the settings folder and the test database of a service of the suite, and removes the
+		output files of its previous run.
+	*/
+	DescribeService(spec)
+	{
+		for (const name of this.GetOutputFiles(spec.name)){
+			fs.rmSync(path.join(this.resultsDir, name), { force: true });
+		}
+
+		const binary = this.FindProgram(spec.name, this.serviceBins[spec.name], spec.binSearchFolders);
+		const settingsFolder = spec.settings === undefined ? null : this.ResolveSettingsFolder(spec);
+		const databaseName = spec.database?.name;
+		const databaseSettings = databaseName === undefined ? null : this.ResolveDatabaseSettings(spec, databaseName, settingsFolder);
+		Log(`${spec.name}: ${binary}`);
+		if (databaseSettings !== null){
+			Log(`Database: ${databaseSettings.name} on ${databaseSettings.host}:${databaseSettings.port} as ${databaseSettings.user}`);
+		}
+
+		const retVal = { spec, binary, settingsFolder, databaseSettings, process: null, starts: 0 };
+
+		return retVal;
+	}
+
+
+	/** The files the output of a program goes to, in the results folder: standard output, then standard error. */
+	GetOutputFiles(name)
+	{
+		return [`${name}-stdout.log`, `${name}-stderr.log`];
 	}
 
 
@@ -134,10 +211,80 @@ export class TestServer
 			await this.StartSims();
 		}
 
+		for (const service of this.services){
+			if (service.process === null){
+				await this.StartService(service);
+			}
+		}
+
 		this.StartServer();
 		await this.WaitForServer();
 		await this.VerifyServerDatabase();
 		Log('Server is ready');
+	}
+
+
+	/**
+		Starts a service and waits until it is ready and has migrated its database; then runs its setup step.
+	*/
+	async StartService(service)
+	{
+		service.starts += 1;
+		const serviceProcess = this.LaunchProgram(service.spec, service.binary, service.spec.name, service.starts);
+		serviceProcess.once('exit', (code, signal) => {
+			Log(`${service.spec.name} exited (code ${code}, signal ${signal})`);
+			if (service.process === serviceProcess){
+				service.process = null;
+			}
+		});
+
+		service.process = serviceProcess;
+
+		await this.WaitForProgram(service.spec, () => service.process !== null);
+		if (service.databaseSettings !== null){
+			await this.VerifyServerDatabase(service.databaseSettings, service.spec.readiness.timeoutSeconds);
+		}
+
+		Log(`${service.spec.name} is ready`);
+		if (service.spec.setup !== undefined){
+			await this.RunServiceSetup(service.spec);
+		}
+	}
+
+
+	/**
+		Runs the setup step of a service once it is ready: a Node script that prepares what the servers started after it
+		need, such as a token, and writes the environment variables they get to the file of --out as
+		{ "environment": { <name>: <value> } }. The values are not logged, since they may be secrets.
+	*/
+	async RunServiceSetup(spec)
+	{
+		const setup = spec.setup;
+		const outputPath = path.join(this.resultsDir, `${setup.name}.json`);
+		fs.rmSync(outputPath, { force: true });
+
+		const extraArguments = Object.entries(setup.arguments ?? {}).flatMap(([name, value]) => [`--${name}`, String(value)]);
+		const args = [
+			this.ResolveKitFile('setup', setup),
+			'--http', `http://127.0.0.1:${spec.ports.http}`,
+			'--env', path.resolve(this.suiteRoot, this.suite.newman.environment),
+			'--out', outputPath,
+			...extraArguments,
+		];
+
+		Log(`Running setup ${setup.name}`);
+		const isSucceeded = await new Promise((resolve) => {
+			const child = spawn(process.execPath, args, { stdio: 'inherit' });
+			child.once('exit', (code) => resolve(code === 0));
+		});
+		if (!isSucceeded || !fs.existsSync(outputPath)){
+			throw new Error(`Setup ${setup.name} of ${spec.name} failed`);
+		}
+
+		const output = JSON.parse(fs.readFileSync(outputPath, 'utf8'));
+		Object.assign(this.serverEnvironment, output.environment ?? {});
+		fs.rmSync(outputPath, { force: true });
+		Log(`Setup ${setup.name} passes ${Object.keys(output.environment ?? {}).join(', ')}`);
 	}
 
 
@@ -147,7 +294,9 @@ export class TestServer
 	async Finish()
 	{
 		if (this.keepServer && this.serverProcess !== null){
-			Log(`Server left running (pid ${this.serverProcess.pid}), sims too (pids ${this.simProcesses.map((sim) => sim.pid).join(', ')})`);
+			const services = this.services.filter((service) => service.process !== null);
+			const servicesText = services.map((service) => `${service.spec.name} (pid ${service.process.pid})`).join(', ');
+			Log(`Server left running (pid ${this.serverProcess.pid}), services ${servicesText || 'none'}, sims too (pids ${this.simProcesses.map((sim) => sim.pid).join(', ')})`);
 		}
 		else {
 			await this.Kill();
@@ -157,20 +306,28 @@ export class TestServer
 	}
 
 
+	/**
+		Stops the server first, so it does not lose the services it uses while it is shutting down, then the services
+		in the reverse order of their start, then the sims.
+	*/
 	async Kill()
 	{
 		await this.StopServer();
+		for (const service of [...this.services].reverse()){
+			await this.StopProgram(service.process);
+		}
+
 		this.StopSims();
 	}
 
 
-	CreateDatabaseClient(databaseName = this.databaseSettings.name)
+	CreateDatabaseClient(databaseName = this.databaseSettings.name, databaseSettings = this.databaseSettings)
 	{
 		return new this.pg.Client({
-			host: this.databaseSettings.host,
-			port: this.databaseSettings.port,
-			user: this.databaseSettings.user,
-			password: this.databaseSettings.password,
+			host: databaseSettings.host,
+			port: databaseSettings.port,
+			user: databaseSettings.user,
+			password: databaseSettings.password,
 			database: databaseName,
 		});
 	}
@@ -180,10 +337,14 @@ export class TestServer
 		Reads the database access parameter from the server's persisted settings: only the attributes of that one
 		element, so the rest of the file may change freely. Returns an empty object before the server first saved it.
 	*/
-	ReadPersistedDatabaseSettings()
+	ReadPersistedDatabaseSettings(spec, settingsFolder)
 	{
-		const persisted = this.suite.server.settings.persistedDatabase;
-		const filePath = path.join(this.settingsFolder, persisted.file);
+		const persisted = spec.settings?.persistedDatabase;
+		if (persisted === undefined){
+			return {};
+		}
+
+		const filePath = path.join(settingsFolder, persisted.file);
 		if (!fs.existsSync(filePath)){
 			return {};
 		}
@@ -203,15 +364,15 @@ export class TestServer
 	}
 
 
-	ResolveDatabaseSettings()
+	ResolveDatabaseSettings(spec, databaseName, settingsFolder)
 	{
 		const database = this.suite.database;
 		const prefix = database.environmentPrefix;
-		const persisted = this.ReadPersistedDatabaseSettings();
+		const persisted = this.ReadPersistedDatabaseSettings(spec, settingsFolder);
 		const defaults = database.compositionDefaults;
 
 		/** The runner drops the database and the server connects to the one of its persisted settings. */
-		VerifyTestDatabaseName(database.name);
+		VerifyTestDatabaseName(databaseName);
 		if (persisted.DatabaseName !== undefined){
 			VerifyTestDatabaseName(persisted.DatabaseName);
 		}
@@ -221,7 +382,7 @@ export class TestServer
 			port: Number(process.env[`${prefix}_PORT`] || persisted.Port || defaults.port),
 			user: process.env[`${prefix}_USER`] || persisted.UserName || defaults.user,
 			password: process.env[`${prefix}_PASSWORD`] ?? persisted.Password ?? defaults.password,
-			name: database.name,
+			name: databaseName,
 			maintenanceName: database.maintenanceName,
 		};
 
@@ -233,10 +394,10 @@ export class TestServer
 		The same folder ifile::CSystemLocationComp resolves for shared application data:
 		<public folder>/<company>/<product>. The public folder is fixed per platform there.
 	*/
-	ResolveSettingsFolder()
+	ResolveSettingsFolder(spec)
 	{
 		const publicFolder = process.platform === 'win32' ? 'C:/Users/Public' : '/Users/Shared';
-		const settings = this.suite.server.settings;
+		const settings = spec.settings;
 
 		const retVal = path.join(publicFolder, settings.company, settings.product);
 
@@ -246,18 +407,29 @@ export class TestServer
 
 	/**
 		A program of the build: the given path, else the newest one with that name under the bin search folders (those of
-		the server by default, relative to the folder of suite.json).
+		the server by default, relative to the folder of suite.json; a folder with a ${ENV} variable that is not set is
+		skipped).
 	*/
 	FindProgram(name, explicitPath, searchFolders = this.suite.server.binSearchFolders)
 	{
 		if (explicitPath){
-			return path.resolve(explicitPath);
+			const retVal = path.resolve(explicitPath);
+			if (!fs.existsSync(retVal)){
+				throw new Error(`${retVal} not found: the executable of ${name}`);
+			}
+
+			return retVal;
 		}
 
 		const fileName = name + (process.platform === 'win32' ? '.exe' : '');
 		const candidates = [];
 		for (const searchFolder of searchFolders){
-			const root = path.resolve(this.suiteRoot, searchFolder);
+			const expandedFolder = ExpandEnvironment(searchFolder);
+			if (expandedFolder === null){
+				continue;
+			}
+
+			const root = path.resolve(this.suiteRoot, expandedFolder);
 			if (!fs.existsSync(root)){
 				continue;
 			}
@@ -271,7 +443,7 @@ export class TestServer
 		}
 
 		if (candidates.length === 0){
-			throw new Error(`${fileName} not found under ${searchFolders.join(', ')}; build it or pass its path`);
+			throw new Error(`${fileName} not found under ${searchFolders.join(', ')}; build it or pass its path (--bin, --service-bin)`);
 		}
 
 		candidates.sort((first, second) => second.time - first.time);
@@ -284,6 +456,7 @@ export class TestServer
 	{
 		const ports = [
 			...Object.values(this.suite.server.ports),
+			...(this.suite.services ?? []).flatMap((service) => Object.values(service.ports)),
 			...(this.suite.sims ?? []).flatMap((sim) => [sim.port, ...Object.values(sim.otherPorts ?? {})]),
 		];
 		for (const port of ports){
@@ -300,11 +473,21 @@ export class TestServer
 	*/
 	ResolveSimFile(sim)
 	{
-		if (sim.kit){
-			return path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'sims', sim.kit);
+		return this.ResolveKitFile('sims', sim);
+	}
+
+
+	/**
+		The script of a sim or of a setup step: one of the kit ("kit": "<name>.mjs" in suite.json, from the folder of that
+		kind of the kit), else the file of the suite, relative to suite.json.
+	*/
+	ResolveKitFile(kitFolder, entry)
+	{
+		if (entry.kit){
+			return path.join(path.dirname(fileURLToPath(import.meta.url)), '..', kitFolder, entry.kit);
 		}
 
-		return path.resolve(this.suiteRoot, sim.file);
+		return path.resolve(this.suiteRoot, entry.file);
 	}
 
 
@@ -349,16 +532,16 @@ export class TestServer
 	/**
 		Drops the test database; the server creates it again and applies the migrations on startup.
 	*/
-	async DropDatabase()
+	async DropDatabase(databaseSettings = this.databaseSettings)
 	{
-		const client = this.CreateDatabaseClient(this.databaseSettings.maintenanceName);
+		const client = this.CreateDatabaseClient(databaseSettings.maintenanceName, databaseSettings);
 		await client.connect();
 		try {
 			await client.query(
 				'SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = $1 AND pid != pg_backend_pid()',
-				[this.databaseSettings.name]
+				[databaseSettings.name]
 			);
-			await client.query(`DROP DATABASE IF EXISTS ${client.escapeIdentifier(this.databaseSettings.name)}`);
+			await client.query(`DROP DATABASE IF EXISTS ${client.escapeIdentifier(databaseSettings.name)}`);
 		}
 		finally {
 			await client.end();
@@ -370,10 +553,34 @@ export class TestServer
 		Guards against a server that runs on another database than the test one, for example because its persisted
 		settings name a different database: the tests would then change that database.
 	*/
-	async VerifyServerDatabase()
+	async VerifyServerDatabase(databaseSettings = this.databaseSettings, timeoutSeconds = 0)
 	{
-		const databaseName = this.databaseSettings.name;
-		const client = this.CreateDatabaseClient();
+		const deadline = Date.now() + timeoutSeconds * 1000;
+		for (;;){
+			try {
+				await this.CheckServerDatabase(databaseSettings);
+
+				return;
+			}
+			catch (error) {
+				if (Date.now() >= deadline){
+					throw error;
+				}
+			}
+
+			await new Promise((resolve) => setTimeout(resolve, 1000));
+		}
+	}
+
+
+	/**
+		One check of the database. A service may open its port before it has created and migrated its database, so
+		VerifyServerDatabase repeats it until the timeout; the server under test answers only after that.
+	*/
+	async CheckServerDatabase(databaseSettings)
+	{
+		const databaseName = databaseSettings.name;
+		const client = this.CreateDatabaseClient(databaseName, databaseSettings);
 		try {
 			await client.connect();
 		}
@@ -397,10 +604,10 @@ export class TestServer
 		Removes the files a previous run left in the server's settings folder that would change this run, such as the
 		cache database. The persisted settings stay: they are the developer's configuration of the test server.
 	*/
-	RemoveRunFiles()
+	RemoveRunFiles(spec, settingsFolder)
 	{
-		for (const file of this.suite.server.settings.runFiles){
-			fs.rmSync(path.join(this.settingsFolder, file), { force: true });
+		for (const file of spec.settings?.runFiles ?? []){
+			fs.rmSync(path.join(settingsFolder, file), { force: true });
 		}
 	}
 
@@ -413,32 +620,7 @@ export class TestServer
 	StartServer()
 	{
 		this.serverStarts += 1;
-		const [stdout, stderr] = TestServer.OUTPUT_FILES.map((name) => {
-			const file = path.join(this.resultsDir, name);
-			fs.appendFileSync(file, `[test-server] Server start ${this.serverStarts}\n`);
-
-			return fs.openSync(file, 'a');
-		});
-
-		/**
-			Per platform, because the deployed Qt platform plugins differ: Windows has only qwindows, while Linux agents
-			without a display need offscreen.
-		*/
-		const argumentsByPlatform = this.suite.server.arguments;
-		const serverArguments = argumentsByPlatform[process.platform] ?? argumentsByPlatform.default;
-
-		/**
-			A server kept for debugging must outlive the runner; on Windows a child that is not detached ends with it.
-		*/
-		const serverProcess = spawn(this.binary, serverArguments, {
-			cwd: path.dirname(this.binary),
-			stdio: ['ignore', stdout, stderr],
-			detached: this.keepServer,
-		});
-		if (this.keepServer){
-			serverProcess.unref();
-		}
-
+		const serverProcess = this.LaunchProgram(this.suite.server, this.binary, 'server', this.serverStarts);
 		serverProcess.once('exit', (code, signal) => {
 			Log(`Server exited (code ${code}, signal ${signal})`);
 			if (this.serverProcess === serverProcess){
@@ -450,10 +632,56 @@ export class TestServer
 	}
 
 
-	async IsServerAnswering(readiness)
+	/**
+		Starts a program of the build, the server or a service, with its output in the results folder as <logName>-stdout.log
+		and -stderr.log. The environment variables the setup steps passed on are added to its environment.
+	*/
+	LaunchProgram(spec, binary, logName, startNumber)
 	{
+		const [stdout, stderr] = this.GetOutputFiles(logName).map((name) => {
+			const file = path.join(this.resultsDir, name);
+			fs.appendFileSync(file, `[test-server] Server start ${startNumber}\n`);
+
+			return fs.openSync(file, 'a');
+		});
+
+		/**
+			Per platform, because the deployed Qt platform plugins differ: Windows has only qwindows, while Linux agents
+			without a display need offscreen.
+		*/
+		const argumentsByPlatform = spec.arguments;
+		const programArguments = argumentsByPlatform[process.platform] ?? argumentsByPlatform.default;
+
+		/**
+			A program kept for debugging must outlive the runner; on Windows a child that is not detached ends with it.
+		*/
+		const retVal = spawn(binary, programArguments, {
+			cwd: path.dirname(binary),
+			env: { ...process.env, ...this.serverEnvironment },
+			stdio: ['ignore', stdout, stderr],
+			detached: this.keepServer,
+		});
+		if (this.keepServer){
+			retVal.unref();
+		}
+
+		return retVal;
+	}
+
+
+	/**
+		Whether a program answers: its readiness request is answered with 200. A service without a request to ask is
+		ready when it accepts connections.
+	*/
+	async IsServerAnswering(spec)
+	{
+		const readiness = spec.readiness;
+		if (readiness.path === undefined){
+			return await IsPortOpen(spec.ports.http);
+		}
+
 		try {
-			const response = await fetch(`http://127.0.0.1:${this.suite.server.ports.http}${readiness.path}`, {
+			const response = await fetch(`http://127.0.0.1:${spec.ports.http}${readiness.path}`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(readiness.body),
@@ -470,35 +698,46 @@ export class TestServer
 
 	async WaitForServer()
 	{
-		const readiness = this.suite.server.readiness;
+		await this.WaitForProgram(this.suite.server, () => this.serverProcess !== null);
+	}
+
+
+	async WaitForProgram(spec, isRunning)
+	{
+		const readiness = spec.readiness;
 		const deadline = Date.now() + readiness.timeoutSeconds * 1000;
 		while (Date.now() < deadline){
-			if (this.serverProcess === null){
-				throw new Error('Server exited before it became ready; see the server logs in the results folder');
+			if (!isRunning()){
+				throw new Error(`${spec.name} exited before it became ready; see its logs in the results folder`);
 			}
 
-			if (await this.IsServerAnswering(readiness)){
+			if (await this.IsServerAnswering(spec)){
 				return;
 			}
 
 			await new Promise((resolve) => setTimeout(resolve, 1000));
 		}
 
-		throw new Error(`Server did not answer within ${readiness.timeoutSeconds} s`);
+		throw new Error(`${spec.name} did not answer within ${readiness.timeoutSeconds} s`);
 	}
 
 
 	async StopServer()
 	{
-		const serverProcess = this.serverProcess;
-		if (serverProcess === null){
+		await this.StopProgram(this.serverProcess);
+	}
+
+
+	async StopProgram(program)
+	{
+		if (program === null){
 			return;
 		}
 
-		const exited = new Promise((resolve) => serverProcess.once('exit', resolve));
-		serverProcess.kill();
+		const exited = new Promise((resolve) => program.once('exit', resolve));
+		program.kill();
 
-		const killTimer = setTimeout(() => serverProcess.kill('SIGKILL'), 10000);
+		const killTimer = setTimeout(() => program.kill('SIGKILL'), 10000);
 		await exited;
 		clearTimeout(killTimer);
 	}
@@ -506,10 +745,16 @@ export class TestServer
 
 	CollectServerLogs()
 	{
-		for (const logFile of this.suite.server.settings.logFiles){
-			const source = path.join(this.settingsFolder, logFile);
-			if (fs.existsSync(source)){
-				fs.copyFileSync(source, path.join(this.resultsDir, path.basename(logFile)));
+		const programs = [
+			{ spec: this.suite.server, settingsFolder: this.settingsFolder },
+			...this.services,
+		];
+		for (const program of programs){
+			for (const logFile of program.spec.settings?.logFiles ?? []){
+				const source = path.join(program.settingsFolder, logFile);
+				if (fs.existsSync(source)){
+					fs.copyFileSync(source, path.join(this.resultsDir, path.basename(logFile)));
+				}
 			}
 		}
 	}

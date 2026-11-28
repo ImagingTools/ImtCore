@@ -8,6 +8,7 @@
 
 // ImtCore includes
 #include <imttest/CEnvironmentDatabaseSettingsComp.h>
+#include <imttest/CEnvironmentIdParamComp.h>
 #include <imttest/CTestInfo.h>
 #include <imttest/CTestMetaInfoCreatorComp.h>
 #include <imttest/CTestDatabaseDelegateComp.h>
@@ -29,6 +30,7 @@ typedef icomp::TModelCompWrap<
 typedef imttest::CTestMetaInfoCreatorComp TestMetaInfoCreator;
 typedef imttest::CTestDatabaseDelegateComp TestDatabaseDelegate;
 using EnvironmentDatabaseSettings = icomp::TModelCompWrap<imttest::CEnvironmentDatabaseSettingsComp>;
+using EnvironmentIdParam = icomp::TModelCompWrap<imttest::CEnvironmentIdParamComp>;
 
 
 } // namespace ImtTestPck

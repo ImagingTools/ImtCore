@@ -15,6 +15,8 @@ FileDialog {
 	property var mimeTypes: []
 
 	property string dataStr: ""
+	// The text to save as it is, in UTF-8. If it is set, dataStr is not used.
+	property string dataText: ""
 
 	function getDialogNameFilterIndex(nameFilters, fileExt){
 		for (let i = 0; i < nameFilters.length; i++){
@@ -67,6 +69,12 @@ FileDialog {
 			let suffix = "." + fileExt
 			let hasSuffix = String(name).length >= suffix.length && String(name).substring(String(name).length - suffix.length) === suffix
 			exportFileIO.source = hasSuffix ? String(name) : name + suffix;
+		}
+
+		if (dataText !== ""){
+			exportFileIO.write(dataText);
+
+			return;
 		}
 
 		let encodedStr = Qt.atob(dataStr);
