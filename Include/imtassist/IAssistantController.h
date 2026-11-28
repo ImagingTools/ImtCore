@@ -35,7 +35,7 @@ namespace imtassist
 
 	\ingroup imtassist
 */
-class IAssistantService: virtual public istd::IPolymorphic
+class IAssistantController: virtual public istd::IPolymorphic
 {
 public:
 	/**

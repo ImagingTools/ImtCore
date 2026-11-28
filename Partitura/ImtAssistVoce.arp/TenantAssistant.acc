@@ -469,7 +469,7 @@
     <ExportedInterfaces>
         <Interface InterfaceId="imtassist::IAssistantActionRegistry" ComponentId="ActionRegistry"/>
         <Interface InterfaceId="imtassist::IAssistantConfigurationStore" ComponentId="ConfigurationStore"/>
-        <Interface InterfaceId="imtassist::IAssistantService" ComponentId="AssistantService"/>
+        <Interface InterfaceId="imtassist::IAssistantController" ComponentId="AssistantService"/>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="AssistantController"/>
     </ExportedInterfaces>
     <ExportedComponents>

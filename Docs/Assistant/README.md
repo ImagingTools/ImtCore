@@ -23,7 +23,7 @@ workflows; it never bypasses permissions or business logic.
 
 | Class | Purpose |
 |---|---|
-| `IAssistantService` / `CAssistantService` | Conversation turns, confirmation and rejection of previews, cancellation. Disabled by default. |
+| `IAssistantController` / `CAssistantService` | Conversation turns, confirmation and rejection of previews, cancellation. Disabled by default. |
 | `IAssistantAction` | Domain function registered by the application: stable ID, description, versioned parameter and result schema, reading or changing. |
 | `CAssistantActionRegistry` | Registry of actions. Only registered actions can be called. |
 | `CParameterSchema` | Strict, versioned schema of a JSON object (parameters, results, UI data). |
@@ -481,7 +481,7 @@ Every message has `formatVersion` (currently `1`), `id`, `kind`, `conversationId
 | `actionPreview` | Prepared change: `previewId`, summary in `text`, `data.targetId`, `data.targetLabel`, `data.changes`, `data.impact`, `data.expiresAt` |
 | `actionExecuted` | Outcome of a confirmed change; `code` is `succeeded`, `failed`, `accessDenied` or `stale` |
 | `status` | For example `previewRejected`, `alreadyProcessed` |
-| `error` | `code` as listed in `IAssistantService` |
+| `error` | `code` as listed in `IAssistantController` |
 
 The UI localizes texts by `code`; the `text` of errors is a technical fallback.
 

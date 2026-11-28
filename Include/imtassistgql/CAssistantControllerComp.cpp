@@ -154,7 +154,7 @@ QJsonObject CAssistantControllerComp::CreateMessagesResponse(const QByteArray& c
 
 QJsonObject CAssistantControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	imtassist::IAssistantService* servicePtr = m_assistantServiceCompPtr.GetPtr();
+	imtassist::IAssistantController* servicePtr = m_assistantServiceCompPtr.GetPtr();
 	if (servicePtr == nullptr){
 		errorMessage = QStringLiteral("The assistant is not available");
 		SendErrorMessage(0, QStringLiteral("No assistant service is configured"), "AssistantController");

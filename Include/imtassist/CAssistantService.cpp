@@ -131,7 +131,7 @@ CActionPreviewStore& CAssistantService::GetPreviewStore()
 }
 
 
-// reimplemented (imtassist::IAssistantService)
+// reimplemented (imtassist::IAssistantController)
 
 bool CAssistantService::IsAvailable(const CAssistantRequestContext& context) const
 {

@@ -2,7 +2,7 @@
 #pragma once
 
 // ImtCore includes
-#include <imtassist/IAssistantService.h>
+#include <imtassist/IAssistantController.h>
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
 
 
@@ -83,7 +83,7 @@ protected:
 	virtual void OnComponentCreated() override;
 
 private:
-	I_REF(imtassist::IAssistantService, m_assistantServiceCompPtr);
+	I_REF(imtassist::IAssistantController, m_assistantServiceCompPtr);
 	I_ATTR(bool, m_allowDemoPrincipalAttrPtr);
 	I_ATTR(QByteArray, m_demoUserIdAttrPtr);
 	I_ATTR(QByteArray, m_demoTenantIdAttrPtr);

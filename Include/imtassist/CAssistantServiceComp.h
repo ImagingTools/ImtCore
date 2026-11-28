@@ -27,7 +27,7 @@ public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CAssistantServiceComp);
-		I_REGISTER_INTERFACE(IAssistantService);
+		I_REGISTER_INTERFACE(IAssistantController);
 		I_ASSIGN(m_isEnabledAttrPtr, "Enabled", "Enable the assistant. While disabled, no request is sent to a provider; overridden by EnabledParam", true, false);
 		I_ASSIGN(m_enabledParamCompPtr, "EnabledParam", "Setting of the server that enables the assistant; Enabled when unset", false, "EnabledParam");
 		I_ASSIGN(m_tenantPolicyCompPtr, "TenantPolicy", "Decision per tenant, e.g. the assistant configuration of the tenant; all tenants when unset", false, "TenantPolicy");
