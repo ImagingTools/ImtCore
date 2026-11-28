@@ -4,6 +4,8 @@ name: TeamCity CI
 on:
   pull_request:
     types: [opened, synchronize, reopened, closed]
+  merge_group:
+    types: [checks_requested]
   push:
     branches:
       - main
